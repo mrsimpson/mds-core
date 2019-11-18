@@ -33,7 +33,7 @@ import {
   isValidAuditIssueCode,
   isValidAuditNote,
   ValidationError
-} from '@mds-core/mds-json-schema'
+} from '@mds-core/mds-schema-validators'
 
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import {

@@ -23,7 +23,7 @@ import {
   isValidProviderId,
   isValidTimestamp,
   isValidNumber
-} from '@mds-core/mds-json-schema'
+} from '@mds-core/mds-schema-validators'
 
 import logger from '@mds-core/mds-logger'
 import db from '@mds-core/mds-db'

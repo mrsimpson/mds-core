@@ -25,7 +25,7 @@ import {
   BadParamsError,
   AlreadyPublishedError
 } from '@mds-core/mds-utils'
-import { policyValidationDetails, geographyValidationDetails } from '@mds-core/mds-json-schema'
+import { policyValidationDetails, geographyValidationDetails } from '@mds-core/mds-schema-validators'
 import log from '@mds-core/mds-logger'
 
 import { checkAccess } from '@mds-core/mds-api-server'

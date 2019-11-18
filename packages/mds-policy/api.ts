@@ -19,7 +19,7 @@ import express from 'express'
 import { Policy, UUID } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import { now, pathsFor, NotFoundError, isUUID } from '@mds-core/mds-utils'
-import { policySchemaJson } from '@mds-core/mds-json-schema'
+import { policySchemaJson } from '@mds-core/mds-schema-validators'
 import log from '@mds-core/mds-logger'
 import { PolicyApiRequest, PolicyApiResponse } from './types'
 
