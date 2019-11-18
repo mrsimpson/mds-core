@@ -18,9 +18,9 @@ import express from 'express'
 import uuid from 'uuid'
 import log from '@mds-core/mds-logger'
 import urls from 'url'
+import { pathsFor, seconds, AuthorizationError, ConflictError, NotFoundError, ServerError } from '@mds-core/mds-utils'
+
 import {
-  pathsFor,
-  seconds,
   isValidAuditDeviceId,
   isValidAuditEventId,
   isValidAuditEventType,
@@ -32,12 +32,9 @@ import {
   isValidVehicleEventType,
   isValidAuditIssueCode,
   isValidAuditNote,
-  ValidationError,
-  AuthorizationError,
-  ConflictError,
-  NotFoundError,
-  ServerError
-} from '@mds-core/mds-utils'
+  ValidationError
+} from '@mds-core/mds-json-schema'
+
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import {
   AUDIT_EVENT_TYPES,

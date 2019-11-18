@@ -30,6 +30,7 @@
     "@mds-core/mds-providers": "0.1.24",
     "@mds-core/mds-types": "0.1.21",
     "@mds-core/mds-utils": "0.1.24",
+    "@mds-core/mds-json-schema": "0.1.1",
     "express": "4.17.1",
     "uuid": "3.3.3"
   },
