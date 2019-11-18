@@ -43,6 +43,13 @@ export class RuntimeError extends BaseError {
 }
 
 /* istanbul ignore next */
+export class ValidationError extends BaseError {
+  public constructor(error?: Error | string, public info?: unknown) {
+    super('ValidationError', reason(error))
+  }
+}
+
+/* istanbul ignore next */
 export class BadParamsError extends BaseError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('BadParamsError', reason(error))

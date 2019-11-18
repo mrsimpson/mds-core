@@ -36,7 +36,9 @@ import {
   StringifiedEventWithTelemetry,
   StringifiedCacheReadDeviceResult
 } from '@mds-core/mds-cache/types'
-import { ValidationError } from './exceptions'
+import { ValidationError } from '@mds-core/mds-utils'
+
+export { ValidationError }
 
 interface ValidatorOptions {
   property: string
