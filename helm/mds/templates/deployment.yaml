@@ -39,7 +39,9 @@ spec:
           protocol: TCP
         env:
           - name: PORT
-            value: "4000"
+            value: {{ $api.port | quote }}
+          - name: EVENT_SOURCE
+            value: cloudevents
           - name: PATH_PREFIX
             value: {{ $api.pathPrefix }}
           - name: TIMEZONE
@@ -48,6 +50,8 @@ spec:
             value: {{ $.Values.postgresql.postgresqlUsername }}
           - name: PG_NAME
             value: {{ $.Values.postgresql.postgresqlDatabase }}
+          - name: PG_PREFIX
+            value: reports_
           - name: PG_PASS
             valueFrom:
               secretKeyRef:
@@ -83,7 +87,7 @@ spec:
           - name: CE_NAME
             value: {{ $name }}
           - name: SINK
-            value: http://default-broker.{{ $.Release.Namespace }}.svc.cluster.local
+            value: http://default-broker.{{ $.Release.Namespace }}.svc.cluster.local/
           {{- end }}
           {{- if $.Values.slack.channel }}
           - name: SLACK_CHANNEL
@@ -113,3 +117,6 @@ data:
   postgresql-password: {{ .Values.postgresql.password | b64enc }}
   {{- end }}
 type: Opaque
+data:
+  postgresql-password: {{ $.Values.pgPass | b64enc }}
+{{- end}}

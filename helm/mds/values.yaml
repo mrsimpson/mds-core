@@ -43,7 +43,38 @@ apis:
     pathPrefix: /policy-author
     version: latest
     migration: false
-useEvents: false
+    useCache: true
+    useEvents: true
+  mds-event-processor:
+    enabled: true
+    port: 80
+    version: latest
+    useDB: true
+    migration: false
+    useCache: true
+    useEvents: true
+    triggeredBy:
+      trigger: [mds.event, mds.telemetry]
+  mds-trip-processor:
+    enabled: true
+    port: 80
+    version: latest
+    useDB: true
+    migration: false
+    useCache: true
+    useEvents: true
+    triggeredBy:
+      cron: "0 * * * *"
+  mds-provider-processor:
+    enabled: true
+    port: 80
+    version: latest
+    useDB: true
+    migration: false
+    useCache: true
+    useEvents: true
+    triggeredBy:
+      cron: "0 * * * *"
 timezone: America/Los_Angeles
 registry:
 useLatestImage: true
