@@ -9,7 +9,7 @@ spec:
     apiVersion: v1
     kind: Service
     name: mds-trip-processor
----
+---    
 apiVersion: sources.eventing.knative.dev/v1alpha1
 kind: CronJobSource
 metadata:

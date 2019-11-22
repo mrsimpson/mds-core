@@ -1,13 +1,9 @@
-import { VehicleEvent, Device, Telemetry } from "@mds-core/mds-types"
-import log from "@mds-core/mds-logger"
+import { VehicleEvent, Device, Telemetry } from '@mds-core/mds-types'
+import log from '@mds-core/mds-logger'
 
-import { dropTables, updateSchema } from "./migration"
-import { MDSPostgresClient } from "./sql-utils"
-import {
-  getReadOnlyClient,
-  getWriteableClient,
-  makeReadOnlyQuery
-} from "./client"
+import { dropTables, updateSchema } from './migration'
+import { MDSPostgresClient } from './sql-utils'
+import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
 
 import {
   readDeviceByVehicleId,
@@ -19,7 +15,7 @@ import {
   wipeDevice,
   getVehicleCountsPerProvider,
   getNumVehiclesRegisteredLast24HoursByProvider
-} from "./devices"
+} from './devices'
 
 import {
   writeEvent,
@@ -32,12 +28,13 @@ import {
   getNumEventsLast24HoursByProvider,
   getMostRecentEventByProvider,
   readEventsWithTelemetry
-} from "./events"
+} from './events'
 
 import {
   readPolicies,
   writePolicy,
   readPolicy,
+  findPoliciesByGeographyID,
   editPolicy,
   deletePolicy,
   writePolicyMetadata,
@@ -47,7 +44,7 @@ import {
   publishPolicy,
   readRule,
   isPolicyPublished
-} from "./policies"
+} from './policies'
 
 import {
   writeGeographyMetadata,
@@ -62,41 +59,27 @@ import {
   deleteGeography,
   isGeographyPublished,
   editGeography
-} from "./geographies"
+} from './geographies'
 
-import {
-  readAudit,
-  readAudits,
-  writeAudit,
-  deleteAudit,
-  readAuditEvents,
-  writeAuditEvent
-} from "./audits"
+import { readAudit, readAudits, writeAudit, deleteAudit, readAuditEvents, writeAuditEvent } from './audits'
 
-import {
-  writeTrips,
-  updateTrip,
-  readTrips,
-  readTripList,
-  readTripIds,
-  getLatestTripTime,
-  getTripEventsLast24HoursByProvider,
-  getTripCountsPerProviderSince
-} from "./trips"
+import { readTripIds, getTripEventsLast24HoursByProvider, getTripCountsPerProviderSince } from './trips'
 
 import {
   readTelemetry,
   writeTelemetry,
   getTelemetryCountsPerProviderSince,
   getMostRecentTelemetryByProvider
-} from "./telemetry"
+} from './telemetry'
 
 import {
-  writeStatusChanges,
-  readStatusChanges,
-  readUnprocessedStatusChangeEvents,
-  getLatestStatusChangeTime
-} from "./status_changes"
+  deleteAttachment,
+  deleteAuditAttachment,
+  readAttachmentsForAudit,
+  readAuditAttachments,
+  writeAttachment,
+  writeAuditAttachment
+} from './attachments'
 
 import schema from "./schema"
 import { TABLE_NAME } from "./schema"
@@ -106,9 +89,10 @@ async function initialize() {
   await dropTables(client)
   await updateSchema(client)
   await getReadOnlyClient()
-  return "postgres"
+  return 'postgres'
 }
 
+//TODO: break out into imported file
 function commaize(array: ReadonlyArray<string>, quote = `'`, join = ","): any {
   return array.map((val: any) => `${stringify(val, quote)}`).join(join)
 }
@@ -168,7 +152,6 @@ async function runQuery(query: any) {
   return results.rows
 }
 
-//TODO: break out into imported file
 async function getStates(
   provider_id: any,
   start_time: any = 0,
@@ -250,12 +233,9 @@ async function resetTable(table_name: TABLE_NAME) {
  */
 async function health(): Promise<{
   using: string
-  stats: {
-    current_running_queries: number
-    cache_hit_result: { heap_read: string; heap_hit: string; ratio: string }
-  }
+  stats: { current_running_queries: number; cache_hit_result: { heap_read: string; heap_hit: string; ratio: string } }
 }> {
-  log.info("postgres health check")
+  log.info('postgres health check')
   const currentQueriesSQL = `SELECT query
     FROM pg_stat_activity
     WHERE query <> '<IDLE>' AND query NOT ILIKE '%pg_stat_activity%' AND query <> ''
@@ -270,7 +250,7 @@ async function health(): Promise<{
       FROM pg_statio_user_tables;`
   const [cacheHitResult] = await makeReadOnlyQuery(cacheHitQuery)
   return {
-    using: "postgres",
+    using: 'postgres',
     stats: {
       current_running_queries: currentQueriesResult.length,
       cache_hit_result: cacheHitResult
@@ -289,7 +269,7 @@ async function shutdown(): Promise<void> {
     const readOnlyClient = await getReadOnlyClient()
     await readOnlyClient.end()
   } catch (err) {
-    await log.error("error during disconnection", err.stack)
+    await log.error('error during disconnection', err.stack)
   }
 }
 
@@ -302,30 +282,24 @@ async function seed(data: {
   telemetry?: Telemetry[]
 }) {
   if (data) {
-    log.info("postgres seed start")
+    log.info('postgres seed start')
     if (data.devices) {
-      await Promise.all(
-        data.devices.map(async (device: Device) => writeDevice(device))
-      )
+      await Promise.all(data.devices.map(async (device: Device) => writeDevice(device)))
     }
-    log.info("postgres devices seeded")
-    if (data.events)
-      await Promise.all(
-        data.events.map(async (event: VehicleEvent) => writeEvent(event))
-      )
-    log.info("postgres events seeded")
+    log.info('postgres devices seeded')
+    if (data.events) await Promise.all(data.events.map(async (event: VehicleEvent) => writeEvent(event)))
+    log.info('postgres events seeded')
     if (data.telemetry) {
       await writeTelemetry(data.telemetry)
     }
-    log.info("postgres seed done")
+    log.info('postgres seed done')
     return Promise.resolve()
   }
-  return Promise.resolve("no data")
+  return Promise.resolve('no data')
 }
 
 export = {
   initialize,
-  health,
   getStates,
   getTripCount,
   getVehicleTripCount,
@@ -333,6 +307,7 @@ export = {
   getTrips,
   insert,
   resetTable,
+  health,
   seed,
   startup,
   shutdown,
@@ -355,10 +330,12 @@ export = {
   deleteAudit,
   readAuditEvents,
   writeAuditEvent,
-  writeTrips,
-  updateTrip,
-  readTrips,
-  readTripList,
+  deleteAttachment,
+  deleteAuditAttachment,
+  readAttachmentsForAudit,
+  readAuditAttachments,
+  writeAttachment,
+  writeAuditAttachment,
   readGeographies,
   readGeographySummaries,
   writeGeography,
@@ -367,6 +344,7 @@ export = {
   isGeographyPublished,
   editGeography,
   readPolicies,
+  findPoliciesByGeographyID,
   writePolicy,
   readPolicy,
   editPolicy,
@@ -383,13 +361,9 @@ export = {
   publishPolicy,
   isPolicyPublished,
   readRule,
-  writeStatusChanges,
-  readStatusChanges,
   getEventCountsPerProviderSince,
   getTelemetryCountsPerProviderSince,
   getTripCountsPerProviderSince,
-  getLatestTripTime,
-  getLatestStatusChangeTime,
   getNumVehiclesRegisteredLast24HoursByProvider,
   getMostRecentEventByProvider,
   getVehicleCountsPerProvider,
@@ -397,7 +371,6 @@ export = {
   getMostRecentTelemetryByProvider,
   getTripEventsLast24HoursByProvider,
   getEventsLast24HoursPerProvider,
-  readUnprocessedStatusChangeEvents,
   readEventsWithTelemetry,
   readTripIds,
   readEventsForStatusChanges

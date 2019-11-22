@@ -2,22 +2,25 @@ import { csv, now } from '@mds-core/mds-utils'
 
 import log from '@mds-core/mds-logger'
 import schema, { COLUMN_NAME, TABLE_NAME } from './schema'
-import { logSql, SqlExecuter, MDSPostgresClient, cols_sql, SqlExecuterFunction } from './sql-utils'
+import { SqlExecuter, MDSPostgresClient, cols_sql, SqlExecuterFunction } from './sql-utils'
 
 const MIGRATIONS = [
   'createMigrationsTable',
   'alterGeographiesColumns',
   'alterAuditEventsColumns',
-  'alterPreviousGeographiesColumn'
+  'alterPreviousGeographiesColumn',
+  'dropDeprecatedProviderTables',
+  'dropReadOnlyGeographyColumn',
+  'dropAuditEventsColumns'
 ] as const
 type MIGRATION = typeof MIGRATIONS[number]
 
 // drop tables from a list of table names
 async function dropTables(client: MDSPostgresClient) {
-  const drop = `DROP TABLE IF EXISTS ${csv(schema.TABLES)};`
-  await logSql(drop)
-  await client.query(drop)
-  await log.info('postgres drop table succeeded')
+  const exec = SqlExecuter(client)
+  const drop = csv(schema.DEPRECATED_PROVIDER_TABLES.concat(schema.TABLES))
+  await exec(`DROP TABLE IF EXISTS ${drop};`)
+  await log.info(`postgres drop table succeeded: ${drop}`)
 }
 
 // Add a foreign key if it doesn't already exist
@@ -112,7 +115,7 @@ async function doMigration(
   migration: MIGRATION,
   migrate: (exec: SqlExecuterFunction) => Promise<void>
 ) {
-  const { PG_MIGRATIONS } = process.env
+  const { PG_MIGRATIONS, PG_DEBUG } = process.env
   const migrations = PG_MIGRATIONS ? PG_MIGRATIONS.split(',') : []
   if (migrations.includes('true') || migrations.includes(migration)) {
     const { rowCount } = await exec(
@@ -125,6 +128,7 @@ async function doMigration(
             schema.TABLE_COLUMNS.migrations
           )}) VALUES ('${migration}', ${now()})`
         )
+        process.env.PG_DEBUG = 'true'
         try {
           await log.warn('Running migration', migration)
           await migrate(exec)
@@ -132,6 +136,7 @@ async function doMigration(
         } catch (err) {
           await log.error('Migration', migration, 'failed', err)
         }
+        process.env.PG_DEBUG = PG_DEBUG
       } catch {
         /* Another process is running this migration */
       }
@@ -154,20 +159,34 @@ async function alterGeographiesColumnsMigration(exec: SqlExecuterFunction) {
 
 async function alterAuditEventsColumnsMigration(exec: SqlExecuterFunction) {
   await exec(
-    `ALTER TABLE ${schema.TABLE.audit_events} ADD COLUMN ${schema.COLUMN.provider_event_id} ${schema.COLUMN_TYPE.provider_event_id}`
+    `ALTER TABLE ${schema.TABLE.audit_events} ADD COLUMN provider_event_id bigint`
   )
   await exec(
-    `ALTER TABLE ${schema.TABLE.audit_events} ADD COLUMN ${schema.COLUMN.provider_event_type} ${schema.COLUMN_TYPE.provider_event_type}`
+    `ALTER TABLE ${schema.TABLE.audit_events} ADD COLUMN provider_event_type varchar(31)`
   )
   await exec(
-    `ALTER TABLE ${schema.TABLE.audit_events} ADD COLUMN ${schema.COLUMN.provider_event_type_reason} ${schema.COLUMN_TYPE.provider_event_type_reason}`
+    `ALTER TABLE ${schema.TABLE.audit_events} ADD COLUMN provider_event_type_reason varchar(31)`
   )
 }
 
 async function alterPreviousGeographiesColumnMigration(exec: SqlExecuterFunction) {
   await exec(
-    `ALTER TABLE ${schema.TABLE.geographies} RENAME COLUMN previous_geographies ${schema.COLUMN.prev_geographies}`
+    `ALTER TABLE ${schema.TABLE.geographies} RENAME COLUMN previous_geographies TO ${schema.COLUMN.prev_geographies}`
   )
+}
+
+async function dropDeprecatedProviderTablesMigration(exec: SqlExecuterFunction) {
+  await exec(`DROP TABLE IF EXISTS ${csv(schema.DEPRECATED_PROVIDER_TABLES)};`)
+}
+
+async function dropReadOnlyGeographyColumnMigration(exec: SqlExecuterFunction) {
+  await exec(`ALTER TABLE ${schema.TABLE.geographies} DROP COLUMN read_only`)
+}
+
+async function dropAuditEventsColumnsMigration(exec: SqlExecuterFunction) {
+  await exec(`ALTER TABLE ${schema.TABLE.audit_events} DROP COLUMN provider_event_id`)
+  await exec(`ALTER TABLE ${schema.TABLE.audit_events} DROP COLUMN provider_event_type`)
+  await exec(`ALTER TABLE ${schema.TABLE.audit_events} DROP COLUMN provider_event_type_reason`)
 }
 
 async function doMigrations(client: MDSPostgresClient) {
@@ -178,6 +197,9 @@ async function doMigrations(client: MDSPostgresClient) {
   await doMigration(exec, 'alterGeographiesColumns', alterGeographiesColumnsMigration)
   await doMigration(exec, 'alterAuditEventsColumns', alterAuditEventsColumnsMigration)
   await doMigration(exec, 'alterPreviousGeographiesColumn', alterPreviousGeographiesColumnMigration)
+  await doMigration(exec, 'dropDeprecatedProviderTables', dropDeprecatedProviderTablesMigration)
+  await doMigration(exec, 'dropReadOnlyGeographyColumn', dropReadOnlyGeographyColumnMigration)
+  await doMigration(exec, 'dropAuditEventsColumns', dropAuditEventsColumnsMigration)
 }
 
 async function updateSchema(client: MDSPostgresClient) {

@@ -51,12 +51,25 @@ function getBinding() {
 }
 
 async function writeCloudEvent(type: string, data: string) {
+  if (!env.SINK) {
+    return
+  }
+  
   const cloudevent = new Cloudevent(Cloudevent.specs['0.2'])
     .type(type)
     .source(env.CE_NAME)
     .data(data)
 
   return getBinding().emit(cloudevent)
+  /*.then(response => {
+    // Treat the response
+    console.log(response.data);
+
+  }).catch(err => {
+    // Deal with errors
+    console.error(err);
+  });
+  */
 }
 
 declare module 'redis' {
@@ -301,6 +314,7 @@ export = {
   reset,
   shutdown,
   startup,
+  writeCloudEvent,
   writeDevice,
   writeEvent,
   writeStream,

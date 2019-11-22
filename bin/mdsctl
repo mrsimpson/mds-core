@@ -54,45 +54,45 @@ declare -A configs=(
   ["os"]="${MDS_OS:-`uname`}"
   ["rc"]="${MDS_RC:-~/.bashrc ~/.zshrc}"
   ["workdir"]="/tmp/mds/tools"
-  ["brew"]="${MDS_BREW:-oq jq gettext yarn nvm kubernetes-helm k9s pgcli redis git}"
+  ["brew"]="${MDS_BREW:-oq jq gettext yarn nvm kubernetes-helm pgcli redis git}"
   ["tools"]="${MDS_TOOLCHAIN:-kubernetes-helm,pgcli}"
   ["image-repository"]="${MDS_IMAGE_REPOSITORY:-}"
   ["simulator-repository"]="${MDS_SIMULATOR_REPOSITORY:-}"
   ["bootstrap"]="${MDS_BOOTSTRAP:-helm,istio}"
   ["install"]="${MDS_INSTALL:-mds}"
   ["test"]="${MDS_TEST:-unit,integration}"
-  ["uninstall"]="${MDS_UNINSTALL:-logging,mds,istio,helm}"
+  ["uninstall"]="${MDS_UNINSTALL:-bookinfo,logging,mds,istio,helm}"
   ["forward"]="${MDS_FORWARD:-default}"
   ["token"]="${MDS_TOKEN:-dashboard}"
   ["reinstall"]="${MDS_REINSTALL:-mds}"
   ["pause"]="${MDS_PAUSE:-3}"
-  ["istio-version"]="${MDS_ISTIO_VERSION:-1.2.6}" #3.0}" # fixme: 1.3.0 istio-system pods stop at INIT at times
+  ["istio-repository"]= 
+  ["istio-version"]="${MDS_ISTIO_VERSION:-1.0.7}" #3.0}" # fixme: 1.3.0 istio-system pods stop at INIT at times
   ["istio-profile"]="${MDS_ISTIO_PROFILE:--istio-sds-auth}"
   ["istio"]="${MDS_ISTIO_PATH:-${configs[workdir]}/istio-${configs[istio-version]}}"
   ["simulator"]="${MDS_SIMULATOR:-${configs[workdir]}/simulator}"
   ["ingress-domain"]="${MDS_INGRESS_DOMAIN:-}"
   ["ingress-gateway-key-path"]="${MDS_INGRESS_GATEWAY_KEY_PATH:-}"
   ["ingress-gateway-certificate-path"]="${MDS_INGRESS_GATEWAY_CERTIFICATE_PATH:-}"
+  ["values"]="${MDS_VALUES:-}"
+  ["values-mds"]="${MDS_VALUES_MDS:-}"
+  ["presets"]="${MDS_PRESETS:-}"
+  ["presets-mds"]="${MDS_PRESETS_MDS:-pgPass=Password123#,apis.mds-agency.migration=true}"
+  ["sets"]="${MDS_SETS:-}"
+  ["sets-mds"]="${MDS_SETS_MDS:-}"
+  ["sets-logging"]="${MDS_SETS_LOGGING:=fluentbit.backend.es.host=elasticsearch-master.util,fluentbit.backend.es.port=9200,fluentbit.backend.es.tls=off,kibana.env.ELASTICSEARCH_URL=http:elasticsearch-master.util:9200}"
+  ["setfiles"]="${MDS_SET_FILES:-}"
+  ["setfiles-mds"]="${MDS_SET_FILES_MDS:-}"
   ["namespace"]="${MDS_NAMESPACE:-default}"
   ["namespace-metrics-adapter"]="${MDS_NAMESPACE_METRICS_ADAPTER:-util}"
   ["namespace-dashboard"]="${MDS_NAMESPACE_LOGGING:-dashboard}"
   ["namespace-logging"]="${MDS_NAMESPACE_LOGGING:-util}"
   ["namespace-mds"]="${MDS_NAMESPACE_MDS:-mds}"
-  ["values"]="${MDS_VALUES:-}"
-  ["values-mds"]="${MDS_VALUES_MDS:-}"
-  ["presets"]="${MDS_PRESETS:-}"
-  ["presets-mds"]="${MDS_PRESETS_MDS:-postgresql.password=Password123#,apis.mds-agency.migration=true}"
-  ["sets"]="${MDS_SETS:-}"
-  ["sets-mds"]="${MDS_SETS_MDS:-}"
-  ["sets-logging"]="${MDS_SETS_LOGGING:-fluentbit.backend.es.host=elasticsearch-master.util,fluentbit.backend.es.port=9200,fluentbit.backend.es.tls=off,kibana.env.ELASTICSEARCH_URL=http:elasticsearch-master.util:9200}"
-  ["sets-simulator"]="${MDS_SETS_SIMULATOR:-host=http://mds-agency.${configs[namespace-mds]}.svc.cluster.local:4000/agency}"
-  ["setfiles"]="${MDS_SET_FILES:-}"
-  ["setfiles-mds"]="${MDS_SET_FILES_MDS:-}"
   ["dryrun"]="${MDS_DRY_RUN:-}"
   ["quiet"]="${MDS_QUIET:-}")
 declare -A helmRepositories=(
   ["stable"]="https://kubernetes-charts.storage.googleapis.com"
-  ["istio.io"]="https://storage.googleapis.com/istio-release/releases/${configs[istio-version]}/charts"
+  ["istio.io"]="https://storage.googleapis.com/istio-release/releases/1.0.7/charts/"
   ["banzaicloud-stable"]="https://kubernetes-charts.banzaicloud.com"
   ["elastic"]="https://helm.elastic.co")
 declare -A apps=(
@@ -111,7 +111,8 @@ declare -A apps=(
   ["kibana"]="http://localhost:[port],util,app"
   ["prometheus"]="http://localhost:[port],istio-system,app"
   ["jaeger"]="http://localhost:[port],istio-system,app,jaeger,16686"
-  ["kiali"]="http://localhost:[port],istio-system,app,kiali,20001")
+  ["kiali"]="http://localhost:[port],istio-system,app,kiali,20001"
+  ["bookinfo"]="http://localhost:[port],booking,app")
 yellow=`tput setaf 3`
 red=`tput setaf 9`
 reset=`tput sgr0`
@@ -177,6 +178,7 @@ where service in:
   metricsAdapter
   logging
   metrics
+  bookinfo
 
 where app in:
   mds-agency
@@ -195,6 +197,7 @@ where app in:
   prometheus                                          : prometheus; see https://prometheus.io
   jaeger                                              : jaeger; see https://www.jaegertracing.io
   kiali                                               : kiali; see https://www.kiali.io
+  bookinfo                                            : bookinfo; see https://istio.io/docs/examples/bookinfo
 
 example:
   % ./bin/$(basename ${0}) bootstrap build install:mds test:integration
@@ -263,6 +266,7 @@ build() {
     yarn;
     yarn image)
 
+  docker rmi $(docker images -f 'dangling=true' -q) > /dev/null 2>&1 || warn "Could not delete all pods tagged 'None'"
   installImages
 }
 
@@ -291,20 +295,6 @@ getBranchSuffix() {
   echo ${suffix}
 }
 
-# TODO: DRY
-templateDockerCompose() {
-  suffix=$(getBranchSuffix)
-  for directory in container-images/mds-*; do
-    api=$(basename $directory)
-    version=$(jq -r '.version' < $directory/package.json)
-    varname="$(echo $api | sed -e 's/^mds-//' -e 's/-/_/g' | tr a-z A-Z)_VERSION"
-    export $varname=${version}${suffix}
-  done
-  envsubst < docker-compose.yml.tpl > docker-compose.yml
-  echo "Wrote docker-compose.yml"
-}
-
-# TODO: DRY
 templateValues() {
   suffix=$(getBranchSuffix)
   for directory in container-images/mds-*; do
@@ -314,7 +304,7 @@ templateValues() {
     export $varname=${version}${suffix}
   done
   mkdir -p dist
-  envsubst < helm/mds/values.yaml.tpl > dist/values.yaml
+  envsubst < helm/mds/values.yaml.tpl > dist/values.html
   echo "Wrote dist/values.yaml"
 }
 
@@ -425,24 +415,23 @@ installIstio() {
   fi
 
   kubectl get namespace istio-system > /dev/null 2>&1 || {
-    ${configs[istio]}/bin/istioctl verify-install || error "istio verify installation failure"
+    kubectl apply -f ${configs[istio]}/install/kubernetes/helm/helm-service-account.yaml
+    helm init --service-account tiller
+    helm install ${configs[istio]}/install/kubernetes/helm/istio --name istio --namespace istio-system
+  }
+}
 
-    installNamespace istio-system
-    pause 2
-    helm install ${configs[istio]}/install/kubernetes/helm/istio-init \
-      --name istio-init --namespace istio-system \
-      ${configs[dryrun]:+--dry-run}
-    # todo: query pod status
-    pause 5
-
-    (( $(kubectl get crds | grep "istio.io" | wc -l) == 23 )) && \
-      echo "istio successfully installed" || echo "istio installation failure"
-
-    helm install ${configs[istio]}/install/kubernetes/helm/istio \
-      --name istio --namespace istio-system \
-      --values ${configs[istio]}/install/kubernetes/helm/istio/values${configs[istio-profile]}.yaml \
-      ${configs[dryrun]:+--dry-run}
-    labelNamespaceIstioInjection default
+installEventing() {
+  check ${FUNCNAME[0]}
+  
+  kubectl get namespace knative-eventing > /dev/null 2>&1 || {
+	kubectl apply --selector knative.dev/crd-install=true -f https://github.com/knative/eventing/releases/download/v0.6.0/eventing.yaml
+	kubectl apply -f https://github.com/knative/eventing/releases/download/v0.6.0/eventing.yaml
+  }
+  kubectl get namespace natss > /dev/null 2>&1 || {
+    kubectl create namespace natss
+	kubectl apply -n natss -f https://raw.githubusercontent.com/knative/eventing/da72a315ff8375cb1176c6f1d5fc34c53662ee76/contrib/natss/config/broker/natss.yaml
+    kubectl apply -f https://github.com/knative/eventing/releases/download/v0.6.0/natss.yaml
   }
 }
 
@@ -481,9 +470,12 @@ installMetrics() {
 
 imageVersion() {
   for s in $(services); do
-    is+="${is:+,}sets-mds+=apis.${s}.version=$(docker images ${s} --format {{.Tag}})"
-  done; unset s mi
-
+	echo here
+	echo s
+    di=$(docker images ${s} --format {{.Tag}})
+    [ ${#di} -ge 1 ] && \
+      is+="${is:+,}sets-mds+=apis.${s}.version=$(docker images ${s} --format {{.Tag}})"
+  done; unset s di
   echo ${is}
 }
 
@@ -505,7 +497,12 @@ installMds() {
       ${configs[setfiles]:+$(helmOptions set-file ${configs[setfiles]})} \
       ${configs[setfiles-mds]:+$(helmOptions set-file ${configs[setfiles-mds]})} \
       ${configs[dryrun]:+--dry-run --debug}
-    pause 12
+	pause 12
+	# create broker eventing filter
+    kubectl -n mds create serviceaccount eventing-broker-filter
+    kubectl -n mds create rolebinding eventing-broker-filter \
+      --clusterrole=eventing-broker-filter \
+      --serviceaccount=mds:eventing-broker-filter
   }
 }
 
@@ -553,13 +550,20 @@ installSimulator() {
   (cd ${configs[simulator]};
     git pull;
     docker build -t trackgen .;
-    helm install ./helm --name trackgen \
-      ${configs[values]:+$(helmOptions values ${configs[values]})} \
-      ${configs[presets]:+$(helmOptions set ${configs[presets]})} \
-      ${configs[sets]:+$(helmOptions set ${configs[sets]})} \
-      ${configs[sets-simulator]:+$(helmOptions set ${configs[sets-simulator]})} \
-      ${configs[setfiles]:+$(helmOptions set-file ${configs[setfiles]})} \
-      ${configs[dryrun]:+--dry-run --debug})
+    helm install ./helm --name trackgen)
+}
+
+installBookinfo() {
+  check ${FUNCNAME[0]}
+
+  kubectl get namespace bookinfo-app > /dev/null 2>&1 || {
+    installNamespace bookinfo-app
+    labelNamespaceIstioInjection bookinfo-app
+    kubectl apply -n bookinfo-app -f ${configs[istio]}/samples/bookinfo/platform/kube/bookinfo.yaml \
+      ${configs[dryrun]:+--dry-run}
+    kubectl apply -n bookinfo-app -f ${configs[istio]}/samples/bookinfo/networking/destination-rule-all.yaml \
+      ${configs[dryrun]:+--dry-run}
+  }
 }
 
 testUnit() {
@@ -687,6 +691,10 @@ uninstallNamespace() {
   done; unset ns
 }
 
+uninstallBookinfo() {
+  uninstallNamespace bookinfo-app
+}
+
 uninstallSimulator() {
   check ${FUNCNAME[0]}
 
@@ -711,6 +719,8 @@ uninstallMetricsAdapter() {
 
 uninstallMds() {
   check ${FUNCNAME[0]}
+  kubectl -n mds delete rolebinding eventing-broker-filter
+  kubectl -n mds delete serviceaccount eventing-broker-filter
   helm delete --purge mds ${configs[dryrun]:+--dry-run}
   uninstallNamespace ${configs[namespace-mds]}
 }
@@ -738,15 +748,19 @@ uninstallKiali() {
 }
 
 uninstallIstio() {
-  kubectl get namespace istio-system > /dev/null 2>&1 && {
-    check ${FUNCNAME[0]}
-    helm delete --purge istio ${configs[dryrun]:+--dry-run}
-    helm delete --purge istio-init ${configs[dryrun]:+--dry-run}
-    kubectl delete namespace istio-system ${configs[dryrun]:+--dry-run}
-    kubectl delete -f ${configs[istio]}/install/kubernetes/helm/istio-init/files \
-      ${configs[dryrun]:+--dry-run} > /dev/null
-  }
-  [[ -d ${configs[istio]} && -z "${configs[dryrun]}" ]] && echo "/bin/rm -rf ${configs[istio]}"
+  helm delete --purge istio
+  kubectl delete -f ${configs[istio]}/install/kubernetes/helm/istio/templates/crds.yaml -n istio-system
+  #helm template ${configs[istio]}/install/kubernetes/helm/istio --name istio --namespace istio-system | kubectl delete -f -
+  #helm delete --purge istio-init
+  kubectl get namespace istio-system > /dev/null 2>&1 && kubectl delete namespace istio-system \
+    ${configs[dryrun]:+--dry-run}
+}
+
+uninstallEventing() {
+  kubectl delete -f https://github.com/knative/eventing/releases/download/v0.6.0/natss.yaml
+  kubectl delete -n natss -f https://raw.githubusercontent.com/knative/eventing/da72a315ff8375cb1176c6f1d5fc34c53662ee76/contrib/natss/config/broker/natss.yaml
+  kubectl delete namespace natss
+  kubectl delete -f https://github.com/knative/eventing/releases/download/v0.6.0/eventing.yaml
 }
 
 uninstallDashboard() {
@@ -863,6 +877,7 @@ normalize() {
 configure() {
   if [[ ${1} == *"="* ]]; then
     for c in $(echo ${1} | tr ',' ' '); do
+	  echo ${c}
       k=$(echo ${c} | cut -d '=' -f 1)
       v=$(echo ${c} | cut -d '=' -f 2-)
 
@@ -899,6 +914,19 @@ preset() {
       minimal)
         preset $(normalize "disable,no-events,local,no-persistence")
         is+="${is:+,}sets-mds+=apis.mds-agency.enabled=true";;
+	  eventing)
+		preset $(normalize "disable,local,no-persistence")
+		is+="${is:+,}sets-mds+=apis.mds-agency.enabled=true"
+		is+="${is:+,}sets-mds+=apis.mds-event-processor.enabled=true"
+		is+="${is:+,}sets-mds+=apis.mds-trip-processor.enabled=true"
+		is+="${is:+,}sets-mds+=apis.mds-provider-processor.enabled=true";;
+	  wsl)
+	    is+="${is:+,}sets-mds+=postgresql.internal=false"
+		is+="${is:+,}sets-mds+=postgresql.host=host.docker.internal"
+		is+="${is:+,}sets-mds+=postgresql.hostReader=host.docker.internal"
+		is+="${is:+,}sets-mds+=redis.internal=false"
+		is+="${is:+,}sets-mds+=redis.host=host.docker.internal"
+	    
     esac
   done; unset p
 
@@ -944,7 +972,6 @@ for arg in "${@:$OPTIND}"; do
     build) build || usage "${arg} failure";;
     buildImage) buildImage ${configs[image-name]};;
     templateValues) templateValues;;
-    templateDockerCompose) templateDockerCompose;;
     install:namespace=*) installNamespace "$(normalize ${arg} =)";;
     install) arg="${configs[install]}";&
     install:*) invoke install "$(normalize ${arg})";;
