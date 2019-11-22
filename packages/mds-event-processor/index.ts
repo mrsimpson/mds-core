@@ -3,6 +3,7 @@ import { trip_handler } from './src/proc-trip'
 //import { provider_handler } from './src/proc-provider'
 import db from '@mds-core/mds-db'
 
+// TODO Switch to yargs (see packages/mds-compliance/mds-compliance-cli.ts)
 function getArgs() {
   let args: { [x: string]: any } = {}
   process.argv.slice(2, process.argv.length).forEach(arg => {
@@ -23,7 +24,7 @@ function getArgs() {
   return args
 }
 
-async function process_data(type: string) {
+async function processData(type: string) {
   // just make sure the tables exist
   await db.initialize()
   console.log('INIT')
@@ -48,7 +49,7 @@ async function process_data(type: string) {
 export const main = () => {
   let args = getArgs()
   if (args['type']) {
-    process_data(args['type'])
+    processData(args['type'])
   } else {
     console.error('no type specified!')
   }

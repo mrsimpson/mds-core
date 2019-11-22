@@ -1,11 +1,9 @@
-import { data_handler } from './proc'
+import { dataHandler } from './proc'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import stream from '@mds-core/mds-stream'
-
-let { calcTotalDist } = require('./geo/geo')
-
 import log from 'loglevel'
+const { calcTotalDist } = require('./geo/geo')
 
 /*
     Trip processor api that runs inside a Kubernetes pod, activated via cron job.
@@ -19,7 +17,7 @@ import log from 'loglevel'
           VALUES = trip_data
 */
 async function trip_handler() {
-  await data_handler('trip', async function(type: any, data: any) {
+  await dataHandler('trip', async function(type: any, data: any) {
     trip_aggregator()
   })
 }
