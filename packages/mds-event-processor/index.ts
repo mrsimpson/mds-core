@@ -1,5 +1,5 @@
 import { event_handler } from './src/proc-event'
-import { trip_handler } from './src/proc-trip'
+//import { trip_handler } from './src/proc-trip'
 //import { provider_handler } from './src/proc-provider'
 import db from '@mds-core/mds-db'
 
@@ -33,12 +33,12 @@ async function processData(type: string) {
       console.log('EVENT')
       await event_handler()
       break
+    /*
     case 'trip':
       console.log('TRIP')
       await trip_handler()
       break
-    /*
-      case 'provider':
+    case 'provider':
       console.log('PROVIDER')
       await provider_handler()
       break

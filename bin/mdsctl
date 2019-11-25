@@ -470,8 +470,6 @@ installMetrics() {
 
 imageVersion() {
   for s in $(services); do
-	echo here
-	echo s
     di=$(docker images ${s} --format {{.Tag}})
     [ ${#di} -ge 1 ] && \
       is+="${is:+,}sets-mds+=apis.${s}.version=$(docker images ${s} --format {{.Tag}})"
@@ -486,7 +484,7 @@ installMds() {
   kubectl get namespace ${configs[namespace-mds]} > /dev/null 2>&1 || {
     installNamespace ${configs[namespace-mds]}
     labelNamespaceIstioInjection ${configs[namespace-mds]}
-    configure $(imageVersion)
+	configure $(imageVersion)
     helm install ${configs[home]}/helm/mds --name mds --namespace ${configs[namespace-mds]} \
       ${configs[values]:+$(helmOptions values ${configs[values]})} \
       ${configs[values-mds]:+$(helmOptions values ${configs[values-mds]})} \
@@ -550,7 +548,7 @@ installSimulator() {
   (cd ${configs[simulator]};
     git pull;
     docker build -t trackgen .;
-    helm install ./helm --name trackgen)
+    helm install ./helm --name trackgen --namespace mds)
 }
 
 installBookinfo() {

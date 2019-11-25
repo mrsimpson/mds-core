@@ -11,7 +11,7 @@ apis:
   mds-agency:
     enabled: true
     pathPrefix: /agency
-    port: 4001
+    port: 4000
     version: latest
     useDB: true
     migration: false

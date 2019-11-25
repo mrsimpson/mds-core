@@ -18,9 +18,11 @@ import { FeatureCollection } from 'geojson'
 export { AccessTokenScope, AccessTokenScopes, ScopeDescriptions } from './scopes'
 
 export const Enum = <T extends string>(...keys: T[]) =>
-  Object.freeze(keys.reduce((e, key) => {
-    return { ...e, [key]: key }
-  }, {}) as { [K in T]: K })
+  Object.freeze(
+    keys.reduce((e, key) => {
+      return { ...e, [key]: key }
+    }, {}) as { [K in T]: K }
+  )
 
 export const isEnum = (enums: { [key: string]: string }, value: unknown) =>
   typeof value === 'string' && typeof enums === 'object' && enums[value] === value
@@ -34,6 +36,48 @@ export type RULE_TYPE = keyof typeof RULE_TYPES
 export const RULE_UNIT_MAP = {
   minutes: 60,
   hours: 60 * 60
+}
+
+// Event Streaming
+export const CE_TYPES = Enum('mds.event', 'mds.telemetry')
+export type CE_TYPE = keyof typeof CE_TYPES
+
+export interface STATE {
+  vehicle_type: VEHICLE_TYPE
+  type: string
+  timestamp: Timestamp
+  device_id: UUID
+  provider_id: UUID
+  time_recorded: Timestamp
+  annotation_version: number
+  annotation?: any | null
+  gps?: { [x: string]: number } | null
+  service_area_id?: UUID | null
+  charge?: number | null
+  state?: VEHICLE_STATUS | null
+  event_type?: VEHICLE_EVENT | string | null
+  event_type_reason?: VEHICLE_REASON | null
+  trip_id?: UUID | null
+}
+
+export interface TRIP_EVENT {
+  vehicle_type: VEHICLE_TYPE
+  timestamp: Timestamp
+  event_type: VEHICLE_EVENT
+  event_type_resaon?: VEHICLE_REASON | null
+  annotation_version: number
+  annotation: any
+  gps: { [x: string]: number }
+  service_area_id?: UUID | null
+}
+
+export interface TRIP_TELEMETRY {
+  timestamp: Timestamp
+  latitude: number
+  longitude: number
+  annotation_version: number
+  annotation: any
+  service_area_id?: UUID | null
 }
 
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')

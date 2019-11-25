@@ -71,6 +71,6 @@ async function dataHandler(
     }
   })
   console.log(`listening on ${env.PORT}...`)
-  server.listen(env.PORT || 4007)
+  server.listen(env.PORT || 4000)
 }
 export { dataHandler }
