@@ -6,9 +6,9 @@ import stream from '@mds-core/mds-stream'
 import { getAnnotationData, getAnnotationVersion } from './annotation'
 import {
   CE_TYPE,
-  STATE_ENTRY,
-  TRIP_EVENT,
-  TRIP_TELEMETRY,
+  StateEntry,
+  TripEvent,
+  TripTelemetry,
   EVENT_STATUS_MAP,
   VEHICLE_EVENT,
   VEHICLE_REASON
@@ -50,7 +50,7 @@ async function processRaw(type: CE_TYPE, data: any) {
     provider_id: string
     recorded: number
   }
-  const lastState = JSON.parse(await cache.hget('device:state', provider_id + ':' + device_id)) as STATE_ENTRY
+  const lastState = JSON.parse(await cache.hget('device:state', provider_id + ':' + device_id)) as StateEntry
   // Construct state
   const baseDeviceState = {
     vehicle_type: 'scooter',
@@ -60,7 +60,7 @@ async function processRaw(type: CE_TYPE, data: any) {
     provider_id: provider_id,
     time_recorded: recorded,
     annotation_version: getAnnotationVersion()
-  } as STATE_ENTRY
+  } as StateEntry
 
   switch (baseDeviceState.type) {
     case 'event': {
@@ -75,7 +75,7 @@ async function processRaw(type: CE_TYPE, data: any) {
       const charge = telemetry ? telemetry.charge : null
       const annotation = gps ? getAnnotationData(gps) : null
       //TODO decide what to do with annotation data
-      const district = annotation ? (annotation.geo.areas.length ? annotation.geo.areas[0].id : null) : null
+      const district = annotation ? (annotation.areas.length ? annotation.areas[0].id : null) : null
       const deviceState = {
         ...baseDeviceState,
         annotation: annotation,
@@ -86,7 +86,7 @@ async function processRaw(type: CE_TYPE, data: any) {
         event_type: event_type,
         event_type_reason: event_type_reason,
         trip_id: trip_id
-      } as STATE_ENTRY
+      } as StateEntry
       // Take necessary steps on event trasitions
       switch (data.event_type) {
         case 'trip_start':
@@ -111,13 +111,13 @@ async function processRaw(type: CE_TYPE, data: any) {
     case 'telemetry': {
       const { gps, charge } = data
       const annotation = getAnnotationData(gps)
-      const district = annotation.geo.areas.length ? annotation.geo.areas[0].id : null
+      const district = annotation.areas.length ? annotation.areas[0].id : null
       const deviceState = {
         ...baseDeviceState,
         annotation: annotation,
         gps: gps,
         charge: charge
-      } as STATE_ENTRY
+      } as StateEntry
       // Match telemetry to trip data
       processTripTelemetry(deviceState)
 
@@ -129,7 +129,7 @@ async function processRaw(type: CE_TYPE, data: any) {
   }
 }
 
-async function processTripEvent(deviceState: STATE_ENTRY) {
+async function processTripEvent(deviceState: StateEntry) {
   /*
   Add vehicle events of a trip to cache (trips:events):
 
@@ -159,10 +159,10 @@ async function processTripEvent(deviceState: STATE_ENTRY) {
     annotation: annotation,
     gps: gps,
     service_area_id: service_area_id
-  } as TRIP_EVENT
+  } as TripEvent
 
   // Either append to existing trip or create new entry
-  const trips: { [trip_id: string]: TRIP_EVENT[] } = JSON.parse(
+  const trips: { [trip_id: string]: TripEvent[] } = JSON.parse(
     await cache.hget('trips:events', provider_id + ':' + device_id)
   )
 
@@ -181,12 +181,12 @@ async function processTripEvent(deviceState: STATE_ENTRY) {
   await processTripTelemetry(deviceState)
 }
 
-async function getTripId(deviceState: STATE_ENTRY) {
+async function getTripId(deviceState: StateEntry) {
   /*
   Return trip_id for telemetery entry by associating timestamps
   */
   const { provider_id, device_id, timestamp } = deviceState
-  const tripsEvents: { [trip_id: string]: TRIP_EVENT[] } = JSON.parse(
+  const tripsEvents: { [trip_id: string]: TripEvent[] } = JSON.parse(
     await cache.hget('trips:events', provider_id + ':' + device_id)
   )
   if (!tripsEvents) {
@@ -198,8 +198,8 @@ async function getTripId(deviceState: STATE_ENTRY) {
     // Find latest trip whose start time is before current timestamp
     // TODO reduce logic with better filtering/mapping ({trip_id, start_time}[])
     for (let trip_id in tripsEvents) {
-      const tripEvents: TRIP_EVENT[] = tripsEvents[trip_id]
-      const startEvents: TRIP_EVENT[] = tripEvents.filter(function(tripEvents) {
+      const tripEvents: TripEvent[] = tripsEvents[trip_id]
+      const startEvents: TripEvent[] = tripEvents.filter(function(tripEvents) {
         return tripEvents.event_type === 'trip_start' || tripEvents.event_type === 'trip_enter'
       })
       startEvents.sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1))
@@ -217,7 +217,7 @@ async function getTripId(deviceState: STATE_ENTRY) {
   }
 }
 
-async function processTripTelemetry(deviceState: STATE_ENTRY) {
+async function processTripTelemetry(deviceState: StateEntry) {
   /*
     Add trip related telemetry to cache (trips:telemetry):
 
@@ -246,14 +246,14 @@ async function processTripTelemetry(deviceState: STATE_ENTRY) {
     annotation_version: annotation_version,
     annotation: annotation,
     service_area_id: service_area_id
-  } as TRIP_TELEMETRY
+  } as TripTelemetry
 
   // Check if associated to an event or telemetry post
   const tripId = type === 'telemetry' ? getTripId(deviceState) : trip_id
   if (typeof tripId === 'undefined') {
     return false
   }
-  const trips: { [trip_id: string]: TRIP_TELEMETRY[] } = JSON.parse(
+  const trips: { [trip_id: string]: TripTelemetry[] } = JSON.parse(
     await cache.hget('trips:telemetry', provider_id + ':' + device_id)
   )
 

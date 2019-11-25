@@ -42,7 +42,7 @@ export const RULE_UNIT_MAP = {
 export const CE_TYPES = Enum('mds.event', 'mds.telemetry')
 export type CE_TYPE = keyof typeof CE_TYPES
 
-export interface STATE_ENTRY {
+export interface StateEntry {
   vehicle_type: VEHICLE_TYPE
   type: string
   timestamp: Timestamp
@@ -60,7 +60,14 @@ export interface STATE_ENTRY {
   trip_id?: UUID | null
 }
 
-export interface TRIP_EVENT {
+export interface AnnotationData {
+  in_bound: boolean
+  /* eslint-reason TODO: areas have not been defined yet within the scope of MJ */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  areas: any
+}
+
+export interface TripEvent {
   vehicle_type: VEHICLE_TYPE
   timestamp: Timestamp
   event_type: VEHICLE_EVENT
@@ -71,7 +78,7 @@ export interface TRIP_EVENT {
   service_area_id?: UUID | null
 }
 
-export interface TRIP_TELEMETRY {
+export interface TripTelemetry {
   timestamp: Timestamp
   latitude: number
   longitude: number
@@ -80,7 +87,7 @@ export interface TRIP_TELEMETRY {
   service_area_id?: UUID | null
 }
 
-export interface TRIP_ENTRY {
+export interface TripEntry {
   vehicle_type: VEHICLE_TYPE
   trip_id: UUID
   device_id: UUID
@@ -95,7 +102,7 @@ export interface TRIP_ENTRY {
   max_violation_dist?: number | null
   min_violoation_dist?: number | null
   avg_violation_dist?: number | null
-  telemetry: any
+  telemetry: TripTelemetry[][]
 }
 
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')

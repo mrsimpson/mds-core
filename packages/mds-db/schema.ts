@@ -277,8 +277,8 @@ const TABLE_KEY: { [T in TABLE_NAME]: COLUMN_NAME[] } = {
   [TABLE.policy_metadata]: [COLUMN.policy_id],
   [TABLE.telemetry]: [COLUMN.device_id, COLUMN.timestamp],
   [TABLE.reports_device_states]: [COLUMN.timestamp, COLUMN.device_id, COLUMN.provider_id, COLUMN.type],
-  [TABLE.reports_trips]: [COLUMN.trip_id, COLUMN.device_id, COLUMN.provider_id],
-  [TABLE.reports_providers]: [COLUMN.provider_id]
+  [TABLE.reports_trips]: [COLUMN.provider_id, COLUMN.device_id, COLUMN.trip_id],
+  [TABLE.reports_providers]: [COLUMN.provider_id, COLUMN.vehicle_type, COLUMN.start_time]
 }
 
 const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {

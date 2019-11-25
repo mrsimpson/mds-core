@@ -1,24 +1,26 @@
-import { data_handler } from "./proc"
-import db from "@mds-core/mds-db"
-import cache from "@mds-core/mds-cache"
-import stream from "@mds-core/mds-stream"
-import metric from "./metrics"
-import config from "./config"
+import { data_handler as dataHandler } from './proc'
+import db from '@mds-core/mds-db'
+import cache from '@mds-core/mds-cache'
+import stream from '@mds-core/mds-stream'
+import metric from './metrics'
+import config from './config'
+
+import { CE_TYPE, TripEvent, TripEntry, TripTelemetry } from '@mds-core/mds-types'
 
 //TODO: import from shared file
-interface MetricsTableRow {
+export interface MetricsTableRow {
   /** Timestamp for start of bin (currently houry bins). */
   // WAS: `timestamp`
   start_time: number // TODO: really type `Timestamp`
   /** Bin size. */
   // TODO: new column
-  bin_size: "hour" | "day"
+  bin_size: 'hour' | 'day'
   /** Geography this row applies to.  `null` = the entire organization. */
   geography: null | string // TODO: May be geography 'name', may be 'id'. ???
   /** Serice provider id */
   provider_id: string // TODO: really type `UUID`
   /** Vehicle type. */
-  vehicle_type: "scooter" | "bicycle" // TODO: is there already a type for this in MDS?
+  vehicle_type: 'scooter' | 'bicycle' // TODO: is there already a type for this in MDS?
   /** Number of events registered within the bin, by type. */
   event_counts: {
     service_start: number
@@ -139,37 +141,37 @@ interface MetricsTableRow {
 }
 
 /*
-    Provider processor api that runs inside a Kubernetes pod, activated via cron job.
+    Provider processor that runs inside a Kubernetes pod, activated via cron job.
     Aggregates trips/event data at a set interval. Provider cache is cleaned as data
     is processed.
 
     The following postgres tables are updated as data is processed:
 
         REPORTS_PROVIDERS:
-          PRIMARY KEY = (provider_id, timestamp)
-          VALUES = trip_data
+          PRIMARY KEY = (provider_id, timestamp, vehicle_type)
+          VALUES = MetricsTableRow
 */
-async function provider_handler() {
-  await data_handler("provider", async function(type: any, data: any) {
-    provider_aggregator()
+async function providerHandler() {
+  await dataHandler('provider', async function(type: CE_TYPE, data: any) {
+    providerAggregator()
   })
 }
 
-async function provider_aggregator() {
-  let providers = await cache.hgetall("provider:state")
+async function providerAggregator() {
+  let providers = await cache.hgetall('provider:state')
   for (let id in providers) {
     let provider = JSON.parse(providers[id])
-    let provider_processed = await process_provider(id, provider)
+    let provider_processed = await processProvider(id, provider)
     if (provider_processed) {
-      console.log("PROVIDER PROCESSED")
-      await cache.hdel("provider:state", id)
+      console.log('PROVIDER PROCESSED')
+      await cache.hdel('provider:state', id)
     } else {
-      console.log("PROVIDER NOT PROCESSED")
+      console.log('PROVIDER NOT PROCESSED')
     }
   }
 }
 
-async function process_provider(provider_id: any, data: any) {
+async function processProvider(provider_id: any, data: any) {
   /*
     Add provider metadata into PG database
 
@@ -186,22 +188,16 @@ async function process_provider(provider_id: any, data: any) {
 
   let provider_data = <MetricsTableRow>{}
   provider_data.start_time = new Date().getTime() - 3600000
-  provider_data.bin_size = "hour"
+  provider_data.bin_size = 'hour'
   provider_data.geography = null
   provider_data.provider_id = provider_id
-  provider_data.vehicle_type = "scooter"
+  provider_data.vehicle_type = 'scooter'
   provider_data.event_counts = await metric.calcEventCounts(provider_id)
   provider_data.vehicle_counts = await metric.calcVehicleCounts(provider_id)
   provider_data.trip_count = await metric.calcTripCount(provider_id)
-  provider_data.vehicle_trips_count = await metric.calcVehicleTripCount(
-    provider_id
-  )
-  provider_data.event_time_violations = await metric.calcLateEventCount(
-    provider_id
-  )
-  provider_data.telemetry_distance_violations = await metric.calcTelemDistViolationCount(
-    provider_id
-  )
+  provider_data.vehicle_trips_count = await metric.calcVehicleTripCount(provider_id)
+  provider_data.event_time_violations = await metric.calcLateEventCount(provider_id)
+  provider_data.telemetry_distance_violations = await metric.calcTelemDistViolationCount(provider_id)
   provider_data.bad_events = {
     invalid_count: data.invalidEvents.length,
     duplicate_count: data.duplicateEvents.length,
@@ -220,23 +216,17 @@ async function process_provider(provider_id: any, data: any) {
   }
   console.log(provider_data)
   console.log(typeof provider_data.vehicle_trips_count)
+
   // Insert into PG DB and stream
-  console.log("INSERT")
+  console.log('INSERT')
   try {
-    await db.insert("reports_providers", provider_data)
+    await db.insert('reports_providers', provider_data)
   } catch (err) {
     console.log(err)
     return false
   }
-  /*
-  console.log('stream')
-  try {
-    await stream.writeCloudEvent('mds.processed.provider', JSON.stringify(provider_data))
-  } catch (err) {
-    console.log(err)
-    return false
-  }
-  */
+  //await stream.writeCloudEvent('mds.processed.provider', JSON.stringify(provider_data))
+
   return true
 }
-export { provider_handler }
+export { providerHandler as provider_handler }

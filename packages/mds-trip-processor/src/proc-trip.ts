@@ -4,9 +4,8 @@ import cache from '@mds-core/mds-cache'
 import stream from '@mds-core/mds-stream'
 import config from './config'
 
-import { CE_TYPE, TRIP_EVENT, TRIP_ENTRY, TRIP_TELEMETRY } from '@mds-core/mds-types'
-// TODO: convert libraries to TS
-let { calcDistance } = require('./geo/geo')
+import { CE_TYPE, TripEvent, TripEntry, TripTelemetry } from '@mds-core/mds-types'
+import { calcDistance } from './geo/geo'
 
 /*
     Trip processor that runs inside a Kubernetes pod, activated via cron job.
@@ -29,7 +28,7 @@ async function tripAggregator() {
   const tripsMap: { [uuid: string]: string } = await cache.hgetall('trips:events')
   for (let vehicleID in tripsMap) {
     const [provider_id, device_id] = vehicleID.split(':')
-    const trips: { [trip_id: string]: TRIP_EVENT[] } = JSON.parse(tripsMap[vehicleID])
+    const trips: { [trip_id: string]: TripEvent[] } = JSON.parse(tripsMap[vehicleID])
     let unprocessedTrips = trips
     for (let trip_id in trips) {
       const trip_processed = await processTrip(provider_id, device_id, trip_id, trips[trip_id])
@@ -71,7 +70,7 @@ async function processTrip(
   provider_id: string,
   device_id: string,
   trip_id: string,
-  tripEvents: TRIP_EVENT[]
+  tripEvents: TripEvent[]
 ): Promise<boolean> {
   /*
     Add telemetry and meta data into database when a trip ends
@@ -115,12 +114,12 @@ async function processTrip(
     end_time: tripEndEvent.timestamp,
     start_service_area_id: tripStartEvent.service_area_id,
     end_service_area_id: tripEndEvent.service_area_id
-  } as TRIP_ENTRY
+  } as TripEntry
 
   // Get trip telemetry data
   let tripMap = JSON.parse(await cache.hget('trips:telemetry', provider_id + ':' + device_id))
   const tripTelemetry = tripMap[trip_id]
-  let telemetry: TRIP_TELEMETRY[][] = []
+  let telemetry: TripTelemetry[][] = []
   // Separate telemetry by trip events
   if (tripTelemetry && tripTelemetry.length > 0) {
     for (let i = 0; i < tripEvents.length - 1; i++) {
@@ -129,7 +128,7 @@ async function processTrip(
       const tripSegment = tripTelemetry.filter(
         (telemetry_point: { timestamp: number }) =>
           telemetry_point.timestamp >= start_time && (end_time ? telemetry_point.timestamp <= end_time : true)
-      ) as TRIP_TELEMETRY[]
+      ) as TripTelemetry[]
       tripSegment.sort(function(a: { timestamp: number }, b: { timestamp: number }) {
         return a.timestamp - b.timestamp
       })
@@ -161,7 +160,7 @@ async function processTrip(
     min_violoation_dist: min_violoation_dist,
     avg_violation_dist: avg_violation_dist,
     telemetry: telemetry
-  } as TRIP_ENTRY
+  } as TripEntry
 
   // Insert into PG DB and stream
   console.log('INSERT')
