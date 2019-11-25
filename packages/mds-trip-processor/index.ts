@@ -1,6 +1,4 @@
-import { event_handler } from './src/proc-event'
 import { trip_handler } from './src/proc-trip'
-//import { provider_handler } from './src/proc-provider'
 import db from '@mds-core/mds-db'
 
 function getArgs() {
@@ -27,22 +25,8 @@ async function process_data(type: string) {
   // just make sure the tables exist
   //await db.initialize()
   console.log('INIT')
-  switch (type) {
-    case 'event':
-      console.log('EVENT')
-      await event_handler()
-      break
-    case 'trip':
-      console.log('TRIP')
-      await trip_handler()
-      break
-    /*
-      case 'provider':
-      console.log('PROVIDER')
-      await provider_handler()
-      break
-    */
-  }
+  console.log('TRIP')
+  await trip_handler()
 }
 
 export const main = () => {

@@ -6,7 +6,7 @@ import stream from '@mds-core/mds-stream'
 import { getAnnotationData, getAnnotationVersion } from './annotation'
 import {
   CE_TYPE,
-  STATE,
+  STATE_ENTRY,
   TRIP_EVENT,
   TRIP_TELEMETRY,
   EVENT_STATUS_MAP,
@@ -50,7 +50,7 @@ async function processRaw(type: CE_TYPE, data: any) {
     provider_id: string
     recorded: number
   }
-  const lastState = JSON.parse(await cache.hget('device:state', provider_id + ':' + device_id)) as STATE
+  const lastState = JSON.parse(await cache.hget('device:state', provider_id + ':' + device_id)) as STATE_ENTRY
   // Construct state
   const baseDeviceState = {
     vehicle_type: 'scooter',
@@ -60,7 +60,7 @@ async function processRaw(type: CE_TYPE, data: any) {
     provider_id: provider_id,
     time_recorded: recorded,
     annotation_version: getAnnotationVersion()
-  } as STATE
+  } as STATE_ENTRY
 
   switch (baseDeviceState.type) {
     case 'event': {
@@ -86,7 +86,7 @@ async function processRaw(type: CE_TYPE, data: any) {
         event_type: event_type,
         event_type_reason: event_type_reason,
         trip_id: trip_id
-      } as STATE
+      } as STATE_ENTRY
       // Take necessary steps on event trasitions
       switch (data.event_type) {
         case 'trip_start':
@@ -117,7 +117,7 @@ async function processRaw(type: CE_TYPE, data: any) {
         annotation: annotation,
         gps: gps,
         charge: charge
-      } as STATE
+      } as STATE_ENTRY
       // Match telemetry to trip data
       processTripTelemetry(deviceState)
 
@@ -129,9 +129,9 @@ async function processRaw(type: CE_TYPE, data: any) {
   }
 }
 
-async function processTripEvent(deviceState: STATE) {
+async function processTripEvent(deviceState: STATE_ENTRY) {
   /*
-  Add vehicle events of a trip to cache (trip:events):
+  Add vehicle events of a trip to cache (trips:events):
 
     Key: 'provider_id:device_id'
     Value: hash map of tripEvents keyed by trip_id
@@ -163,7 +163,7 @@ async function processTripEvent(deviceState: STATE) {
 
   // Either append to existing trip or create new entry
   const trips: { [trip_id: string]: TRIP_EVENT[] } = JSON.parse(
-    await cache.hget('trip:events', provider_id + ':' + device_id)
+    await cache.hget('trips:events', provider_id + ':' + device_id)
   )
 
   //TODO reduce logic
@@ -175,19 +175,19 @@ async function processTripEvent(deviceState: STATE) {
   }
 
   // Update trip event cache and stream
-  await cache.hset('trip:events', provider_id + ':' + device_id, JSON.stringify(trips))
+  await cache.hset('trips:events', provider_id + ':' + device_id, JSON.stringify(trips))
   //await stream.writeCloudEvent('mds.trip.event', JSON.stringify(tripEvent))
 
   await processTripTelemetry(deviceState)
 }
 
-async function getTripId(deviceState: STATE) {
+async function getTripId(deviceState: STATE_ENTRY) {
   /*
   Return trip_id for telemetery entry by associating timestamps
   */
   const { provider_id, device_id, timestamp } = deviceState
   const tripsEvents: { [trip_id: string]: TRIP_EVENT[] } = JSON.parse(
-    await cache.hget('trip:events', provider_id + ':' + device_id)
+    await cache.hget('trips:events', provider_id + ':' + device_id)
   )
   if (!tripsEvents) {
     console.log('NO TRIP DATA FOUND')
@@ -197,7 +197,7 @@ async function getTripId(deviceState: STATE) {
     let matchedID
     // Find latest trip whose start time is before current timestamp
     // TODO reduce logic with better filtering/mapping ({trip_id, start_time}[])
-    for (const trip_id in tripsEvents) {
+    for (let trip_id in tripsEvents) {
       const tripEvents: TRIP_EVENT[] = tripsEvents[trip_id]
       const startEvents: TRIP_EVENT[] = tripEvents.filter(function(tripEvents) {
         return tripEvents.event_type === 'trip_start' || tripEvents.event_type === 'trip_enter'
@@ -217,9 +217,9 @@ async function getTripId(deviceState: STATE) {
   }
 }
 
-async function processTripTelemetry(deviceState: STATE) {
+async function processTripTelemetry(deviceState: STATE_ENTRY) {
   /*
-    Add trip related telemetry to cache (trip:telemetry):
+    Add trip related telemetry to cache (trips:telemetry):
 
       Key: 'provider_id:device_id'
       Value: hash map of tripTelemetry keyed by trip_id
@@ -254,7 +254,7 @@ async function processTripTelemetry(deviceState: STATE) {
     return false
   }
   const trips: { [trip_id: string]: TRIP_TELEMETRY[] } = JSON.parse(
-    await cache.hget('trip:telemetry', provider_id + ':' + device_id)
+    await cache.hget('trips:telemetry', provider_id + ':' + device_id)
   )
 
   //TODO reduce logic

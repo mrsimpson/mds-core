@@ -1,3 +1,4 @@
+//TODO break out into util dir for use by all processors
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import http from 'http'
@@ -37,7 +38,6 @@ async function dataHandler(
       req.on('end', function() {
         const contentType = req.headers['content-type'] ?? ''
         const type = contentType?.indexOf(';') >= 0 ? contentType.substring(0, contentType.indexOf(';')) : contentType
-
         const parsedBody = JSON.parse(body)
 
         if (type === 'application/json') {
