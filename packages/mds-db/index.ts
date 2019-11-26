@@ -81,8 +81,8 @@ import {
   writeAuditAttachment
 } from './attachments'
 
-import schema from "./schema"
-import { TABLE_NAME } from "./schema"
+import schema from './schema'
+import { TABLE_NAME } from './schema'
 
 async function initialize() {
   const client: MDSPostgresClient = await getWriteableClient()
@@ -93,18 +93,8 @@ async function initialize() {
 }
 
 //TODO: break out into imported file
-function commaize(array: ReadonlyArray<string>, quote = `'`, join = ","): any {
-  return array.map((val: any) => `${stringify(val, quote)}`).join(join)
-}
-
-function db_time(time: any): any {
-  let date_time = parseInt(time) ? parseInt(time) : time
-  return (
-    new Date(date_time)
-      .toISOString()
-      .replace("T", " ")
-      .substr(0, 23) + "UTC"
-  )
+function commaize(array: ReadonlyArray<string>, quote = `'`, join = ','): any {
+  return array.map((val: string) => `${stringify(val, quote)}`).join(join)
 }
 
 function stringify(data: any, quote: any, nested = false): any {
@@ -112,20 +102,20 @@ function stringify(data: any, quote: any, nested = false): any {
     return `NULL`
   } else if (Array.isArray(data)) {
     // get type
-    let type = ""
+    let type = ''
     let first = [data]
     while (first.length > 0 && Array.isArray(first[0])) {
-      type = "[]" + type
+      type = '[]' + type
       first = first[0]
     }
 
     first = first[0]
     switch (typeof first) {
-      case "object":
-        type = "JSON" + type
+      case 'object':
+        type = 'JSON' + type
         break
-      case "string":
-        type = "varchar(31)" + type
+      case 'string':
+        type = 'varchar(31)' + type
         break
       default:
         type = typeof first + type
@@ -135,71 +125,54 @@ function stringify(data: any, quote: any, nested = false): any {
       data.map(data_element => stringify(data_element, `'`, true)),
       ``
     )
-    let cast = !nested && type !== "[]"
-    return `${cast ? "CAST(" : ""}${
-      nested ? "" : "ARRAY"
-    }[${commaized_content}]${cast ? ` AS ${type})` : ""}`
-  } else if (typeof data === "object") {
+    let cast = !nested && type !== '[]'
+    return `${cast ? 'CAST(' : ''}${nested ? '' : 'ARRAY'}[${commaized_content}]${cast ? ` AS ${type})` : ''}`
+  } else if (typeof data === 'object') {
     return `${quote}${JSON.stringify(data)}${quote}`
   } else {
     return `${quote}${data}${quote}`
   }
 }
 
-async function runQuery(query: any) {
+async function readQuery(query: any) {
   const client = await getWriteableClient()
   let results = await client.query(query)
   return results.rows
 }
 
-async function getStates(
-  provider_id: any,
-  start_time: any = 0,
-  end_time: any = Date.now()
-) {
+async function writeQuery(query: any) {
+  const client = await getReadOnlyClient()
+  let results = await client.query(query)
+  return results.rows
+}
+
+async function getStates(provider_id: any, start_time: any = 0, end_time: any = Date.now()) {
   let query = `SELECT * FROM reports_device_states WHERE utc_epoch BETWEEN ${start_time} AND ${end_time}`
   //let query = `SELECT * FROM reports_device_states WHERE provider_id = ${provider_id} AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
-  return runQuery(query)
+  return readQuery(query)
 }
 
-async function getTripCount(
-  provider_id: any,
-  start_time: any = 0,
-  end_time: any = Date.now()
-) {
+async function getTripCount(provider_id: any, start_time: any = 0, end_time: any = Date.now()) {
   let query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE type = 'event' AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
   //let query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE provider_id = ${provider_id} AND type = 'event' AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
-  return runQuery(query)
+  return readQuery(query)
 }
 
-async function getVehicleTripCount(
-  device_id: any,
-  start_time: any = 0,
-  end_time: any = Date.now()
-) {
+async function getVehicleTripCount(device_id: any, start_time: any = 0, end_time: any = Date.now()) {
   let query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE type = 'event' AND device_id = '${device_id}' AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
-  return runQuery(query)
+  return readQuery(query)
 }
 
-async function getLateEventCount(
-  provider_id: any,
-  events: any,
-  start_time: any = 0,
-  end_time: any = Date.now()
-) {
+async function getLateEventCount(provider_id: any, events: any, start_time: any = 0, end_time: any = Date.now()) {
   let query = `SELECT count(*) FROM reports_device_states WHERE event_type IN ${events} AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
   //let query = `SELECT count(*) FROM reports_device_states WHERE provider_id = ${provider_id} AND event_type IN ${events} AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
-  return runQuery(query)
+  return readQuery(query)
 }
 
-async function getTrips(
-  provider_id: any,
-  start_time: any = 0,
-  end_time: any = Date.now()
-) {
+async function getTrips(provider_id: any, start_time: any = 0, end_time: any = Date.now()) {
   let query = `SELECT * FROM reports_trips WHERE end_time BETWEEN ${start_time} AND ${end_time}`
   //let query = `SELECT * FROM reports_trips WHERE provider_id = ${provider_id} AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
-  return runQuery(query)
+  return readQuery(query)
 }
 
 async function insert(table_name: TABLE_NAME, data: { [x: string]: any }) {
@@ -208,16 +181,12 @@ async function insert(table_name: TABLE_NAME, data: { [x: string]: any }) {
   }
   let fields = schema.TABLE_COLUMNS[table_name]
   let query = `INSERT INTO ${String(table_name)} (${commaize(fields, `"`)}) `
-  query += `VALUES (${commaize(
-    fields.map(field =>
-      field.includes("timezone") ? db_time(data[field]) : data[field]
-    )
-  )})`
-  return runQuery(query)
+  query += `VALUES (${commaize(fields.map(field => data[field]))})`
+  return writeQuery(query)
 }
 
 async function resetTable(table_name: TABLE_NAME) {
-  await runQuery(`TRUNCATE ${String(table_name)}`)
+  await writeQuery(`TRUNCATE ${String(table_name)}`)
 }
 
 /*

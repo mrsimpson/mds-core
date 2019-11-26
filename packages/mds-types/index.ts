@@ -113,6 +113,33 @@ export interface ProviderStreamData {
   outOfOrderEvents: StateEntry[]
 }
 
+export interface MetricCount {
+  count: number
+  min?: number | null
+  max?: number | null
+  average?: number | null
+}
+export interface LateMetricObj {
+  /** Number of trip_start and trip_end events out of compliance with time SLA. */
+  start_end: MetricCount
+  /** Number of trip_enter and trip_leave events out of compliance with time SLA. */
+  enter_leave: MetricCount
+  /** Number of telemetry events out of compliance with time SLA. */
+  telemetry: MetricCount
+}
+
+export interface VehicleCountMetricObj {
+  /** Total number of registered vehicles at start of bin. */
+  // WAS: `registered`
+  registered?: number | null
+  /** Total number of vehicles in the right-of-way at start of bin (available, reserved, trip). */
+  // WAS: `cap_count`
+  deployed?: number | null
+  /** Number of vehicles in the right-fo-way with 0 charge at start of bin. */
+  // WAS: `dead_count`
+  dead?: number | null
+}
+
 export interface MetricsTableRow {
   /** Timestamp for start of bin (currently houry bins). */
   // WAS: `timestamp`
@@ -146,17 +173,7 @@ export interface MetricsTableRow {
     deregister: number
     agency_pick_up: number
   }
-  vehicle_counts: {
-    /** Total number of registered vehicles at start of bin. */
-    // WAS: `registered`
-    registered: number
-    /** Total number of vehicles in the right-of-way at start of bin (available, reserved, trip). */
-    // WAS: `cap_count`
-    deployed: number
-    /** Number of vehicles in the right-fo-way with 0 charge at start of bin. */
-    // WAS: `dead_count`
-    dead: number
-  }
+  vehicle_counts: VehicleCountMetricObj
   /** Number of trips in region, derived from distinct trip ids. */
   trip_count: number
   /** Number of vehicles with: [0 trips, 1 trip, 2 trips, ...] during bin. */
@@ -165,35 +182,10 @@ export interface MetricsTableRow {
   /** Number of events which out of compliance with time SLA. */
   // TODO:  break into object with this binning, other event types not important. (?)
   // WAS: `late_event_count`
-  event_time_violations: {
-    /** Number of trip_start and trip_end events out of compliance with time SLA. */
-    start_end: {
-      /** Total number of events out of SLA compliance during bin. */
-      count: number
-      /** Minimum time value recorded during bin. */
-      min: number
-      /** Maximum time value recorded during bin. */
-      max: number
-      /** Average time value for all events during bin. */
-      average: number
-    }
-    /** Number of trip_enter and trip_leave events out of compliance with time SLA. */
-    enter_leave: { count: number; min: number; max: number; average: number }
-    /** Number of telemetry events out of compliance with time SLA. */
-    telemetry: { count: number; min: number; max: number; average: number }
-  }
+  event_time_violations: LateMetricObj
   /** Number of telemetry events out of compliance with distance SLA. */
   // WAS: `bad_telem_count`
-  telemetry_distance_violations: {
-    /** Total number of events out of SLA compliance during bin. */
-    count: number
-    /** Minimum distance value recorded during bin. */
-    min: number
-    /** Maximum distance value recorded during bin. */
-    max: number
-    /** Average distance value for all events during bin. */
-    average: number
-  }
+  telemetry_distance_violations: MetricCount
   /** Number of event anomalies. */
   // TODO:  break into object like so
   bad_events: {

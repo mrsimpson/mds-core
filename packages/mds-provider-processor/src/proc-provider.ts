@@ -59,8 +59,8 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
     vehicle_counts: await metric.calcVehicleCounts(providerID),
     trip_count: await metric.calcTripCount(providerID, curTime),
     vehicle_trips_count: await metric.calcVehicleTripCount(providerID, curTime),
-    event_time_violations: await metric.calcLateEventCount(providerID),
-    telemetry_distance_violations: await metric.calcTelemDistViolationCount(providerID),
+    event_time_violations: await metric.calcLateEventCount(providerID, curTime),
+    telemetry_distance_violations: await metric.calcTelemDistViolationCount(providerID, curTime),
     bad_events: {
       invalid_count: providerData ? providerData.invalidEvents.length : null,
       duplicate_count: providerData ? providerData.duplicateEvents.length : null,

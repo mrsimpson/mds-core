@@ -1,6 +1,6 @@
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
-import { StateEntry, EVENT_STATUS_MAP } from '@mds-core/mds-types'
+import { StateEntry, EVENT_STATUS_MAP, VehicleCountMetricObj, MetricCount, LateMetricObj } from '@mds-core/mds-types'
 
 // TODO: refactor
 async function calcEventCounts(id: string) {
@@ -33,11 +33,10 @@ async function calcEventCounts(id: string) {
   return eventCounts
 }
 
-// TODO: refactor
-async function calcVehicleCounts(id: string) {
-  let events = await db.getStates(id)
-  let rs = await cache.hgetall('device:state')
-  let recent_states = Object.values(rs)
+async function calcVehicleCounts(id: string): Promise<VehicleCountMetricObj> {
+  const events = await db.getStates(id)
+  const stateCache = await cache.hgetall('device:state')
+  const recentStates = Object.values(stateCache)
 
   let vehicle_counts: any = {
     registered: null,
@@ -45,30 +44,38 @@ async function calcVehicleCounts(id: string) {
     dead: null
   }
   // Calculate total number of registered vehicles at start of bin
-  let hist_registered = events.filter(function(events: StateEntry) {
+  let histRegistered = events.filter(function(events: StateEntry) {
     return events.event_type === 'register'
   }).length
-  let hist_deregistered = events.filter(function(events: StateEntry) {
+  let histDeregistered = events.filter(function(events: StateEntry) {
     return events.event_type === 'deregister'
   }).length
-  let curr_registered = hist_registered - hist_deregistered
-  vehicle_counts.registered = curr_registered
+  let currRegistered = histRegistered - histDeregistered
 
   // Calculate total number of vehicle in Right of way
   //TODO: 48 hour filtering
   let count = 0
-  for (let i in recent_states) {
-    let s = JSON.parse(recent_states[i])
-    if (s.state === 'available' || s.state === 'trip' || s.state === 'reserved' || s.state === 'unavailable') {
+  for (let i in recentStates) {
+    const deviceState = JSON.parse(recentStates[i])
+    if (
+      deviceState.state === 'available' ||
+      deviceState.state === 'trip' ||
+      deviceState.state === 'reserved' ||
+      deviceState.state === 'unavailable'
+    ) {
       count += 1
     }
   }
-  vehicle_counts.deployed = count
   //vehicle_counts.deployed = recent_states.filter(function(recent_states: any) {
   //  return recent_states.state === "available"
   //}).length
 
-  return vehicle_counts
+  const vehicleCounts: VehicleCountMetricObj = {
+    registered: currRegistered,
+    deployed: count,
+    dead: null
+  }
+  return vehicleCounts
 }
 
 async function calcTripCount(id: string, curTime: number): Promise<number> {
@@ -99,60 +106,57 @@ async function calcVehicleTripCount(id: string, curTime: number): Promise<string
   return String(trip_count_array)
 }
 
-// TODO: refactor
-async function calcLateEventCount(id: string) {
-  let late_counts: any = {
-    start_end: { count: 0, min: 0, max: 0, average: 0 },
-    enter_leave: { count: 0, min: 0, max: 0, average: 0 },
-    telemetry: { count: 0, min: 0, max: 0, average: 0 }
-  }
-  let now = new Date().getTime()
-  let last_hour = now - 3600000
-  let late_start_end_count = await db.getLateEventCount(id, "('trip_start', 'trip_end')", last_hour, now)
-  let late_enter_leave_count = await db.getLateEventCount(id, "('trip_enter', 'trip_leave')", last_hour, now)
-  let late_telemetry_count = await db.getLateEventCount(id, "('telemetry')", last_hour, now)
+async function calcLateEventCount(id: string, curTime: number): Promise<LateMetricObj> {
+  const last_hour = curTime - 3600000
+  const lateStartEnd = {
+    count: await db.getLateEventCount(id, "('trip_start', 'trip_end')", last_hour, curTime)
+  } as MetricCount
+  const lateEnterLeave = {
+    count: await db.getLateEventCount(id, "('trip_enter', 'trip_leave')", last_hour, curTime)
+  } as MetricCount
+  const lateTelemetry = {
+    count: await db.getLateEventCount(id, "('telemetry')", last_hour, curTime)
+  } as MetricCount
 
-  late_counts.start_end.count = late_start_end_count[0].count
-  late_counts.enter_leave.count = late_enter_leave_count[0].count
-  late_counts.telemetry.count = late_telemetry_count[0].count
-  return late_counts
+  const lateMetric: LateMetricObj = {
+    start_end: lateStartEnd,
+    enter_leave: lateEnterLeave,
+    telemetry: lateTelemetry
+  }
+  return lateMetric
 }
 
-// TODO: refactor
-async function calcTelemDistViolationCount(id: string) {
-  let telem_violations: any = {
-    count: 0,
-    min: 0,
-    max: 0,
-    average: 0
-  }
+async function calcTelemDistViolationCount(id: string, curTime: number): Promise<MetricCount> {
   // Calculating for trips that ended 24 hours ago in an hour bin
-  let now_yesterday = new Date().getTime() - 86400000
-  let last_hour_yesterday = now_yesterday - 90000000
-  let trips = await db.getTrips(id, last_hour_yesterday, now_yesterday)
+  const binEnd = curTime - 86400000
+  const binStart = binEnd - 90000000
+  const trips = await db.getTrips(id, binStart, binEnd)
 
-  let violation_count_array = trips.map(function(trips: any) {
+  let countArray = trips.map(function(trips: any) {
     return trips.violation_count
   })
-  let telem_avg_array = trips.map(function(trip: any) {
+  let avgArray = trips.map(function(trip: any) {
     return trip.avg_violation_dist
   })
-  let telem_max_array = trips.map(function(trip: any) {
+  let maxArray = trips.map(function(trip: any) {
     return trip.max_violation_dist
   })
-  let telem_min_array = trips.map(function(trip: any) {
+  let minArray = trips.map(function(trip: any) {
     return trip.min_violation_dist
   })
 
-  if (violation_count_array.length > 0) {
-    let add = (a: number, b: number) => a + b
-    telem_violations.count = violation_count_array.reduce(add)
-    telem_violations.average = telem_avg_array.reduce(add) / telem_avg_array.length
-    telem_violations.min = Math.min(...telem_min_array)
-    telem_violations.max = Math.max(...telem_max_array)
-  }
+  const add = (a: number, b: number) => a + b
 
-  return telem_violations
+  const telemViolations: MetricCount =
+    countArray.length > 0
+      ? {
+          count: countArray.reduce(add),
+          average: avgArray.reduce(add) / avgArray.length,
+          min: Math.min(...minArray),
+          max: Math.max(...maxArray)
+        }
+      : { count: 0 }
+  return telemViolations
 }
 
 export = {
