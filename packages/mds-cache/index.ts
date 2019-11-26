@@ -52,7 +52,7 @@ declare module 'redis' {
     flushdbAsync: () => Promise<'OK'>
     hdelAsync: (...args: (string | number)[]) => Promise<number>
     hgetallAsync: (arg1: string) => Promise<{ [key: string]: string }>
-	hgetAsync: (key: string, field: string) => Promise<string>
+    hgetAsync: (key: string, field: string) => Promise<string>
     hsetAsync: (key: string, field: string, value: string) => Promise<number>
     hmsetAsync: (...args: unknown[]) => Promise<'OK'>
     infoAsync: () => Promise<string>
@@ -105,13 +105,6 @@ async function info() {
     }
   })
   return data
-}
-
-async function delMatch(key: string) {
-  let rows = await readKeys(key)
-  for (let row_index in rows) {
-    await (await getClient()).delAsync(rows[row_index])
-  }
 }
 
 async function delCache(key: string) {
@@ -371,7 +364,7 @@ async function readDeviceStatus(device_id: UUID) {
     Object.assign(deviceStatusMap[item.device_id], item)
   })
   const values = Object.values(deviceStatusMap)
-
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   return values.filter((item: any) => item.telemetry)[0]
 }
 
@@ -430,7 +423,7 @@ async function readDevicesStatus(query: { since?: number; skip?: number; take?: 
     Object.assign(deviceStatusMap[item.device_id], item)
   })
   const values = Object.values(deviceStatusMap)
-
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   return values.filter((item: any) => item.telemetry)
 }
 
@@ -574,7 +567,6 @@ export = {
   initialize,
   health,
   info,
-  delMatch,
   delCache,
   hget,
   hgetall,

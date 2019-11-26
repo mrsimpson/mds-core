@@ -3,13 +3,16 @@ import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import http from 'http'
 
-async function reset_all(type: string) {
+async function resetAll(type: string) {
   // cache related
   if (type === 'event') {
     await cache.delCache('device:state')
   } else if (type === 'trip') {
     await cache.delCache('trip:state')
-    await cache.delMatch('device:*:trips')
+    await cache.delCache('trips:events')
+    await cache.delCache('trips:telemetry')
+  } else if (type === 'trip') {
+    await cache.delCache('provider:state')
   }
 
   // database related
@@ -18,6 +21,8 @@ async function reset_all(type: string) {
     await db.resetTable('reports_device_states')
   } else if (type === 'trip') {
     await db.resetTable('reports_trips')
+  } else if (type === 'provider') {
+    await db.resetTable('reports_providers')
   }
 }
 
@@ -65,7 +70,7 @@ async function data_handler(
     } else if (req.method === 'GET') {
       // TODO: MAKE SURE ADMIN PERMISSIONS ARE SETUP
       if (req.url === '/reset') {
-        reset_all(type)
+        resetAll(type)
         res.statusCode = 200
         res.end()
       }

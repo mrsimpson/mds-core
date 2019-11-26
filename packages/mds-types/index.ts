@@ -50,8 +50,8 @@ export interface StateEntry {
   provider_id: UUID
   time_recorded: Timestamp
   annotation_version: number
-  annotation?: any | null
-  gps?: { [x: string]: number } | null
+  annotation?: AnnotationData | null
+  gps?: GpsData | null
   service_area_id?: UUID | null
   charge?: number | null
   state?: VEHICLE_STATUS | null
@@ -73,8 +73,8 @@ export interface TripEvent {
   event_type: VEHICLE_EVENT
   event_type_resaon?: VEHICLE_REASON | null
   annotation_version: number
-  annotation: any
-  gps: { [x: string]: number }
+  annotation: AnnotationData
+  gps: GpsData
   service_area_id?: UUID | null
 }
 
@@ -83,7 +83,7 @@ export interface TripTelemetry {
   latitude: number
   longitude: number
   annotation_version: number
-  annotation: any
+  annotation: AnnotationData
   service_area_id?: UUID | null
 }
 
@@ -103,6 +103,145 @@ export interface TripEntry {
   min_violoation_dist?: number | null
   avg_violation_dist?: number | null
   telemetry: TripTelemetry[][]
+}
+
+export type GpsData = Omit<TelemetryData, 'charge' | 'hdop' | 'satellites'>
+
+export interface ProviderStreamData {
+  invalidEvents: StateEntry[]
+  duplicateEvents: StateEntry[]
+  outOfOrderEvents: StateEntry[]
+}
+
+export interface MetricsTableRow {
+  /** Timestamp for start of bin (currently houry bins). */
+  // WAS: `timestamp`
+  start_time: Timestamp
+  /** Bin size. */
+  // TODO: new column
+  bin_size: 'hour' | 'day'
+  /** Geography this row applies to.  `null` = the entire organization. */
+  geography: null | string // TODO: May be geography 'name', may be 'id'. ???
+  /** Serice provider id */
+  provider_id: UUID
+  /** Vehicle type. */
+  vehicle_type: VEHICLE_TYPE
+  /** Number of events registered within the bin, by type. */
+  event_counts: {
+    service_start: number
+    user_drop_off: number
+    provider_drop_off: number
+    trip_end: number
+    cancel_reservation: number
+    reserve: number
+    service_end: number
+    telemetry: number
+    trip_start: number
+    trip_enter: number
+    trip_leave: number
+    register: number
+    provider_pick_up: number
+    agency_drop_off: number
+    default: number
+    deregister: number
+    agency_pick_up: number
+  }
+  vehicle_counts: {
+    /** Total number of registered vehicles at start of bin. */
+    // WAS: `registered`
+    registered: number
+    /** Total number of vehicles in the right-of-way at start of bin (available, reserved, trip). */
+    // WAS: `cap_count`
+    deployed: number
+    /** Number of vehicles in the right-fo-way with 0 charge at start of bin. */
+    // WAS: `dead_count`
+    dead: number
+  }
+  /** Number of trips in region, derived from distinct trip ids. */
+  trip_count: number
+  /** Number of vehicles with: [0 trips, 1 trip, 2 trips, ...] during bin. */
+  // WAS: `trips_count`
+  vehicle_trips_count: string
+  /** Number of events which out of compliance with time SLA. */
+  // TODO:  break into object with this binning, other event types not important. (?)
+  // WAS: `late_event_count`
+  event_time_violations: {
+    /** Number of trip_start and trip_end events out of compliance with time SLA. */
+    start_end: {
+      /** Total number of events out of SLA compliance during bin. */
+      count: number
+      /** Minimum time value recorded during bin. */
+      min: number
+      /** Maximum time value recorded during bin. */
+      max: number
+      /** Average time value for all events during bin. */
+      average: number
+    }
+    /** Number of trip_enter and trip_leave events out of compliance with time SLA. */
+    enter_leave: { count: number; min: number; max: number; average: number }
+    /** Number of telemetry events out of compliance with time SLA. */
+    telemetry: { count: number; min: number; max: number; average: number }
+  }
+  /** Number of telemetry events out of compliance with distance SLA. */
+  // WAS: `bad_telem_count`
+  telemetry_distance_violations: {
+    /** Total number of events out of SLA compliance during bin. */
+    count: number
+    /** Minimum distance value recorded during bin. */
+    min: number
+    /** Maximum distance value recorded during bin. */
+    max: number
+    /** Average distance value for all events during bin. */
+    average: number
+  }
+  /** Number of event anomalies. */
+  // TODO:  break into object like so
+  bad_events: {
+    /** Number of invalid events (not matching event state machine). */
+    // WAS: `invalid_count`
+    invalid_count: number | null
+    /** Number of duplicate events submitted. */
+    // WAS: `duplicate_count`
+    duplicate_count: number | null
+    /** Number of out-of-order events submitted (according to state machine). */
+    // WAS: `ooo_count`
+    out_of_order_count: number | null
+  }
+  /** SLA values used in these calculations, as of start of bin. */
+  // TODO:  break into object like so:
+  sla: {
+    /** Maximum number of deployed vehicles for provider. Comes from Policy rules. */
+    // Typical SLA: 500-2000 vehicles
+    max_vehicle_cap: number
+    /** Minimum number of registered vehicles for provider. */
+    // Typical SLA: 100 vehicles
+    min_registered: number
+    /** Minumum number of trip_start events. */
+    // Typical SLA: 100 events???
+    // TODO: per day???
+    min_trip_start_count: number
+    /** Minumum number of trip_end events. */
+    // Typical SLA: 100 events???
+    // TODO: per day???
+    min_trip_end_count: number
+    /** Minumum number of telemetry events. */
+    // Typical SLA: 1000 events???
+    // TODO: per day???
+    min_telemetry_count: number
+    /** Maximum time between trip_start or trip_end event and submission to server. */
+    // Typical SLA: 30 seconds
+    // TODO: per day???
+    max_start_end_time: number
+    /** Maximum time between trip_enter or trip_leave event and submission to server. */
+    // Typical SLA: 30 seconds
+    max_enter_leave_time: number
+    /** Maximum time between telemetry event and submission to server. */
+    // Typical SLA: 1680 seconds
+    max_telemetry_time: number
+    /** Maximum distance between telemetry events when on-trip. */
+    // Typical SLA: 100 meters
+    max_telemetry_distance: number
+  }
 }
 
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')

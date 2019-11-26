@@ -9,6 +9,7 @@ import {
   StateEntry,
   TripEvent,
   TripTelemetry,
+  Telemetry,
   EVENT_STATUS_MAP,
   VEHICLE_EVENT,
   VEHICLE_REASON
@@ -66,7 +67,7 @@ async function processRaw(type: CE_TYPE, data: any) {
     case 'event': {
       const { event_type, telemetry, event_type_reason, trip_id, service_area_id } = data as {
         event_type: VEHICLE_EVENT
-        telemetry: any
+        telemetry: Telemetry
         event_type_reason: VEHICLE_REASON
         trip_id: string
         service_area_id: string
@@ -154,7 +155,7 @@ async function processTripEvent(deviceState: StateEntry) {
     vehicle_type: 'scooter',
     timestamp: timestamp,
     event_type: event_type,
-    event_type_resaon: event_type_reason,
+    event_type_reason: event_type_reason,
     annotation_version: annotation_version,
     annotation: annotation,
     gps: gps,
@@ -162,10 +163,8 @@ async function processTripEvent(deviceState: StateEntry) {
   } as TripEvent
 
   // Either append to existing trip or create new entry
-  const trips: { [trip_id: string]: TripEvent[] } = JSON.parse(
-    await cache.hget('trips:events', provider_id + ':' + device_id)
-  )
-
+  const cacheEntry: string | null = await cache.hget('trips:events', provider_id + ':' + device_id)
+  let trips: { [trip_id: string]: TripEvent[] } = cacheEntry ? JSON.parse(cacheEntry) : {}
   //TODO reduce logic
   if (trip_id) {
     if (!trips[trip_id]) {
@@ -177,7 +176,6 @@ async function processTripEvent(deviceState: StateEntry) {
   // Update trip event cache and stream
   await cache.hset('trips:events', provider_id + ':' + device_id, JSON.stringify(trips))
   //await stream.writeCloudEvent('mds.trip.event', JSON.stringify(tripEvent))
-
   await processTripTelemetry(deviceState)
 }
 
@@ -253,9 +251,11 @@ async function processTripTelemetry(deviceState: StateEntry) {
   if (typeof tripId === 'undefined') {
     return false
   }
-  const trips: { [trip_id: string]: TripTelemetry[] } = JSON.parse(
-    await cache.hget('trips:telemetry', provider_id + ':' + device_id)
-  )
+  if (!tripId) {
+    console.log('here')
+  }
+  const cacheEntry: string | null = await cache.hget('trips:telemetry', provider_id + ':' + device_id)
+  let trips: { [trip_id: string]: TripTelemetry[] } = cacheEntry ? JSON.parse(cacheEntry) : {}
 
   //TODO reduce logic
   if (typeof tripId === 'string') {

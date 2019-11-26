@@ -25,14 +25,17 @@ async function tripHandler() {
 }
 
 async function tripAggregator() {
-  const tripsMap: { [uuid: string]: string } = await cache.hgetall('trips:events')
+  const curTime = new Date().getTime()
+  const tripsMap = await cache.hgetall('trips:events')
+  console.log('triggered')
   for (let vehicleID in tripsMap) {
     const [provider_id, device_id] = vehicleID.split(':')
     const trips: { [trip_id: string]: TripEvent[] } = JSON.parse(tripsMap[vehicleID])
+    console.log(trips)
     let unprocessedTrips = trips
     for (let trip_id in trips) {
-      const trip_processed = await processTrip(provider_id, device_id, trip_id, trips[trip_id])
-      if (trip_processed) {
+      const tripProcessed = await processTrip(provider_id, device_id, trip_id, trips[trip_id], curTime)
+      if (tripProcessed) {
         console.log('TRIP PROCESSED')
         delete unprocessedTrips[trip_id]
       }
@@ -50,17 +53,17 @@ async function tripAggregator() {
 
 function calcTimeIntervals(
   telemetry: { [x: string]: { [x: string]: { timestamp: number } } },
-  start_time: number
+  startTime: number
 ): number {
   /*
     Not currently used. Allows tracking of time between individual telemetry/event points
   */
-  let temp_time = start_time
+  let tempTime = startTime
   let count = 0
   for (let n in telemetry) {
     for (let m in telemetry[n]) {
-      count += telemetry[n][m].timestamp - temp_time
-      temp_time = telemetry[n][m].timestamp
+      count += telemetry[n][m].timestamp - tempTime
+      tempTime = telemetry[n][m].timestamp
     }
   }
   return count
@@ -70,7 +73,8 @@ async function processTrip(
   provider_id: string,
   device_id: string,
   trip_id: string,
-  tripEvents: TripEvent[]
+  tripEvents: TripEvent[],
+  curTime: number
 ): Promise<boolean> {
   /*
     Add telemetry and meta data into database when a trip ends
@@ -95,7 +99,6 @@ async function processTrip(
     return a.timestamp - b.timestamp
   })
   const timeSLA = config.compliance_sla.max_telemetry_time
-  const curTime = new Date().getTime()
   const latestTime = tripEvents[tripEvents.length - 1].timestamp
   if (latestTime + timeSLA > curTime) {
     console.log('trips ended less than 24hrs ago')

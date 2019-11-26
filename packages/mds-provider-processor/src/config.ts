@@ -1,39 +1,39 @@
 export default {
   // 'key' for the organization (used by client to access additional client config)
-  _organization: "ladot",
+  _organization: 'ladot',
 
   // Specifics about the organization
   organization: {
     // Name for reporting.
-    name: "Los Angeles Department of Transportation",
+    name: 'Los Angeles Department of Transportation',
     // Name for reporting.
-    shortName: "LADOT",
+    shortName: 'LADOT',
     // List of active providers for this organization.
-    // TODO: convert to UUIDs
     // TODO: server return format is UUIDs or all provider data?
     providers: [
-      "Bird",
-      "Bolt",
-      "Jump",
-      "Lime",
-      "Lyft",
-      "Sherpa",
-      "Spin",
-      "Wheels"
+      'c20e08cf-8488-46a6-a66c-5d8fb827f7e0',
+      '63f13c48-34ff-49d2-aca7-cf6a5b6171c3',
+      '2411d395-04f2-47c9-ab66-d09e9e3c3251',
+      '6ddcc0ad-1d66-4046-bba4-d1d96bb8ca4d',
+      'e714f168-ce56-4b41-81b7-0b6a4bd26128',
+      'd73fcf80-22b1-450f-b535-042b4e30aac7'
     ],
     // Used to determine "day" for the provider, e.g. for metrics reporting.
     // TODO: assuming one timezone per organization. ???
-    timezone: "America/Los_Angeles",
+    timezone: 'America/Los_Angeles',
     // DOT organization center [lat,lng] (or other relevant point for tight map center).
     // Used as default for map "location", e.g. in audit mobile app.
     mapCenter: [-118.242985, 34.0513794],
     // FUTURE (Q1): Map bounds that encompass the entire organization jurisdiction.
     // Used to show map for jurisdiction bounds in reports.
-    mapBounds: [[-118.69, 33.674], [-118.139, 34.357]],
+    mapBounds: [
+      [-118.69, 33.674],
+      [-118.139, 34.357]
+    ],
     // FUTURE: `name` of the jurisdiction boundary in the Geography table.
     // Will be used to restrict metrics to jurisdiction boundary.
     // NOTE: this must be `name` as `id` will change if geo is updated!!!
-    jurisdictionGeoName: "??? TODO ???"
+    jurisdictionGeoName: '??? TODO ???'
     // ... ???
 
     // TODO: address???
@@ -72,17 +72,17 @@ export default {
 
   // Status page for production app.
   // TODO: staging? dev?  any other config to go with this?
-  statusAppUrl: "https://status.ladot.io",
+  statusAppUrl: 'https://status.ladot.io',
 
   // Agency-specific report setup
   reports: [
     {
-      report: "agency_tc_email", // Report name, known to client
+      report: 'agency_tc_email', // Report name, known to client
       active: true, // Set to `false` to turn off the report or when developing a new one.
-      frequency: "daily", // Run once a day, vs say "hourly" or "weekly"
-      time: "5:00", // Run at 5am
-      recipients: ["agency_tc_email@ladot.lacuna.city"], // SendGrid mailing list
-      slackChannel: "ladot-reports", // Slack channel to post success/failure events to (???)
+      frequency: 'daily', // Run once a day, vs say "hourly" or "weekly"
+      time: '5:00', // Run at 5am
+      recipients: ['agency_tc_email@ladot.lacuna.city'], // SendGrid mailing list
+      slackChannel: 'ladot-reports', // Slack channel to post success/failure events to (???)
       params: {} // Report-specific parameters to pass to report invocation page (???)
     }
   ],
@@ -94,29 +94,29 @@ export default {
     // Audit Mobile app:
     audit: {
       production: {
-        apiServer: "https://api.ladot.io",
-        appUrl: "https://ladot.mdsaudit.app",
-        authDomain: "auth.ladot.io",
-        authClientId: "IF5lGWhnmqBrGaGORJH2H3D5QuYtx4KL",
-        authAudience: "https://api.ladot.io/",
-        s3Bucket: "s3://compliance-mobile-2.0",
-        s3Profile: "lacuna"
+        apiServer: 'https://api.ladot.io',
+        appUrl: 'https://ladot.mdsaudit.app',
+        authDomain: 'auth.ladot.io',
+        authClientId: 'IF5lGWhnmqBrGaGORJH2H3D5QuYtx4KL',
+        authAudience: 'https://api.ladot.io/',
+        s3Bucket: 's3://compliance-mobile-2.0',
+        s3Profile: 'lacuna'
       },
       staging: {
-        apiServer: "https://test2.aws.lacuna.ai/",
-        appUrl: "https://dev.mdscompliance.app",
-        authDomain: "auth.ladot.io",
-        authClientId: "sgsSRcN9PLQhzseYH9cmrYDtp5NxC9s1",
-        authAudience: "https://develop.mds-testing.info/",
-        s3Bucket: "s3://dev.mdscompliance.app",
-        s3Profile: "dev-ea"
+        apiServer: 'https://test2.aws.lacuna.ai/',
+        appUrl: 'https://dev.mdscompliance.app',
+        authDomain: 'auth.ladot.io',
+        authClientId: 'sgsSRcN9PLQhzseYH9cmrYDtp5NxC9s1',
+        authAudience: 'https://develop.mds-testing.info/',
+        s3Bucket: 's3://dev.mdscompliance.app',
+        s3Profile: 'dev-ea'
       },
       dev: {
-        apiServer: "https://test2.aws.lacuna.ai",
-        appUrl: "https://localhost:3001",
-        authDomain: "auth.ladot.io",
-        authClientId: "sgsSRcN9PLQhzseYH9cmrYDtp5NxC9s1",
-        authAudience: "https://develop.mds-testing.info/"
+        apiServer: 'https://test2.aws.lacuna.ai',
+        appUrl: 'https://localhost:3001',
+        authDomain: 'auth.ladot.io',
+        authClientId: 'sgsSRcN9PLQhzseYH9cmrYDtp5NxC9s1',
+        authAudience: 'https://develop.mds-testing.info/'
         // NOTE: no deploy for "dev" environment
       }
     },
@@ -126,11 +126,11 @@ export default {
       production: null, // No production app yet
       staging: null, // No staging app yet
       dev: {
-        apiServer: "https://dev.api.ladot.io",
-        appUrl: "https://localhost:3003",
-        authDomain: "auth.ladot.io",
-        authClientId: "kPuq3MShnJYUM5B0jirMFnR8v7q27kvO",
-        authAudience: "https://sandbox.ladot.io"
+        apiServer: 'https://dev.api.ladot.io',
+        appUrl: 'https://localhost:3003',
+        authDomain: 'auth.ladot.io',
+        authClientId: 'kPuq3MShnJYUM5B0jirMFnR8v7q27kvO',
+        authAudience: 'https://sandbox.ladot.io'
       }
     },
 
@@ -138,20 +138,20 @@ export default {
     policy: {
       production: null, // No production app yet
       staging: {
-        apiServer: "https://sandbox.ladot.io",
-        appUrl: "https://dev.lacuna.city/",
-        authDomain: "auth.ladot.io",
-        authClientId: "MV7X8rpMAPn2feIHRxBr03DiMygSL6S4",
-        authAudience: "https://sandbox.ladot.io/",
-        s3Bucket: "s3://dev.lacuna.city",
-        s3Profile: "lacuna-apps-dev"
+        apiServer: 'https://sandbox.ladot.io',
+        appUrl: 'https://dev.lacuna.city/',
+        authDomain: 'auth.ladot.io',
+        authClientId: 'MV7X8rpMAPn2feIHRxBr03DiMygSL6S4',
+        authAudience: 'https://sandbox.ladot.io/',
+        s3Bucket: 's3://dev.lacuna.city',
+        s3Profile: 'lacuna-apps-dev'
       },
       dev: {
-        apiServer: "https://sandbox.ladot.io",
-        appUrl: "http://localhost:3005",
-        authDomain: "auth.ladot.io",
-        authClientId: "MV7X8rpMAPn2feIHRxBr03DiMygSL6S4",
-        authAudience: "https://sandbox.ladot.io/"
+        apiServer: 'https://sandbox.ladot.io',
+        appUrl: 'http://localhost:3005',
+        authDomain: 'auth.ladot.io',
+        authClientId: 'MV7X8rpMAPn2feIHRxBr03DiMygSL6S4',
+        authAudience: 'https://sandbox.ladot.io/'
       }
     }
   }
