@@ -268,4 +268,4 @@ async function processTripTelemetry(deviceState: StateEntry) {
   return true
 }
 
-export { eventHandler as event_handler }
+export { eventHandler }

@@ -1,7 +1,8 @@
-const env = process.env
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import http from 'http'
+
+const env = process.env
 
 async function resetAll(type: string) {
   // cache related
@@ -26,43 +27,38 @@ async function resetAll(type: string) {
   }
 }
 
-async function data_handler(
+async function dataHandler(
   type: string,
   callback: { (type: any, data: any): Promise<any>; (arg0: any, arg1: any): void }
 ) {
   console.log('Creating server...')
-  const server = http.createServer((req: any, res: any) => {
-    if (req.method === 'POST') {
-      let body: string
-      body = ''
+  const server = http.createServer((req, res) => {
+    const { method } = req
+    if (method === 'POST') {
+      let body: string = ''
       req.on('data', function(data: string) {
         body += data
       })
       req.on('end', function() {
-        let type = req.headers['content-type']
-        if (type.indexOf(';') >= 0) {
-          type = type.substring(0, type.indexOf(';'))
-        }
+        const contentType = req.headers['content-type'] ?? ''
+        const type = contentType?.indexOf(';') >= 0 ? contentType.substring(0, contentType.indexOf(';')) : contentType
+        const parsedBody = JSON.parse(body)
 
-        let parsed_body: any
-        parsed_body = JSON.parse(body)
-
-        let ce_data: { [x: string]: any } = {}
         if (type === 'application/json') {
           // binary
-          ce_data = {
+          const ce_data: { [x: string]: any } = {
             type: req.headers['ce-type'],
             specversion: req.headers['ce-specversion'],
             source: req.headers['ce-source'],
             id: req.headers['ce-id'],
-            data: parsed_body
+            data: parsedBody
           }
+
+          callback(ce_data.type, ce_data.data)
         } else if (type === 'application/cloudevents+json') {
           // structured
-          ce_data = parsed_body
+          callback(parsedBody.type, parsedBody.data)
         }
-
-        callback(ce_data.type, ce_data.data)
 
         res.statusCode = 200
         res.end()
@@ -79,6 +75,6 @@ async function data_handler(
     }
   })
   console.log(`listening on ${env.PORT}...`)
-  server.listen(env.PORT || 4007)
+  server.listen(env.PORT || 4000)
 }
-export { data_handler }
+export { dataHandler }

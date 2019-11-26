@@ -1,4 +1,4 @@
-import { data_handler as dataHandler } from './proc'
+import { dataHandler } from './proc'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import stream from '@mds-core/mds-stream'
@@ -185,4 +185,4 @@ async function processTrip(
   return true
 }
 
-export { tripHandler as trip_handler }
+export { tripHandler }

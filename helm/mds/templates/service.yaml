@@ -11,7 +11,7 @@ spec:
     app: {{ $key }}
   ports:
   - name: http-{{ $key }}
-    port: {{ $api.port }}
-    targetPort: {{ $api.port }}
+    port: 4000
+    targetPort: 4000
 {{- end }}
 {{- end }}

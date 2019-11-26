@@ -1,4 +1,4 @@
-import { data_handler as dataHandler } from './proc'
+import { dataHandler } from './proc'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import stream from '@mds-core/mds-stream'
@@ -90,4 +90,4 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
 
   return true
 }
-export { providerHandler as provider_handler }
+export { providerHandler }
