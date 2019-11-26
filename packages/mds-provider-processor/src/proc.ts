@@ -1,6 +1,7 @@
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import http from 'http'
+import log from '@mds-core/mds-logger'
 
 const env = process.env
 
@@ -31,7 +32,7 @@ async function dataHandler(
   type: string,
   callback: { (type: any, data: any): Promise<any>; (arg0: any, arg1: any): void }
 ) {
-  console.log('Creating server...')
+  log.info('Creating server...')
   const server = http.createServer((req, res) => {
     const { method } = req
     if (method === 'POST') {
@@ -74,7 +75,7 @@ async function dataHandler(
       res.end()
     }
   })
-  console.log(`listening on ${env.PORT}...`)
+  log.info(`listening on ${env.PORT}...`)
   server.listen(env.PORT || 4000)
 }
 export { dataHandler }

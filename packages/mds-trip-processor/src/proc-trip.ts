@@ -3,6 +3,7 @@ import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import stream from '@mds-core/mds-stream'
 import config from './config'
+import log from '@mds-core/mds-logger'
 
 import { CE_TYPE, TripEvent, TripEntry, TripTelemetry } from '@mds-core/mds-types'
 import { calcDistance } from './geo/geo'
@@ -27,25 +28,25 @@ async function tripHandler() {
 async function tripAggregator() {
   const curTime = new Date().getTime()
   const tripsMap = await cache.hgetall('trips:events')
-  console.log('triggered')
+  log.info('triggered')
   for (let vehicleID in tripsMap) {
     const [provider_id, device_id] = vehicleID.split(':')
     const trips: { [trip_id: string]: TripEvent[] } = JSON.parse(tripsMap[vehicleID])
-    console.log(trips)
+    log.info(trips)
     let unprocessedTrips = trips
     for (let trip_id in trips) {
       const tripProcessed = await processTrip(provider_id, device_id, trip_id, trips[trip_id], curTime)
       if (tripProcessed) {
-        console.log('TRIP PROCESSED')
+        log.info('TRIP PROCESSED')
         delete unprocessedTrips[trip_id]
       }
     }
     // Update or clear cache
     if (Object.keys(unprocessedTrips).length) {
-      console.log('PROCESSED SOME TRIPS')
+      log.info('PROCESSED SOME TRIPS')
       await cache.hset('trips:events', vehicleID, JSON.stringify(unprocessedTrips))
     } else {
-      console.log('PROCESSED ALL TRIPS')
+      log.info('PROCESSED ALL TRIPS')
       await cache.hdel('trips:events', vehicleID)
     }
   }
@@ -90,7 +91,7 @@ async function processTrip(
   // Validation steps
   // TODO: make checks more robust
   if (tripEvents.length < 2) {
-    console.log('No trip end seen yet')
+    log.info('No trip end seen yet')
     return false
   }
 
@@ -101,7 +102,7 @@ async function processTrip(
   const timeSLA = config.compliance_sla.max_telemetry_time
   const latestTime = tripEvents[tripEvents.length - 1].timestamp
   if (latestTime + timeSLA > curTime) {
-    console.log('trips ended less than 24hrs ago')
+    log.info('trips ended less than 24hrs ago')
     return false
   }
 
@@ -138,7 +139,7 @@ async function processTrip(
       telemetry.push(tripSegment)
     }
   } else {
-    console.log('No telemtry found')
+    log.warn('No telemtry found')
   }
 
   // Calculate trip metrics
@@ -166,21 +167,21 @@ async function processTrip(
   } as TripEntry
 
   // Insert into PG DB and stream
-  console.log('INSERT')
+  log.info('INSERT')
   try {
     await db.insert('reports_trips', tripData)
   } catch (err) {
-    console.log(err)
+    log.error(err)
   }
   //await stream.writeCloudEvent('mds.processed.trip', JSON.stringify(trip_data))
 
   // Delete all processed telemetry data and update cache
-  console.log('DELETE')
+  log.info('DELETE')
   try {
     delete tripMap[trip_id]
     await cache.hset('trips:telemetry', provider_id + ':' + device_id, JSON.stringify(tripMap))
   } catch (err) {
-    console.log(err)
+    log.error(err)
   }
   return true
 }

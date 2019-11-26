@@ -2,6 +2,7 @@ import { dataHandler } from './proc'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import stream from '@mds-core/mds-stream'
+import log from '@mds-core/mds-logger'
 
 import { getAnnotationData, getAnnotationVersion } from './annotation'
 import {
@@ -39,7 +40,7 @@ import {
 
 async function eventHandler() {
   await dataHandler('event', async function(type: CE_TYPE, data: any) {
-    console.log(type, data)
+    log.info(type, data)
     return processRaw(type, data)
   })
 }
@@ -188,7 +189,7 @@ async function getTripId(deviceState: StateEntry) {
     await cache.hget('trips:events', provider_id + ':' + device_id)
   )
   if (!tripsEvents) {
-    console.log('NO TRIP DATA FOUND')
+    log.warn('NO TRIP DATA FOUND')
     return undefined
   } else {
     let latestStartTime
@@ -208,7 +209,7 @@ async function getTripId(deviceState: StateEntry) {
       }
     }
     if (!matchedID) {
-      console.log('NO TRIPS MATCHED')
+      log.warn('NO TRIPS MATCHED')
       return undefined
     }
     return matchedID
@@ -250,9 +251,6 @@ async function processTripTelemetry(deviceState: StateEntry) {
   const tripId = type === 'telemetry' ? getTripId(deviceState) : trip_id
   if (typeof tripId === 'undefined') {
     return false
-  }
-  if (!tripId) {
-    console.log('here')
   }
   const cacheEntry: string | null = await cache.hget('trips:telemetry', provider_id + ':' + device_id)
   let trips: { [trip_id: string]: TripTelemetry[] } = cacheEntry ? JSON.parse(cacheEntry) : {}

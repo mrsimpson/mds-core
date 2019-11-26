@@ -4,6 +4,7 @@ import cache from '@mds-core/mds-cache'
 import stream from '@mds-core/mds-stream'
 import metric from './metrics'
 import config from './config'
+import log from '@mds-core/mds-logger'
 
 import { CE_TYPE, MetricsTableRow, ProviderStreamData } from '@mds-core/mds-types'
 
@@ -30,9 +31,9 @@ async function providerAggregator() {
   for (let id in providersList) {
     const providerProcessed = await processProvider(id, curTime)
     if (providerProcessed) {
-      console.log('PROVIDER PROCESSED')
+      log.info('PROVIDER PROCESSED')
     } else {
-      console.log('PROVIDER NOT PROCESSED')
+      log.warn('PROVIDER NOT PROCESSED')
     }
   }
 }
@@ -79,11 +80,11 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
   }
 
   // Insert into PG DB and stream
-  console.log('INSERT')
+  log.info('INSERT')
   try {
     await db.insert('reports_providers', provider_data)
   } catch (err) {
-    console.log(err)
+    log.error(err)
     return false
   }
   //await stream.writeCloudEvent('mds.processed.provider', JSON.stringify(provider_data))
