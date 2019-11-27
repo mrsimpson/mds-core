@@ -46,18 +46,21 @@ apis:
     migration: false
   mds-event-processor:
     enabled: true
+    pathPrefix: /event-processor
     version: latest
     migration: false
     triggeredBy:
       trigger: [mds.event, mds.telemetry]
   mds-trip-processor:
     enabled: true
+    pathPrefix: /trip-processor
     version: latest
     migration: false
     triggeredBy:
       cron: '0 * * * *'
   mds-provider-processor:
     enabled: true
+    pathPrefix: /provider-processor
     version: latest
     migration: false
     triggeredBy:
@@ -75,20 +78,20 @@ jwt:
   enabled: false
   audiences: []
 postgresql:
-  internal: true
-  host:
-  hostReader:
+  internal: false
+  host: host.docker.internal
+  hostReader: host.docker.internal
   port: 5432
   existingSecret: mds-secrets
-  password: # for setting secret internally - not used by https://github.com/helm/charts/tree/master/stable/postgresql
+  password: 'Password123#'
   postgresqlUsername: mdsadmin
   postgresqlDatabase: mds
   image:
     repository: postgres
     tag: 10
 redis:
-  internal: true
-  host:
+  internal: false
+  host: host.docker.internal
   port: 6379
   usePassword: false
   cluster:

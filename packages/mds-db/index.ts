@@ -134,44 +134,49 @@ function stringify(data: any, quote: any, nested = false): any {
   }
 }
 
-async function readQuery(query: any) {
+async function readQuery(query: string) {
   const client = await getWriteableClient()
-  let results = await client.query(query)
+  const results = await client.query(query)
   return results.rows
 }
 
-async function writeQuery(query: any) {
+async function writeQuery(query: string) {
   const client = await getReadOnlyClient()
-  let results = await client.query(query)
+  const results = await client.query(query)
   return results.rows
 }
 
-async function getStates(provider_id: any, start_time: any = 0, end_time: any = Date.now()) {
-  let query = `SELECT * FROM reports_device_states WHERE utc_epoch BETWEEN ${start_time} AND ${end_time}`
-  //let query = `SELECT * FROM reports_device_states WHERE provider_id = ${provider_id} AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
+async function getStates(provider_id: string, start_time: number = 0, end_time: number = Date.now()) {
+  const query = `SELECT * FROM reports_device_states WHERE timestamp BETWEEN ${start_time} AND ${end_time}`
+  //let query = `SELECT * FROM reports_device_states WHERE provider_id = ${provider_id} AND timestamp BETWEEN ${start_time} AND ${end_time}`
   return readQuery(query)
 }
 
-async function getTripCount(provider_id: any, start_time: any = 0, end_time: any = Date.now()) {
-  let query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE type = 'event' AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
-  //let query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE provider_id = ${provider_id} AND type = 'event' AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
+async function getTripCount(provider_id: string, start_time: number = 0, end_time: number = Date.now()) {
+  const query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE type = 'event' AND timestamp BETWEEN ${start_time} AND ${end_time}`
+  //let query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE provider_id = ${provider_id} AND type = 'event' AND timestamp BETWEEN ${start_time} AND ${end_time}`
   return readQuery(query)
 }
 
-async function getVehicleTripCount(device_id: any, start_time: any = 0, end_time: any = Date.now()) {
-  let query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE type = 'event' AND device_id = '${device_id}' AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
+async function getVehicleTripCount(device_id: string, start_time: number = 0, end_time: number = Date.now()) {
+  const query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE type = 'event' AND device_id = '${device_id}' AND timestamp BETWEEN ${start_time} AND ${end_time}`
   return readQuery(query)
 }
 
-async function getLateEventCount(provider_id: any, events: any, start_time: any = 0, end_time: any = Date.now()) {
-  let query = `SELECT count(*) FROM reports_device_states WHERE event_type IN ${events} AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
-  //let query = `SELECT count(*) FROM reports_device_states WHERE provider_id = ${provider_id} AND event_type IN ${events} AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
+async function getLateEventCount(
+  provider_id: string,
+  events: any,
+  start_time: number = 0,
+  end_time: number = Date.now()
+) {
+  const query = `SELECT count(*) FROM reports_device_states WHERE event_type IN ${events} AND timestamp BETWEEN ${start_time} AND ${end_time}`
+  //let query = `SELECT count(*) FROM reports_device_states WHERE provider_id = ${provider_id} AND event_type IN ${events} AND timestamp BETWEEN ${start_time} AND ${end_time}`
   return readQuery(query)
 }
 
-async function getTrips(provider_id: any, start_time: any = 0, end_time: any = Date.now()) {
-  let query = `SELECT * FROM reports_trips WHERE end_time BETWEEN ${start_time} AND ${end_time}`
-  //let query = `SELECT * FROM reports_trips WHERE provider_id = ${provider_id} AND utc_epoch BETWEEN ${start_time} AND ${end_time}`
+async function getTrips(provider_id: string, start_time: number = 0, end_time: number = Date.now()) {
+  const query = `SELECT * FROM reports_trips WHERE end_time BETWEEN ${start_time} AND ${end_time}`
+  //let query = `SELECT * FROM reports_trips WHERE provider_id = ${provider_id} AND end_time BETWEEN ${start_time} AND ${end_time}`
   return readQuery(query)
 }
 
@@ -179,7 +184,7 @@ async function insert(table_name: TABLE_NAME, data: { [x: string]: any }) {
   if (!data) {
     return null
   }
-  let fields = schema.TABLE_COLUMNS[table_name]
+  const fields = schema.TABLE_COLUMNS[table_name]
   let query = `INSERT INTO ${String(table_name)} (${commaize(fields, `"`)}) `
   query += `VALUES (${commaize(fields.map(field => data[field]))})`
   return writeQuery(query)

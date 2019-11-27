@@ -1,5 +1,5 @@
 {{- range $name, $api := .Values.apis }}
-{{- if $api.enabled }}
+  {{- if $api.enabled }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -34,12 +34,12 @@ spec:
             cpu: {{ $api.resourcesRequestsCpu | default ($.Values.resourcesRequestsCpu | default "50m") }}
             memory: {{ $api.resourcesRequestsMemory | default ($.Values.resourcesRequestsMemory | default "128Mi") }}
         ports:
-        - containerPort: 4000
+        - containerPort: 80
           name: user-port
           protocol: TCP
         env:
           - name: PORT
-            value: 4000
+            value: "80"
           - name: PATH_PREFIX
             value: {{ $api.pathPrefix }}
           - name: TIMEZONE
@@ -54,11 +54,12 @@ spec:
                 name: mds-secrets
                 key: postgresql-password
           - name: PG_HOST
-            {{- if $.Values.postgresql.internal }}
+          {{- if $.Values.postgresql.internal }}
             value: mds-postgresql.{{ $.Release.Namespace }}.svc.cluster.local
-            {{- else }}
+          {{- else }}
             value: {{ $.Values.postgresql.host }}
-            {{- end }}
+          {{- end }}
+          {{- if $.Values.postgresql.hostReader }}
           - name: PG_HOST_READER
             value: {{ $.Values.postgresql.hostReader }}
           {{- end }}
@@ -71,14 +72,14 @@ spec:
             value: {{ $api.migration | quote }}
           {{- end }}
           - name: REDIS_HOST
-            {{- if $.Values.redis.internal }}
+          {{- if $.Values.redis.internal }}
             value: mds-redis-master.{{ $.Release.Namespace }}.svc.cluster.local
-            {{- else }}
+          {{- else }}
             value: {{ $.Values.redis.host }}
-            {{- end }}
+          {{- end }}
           - name: REDIS_PORT
             value: {{ $.Values.redis.port | quote }}
-          {{- if $api.useEvents }}
+          {{- if $.Values.useEvents }}
           - name: EVENT_SOURCE
             value: cloudevents
           - name: CE_NAME

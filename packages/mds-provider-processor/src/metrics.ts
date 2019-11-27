@@ -38,11 +38,6 @@ async function calcVehicleCounts(id: string): Promise<VehicleCountMetricObj> {
   const stateCache = await cache.hgetall('device:state')
   const recentStates = Object.values(stateCache)
 
-  let vehicle_counts: any = {
-    registered: null,
-    deployed: null,
-    dead: null
-  }
   // Calculate total number of registered vehicles at start of bin
   let histRegistered = events.filter(function(events: StateEntry) {
     return events.event_type === 'register'
@@ -79,43 +74,47 @@ async function calcVehicleCounts(id: string): Promise<VehicleCountMetricObj> {
 }
 
 async function calcTripCount(id: string, curTime: number): Promise<number> {
-  const last_hour = curTime - 3600000
-  const trip_count = await db.getTripCount(id, last_hour, curTime)
-  return trip_count[0].count
+  const lastHour = curTime - 3600000
+  const tripCount = await db.getTripCount(id, lastHour, curTime)
+  return tripCount[0].count
 }
 
 async function calcVehicleTripCount(id: string, curTime: number): Promise<string> {
-  const max_trips = 5
-  let trip_count_array = new Array(max_trips + 1).fill(0)
+  const maxTrips = 5
+  let tripCountArray = new Array(maxTrips + 1).fill(0)
   const rs = await cache.hgetall('device:state')
   const vehicles = Object.keys(rs)
-  const last_hour = curTime - 3600000
+  const lastHour = curTime - 3600000
   // TODO: migrate form inefficient loop once SET is created in cache
   for (let i in vehicles) {
-    const [provider_id, device_id] = vehicles[i].split(':')
-    if (provider_id === id) {
-      const trip_count = await db.getVehicleTripCount(device_id, last_hour, curTime)
-      const trip_count_index = trip_count[0].count
-      if (trip_count_index >= max_trips) {
-        trip_count_array[max_trips] += 1
+    const [providerID, deviceID] = vehicles[i].split(':')
+    if (providerID === id) {
+      const tripCount = await db.getVehicleTripCount(deviceID, lastHour, curTime)
+      const tripCountIndex = tripCount[0].count
+      if (tripCountIndex >= maxTrips) {
+        tripCountArray[maxTrips] += 1
       } else {
-        trip_count_array[trip_count_index] += 1
+        tripCountArray[tripCountIndex] += 1
       }
     }
   }
-  return String(trip_count_array)
+  return String(tripCountArray)
 }
 
 async function calcLateEventCount(id: string, curTime: number): Promise<LateMetricObj> {
   const last_hour = curTime - 3600000
+  const a = await db.getLateEventCount(id, "('trip_start', 'trip_end')", last_hour, curTime)
+  const b = await db.getLateEventCount(id, "('trip_enter', 'trip_leave')", last_hour, curTime)
+  const c = await db.getLateEventCount(id, "('telemetry')", last_hour, curTime)
+
   const lateStartEnd = {
-    count: await db.getLateEventCount(id, "('trip_start', 'trip_end')", last_hour, curTime)
+    count: a[0].count
   } as MetricCount
   const lateEnterLeave = {
-    count: await db.getLateEventCount(id, "('trip_enter', 'trip_leave')", last_hour, curTime)
+    count: b[0].count
   } as MetricCount
   const lateTelemetry = {
-    count: await db.getLateEventCount(id, "('telemetry')", last_hour, curTime)
+    count: c[0].count
   } as MetricCount
 
   const lateMetric: LateMetricObj = {
