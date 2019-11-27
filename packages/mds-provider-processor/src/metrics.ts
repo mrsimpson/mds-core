@@ -1,6 +1,13 @@
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
-import { StateEntry, EVENT_STATUS_MAP, VehicleCountMetricObj, MetricCount, LateMetricObj } from '@mds-core/mds-types'
+import {
+  StateEntry,
+  EVENT_STATUS_MAP,
+  VEHICLE_STATUSES_ROW,
+  VehicleCountMetricObj,
+  MetricCount,
+  LateMetricObj
+} from '@mds-core/mds-types'
 
 // TODO: refactor
 async function calcEventCounts(id: string) {
@@ -52,12 +59,7 @@ async function calcVehicleCounts(id: string): Promise<VehicleCountMetricObj> {
   let count = 0
   for (let i in recentStates) {
     const deviceState = JSON.parse(recentStates[i])
-    if (
-      deviceState.state === 'available' ||
-      deviceState.state === 'trip' ||
-      deviceState.state === 'reserved' ||
-      deviceState.state === 'unavailable'
-    ) {
+    if (VEHICLE_STATUSES_ROW.includes(deviceState.state)) {
       count += 1
     }
   }
@@ -103,18 +105,18 @@ async function calcVehicleTripCount(id: string, curTime: number): Promise<string
 
 async function calcLateEventCount(id: string, curTime: number): Promise<LateMetricObj> {
   const last_hour = curTime - 3600000
-  const a = await db.getLateEventCount(id, "('trip_start', 'trip_end')", last_hour, curTime)
-  const b = await db.getLateEventCount(id, "('trip_enter', 'trip_leave')", last_hour, curTime)
-  const c = await db.getLateEventCount(id, "('telemetry')", last_hour, curTime)
+  const se = await db.getLateEventCount(id, "('trip_start', 'trip_end')", last_hour, curTime)
+  const el = await db.getLateEventCount(id, "('trip_enter', 'trip_leave')", last_hour, curTime)
+  const t = await db.getLateEventCount(id, "('telemetry')", last_hour, curTime)
 
   const lateStartEnd = {
-    count: a[0].count
+    count: se[0].count
   } as MetricCount
   const lateEnterLeave = {
-    count: b[0].count
+    count: el[0].count
   } as MetricCount
   const lateTelemetry = {
-    count: c[0].count
+    count: t[0].count
   } as MetricCount
 
   const lateMetric: LateMetricObj = {
