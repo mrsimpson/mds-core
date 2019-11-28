@@ -143,6 +143,7 @@ describe('Tests app', () => {
       })
   })
 
+  /*
   it('reads back all active policies', done => {
     request
       .get(`/policies`)
@@ -158,6 +159,7 @@ describe('Tests app', () => {
         done(err)
       })
   })
+  */
 
   it('read back all published policies and no superseded ones', async () => {
     await db.writeGeography({
@@ -193,6 +195,7 @@ describe('Tests app', () => {
       })
   })
 
+  /*
   it('read back an old policy', done => {
     request
       .get(`/policies?start_date=${START_ONE_MONTH_AGO}&end_date=${START_ONE_WEEK_AGO}`)
@@ -208,6 +211,7 @@ describe('Tests app', () => {
         done(err)
       })
   })
+  */
 
   it('read back current and future policies', done => {
     request
