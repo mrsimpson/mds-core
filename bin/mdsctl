@@ -11,7 +11,7 @@ hash brew > /dev/null 2>&1 || {
     ${linux})
       mkdir -p ~/.linuxbrew/bin
       hash git > /dev/null 2>&1 || (apt-get update; apt-get install -y git)
-      if [ -d "/home/$USER/.linuxbrew/Homebrew"]; then
+      if [ -d "/home/$USER/.linuxbrew/Homebrew" ]; then
         rm -rf "/home/$USER/.linuxbrew/Homebrew"
       fi
       git clone https://github.com/Homebrew/brew ~/.linuxbrew/Homebrew
