@@ -1,51 +1,28 @@
-import db from '@mds-core/mds-db'
-import cache from '@mds-core/mds-cache'
+/* eslint-disable promise/prefer-await-to-callbacks */
 import http from 'http'
 import log from '@mds-core/mds-logger'
 
-const env = process.env
-
-async function resetAll(type: string) {
-  // cache related
-  if (type === 'event') {
-    await cache.delCache('device:state')
-  } else if (type === 'trip') {
-    await cache.delCache('trip:state')
-    await cache.delCache('trips:events')
-    await cache.delCache('trips:telemetry')
-  } else if (type === 'trip') {
-    await cache.delCache('provider:state')
-  }
-
-  // database related
-  await db.initialize()
-  if (type === 'event') {
-    await db.resetTable('reports_device_states')
-  } else if (type === 'trip') {
-    await db.resetTable('reports_trips')
-  } else if (type === 'provider') {
-    await db.resetTable('reports_providers')
-  }
-}
+const { env } = process
 
 async function dataHandler(
   type: string,
+  // eslint-disable-next-line promise/prefer-await-to-callbacks
   callback: { (type: any, data: any): Promise<any>; (arg0: any, arg1: any): void }
 ) {
   log.info('Creating server...')
   const server = http.createServer((req, res) => {
     const { method } = req
     if (method === 'POST') {
-      let body: string = ''
-      req.on('data', function(data: string) {
+      let body = ''
+      req.on('data', (data: string) => {
         body += data
       })
-      req.on('end', function() {
+      req.on('end', () => {
         const contentType = req.headers['content-type'] ?? ''
-        const type = contentType?.indexOf(';') >= 0 ? contentType.substring(0, contentType.indexOf(';')) : contentType
+        const parsedContentType = contentType?.indexOf(';') >= 0 ? contentType.substring(0, contentType.indexOf(';')) : contentType
         const parsedBody = JSON.parse(body)
 
-        if (type === 'application/json') {
+        if (parsedContentType === 'application/json') {
           // binary
           const ce_data: { [x: string]: any } = {
             type: req.headers['ce-type'],
@@ -55,9 +32,11 @@ async function dataHandler(
             data: parsedBody
           }
 
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           callback(ce_data.type, ce_data.data)
         } else if (type === 'application/cloudevents+json') {
           // structured
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           callback(parsedBody.type, parsedBody.data)
         }
 
@@ -65,12 +44,6 @@ async function dataHandler(
         res.end()
       })
     } else if (req.method === 'GET') {
-      // TODO: MAKE SURE ADMIN PERMISSIONS ARE SETUP
-      if (req.url === '/reset') {
-        resetAll(type)
-        res.statusCode = 200
-        res.end()
-      }
       res.statusCode = 404
       res.end()
     }
