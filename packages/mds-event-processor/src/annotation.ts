@@ -1,13 +1,14 @@
-import { findServiceAreas } from './geo/geo'
 import { AnnotationData, GpsData } from '@mds-core/mds-types'
-let version = 1.0
+import { findServiceAreas } from './geo/geo'
+
+const version = 1.0
 /* This function is called on each event processed. It calculates the annotation data and
  * returns it. To be used with mds geography related things.
  */
 function getAnnotationData(gps: GpsData): AnnotationData {
   const areas = findServiceAreas(gps.lng, gps.lat)
   const in_bound = areas.length > 0
-  const annotation: AnnotationData = { in_bound: in_bound, areas: areas }
+  const annotation: AnnotationData = { in_bound, areas }
   return annotation
 }
 
