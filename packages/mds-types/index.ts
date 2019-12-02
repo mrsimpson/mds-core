@@ -133,9 +133,9 @@ export interface TripEntry {
   duration: number // in milliseconds
   distance: number // default in miles
   violation_count?: number | null
-  max_violation_dist?: number | null
-  min_violoation_dist?: number | null
-  avg_violation_dist?: number | null
+  max_violation_dist?: number
+  min_violation_dist?: number
+  avg_violation_dist?: number
   telemetry: TripTelemetry[][]
 }
 
