@@ -1,11 +1,162 @@
-import { VEHICLE_TYPE, VEHICLE_EVENT, VEHICLE_STATUS, Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import {
+  VEHICLE_TYPE,
+  VEHICLE_EVENT,
+  VEHICLE_STATUS,
+  VEHICLE_REASON,
+  Device,
+  StateEntry,
+  TripsEvents,
+  TripsTelemetry,
+  Telemetry,
+  VehicleEvent,
+  Timestamp,
+  UUID
+} from '@mds-core/mds-types'
 import {
   isStringifiedTelemetry,
   isStringifiedEventWithTelemetry,
   isStringifiedCacheReadDeviceResult
 } from '@mds-core/mds-utils'
 
-import { StringifiedEvent, StringifiedTelemetry, StringifiedCacheReadDeviceResult, CachedItem } from './types'
+import {
+  StringifiedEvent,
+  StringifiedTelemetry,
+  StringifiedCacheReadDeviceResult,
+  CachedItem,
+  StringifiedStateEntry,
+  StringifiedAllDeviceStates,
+  StringifiedTripsEvents,
+  StringifiedTripsTelemetry,
+  StringifiedAllTripsEvents
+} from './types'
+
+function parseDeviceState(deviceState: StringifiedStateEntry): StateEntry {
+  try {
+    return {
+      vehicle_type: deviceState.vehicle_type as VEHICLE_TYPE,
+      type: deviceState.type,
+      timestamp: Number(deviceState.timestamp) as Timestamp,
+      device_id: deviceState.device_id,
+      provider_id: deviceState.provider_id,
+      recorded: Number(deviceState.recorded) as Timestamp,
+      annotation_version: Number(deviceState.annotation_version),
+      annotation: deviceState.annotation
+        ? { in_bound: JSON.parse(deviceState.annotation.in_bound), areas: deviceState.annotation.areas }
+        : null,
+      gps: deviceState.gps
+        ? {
+            lat: Number(deviceState.gps.lat),
+            lng: Number(deviceState.gps.lng),
+            altitude: deviceState.gps.altitude ? Number(deviceState.gps.altitude) : null,
+            heading: deviceState.gps.heading ? Number(deviceState.gps.heading) : null,
+            speed: deviceState.gps.speed ? Number(deviceState.gps.speed) : null,
+            accuracy: deviceState.gps.accuracy ? Number(deviceState.gps.accuracy) : null
+          }
+        : null,
+      service_area_id: deviceState.service_area_id ? (deviceState.service_area_id as UUID) : null,
+      charge: deviceState.charge ? Number(deviceState.charge) : null,
+      state: deviceState.state ? (deviceState.state as VEHICLE_STATUS) : null,
+      event_type: deviceState.event_type ? (deviceState.event_type as VEHICLE_EVENT) : null,
+      event_type_reason: deviceState.event_type_reason ? (deviceState.event_type_reason as VEHICLE_REASON) : null,
+      trip_id: deviceState.trip_id ? (deviceState.trip_id as UUID) : null
+    }
+  } catch (err) {
+    throw new Error(`unable to parse deviceState: ${deviceState}`)
+  }
+}
+
+function parseAllDeviceStates(allDeviceStates: StringifiedAllDeviceStates): { [vehicle_id: string]: StateEntry } {
+  try {
+    let devices: { [vehicle_id: string]: StateEntry } = {}
+    for (let vehicle_id in allDeviceStates) {
+      devices[vehicle_id] = parseDeviceState(allDeviceStates[vehicle_id])
+    }
+    return devices
+  } catch (err) {
+    throw new Error(`unable to parse allDeviceStates`)
+  }
+}
+
+function parseTripsEvents(tripsEvents: StringifiedTripsEvents): TripsEvents {
+  try {
+    let trips: TripsEvents = {}
+    for (let trip_id in tripsEvents) {
+      for (let i = 0; i < tripsEvents[trip_id].length; i++) {
+        trips[trip_id][i] = {
+          vehicle_type: tripsEvents[trip_id][i].vehicle_type as VEHICLE_TYPE,
+          timestamp: Number(tripsEvents[trip_id][i].timestamp) as Timestamp,
+          event_type: tripsEvents[trip_id][i].event_type as VEHICLE_EVENT,
+          event_type_reason: tripsEvents[trip_id][i].event_type_reason
+            ? (tripsEvents[trip_id][i].event_type_reason as VEHICLE_REASON)
+            : null,
+          annotation_version: Number(tripsEvents[trip_id][i].annotation_version),
+          annotation: {
+            in_bound: JSON.parse(tripsEvents[trip_id][i].annotation.in_bound),
+            areas: tripsEvents[trip_id][i].annotation.areas
+          },
+          gps: {
+            lat: Number(tripsEvents[trip_id][i].gps.lat),
+            lng: Number(tripsEvents[trip_id][i].gps.lng),
+            altitude: tripsEvents[trip_id][i].gps.altitude ? Number(tripsEvents[trip_id][i].gps.altitude) : null,
+            heading: tripsEvents[trip_id][i].gps.heading ? Number(tripsEvents[trip_id][i].gps.heading) : null,
+            speed: tripsEvents[trip_id][i].gps.speed ? Number(tripsEvents[trip_id][i].gps.speed) : null,
+            accuracy: tripsEvents[trip_id][i].gps.accuracy ? Number(tripsEvents[trip_id][i].gps.accuracy) : null
+          },
+          service_area_id: tripsEvents[trip_id][i].service_area_id
+            ? (tripsEvents[trip_id][i].service_area_id as UUID)
+            : null
+        }
+      }
+    }
+    return trips
+  } catch (err) {
+    console.log(err)
+    throw new Error(`unable to parse tripsEvents: ${tripsEvents}`)
+  }
+}
+
+function parseTripsTelemetry(tripsTelemetry: StringifiedTripsTelemetry): TripsTelemetry {
+  try {
+    let trips: TripsTelemetry = {}
+    for (let trip_id in tripsTelemetry) {
+      for (let i = 0; i < tripsTelemetry[trip_id].length; i++) {
+        console.log('HERERERE1')
+        console.log(tripsTelemetry)
+        console.log('check')
+        console.log(tripsTelemetry[trip_id])
+        trips[trip_id][i] = {
+          timestamp: Number(tripsTelemetry[trip_id][i].timestamp) as Timestamp,
+          latitude: Number(tripsTelemetry[trip_id][i].latitude),
+          longitude: Number(tripsTelemetry[trip_id][i].longitude),
+          annotation_version: Number(tripsTelemetry[trip_id][i].annotation_version),
+          annotation: {
+            in_bound: JSON.parse(tripsTelemetry[trip_id][i].annotation.in_bound),
+            areas: tripsTelemetry[trip_id][i].annotation.areas
+          },
+          service_area_id: tripsTelemetry[trip_id][i].service_area_id
+            ? (tripsTelemetry[trip_id][i].service_area_id as UUID)
+            : null
+        }
+      }
+    }
+    return trips
+  } catch (err) {
+    console.log(err)
+    throw new Error(`unable to parse tripsTelemetry: ${tripsTelemetry}`)
+  }
+}
+
+function parseAllTripsEvents(allTripsEvents: StringifiedAllTripsEvents): { [vehicle_id: string]: TripsEvents } {
+  try {
+    let allTrips: { [vehicle_id: string]: TripsEvents } = {}
+    for (let vehicle_id in allTripsEvents) {
+      allTrips[vehicle_id] = parseTripsEvents(allTripsEvents[vehicle_id])
+    }
+    return allTrips
+  } catch (err) {
+    throw new Error(`unable to parse allTripsEvents`)
+  }
+}
 
 function parseTelemetry(telemetry: StringifiedTelemetry): Telemetry {
   try {
@@ -85,4 +236,14 @@ function parseCachedItem(item: CachedItem): Device | Telemetry | VehicleEvent {
   throw new Error(`unable to parse ${JSON.stringify(item)}`)
 }
 
-export { parseEvent, parseTelemetry, parseDevice, parseCachedItem }
+export {
+  parseDeviceState,
+  parseAllDeviceStates,
+  parseTripsEvents,
+  parseTripsTelemetry,
+  parseAllTripsEvents,
+  parseEvent,
+  parseTelemetry,
+  parseDevice,
+  parseCachedItem
+}

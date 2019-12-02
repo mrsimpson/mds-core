@@ -7,6 +7,8 @@ import log from '@mds-core/mds-logger'
 import { getAnnotationData, getAnnotationVersion } from './annotation'
 import {
   CE_TYPE,
+  InboundEvent,
+  InboundTelemetry,
   StateEntry,
   TripEvent,
   TripTelemetry,
@@ -45,14 +47,14 @@ async function eventHandler() {
   })
 }
 
-async function processRaw(type: CE_TYPE, data: any) {
+async function processRaw(type: CE_TYPE, data: InboundEvent & InboundTelemetry) {
   const { timestamp, device_id, provider_id, recorded } = data as {
     timestamp: number
     device_id: string
     provider_id: string
     recorded: number
   }
-  const lastState = JSON.parse(await cache.hget('device:state', provider_id + ':' + device_id)) as StateEntry
+  const lastState = await cache.readDeviceState(provider_id + ':' + device_id)
   // Construct state
   const baseDeviceState = {
     vehicle_type: 'scooter',
@@ -60,7 +62,7 @@ async function processRaw(type: CE_TYPE, data: any) {
     timestamp: timestamp,
     device_id: device_id,
     provider_id: provider_id,
-    time_recorded: recorded,
+    recorded: recorded,
     annotation_version: getAnnotationVersion()
   } as StateEntry
 
@@ -102,10 +104,11 @@ async function processRaw(type: CE_TYPE, data: any) {
       }
       // Only update cache (device:state) with most recent event
       if (!lastState || lastState.timestamp < deviceState.timestamp) {
-        await cache.hset('device:state', provider_id + ':' + device_id, JSON.stringify(deviceState))
+        //await cache.hset('device:state', provider_id + ':' + device_id, JSON.stringify(deviceState))
+        await cache.writeDeviceState(provider_id + ':' + device_id, deviceState)
       }
       // Add to PG table (reports_device_states) and stream
-      await db.insert('reports_device_states', deviceState)
+      await db.insertDeviceStates(deviceState)
       //await stream.writeCloudEvent('mds.processed.event', JSON.stringify(device_state))
       return deviceState
     }
@@ -124,7 +127,7 @@ async function processRaw(type: CE_TYPE, data: any) {
       processTripTelemetry(deviceState)
 
       // Add to PG table (reports_device_states) and stream
-      await db.insert('reports_device_states', deviceState)
+      await db.insertDeviceStates(deviceState)
       //await stream.writeCloudEvent('mds.processed.event', JSON.stringify(device_state))
       return deviceState
     }
@@ -164,19 +167,18 @@ async function processTripEvent(deviceState: StateEntry) {
   } as TripEvent
 
   // Either append to existing trip or create new entry
-  const cacheEntry: string | null = await cache.hget('trips:events', provider_id + ':' + device_id)
-  let trips: { [trip_id: string]: TripEvent[] } = cacheEntry ? JSON.parse(cacheEntry) : {}
+  const tripsCache = await cache.readTripsEvents(provider_id + ':' + device_id)
+  let trips = tripsCache ? tripsCache : {}
   //TODO reduce logic
   if (trip_id) {
     if (!trips[trip_id]) {
       trips[trip_id] = []
     }
     trips[trip_id].push(tripEvent)
+    // Update trip event cache and stream
+    await cache.writeTripsEvents(provider_id + ':' + device_id, trips)
+    //await stream.writeCloudEvent('mds.trip.event', JSON.stringify(tripEvent))
   }
-
-  // Update trip event cache and stream
-  await cache.hset('trips:events', provider_id + ':' + device_id, JSON.stringify(trips))
-  //await stream.writeCloudEvent('mds.trip.event', JSON.stringify(tripEvent))
   await processTripTelemetry(deviceState)
 }
 
@@ -185,9 +187,7 @@ async function getTripId(deviceState: StateEntry) {
   Return trip_id for telemetery entry by associating timestamps
   */
   const { provider_id, device_id, timestamp } = deviceState
-  const tripsEvents: { [trip_id: string]: TripEvent[] } = JSON.parse(
-    await cache.hget('trips:events', provider_id + ':' + device_id)
-  )
+  const tripsEvents = await cache.readTripsEvents(provider_id + ':' + device_id)
   if (!tripsEvents) {
     log.warn('NO TRIP DATA FOUND')
     return undefined
@@ -252,17 +252,16 @@ async function processTripTelemetry(deviceState: StateEntry) {
   if (typeof tripId === 'undefined') {
     return false
   }
-  const cacheEntry: string | null = await cache.hget('trips:telemetry', provider_id + ':' + device_id)
-  let trips: { [trip_id: string]: TripTelemetry[] } = cacheEntry ? JSON.parse(cacheEntry) : {}
-
+  const tripsCache = await cache.readTripsTelemetry(provider_id + ':' + device_id)
+  let trips = tripsCache ? tripsCache : {}
   //TODO reduce logic
   if (typeof tripId === 'string') {
     if (!trips[tripId]) {
       trips[tripId] = []
     }
     trips[tripId].push(tripTelemetry)
+    await cache.writeTripsTelemetry(provider_id + ':' + device_id, trips)
   }
-  await cache.hset('trips:telemetry', provider_id + ':' + device_id, JSON.stringify(trips))
   return true
 }
 

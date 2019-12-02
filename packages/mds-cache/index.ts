@@ -23,7 +23,10 @@ import {
   Timestamp,
   Device,
   VehicleEvent,
+  TripsEvents,
+  TripsTelemetry,
   Telemetry,
+  StateEntry,
   BoundingBox,
   EVENT_STATUS_MAP,
   VEHICLE_STATUSES
@@ -31,14 +34,30 @@ import {
 import redis from 'redis'
 import bluebird from 'bluebird'
 
-import { parseTelemetry, parseEvent, parseDevice, parseCachedItem } from './unflatteners'
+import {
+  parseDeviceState,
+  parseAllDeviceStates,
+  parseTripsEvents,
+  parseTripsTelemetry,
+  parseAllTripsEvents,
+  parseTelemetry,
+  parseEvent,
+  parseDevice,
+  parseCachedItem
+} from './unflatteners'
 import {
   CacheReadDeviceResult,
   CachedItem,
+  CachedHashItem,
   StringifiedCacheReadDeviceResult,
   StringifiedEventWithTelemetry,
   StringifiedTelemetry,
-  StringifiedEvent
+  StringifiedEvent,
+  StringifiedStateEntry,
+  StringifiedAllDeviceStates,
+  StringifiedTripsEvents,
+  StringifiedTripsTelemetry,
+  StringifiedAllTripsEvents
 } from './types'
 
 const { env } = process
@@ -107,24 +126,68 @@ async function info() {
   return data
 }
 
+async function hget(key: string, field: UUID): Promise<CachedItem | CachedHashItem | null> {
+  const flat = await (await getClient()).hgetAsync(key, field)
+  if (flat) {
+    return unflatten(flat)
+  }
+  return null
+  //throw new Error(`${field} not found in ${key}`)
+}
+
+async function hgetall(key: string): Promise<CachedItem | CachedHashItem | null> {
+  const flat = await (await getClient()).hgetallAsync(key)
+  if (flat) {
+    return unflatten(flat)
+  }
+  return null
+  //throw new Error(`${key} not found`)
+}
+
+async function readDeviceState(field: UUID): Promise<StateEntry | null> {
+  const deviceState = await hget('device:state', field)
+  return deviceState ? parseDeviceState(deviceState as StringifiedStateEntry) : null
+}
+
+async function readAllDeviceStates(): Promise<{ [vehicle_id: string]: StateEntry } | null> {
+  const allDeviceStates = await hgetall('device:state')
+  return allDeviceStates ? parseAllDeviceStates(allDeviceStates as StringifiedAllDeviceStates) : null
+}
+
+async function writeDeviceState(field: UUID, data: StateEntry) {
+  return await (await getClient()).hsetAsync('device:state', field, JSON.stringify(data))
+}
+
+async function readTripsEvents(field: UUID): Promise<TripsEvents | null> {
+  const tripsEvents = await hget('trips:events', field)
+  return tripsEvents ? parseTripsEvents(tripsEvents as StringifiedTripsEvents) : null
+}
+
+async function readAllTripsEvents(): Promise<{ [vehicle_id: string]: TripsEvents } | null> {
+  const allTripsEvents = await hgetall('trips:events')
+  return allTripsEvents ? parseAllTripsEvents(allTripsEvents as StringifiedAllTripsEvents) : null
+}
+
+async function writeTripsEvents(field: UUID, data: TripsEvents) {
+  return await (await getClient()).hsetAsync('trips:events', field, JSON.stringify(data))
+}
+
+async function deleteTripsEvents(field: UUID) {
+  return await (await getClient()).hdelAsync('trips:events', field)
+}
+
+async function readTripsTelemetry(field: UUID): Promise<TripsTelemetry | null> {
+  const tripsTelemetry = await hget('trips:telemetry', field)
+  return tripsTelemetry ? parseTripsTelemetry(tripsTelemetry as StringifiedTripsTelemetry) : null
+}
+
+async function writeTripsTelemetry(field: UUID, data: TripsTelemetry) {
+  return await (await getClient()).hsetAsync('trips:telemetry', field, JSON.stringify(data))
+}
+
+// Exposing temporarily for testing purposes
 async function delCache(key: string) {
   await (await getClient()).delAsync(key)
-}
-
-async function hget(key: string, field: string) {
-  return (await getClient()).hgetAsync(key, field)
-}
-
-async function hgetall(key: string) {
-  return (await getClient()).hgetallAsync(key)
-}
-
-async function hset(key: string, field: string, value: string) {
-  await (await getClient()).hsetAsync(key, field, value)
-}
-
-async function hdel(key: string, field: string) {
-  return (await getClient()).hdelAsync(key, field)
 }
 
 // update the ordered list of (device_id, timestamp) tuples
@@ -567,11 +630,16 @@ export = {
   initialize,
   health,
   info,
+  readDeviceState,
+  readAllDeviceStates,
+  writeDeviceState,
+  readTripsEvents,
+  readAllTripsEvents,
+  writeTripsEvents,
+  deleteTripsEvents,
+  readTripsTelemetry,
+  writeTripsTelemetry,
   delCache,
-  hget,
-  hgetall,
-  hset,
-  hdel,
   seed,
   reset,
   startup,

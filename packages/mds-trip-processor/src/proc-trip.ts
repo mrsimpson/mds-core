@@ -6,7 +6,7 @@ import config from './config'
 import log from '@mds-core/mds-logger'
 
 import { CE_TYPE, TripEvent, TripEntry, TripTelemetry } from '@mds-core/mds-types'
-import { calcDistance } from './geo/geo'
+import { calcDistance, DistanceMeasure } from './geo/geo'
 
 /*
     Trip processor that runs inside a Kubernetes pod, activated via cron job.
@@ -27,11 +27,11 @@ async function tripHandler() {
 
 async function tripAggregator() {
   const curTime = new Date().getTime()
-  const tripsMap = await cache.hgetall('trips:events')
+  const tripsMap = await cache.readAllTripsEvents()
   log.info('triggered')
   for (let vehicleID in tripsMap) {
     const [provider_id, device_id] = vehicleID.split(':')
-    const trips: { [trip_id: string]: TripEvent[] } = JSON.parse(tripsMap[vehicleID])
+    const trips = tripsMap[vehicleID]
     log.info(trips)
     let unprocessedTrips = trips
     for (let trip_id in trips) {
@@ -44,10 +44,10 @@ async function tripAggregator() {
     // Update or clear cache
     if (Object.keys(unprocessedTrips).length) {
       log.info('PROCESSED SOME TRIPS')
-      await cache.hset('trips:events', vehicleID, JSON.stringify(unprocessedTrips))
+      await cache.writeTripsEvents(vehicleID, unprocessedTrips)
     } else {
       log.info('PROCESSED ALL TRIPS')
-      await cache.hdel('trips:events', vehicleID)
+      await cache.deleteTripsEvents(vehicleID)
     }
   }
 }
@@ -121,7 +121,11 @@ async function processTrip(
   } as TripEntry
 
   // Get trip telemetry data
-  let tripMap = JSON.parse(await cache.hget('trips:telemetry', provider_id + ':' + device_id))
+  const tripMap = await cache.readTripsTelemetry(provider_id + ':' + device_id)
+  if (!tripMap) {
+    log.info('NO TELEMETRY FOUND FOR TRIP')
+    return false
+  }
   const tripTelemetry = tripMap[trip_id]
   let telemetry: TripTelemetry[][] = []
   // Separate telemetry by trip events
@@ -146,7 +150,7 @@ async function processTrip(
   // We must calculate with trip since telemetry is delayed by up to 24 hrs
   const total_time = tripEndEvent.timestamp - tripStartEvent.timestamp
   const duration = total_time
-  const distMeasure: any = calcDistance(telemetry, tripStartEvent.gps)
+  const distMeasure: DistanceMeasure = calcDistance(telemetry, tripStartEvent.gps)
   const distance = distMeasure.totalDist
   const distArray = distMeasure.points
   const violation_count = distMeasure.points.length
@@ -169,7 +173,7 @@ async function processTrip(
   // Insert into PG DB and stream
   log.info('INSERT')
   try {
-    await db.insert('reports_trips', tripData)
+    await db.insertTrips(tripData)
   } catch (err) {
     log.error(err)
   }
@@ -179,7 +183,7 @@ async function processTrip(
   log.info('DELETE')
   try {
     delete tripMap[trip_id]
-    await cache.hset('trips:telemetry', provider_id + ':' + device_id, JSON.stringify(tripMap))
+    await cache.writeTripsTelemetry(provider_id + ':' + device_id, tripMap)
   } catch (err) {
     log.error(err)
   }

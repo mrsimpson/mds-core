@@ -45,7 +45,8 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
   */
   // TODO: decide between seperate aggerator services for vehicle type/jurisdiction.
   // Only processing at organization level for scooters now
-  const providersMap = await cache.hgetall('provider:state')
+  //const providersMap = await cache.hgetall('provider:state')
+  const providersMap = null
   const providerData: ProviderStreamData = providersMap ? JSON.parse(providersMap[providerID]) : null
 
   // TODO: convert hardcoded bin start time, vehicle_type and geography
@@ -80,9 +81,9 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
   }
 
   // Insert into PG DB and stream
-  log.info('INSERT')
   try {
-    await db.insert('reports_providers', provider_data)
+    await db.insertMetrics(provider_data)
+    log.info('INSERT')
   } catch (err) {
     log.error(err)
     return false

@@ -1,45 +1,45 @@
-let service_areas = require('./service-areas')
-let turf_main = require('@turf/helpers')
+let serviceAreas = require('./service-areas')
+let turfMain = require('@turf/helpers')
 let turf = require('@turf/boolean-point-in-polygon')
+import { TripTelemetry, GpsData } from '@mds-core/mds-types'
+import log from '@mds-core/mds-logger'
 
-const log = require('loglevel')
-
-let district_areas = Array()
-for (let index in service_areas['features']) {
-  let district_uuid = service_areas['features'][index]['properties']['dist_uuid']
-  let area = service_areas['features'][index]['geometry']['coordinates']
+var districtAreas = Array()
+for (let index in serviceAreas['features']) {
+  const district_uuid = serviceAreas['features'][index]['properties']['dist_uuid']
+  const area = serviceAreas['features'][index]['geometry']['coordinates']
   // still servicing
-  district_areas[district_uuid] = service_areas['features'][index] // turf_main.polygon(area[0]));
+  districtAreas[district_uuid] = serviceAreas['features'][index] // turf_main.polygon(area[0]));
 }
 
-let findServiceAreas = function(lng: any, lat: any) {
+function findServiceAreas(lng: number, lat: number) {
   let areas = []
-  let turf_pt = turf_main.point([lng, lat])
-  for (let key in district_areas) {
-    if (turf.default(turf_pt, district_areas[key])) {
+  const turfPT = turfMain.point([lng, lat])
+  for (let key in districtAreas) {
+    if (turf.default(turfPT, districtAreas[key])) {
       areas.push({ id: key, type: 'district' })
     }
   }
   return areas
 }
 
-let moved = function(first_data: any, second_data: any) {
-  let limit = 0.00001 // arbitrary amount
-  let lat_diff = Math.abs(first_data.latitude - second_data.latitude)
-  let lng_diff = Math.abs(first_data.longitude - second_data.longitude)
-  return lng_diff > limit || lat_diff > limit // very computational efficient basic check (better than sqrts & trig)
+function moved(latA: number, lngA: number, latB: number, lngB: number) {
+  const limit = 0.00001 // arbitrary amount
+  let latDiff = Math.abs(latA - latB)
+  let lngDiff = Math.abs(lngA - lngB)
+  return lngDiff > limit || latDiff > limit // very computational efficient basic check (better than sqrts & trig)
 }
 
 // Helper funtion to calculate distance between two points given latitudes and longitudes
 // Unit is default miles but can be expressed in kilometers given the value 'K'
-function gpsDistance(lat1: number, lon1: number, lat2: number, lon2: number, unit: string) {
-  if (lat1 === lat2 && lon1 === lon2) {
+function gpsDistance(latA: number, lngA: number, latB: number, lngB: number, unit: string = 'M'): number {
+  if (latA === latB && lngA === lngB) {
     return 0
   } else {
-    let radlat1 = (Math.PI * lat1) / 180
-    let radlat2 = (Math.PI * lat2) / 180
-    let theta = lon1 - lon2
-    let radtheta = (Math.PI * theta) / 180
+    const radlat1 = (Math.PI * latA) / 180
+    const radlat2 = (Math.PI * latB) / 180
+    const theta = lngA - lngB
+    const radtheta = (Math.PI * theta) / 180
     let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta)
     if (dist > 1) {
       dist = 1
@@ -54,19 +54,27 @@ function gpsDistance(lat1: number, lon1: number, lat2: number, lon2: number, uni
   }
 }
 
-let calcTotalDist = function(telemetry: any, start_gps: any) {
-  let temp_x = start_gps.lat
-  let temp_y = start_gps.lng
-  let distance = 0
-  for (let n in telemetry) {
-    for (let m in telemetry[n]) {
-      let curr_ping = telemetry[n][m]
-      distance += gpsDistance(curr_ping.latitude, curr_ping.longitude, temp_x, temp_y, 'M')
-      temp_x = curr_ping.latitude
-      temp_y = curr_ping.longitude
-    }
-  }
-  return distance
+export interface DistanceMeasure {
+  totalDist: number
+  points: number[]
 }
 
-export { findServiceAreas, moved, calcTotalDist }
+let calcDistance = function(telemetry: TripTelemetry[][], startGps: GpsData, units: string = 'M'): DistanceMeasure {
+  let tempX = startGps.lat
+  let tempY = startGps.lng
+  let distance: number = 0
+  let points: number[] = new Array()
+  for (let n = 0; n < telemetry.length; n++) {
+    for (let m = 0; m < telemetry[n].length; m++) {
+      const currPing = telemetry[n][m]
+      const pointDist = gpsDistance(currPing.latitude, currPing.longitude, tempX, tempY, units)
+      distance += pointDist
+      points.push(pointDist)
+      tempX = currPing.latitude
+      tempY = currPing.longitude
+    }
+  }
+  return { totalDist: distance, points: points }
+}
+
+export { findServiceAreas, moved, calcDistance }

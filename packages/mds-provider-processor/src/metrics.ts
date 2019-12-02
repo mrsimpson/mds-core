@@ -40,9 +40,12 @@ async function calcEventCounts(id: string) {
   return eventCounts
 }
 
-async function calcVehicleCounts(id: string): Promise<VehicleCountMetricObj> {
+async function calcVehicleCounts(id: string): Promise<VehicleCountMetricObj | null> {
   const events = await db.getStates(id)
-  const stateCache = await cache.hgetall('device:state')
+  const stateCache = await cache.readAllDeviceStates()
+  if (!stateCache) {
+    return null
+  }
   const recentStates = Object.values(stateCache)
 
   // Calculate total number of registered vehicles at start of bin
@@ -58,8 +61,8 @@ async function calcVehicleCounts(id: string): Promise<VehicleCountMetricObj> {
   //TODO: 48 hour filtering
   let count = 0
   for (let i in recentStates) {
-    const deviceState = JSON.parse(recentStates[i])
-    if (VEHICLE_STATUSES_ROW.includes(deviceState.state)) {
+    const deviceState = recentStates[i]
+    if (VEHICLE_STATUSES_ROW.includes(String(deviceState.state))) {
       count += 1
     }
   }
@@ -81,10 +84,13 @@ async function calcTripCount(id: string, curTime: number): Promise<number> {
   return tripCount[0].count
 }
 
-async function calcVehicleTripCount(id: string, curTime: number): Promise<string> {
+async function calcVehicleTripCount(id: string, curTime: number): Promise<string | null> {
   const maxTrips = 5
   let tripCountArray = new Array(maxTrips + 1).fill(0)
-  const rs = await cache.hgetall('device:state')
+  const rs = await cache.readAllDeviceStates()
+  if (!rs) {
+    return null
+  }
   const vehicles = Object.keys(rs)
   const lastHour = curTime - 3600000
   // TODO: migrate form inefficient loop once SET is created in cache

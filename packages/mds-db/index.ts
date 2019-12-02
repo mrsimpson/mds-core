@@ -87,8 +87,10 @@ import {
   getTripCount,
   getVehicleTripCount,
   getLateEventCount,
-  insert,
-  resetTable
+  resetTable,
+  insertDeviceStates,
+  insertTrips,
+  insertMetrics
 } from './processors'
 
 async function initialize() {
@@ -179,13 +181,6 @@ async function seed(data: {
 
 export = {
   initialize,
-  getStates,
-  getTrips,
-  getTripCount,
-  getVehicleTripCount,
-  getLateEventCount,
-  insert,
-  resetTable,
   health,
   seed,
   startup,
@@ -215,6 +210,15 @@ export = {
   readAuditAttachments,
   writeAttachment,
   writeAuditAttachment,
+  getStates,
+  getTrips,
+  getTripCount,
+  getVehicleTripCount,
+  getLateEventCount,
+  resetTable,
+  insertDeviceStates,
+  insertTrips,
+  insertMetrics,
   readGeographies,
   readGeographySummaries,
   writeGeography,
