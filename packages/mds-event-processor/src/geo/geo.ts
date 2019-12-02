@@ -3,7 +3,8 @@ import { TripTelemetry, GpsData } from '@mds-core/mds-types'
 import turfMain, { Polygon, MultiPolygon, Feature, Properties } from '@turf/helpers'
 import turf from '@turf/boolean-point-in-polygon'
 
-const serviceAreas = require ('./service-areas')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const serviceAreas = require('./service-areas')
 
 const districtAreas: { [key: string]: Polygon | MultiPolygon | Feature<Polygon | MultiPolygon, Properties> } = {}
 
