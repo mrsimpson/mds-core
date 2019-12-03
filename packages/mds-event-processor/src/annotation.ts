@@ -1,5 +1,5 @@
 import { AnnotationData, GpsData } from '@mds-core/mds-types'
-import { findServiceAreas } from './geo/geo'
+import { findServiceAreas } from '@mds-core/mds-utils'
 
 const version = 1.0
 /* This function is called on each event processed. It calculates the annotation data and

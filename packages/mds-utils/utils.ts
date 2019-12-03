@@ -30,11 +30,16 @@ import {
   VEHICLE_STATUSES,
   EVENT_STATUS_MAP,
   VEHICLE_STATUS,
-  BBox
+  BBox,
+  TripTelemetry,
+  GpsData
 } from '@mds-core/mds-types'
 import { TelemetryRecord } from '@mds-core/mds-db/types'
 import log from '@mds-core/mds-logger'
 import { MultiPolygon, Polygon, FeatureCollection, Geometry, Feature } from 'geojson'
+import turfMain from '@turf/helpers'
+import turf from '@turf/boolean-point-in-polygon'
+import { serviceAreaMap } from 'ladot-service-areas'
 
 const RADIUS = 30.48 // 100 feet, in meters
 const NUMBER_OF_EDGES = 32 // Number of edges to add, geojson doesn't support real circles
@@ -636,6 +641,54 @@ function filterEmptyHelper<T>(warnOnEmpty?: boolean) {
   }
 }
 
+function findServiceAreas(lng: number, lat: number) {
+  const districtAreas: {
+    [key: string]: MultiPolygon
+  } = {}
+
+  /* eslint-reason FIXME use map() */
+  /* eslint-disable-next-line guard-for-in */
+  for (const index in serviceAreaMap) {
+    districtAreas[index] = serviceAreaMap[index].area
+  }
+  const areas = []
+  const turfPT = turfMain.point([lng, lat])
+  for (const key in districtAreas) {
+    if (turf(turfPT, districtAreas[key])) {
+      areas.push({ id: key, type: 'district' })
+    }
+  }
+  return areas
+}
+
+function moved(latA: number, lngA: number, latB: number, lngB: number) {
+  const limit = 0.00001 // arbitrary amount
+  const latDiff = Math.abs(latA - latB)
+  const lngDiff = Math.abs(lngA - lngB)
+  return lngDiff > limit || latDiff > limit // very computational efficient basic check (better than sqrts & trig)
+}
+
+const calcDistance = (telemetry: TripTelemetry[][], startGps: GpsData) => {
+  let tempX = startGps.lat
+  let tempY = startGps.lng
+  let distance = 0
+  const points: number[] = []
+  for (let n = 0; n < telemetry.length; n++) {
+    for (let m = 0; m < telemetry[n].length; m++) {
+      const currPing = telemetry[n][m]
+      const pointDist = routeDistance([
+        { lat: currPing.latitude, lng: currPing.longitude },
+        { lat: tempX, lng: tempY }
+      ])
+      distance += pointDist
+      points.push(pointDist)
+      tempX = currPing.latitude
+      tempY = currPing.longitude
+    }
+  }
+  return { totalDist: distance, points }
+}
+
 export {
   UUID_REGEX,
   isUUID,
@@ -676,5 +729,8 @@ export {
   isInStatesOrEvents,
   routeDistance,
   clone,
-  filterEmptyHelper
+  filterEmptyHelper,
+  findServiceAreas,
+  moved,
+  calcDistance
 }

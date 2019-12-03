@@ -1,11 +1,11 @@
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import log from '@mds-core/mds-logger'
+import { calcDistance } from '@mds-core/mds-utils'
 
 import { TripEvent, TripEntry, TripTelemetry } from '@mds-core/mds-types'
 import config from './config'
 import { dataHandler } from './proc'
-import { calcDistance, DistanceMeasure } from './geo/geo'
 
 /*
     Trip processor that runs inside a Kubernetes pod, activated via cron job.
@@ -99,7 +99,7 @@ async function processTrip(
   // We must calculate with trip since telemetry is delayed by up to 24 hrs
   const total_time = tripEndEvent.timestamp - tripStartEvent.timestamp
   const duration = total_time
-  const distMeasure: DistanceMeasure = calcDistance(telemetry, tripStartEvent.gps)
+  const distMeasure = calcDistance(telemetry, tripStartEvent.gps)
   const distance = distMeasure.totalDist
   const distArray = distMeasure.points
   const violation_count = distMeasure.points.length

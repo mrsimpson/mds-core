@@ -103,7 +103,7 @@ async function calcVehicleTripCount(id: string, curTime: number): Promise<string
     const [providerID, deviceID] = vehicles[i].split(':')
     if (providerID === id) {
       /* eslint-reason FIXME use Promise.all() */
-      // eslint-disable-next-line no-await-in-loop
+      /* eslint-disable-next-line no-await-in-loop */
       const tripCount = await db.getVehicleTripCount(deviceID, lastHour, curTime)
       const tripCountIndex = tripCount[0].count
       if (tripCountIndex >= maxTrips) {
