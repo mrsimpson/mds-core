@@ -1,6 +1,6 @@
-import { eventHandler } from './src/proc-event'
 import db from '@mds-core/mds-db'
 import log from '@mds-core/mds-logger'
+import { eventHandler } from './src/proc-event'
 
 async function processData() {
   // make sure the tables exist
@@ -10,5 +10,6 @@ async function processData() {
 }
 
 export const main = () => {
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   processData()
 }

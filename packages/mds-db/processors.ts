@@ -1,44 +1,41 @@
 import { StateEntry, TripEntry, MetricsTableRow, Recorded } from '@mds-core/mds-types'
-import schema from './schema'
+import schema, { TABLE_NAME } from './schema'
 import { vals_sql, cols_sql, vals_list, logSql } from './sql-utils'
-import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
-import log from '@mds-core/mds-logger'
-//remove
-import { TABLE_NAME } from './schema'
+import { getWriteableClient, makeReadOnlyQuery } from './client'
 
 export async function getStates(
   provider_id: string,
-  start_time: number = 0,
+  start_time = 0,
   end_time: number = Date.now()
 ): Promise<StateEntry[]> {
   const query = `SELECT * FROM reports_device_states WHERE timestamp BETWEEN ${start_time} AND ${end_time}`
-  //let query = `SELECT * FROM reports_device_states WHERE provider_id = ${provider_id} AND timestamp BETWEEN ${start_time} AND ${end_time}`
+  // let query = `SELECT * FROM reports_device_states WHERE provider_id = ${provider_id} AND timestamp BETWEEN ${start_time} AND ${end_time}`
   return makeReadOnlyQuery(query)
 }
 
 export async function getTrips(
   provider_id: string,
-  start_time: number = 0,
+  start_time = 0,
   end_time: number = Date.now()
 ): Promise<TripEntry[]> {
   const query = `SELECT * FROM reports_trips WHERE end_time BETWEEN ${start_time} AND ${end_time}`
-  //let query = `SELECT * FROM reports_trips WHERE provider_id = ${provider_id} AND end_time BETWEEN ${start_time} AND ${end_time}`
+  // let query = `SELECT * FROM reports_trips WHERE provider_id = ${provider_id} AND end_time BETWEEN ${start_time} AND ${end_time}`
   return makeReadOnlyQuery(query)
 }
 
 export async function getTripCount(
   provider_id: string,
-  start_time: number = 0,
+  start_time = 0,
   end_time: number = Date.now()
 ): Promise<Array<{ count: number }>> {
   const query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE type = 'event' AND timestamp BETWEEN ${start_time} AND ${end_time}`
-  //let query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE provider_id = ${provider_id} AND type = 'event' AND timestamp BETWEEN ${start_time} AND ${end_time}`
+  // let query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE provider_id = ${provider_id} AND type = 'event' AND timestamp BETWEEN ${start_time} AND ${end_time}`
   return makeReadOnlyQuery(query)
 }
 
 export async function getVehicleTripCount(
   device_id: string,
-  start_time: number = 0,
+  start_time = 0,
   end_time: number = Date.now()
 ): Promise<Array<{ [count: string]: number }>> {
   const query = `SELECT count(DISTINCT trip_id) FROM reports_device_states WHERE type = 'event' AND device_id = '${device_id}' AND timestamp BETWEEN ${start_time} AND ${end_time}`
@@ -48,11 +45,11 @@ export async function getVehicleTripCount(
 export async function getLateEventCount(
   provider_id: string,
   events: any,
-  start_time: number = 0,
+  start_time = 0,
   end_time: number = Date.now()
 ): Promise<Array<{ count: number }>> {
   const query = `SELECT count(*) FROM reports_device_states WHERE event_type IN ${events} AND timestamp BETWEEN ${start_time} AND ${end_time}`
-  //let query = `SELECT count(*) FROM reports_device_states WHERE provider_id = ${provider_id} AND event_type IN ${events} AND timestamp BETWEEN ${start_time} AND ${end_time}`
+  // let query = `SELECT count(*) FROM reports_device_states WHERE provider_id = ${provider_id} AND event_type IN ${events} AND timestamp BETWEEN ${start_time} AND ${end_time}`
   return makeReadOnlyQuery(query)
 }
 

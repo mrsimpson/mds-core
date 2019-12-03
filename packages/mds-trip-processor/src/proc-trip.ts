@@ -1,11 +1,10 @@
-import { dataHandler } from './proc'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
-import stream from '@mds-core/mds-stream'
-import config from './config'
 import log from '@mds-core/mds-logger'
 
-import { CE_TYPE, TripEvent, TripEntry, TripTelemetry } from '@mds-core/mds-types'
+import { TripEvent, TripEntry, TripTelemetry } from '@mds-core/mds-types'
+import config from './config'
+import { dataHandler } from './proc'
 import { calcDistance, DistanceMeasure } from './geo/geo'
 
 /*
@@ -19,56 +18,6 @@ import { calcDistance, DistanceMeasure } from './geo/geo'
           PRIMARY KEY = (provider_id, device_id, trip_id)
           VALUES = trip_data
 */
-async function tripHandler() {
-  await dataHandler('trip', async function(type: CE_TYPE, data: any) {
-    tripAggregator()
-  })
-}
-
-async function tripAggregator() {
-  const curTime = new Date().getTime()
-  const tripsMap = await cache.readAllTripsEvents()
-  log.info('triggered')
-  for (let vehicleID in tripsMap) {
-    const [provider_id, device_id] = vehicleID.split(':')
-    const trips = tripsMap[vehicleID]
-    log.info(trips)
-    let unprocessedTrips = trips
-    for (let trip_id in trips) {
-      const tripProcessed = await processTrip(provider_id, device_id, trip_id, trips[trip_id], curTime)
-      if (tripProcessed) {
-        log.info('TRIP PROCESSED')
-        delete unprocessedTrips[trip_id]
-      }
-    }
-    // Update or clear cache
-    if (Object.keys(unprocessedTrips).length) {
-      log.info('PROCESSED SOME TRIPS')
-      await cache.writeTripsEvents(vehicleID, unprocessedTrips)
-    } else {
-      log.info('PROCESSED ALL TRIPS')
-      await cache.deleteTripsEvents(vehicleID)
-    }
-  }
-}
-
-function calcTimeIntervals(
-  telemetry: { [x: string]: { [x: string]: { timestamp: number } } },
-  startTime: number
-): number {
-  /*
-    Not currently used. Allows tracking of time between individual telemetry/event points
-  */
-  let tempTime = startTime
-  let count = 0
-  for (let n in telemetry) {
-    for (let m in telemetry[n]) {
-      count += telemetry[n][m].timestamp - tempTime
-      tempTime = telemetry[n][m].timestamp
-    }
-  }
-  return count
-}
 
 async function processTrip(
   provider_id: string,
@@ -96,7 +45,7 @@ async function processTrip(
   }
 
   // Process anything where the last event timestamp is more than 24 hours old
-  tripEvents.sort(function(a: { timestamp: number }, b: { timestamp: number }) {
+  tripEvents.sort((a: { timestamp: number }, b: { timestamp: number }) => {
     return a.timestamp - b.timestamp
   })
   const timeSLA = config.compliance_sla.max_telemetry_time
@@ -111,9 +60,9 @@ async function processTrip(
   const tripEndEvent = tripEvents[tripEvents.length - 1]
   const baseTripData = {
     vehicle_type: tripStartEvent.vehicle_type,
-    trip_id: trip_id,
-    device_id: device_id,
-    provider_id: provider_id,
+    trip_id,
+    device_id,
+    provider_id,
     start_time: tripStartEvent.timestamp,
     end_time: tripEndEvent.timestamp,
     start_service_area_id: tripStartEvent.service_area_id,
@@ -121,13 +70,13 @@ async function processTrip(
   } as TripEntry
 
   // Get trip telemetry data
-  const tripMap = await cache.readTripsTelemetry(provider_id + ':' + device_id)
+  const tripMap = await cache.readTripsTelemetry(`${provider_id}:${device_id}`)
   if (!tripMap) {
     log.info('NO TELEMETRY FOUND FOR TRIP')
     return false
   }
   const tripTelemetry = tripMap[trip_id]
-  let telemetry: TripTelemetry[][] = []
+  const telemetry: TripTelemetry[][] = []
   // Separate telemetry by trip events
   if (tripTelemetry && tripTelemetry.length > 0) {
     for (let i = 0; i < tripEvents.length - 1; i++) {
@@ -137,13 +86,13 @@ async function processTrip(
         (telemetry_point: { timestamp: number }) =>
           telemetry_point.timestamp >= start_time && (end_time ? telemetry_point.timestamp <= end_time : true)
       ) as TripTelemetry[]
-      tripSegment.sort(function(a: { timestamp: number }, b: { timestamp: number }) {
+      tripSegment.sort((a: { timestamp: number }, b: { timestamp: number }) => {
         return a.timestamp - b.timestamp
       })
       telemetry.push(tripSegment)
     }
   } else {
-    log.warn('No telemtry found')
+    await log.warn('No telemtry found')
   }
 
   // Calculate trip metrics
@@ -161,13 +110,13 @@ async function processTrip(
 
   const tripData = {
     ...baseTripData,
-    duration: duration,
-    distance: distance,
-    violation_count: violation_count,
-    max_violation_dist: max_violation_dist,
-    min_violoation_dist: min_violoation_dist,
-    avg_violation_dist: avg_violation_dist,
-    telemetry: telemetry
+    duration,
+    distance,
+    violation_count,
+    max_violation_dist,
+    min_violoation_dist,
+    avg_violation_dist,
+    telemetry
   } as TripEntry
 
   // Insert into PG DB and stream
@@ -175,19 +124,79 @@ async function processTrip(
   try {
     await db.insertTrips(tripData)
   } catch (err) {
-    log.error(err)
+    await log.error(err)
   }
-  //await stream.writeCloudEvent('mds.processed.trip', JSON.stringify(trip_data))
+  // await stream.writeCloudEvent('mds.processed.trip', JSON.stringify(trip_data))
 
   // Delete all processed telemetry data and update cache
   log.info('DELETE')
   try {
     delete tripMap[trip_id]
-    await cache.writeTripsTelemetry(provider_id + ':' + device_id, tripMap)
+    await cache.writeTripsTelemetry(`${provider_id}:${device_id}`, tripMap)
   } catch (err) {
-    log.error(err)
+    await log.error(err)
   }
   return true
+}
+
+async function tripAggregator() {
+  const curTime = new Date().getTime()
+  const tripsMap = await cache.readAllTripsEvents()
+  log.info('triggered')
+  // eslint-disable-next-line guard-for-in
+  for (const vehicleID in tripsMap) {
+    const [provider_id, device_id] = vehicleID.split(':')
+    const trips = tripsMap[vehicleID]
+    log.info(trips)
+    const unprocessedTrips = trips
+    // eslint-disable-next-line guard-for-in
+    for (const trip_id in trips) {
+      // eslint-disable-next-line no-await-in-loop
+      const tripProcessed = await processTrip(provider_id, device_id, trip_id, trips[trip_id], curTime)
+      if (tripProcessed) {
+        log.info('TRIP PROCESSED')
+        delete unprocessedTrips[trip_id]
+      }
+    }
+    // Update or clear cache
+    if (Object.keys(unprocessedTrips).length) {
+      log.info('PROCESSED SOME TRIPS')
+      // eslint-disable-next-line no-await-in-loop
+      await cache.writeTripsEvents(vehicleID, unprocessedTrips)
+    } else {
+      log.info('PROCESSED ALL TRIPS')
+      // eslint-disable-next-line no-await-in-loop
+      await cache.deleteTripsEvents(vehicleID)
+    }
+  }
+}
+
+/*
+function calcTimeIntervals(
+  telemetry: { [x: string]: { [x: string]: { timestamp: number } } },
+  startTime: number
+): number {
+
+  // Not currently used. Allows tracking of time between individual telemetry/event points
+
+  let tempTime = startTime
+  let count = 0
+  // eslint-disable-next-line guard-for-in
+  for (const n in telemetry) {
+    // eslint-disable-next-line guard-for-in
+    for (const m in telemetry[n]) {
+      count += telemetry[n][m].timestamp - tempTime
+      tempTime = telemetry[n][m].timestamp
+    }
+  }
+  return count
+}
+*/
+
+async function tripHandler() {
+  await dataHandler('trip', async () => {
+    await tripAggregator()
+  })
 }
 
 export { tripHandler }

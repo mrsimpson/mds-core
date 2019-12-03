@@ -18,7 +18,8 @@ async function dataHandler(
       })
       req.on('end', () => {
         const contentType = req.headers['content-type'] ?? ''
-        const parsedContentType = contentType?.indexOf(';') >= 0 ? contentType.substring(0, contentType.indexOf(';')) : contentType
+        const parsedContentType =
+          contentType?.indexOf(';') >= 0 ? contentType.substring(0, contentType.indexOf(';')) : contentType
         const parsedBody = JSON.parse(body)
 
         if (parsedContentType === 'application/json') {

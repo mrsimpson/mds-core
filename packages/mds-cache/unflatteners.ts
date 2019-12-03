@@ -18,6 +18,7 @@ import {
   isStringifiedCacheReadDeviceResult
 } from '@mds-core/mds-schema-validators'
 
+import log from '@mds-core/mds-logger'
 import {
   StringifiedEvent,
   StringifiedTelemetry,
@@ -67,8 +68,9 @@ function parseDeviceState(deviceState: StringifiedStateEntry): StateEntry {
 
 function parseAllDeviceStates(allDeviceStates: StringifiedAllDeviceStates): { [vehicle_id: string]: StateEntry } {
   try {
-    let devices: { [vehicle_id: string]: StateEntry } = {}
-    for (let vehicle_id in allDeviceStates) {
+    const devices: { [vehicle_id: string]: StateEntry } = {}
+    /* eslint-disable-next-line guard-for-in */
+    for (const vehicle_id in allDeviceStates) {
       devices[vehicle_id] = parseDeviceState(allDeviceStates[vehicle_id])
     }
     return devices
@@ -77,10 +79,11 @@ function parseAllDeviceStates(allDeviceStates: StringifiedAllDeviceStates): { [v
   }
 }
 
-function parseTripsEvents(tripsEvents: StringifiedTripsEvents): TripsEvents {
+async function parseTripsEvents(tripsEvents: StringifiedTripsEvents): Promise<TripsEvents> {
   try {
-    let trips: TripsEvents = {}
-    for (let trip_id in tripsEvents) {
+    const trips: TripsEvents = {}
+    // eslint-disable-next-line guard-for-in
+    for (const trip_id in tripsEvents) {
       for (let i = 0; i < tripsEvents[trip_id].length; i++) {
         trips[trip_id][i] = {
           vehicle_type: tripsEvents[trip_id][i].vehicle_type as VEHICLE_TYPE,
@@ -110,20 +113,17 @@ function parseTripsEvents(tripsEvents: StringifiedTripsEvents): TripsEvents {
     }
     return trips
   } catch (err) {
-    console.log(err)
+    await log.error(err)
     throw new Error(`unable to parse tripsEvents: ${tripsEvents}`)
   }
 }
 
-function parseTripsTelemetry(tripsTelemetry: StringifiedTripsTelemetry): TripsTelemetry {
+async function parseTripsTelemetry(tripsTelemetry: StringifiedTripsTelemetry): Promise<TripsTelemetry> {
   try {
-    let trips: TripsTelemetry = {}
-    for (let trip_id in tripsTelemetry) {
+    const trips: TripsTelemetry = {}
+    // eslint-disable-next-line guard-for-in
+    for (const trip_id in tripsTelemetry) {
       for (let i = 0; i < tripsTelemetry[trip_id].length; i++) {
-        console.log('HERERERE1')
-        console.log(tripsTelemetry)
-        console.log('check')
-        console.log(tripsTelemetry[trip_id])
         trips[trip_id][i] = {
           timestamp: Number(tripsTelemetry[trip_id][i].timestamp) as Timestamp,
           latitude: Number(tripsTelemetry[trip_id][i].latitude),
@@ -141,16 +141,22 @@ function parseTripsTelemetry(tripsTelemetry: StringifiedTripsTelemetry): TripsTe
     }
     return trips
   } catch (err) {
-    console.log(err)
+    await log.error(err)
     throw new Error(`unable to parse tripsTelemetry: ${tripsTelemetry}`)
   }
 }
 
-function parseAllTripsEvents(allTripsEvents: StringifiedAllTripsEvents): { [vehicle_id: string]: TripsEvents } {
+async function parseAllTripsEvents(
+  allTripsEvents: StringifiedAllTripsEvents
+): Promise<{
+  [vehicle_id: string]: TripsEvents
+}> {
   try {
-    let allTrips: { [vehicle_id: string]: TripsEvents } = {}
-    for (let vehicle_id in allTripsEvents) {
-      allTrips[vehicle_id] = parseTripsEvents(allTripsEvents[vehicle_id])
+    const allTrips: { [vehicle_id: string]: TripsEvents } = {}
+    // eslint-disable-next-line guard-for-in
+    for (const vehicle_id in allTripsEvents) {
+      // eslint-disable-next-line no-await-in-loop
+      allTrips[vehicle_id] = await parseTripsEvents(allTripsEvents[vehicle_id])
     }
     return allTrips
   } catch (err) {

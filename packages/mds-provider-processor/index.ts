@@ -1,6 +1,5 @@
-import { providerHandler } from './src/proc-provider'
-import db from '@mds-core/mds-db'
 import log from '@mds-core/mds-logger'
+import { providerHandler } from './src/proc-provider'
 
 async function processData() {
   log.info('INIT')
@@ -8,5 +7,6 @@ async function processData() {
 }
 
 export const main = () => {
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   processData()
 }

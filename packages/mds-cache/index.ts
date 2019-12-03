@@ -132,7 +132,7 @@ async function hget(key: string, field: UUID): Promise<CachedItem | CachedHashIt
     return unflatten(flat)
   }
   return null
-  //throw new Error(`${field} not found in ${key}`)
+  // throw new Error(`${field} not found in ${key}`)
 }
 
 async function hgetall(key: string): Promise<CachedItem | CachedHashItem | null> {
@@ -141,7 +141,7 @@ async function hgetall(key: string): Promise<CachedItem | CachedHashItem | null>
     return unflatten(flat)
   }
   return null
-  //throw new Error(`${key} not found`)
+  // throw new Error(`${key} not found`)
 }
 
 async function readDeviceState(field: UUID): Promise<StateEntry | null> {
@@ -155,7 +155,7 @@ async function readAllDeviceStates(): Promise<{ [vehicle_id: string]: StateEntry
 }
 
 async function writeDeviceState(field: UUID, data: StateEntry) {
-  return await (await getClient()).hsetAsync('device:state', field, JSON.stringify(data))
+  return (await getClient()).hsetAsync('device:state', field, JSON.stringify(data))
 }
 
 async function readTripsEvents(field: UUID): Promise<TripsEvents | null> {
@@ -169,11 +169,11 @@ async function readAllTripsEvents(): Promise<{ [vehicle_id: string]: TripsEvents
 }
 
 async function writeTripsEvents(field: UUID, data: TripsEvents) {
-  return await (await getClient()).hsetAsync('trips:events', field, JSON.stringify(data))
+  return (await getClient()).hsetAsync('trips:events', field, JSON.stringify(data))
 }
 
 async function deleteTripsEvents(field: UUID) {
-  return await (await getClient()).hdelAsync('trips:events', field)
+  return (await getClient()).hdelAsync('trips:events', field)
 }
 
 async function readTripsTelemetry(field: UUID): Promise<TripsTelemetry | null> {
@@ -182,7 +182,7 @@ async function readTripsTelemetry(field: UUID): Promise<TripsTelemetry | null> {
 }
 
 async function writeTripsTelemetry(field: UUID, data: TripsTelemetry) {
-  return await (await getClient()).hsetAsync('trips:telemetry', field, JSON.stringify(data))
+  return (await getClient()).hsetAsync('trips:telemetry', field, JSON.stringify(data))
 }
 
 // Exposing temporarily for testing purposes
