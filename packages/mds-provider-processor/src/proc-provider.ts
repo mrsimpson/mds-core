@@ -1,12 +1,10 @@
-import { dataHandler } from './proc'
 import db from '@mds-core/mds-db'
-import cache from '@mds-core/mds-cache'
-import stream from '@mds-core/mds-stream'
+import log from '@mds-core/mds-logger'
+import { MetricsTableRow, ProviderStreamData } from '@mds-core/mds-types'
 import metric from './metrics'
 import config from './config'
-import log from '@mds-core/mds-logger'
 
-import { CE_TYPE, MetricsTableRow, ProviderStreamData } from '@mds-core/mds-types'
+import { dataHandler } from './proc'
 
 /*
     Provider processor that runs inside a Kubernetes pod, activated via cron job.
@@ -19,24 +17,6 @@ import { CE_TYPE, MetricsTableRow, ProviderStreamData } from '@mds-core/mds-type
           PRIMARY KEY = (provider_id, timestamp, vehicle_type)
           VALUES = MetricsTableRow
 */
-async function providerHandler() {
-  await dataHandler('provider', async function(type: CE_TYPE, data: any) {
-    providerAggregator()
-  })
-}
-
-async function providerAggregator() {
-  const curTime = new Date().getTime()
-  const providersList = config.organization.providers
-  for (let id in providersList) {
-    const providerProcessed = await processProvider(id, curTime)
-    if (providerProcessed) {
-      log.info('PROVIDER PROCESSED')
-    } else {
-      log.warn('PROVIDER NOT PROCESSED')
-    }
-  }
-}
 
 async function processProvider(providerID: string, curTime: number): Promise<boolean> {
   /*
@@ -45,7 +25,7 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
   */
   // TODO: decide between seperate aggerator services for vehicle type/jurisdiction.
   // Only processing at organization level for scooters now
-  //const providersMap = await cache.hgetall('provider:state')
+  // const providersMap = await cache.hgetall('provider:state')
   const providersMap = null
   const providerData: ProviderStreamData = providersMap ? JSON.parse(providersMap[providerID]) : null
 
@@ -68,7 +48,7 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
       out_of_order_count: providerData ? providerData.outOfOrderEvents.length : null
     },
     sla: {
-      max_vehicle_cap: 1600, //TODO: import from PCE
+      max_vehicle_cap: 1600, // TODO: import from PCE
       min_registered: config.compliance_sla.min_registered,
       min_trip_start_count: config.compliance_sla.min_trip_start_count,
       min_trip_end_count: config.compliance_sla.min_trip_end_count,
@@ -85,11 +65,34 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
     await db.insertMetrics(provider_data)
     log.info('INSERT')
   } catch (err) {
-    log.error(err)
+    await log.error(err)
     return false
   }
-  //await stream.writeCloudEvent('mds.processed.provider', JSON.stringify(provider_data))
+  // await stream.writeCloudEvent('mds.processed.provider', JSON.stringify(provider_data))
 
   return true
 }
+
+async function providerAggregator() {
+  const curTime = new Date().getTime()
+  const providersList = config.organization.providers
+  // eslint-disable-next-line guard-for-in
+  for (const id in providersList) {
+    // eslint-disable-next-line no-await-in-loop
+    const providerProcessed = await processProvider(id, curTime)
+    if (providerProcessed) {
+      log.info('PROVIDER PROCESSED')
+    } else {
+      // eslint-disable-next-line no-await-in-loop
+      await log.warn('PROVIDER NOT PROCESSED')
+    }
+  }
+}
+
+async function providerHandler() {
+  await dataHandler('provider', async () => {
+    await providerAggregator()
+  })
+}
+
 export { providerHandler }

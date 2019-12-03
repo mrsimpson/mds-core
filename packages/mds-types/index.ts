@@ -186,25 +186,7 @@ export interface MetricsTableRow {
   /** Vehicle type. */
   vehicle_type: VEHICLE_TYPE
   /** Number of events registered within the bin, by type. */
-  event_counts: {
-    service_start: number
-    user_drop_off: number
-    provider_drop_off: number
-    trip_end: number
-    cancel_reservation: number
-    reserve: number
-    service_end: number
-    telemetry: number
-    trip_start: number
-    trip_enter: number
-    trip_leave: number
-    register: number
-    provider_pick_up: number
-    agency_drop_off: number
-    default: number
-    deregister: number
-    agency_pick_up: number
-  }
+  event_counts: { [S in VEHICLE_EVENT]: number }
   vehicle_counts?: VehicleCountMetricObj | null
   /** Number of trips in region, derived from distinct trip ids. */
   trip_count: number
