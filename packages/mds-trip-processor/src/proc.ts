@@ -32,11 +32,13 @@ async function dataHandler(
             data: parsedBody
           }
 
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          /* eslint-reason FIXME need to refactor */
+          /* eslint-disable-next-line @typescript-eslint/no-floating-promises */
           callback(ce_data.type, ce_data.data)
         } else if (type === 'application/cloudevents+json') {
           // structured
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          /* eslint-reason FIXME need to refactor */
+          /* eslint-disable-next-line @typescript-eslint/no-floating-promises */
           callback(parsedBody.type, parsedBody.data)
         }
 

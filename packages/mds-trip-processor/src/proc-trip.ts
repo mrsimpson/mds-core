@@ -143,15 +143,20 @@ async function tripAggregator() {
   const curTime = new Date().getTime()
   const tripsMap = await cache.readAllTripsEvents()
   log.info('triggered')
-  // eslint-disable-next-line guard-for-in
+
+  /* eslint-reason FIXME use map() */
+  /* eslint-disable-next-line guard-for-in */
   for (const vehicleID in tripsMap) {
     const [provider_id, device_id] = vehicleID.split(':')
     const trips = tripsMap[vehicleID]
     log.info(trips)
     const unprocessedTrips = trips
-    // eslint-disable-next-line guard-for-in
+
+    /* eslint-reason FIXME use map() */
+    /* eslint-disable-next-line guard-for-in */
     for (const trip_id in trips) {
-      // eslint-disable-next-line no-await-in-loop
+      /* eslint-reason FIXME use Promise.all() */
+      /* eslint-disable-next-line no-await-in-loop */
       const tripProcessed = await processTrip(provider_id, device_id, trip_id, trips[trip_id], curTime)
       if (tripProcessed) {
         log.info('TRIP PROCESSED')
@@ -161,11 +166,13 @@ async function tripAggregator() {
     // Update or clear cache
     if (Object.keys(unprocessedTrips).length) {
       log.info('PROCESSED SOME TRIPS')
-      // eslint-disable-next-line no-await-in-loop
+      /* eslint-reason FIXME use Promise.all() */
+      /* eslint-disable-next-line no-await-in-loop */
       await cache.writeTripsEvents(vehicleID, unprocessedTrips)
     } else {
       log.info('PROCESSED ALL TRIPS')
-      // eslint-disable-next-line no-await-in-loop
+      /* eslint-reason FIXME use Promise.all() */
+      /* eslint-disable-next-line no-await-in-loop */
       await cache.deleteTripsEvents(vehicleID)
     }
   }

@@ -82,7 +82,8 @@ function parseAllDeviceStates(allDeviceStates: StringifiedAllDeviceStates): { [v
 async function parseTripsEvents(tripsEvents: StringifiedTripsEvents): Promise<TripsEvents> {
   try {
     const trips: TripsEvents = {}
-    // eslint-disable-next-line guard-for-in
+    /* eslint-reason FIXME use map() */
+    /* eslint-disable-next-line guard-for-in */
     for (const trip_id in tripsEvents) {
       for (let i = 0; i < tripsEvents[trip_id].length; i++) {
         trips[trip_id][i] = {
@@ -121,7 +122,9 @@ async function parseTripsEvents(tripsEvents: StringifiedTripsEvents): Promise<Tr
 async function parseTripsTelemetry(tripsTelemetry: StringifiedTripsTelemetry): Promise<TripsTelemetry> {
   try {
     const trips: TripsTelemetry = {}
-    // eslint-disable-next-line guard-for-in
+
+    /* eslint-reason FIXME use map() */
+    /* eslint-disable-next-line guard-for-in */
     for (const trip_id in tripsTelemetry) {
       for (let i = 0; i < tripsTelemetry[trip_id].length; i++) {
         trips[trip_id][i] = {
@@ -153,9 +156,12 @@ async function parseAllTripsEvents(
 }> {
   try {
     const allTrips: { [vehicle_id: string]: TripsEvents } = {}
-    // eslint-disable-next-line guard-for-in
+
+    /* eslint-reason FIXME use map() */
+    /* eslint-disable-next-line guard-for-in */
     for (const vehicle_id in allTripsEvents) {
-      // eslint-disable-next-line no-await-in-loop
+      /* eslint-reason FIXME use Promise.all() */
+      /* eslint-disable-next-line no-await-in-loop */
       allTrips[vehicle_id] = await parseTripsEvents(allTripsEvents[vehicle_id])
     }
     return allTrips

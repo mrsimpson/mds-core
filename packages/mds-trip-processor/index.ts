@@ -7,6 +7,7 @@ async function processData() {
 }
 
 export const main = () => {
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  /* eslint-reason FIXME need to refactor */
+  /* eslint-disable-next-line @typescript-eslint/no-floating-promises */
   processData()
 }

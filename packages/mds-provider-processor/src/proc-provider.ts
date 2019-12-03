@@ -76,14 +76,18 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
 async function providerAggregator() {
   const curTime = new Date().getTime()
   const providersList = config.organization.providers
-  // eslint-disable-next-line guard-for-in
+
+  /* eslint-reason FIXME use map() */
+  /* eslint-disable-next-line guard-for-in */
   for (const id in providersList) {
-    // eslint-disable-next-line no-await-in-loop
+    /* eslint-reason FIXME use Promise.all() */
+    /* eslint-disable-next-line no-await-in-loop */
     const providerProcessed = await processProvider(id, curTime)
     if (providerProcessed) {
       log.info('PROVIDER PROCESSED')
     } else {
-      // eslint-disable-next-line no-await-in-loop
+      /* eslint-reason FIXME use Promise.all() */
+      /* eslint-disable-next-line no-await-in-loop */
       await log.warn('PROVIDER NOT PROCESSED')
     }
   }

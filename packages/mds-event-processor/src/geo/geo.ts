@@ -8,7 +8,8 @@ const serviceAreas = require('./service-areas')
 
 const districtAreas: { [key: string]: Polygon | MultiPolygon | Feature<Polygon | MultiPolygon, Properties> } = {}
 
-// eslint-disable-next-line guard-for-in
+/* eslint-reason FIXME use map() */
+/* eslint-disable-next-line guard-for-in */
 for (const index in serviceAreas.features) {
   const district_uuid = serviceAreas.features[index].properties.dist_uuid
   // still servicing

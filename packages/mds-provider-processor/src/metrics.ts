@@ -30,7 +30,8 @@ async function calcEventCounts(id: string) {
     agency_pick_up: 0
   }
 
-  // eslint-disable-next-line guard-for-in
+  /* eslint-reason FIXME use map() */
+  /* eslint-disable-next-line guard-for-in */
   for (const event_type in EVENT_STATUS_MAP) {
     eventCounts[event_type as VEHICLE_EVENT] = events.filter((event: StateEntry) => {
       return event.event_type === event_type
@@ -59,7 +60,9 @@ async function calcVehicleCounts(id: string): Promise<VehicleCountMetricObj | nu
   // Calculate total number of vehicle in Right of way
   // TODO: 48 hour filtering
   let count = 0
-  // eslint-disable-next-line guard-for-in
+
+  /* eslint-reason FIXME use map() */
+  /* eslint-disable-next-line guard-for-in */
   for (const i in recentStates) {
     const deviceState = recentStates[i]
     if (VEHICLE_STATUSES_ROW.includes(String(deviceState.state))) {
@@ -94,10 +97,12 @@ async function calcVehicleTripCount(id: string, curTime: number): Promise<string
   const vehicles = Object.keys(rs)
   const lastHour = curTime - 3600000
   // TODO: migrate form inefficient loop once SET is created in cache
-  // eslint-disable-next-line guard-for-in
+  /* eslint-reason FIXME use map() */
+  /* eslint-disable-next-line guard-for-in */
   for (const i in vehicles) {
     const [providerID, deviceID] = vehicles[i].split(':')
     if (providerID === id) {
+      /* eslint-reason FIXME use Promise.all() */
       // eslint-disable-next-line no-await-in-loop
       const tripCount = await db.getVehicleTripCount(deviceID, lastHour, curTime)
       const tripCountIndex = tripCount[0].count
