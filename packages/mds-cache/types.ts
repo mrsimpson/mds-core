@@ -37,12 +37,14 @@ export type StringifiedTripEvent = Stringify<Omit<Omit<TripEvent, 'annotation'>,
   annotation: Stringify<AnnotationData>
   gps: Stringify<GpsData>
 }
-export type StringifiedTripsEvents = { [trip_id: string]: StringifiedTripEvent[] }
+//export type StringifiedTripsEvents = { [trip_id: string]: StringifiedTripEvent[] }
+export type StringifiedTripsEvents = string
 export type StringifiedAllTripsEvents = { [vehicle_id: string]: StringifiedTripsEvents }
 export type StringifiedTripTelemetry = Stringify<Omit<TripTelemetry, 'annotation'>> & {
   annotation: Stringify<AnnotationData>
 }
-export type StringifiedTripsTelemetry = { [trip_id: string]: StringifiedTripTelemetry[] }
+//export type StringifiedTripsTelemetry = { [trip_id: string]: StringifiedTripTelemetry[] }
+export type StringifiedTripsTelemetry = string
 export type StringifiedEvent = Stringify<Omit<VehicleEvent, 'telemetry'>>
 export type StringifiedTelemetry = Stringify<Omit<Telemetry, 'gps'>> & {
   gps: Stringify<Omit<TelemetryData, 'charge'>>

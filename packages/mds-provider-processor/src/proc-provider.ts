@@ -62,6 +62,8 @@ async function processProvider(providerID: string, curTime: number): Promise<boo
 
   // Insert into PG DB and stream
   try {
+    log.info('HERE')
+    log.info(provider_data)
     await db.insertMetrics(provider_data)
     log.info('INSERT')
   } catch (err) {
@@ -82,7 +84,7 @@ async function providerAggregator() {
   for (const id in providersList) {
     /* eslint-reason FIXME use Promise.all() */
     /* eslint-disable-next-line no-await-in-loop */
-    const providerProcessed = await processProvider(id, curTime)
+    const providerProcessed = await processProvider(providersList[id], curTime)
     if (providerProcessed) {
       log.info('PROVIDER PROCESSED')
     } else {

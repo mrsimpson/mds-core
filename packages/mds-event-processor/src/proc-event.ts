@@ -232,7 +232,8 @@ async function processRaw(type: CE_TYPE, data: InboundEvent & InboundTelemetry) 
           break
         }
         default: {
-          throw new Error('EVANNN')
+          //throw new Error('EVANNN')
+          log.info(event_type)
         }
       }
       // Only update cache (device:state) with most recent event

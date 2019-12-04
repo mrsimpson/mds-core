@@ -85,6 +85,8 @@ export async function insertMetrics(metric: MetricsTableRow) {
     schema.TABLE_COLUMNS.reports_providers
   )}) VALUES (${vals_sql(schema.TABLE_COLUMNS.reports_providers)}) RETURNING *`
   const values = vals_list(schema.TABLE_COLUMNS.reports_providers, { ...metric })
+  console.log(sql)
+  console.log(values)
   await logSql(sql, values)
   const {
     rows: [recorded_metric]
