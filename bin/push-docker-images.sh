@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-yarn clean && yarn image
+# yarn clean && yarn image
