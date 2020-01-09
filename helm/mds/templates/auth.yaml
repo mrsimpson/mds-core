@@ -35,7 +35,7 @@ metadata:
   name: default
   namespace: {{ .Release.Namespace }}
 spec:
-  host: "*.foo.svc.cluster.local"
+  host: {{ printf "*.%s.svc.cluster.local" .Release.Namespace }}
   trafficPolicy:
     tls:
       mode: ISTIO_MUTUAL
@@ -47,13 +47,14 @@ metadata:
 spec:
   mode: 'ON_WITH_INCLUSION'
   inclusion:
-    namespaces: ["foo"]
+    namespaces:
+    - {{ .Release.Namespace }}
 ---
 apiVersion: rbac.istio.io/v1alpha1
 kind: ServiceRole
 metadata:
   name: mds-internal-service
-  namespace: foo
+  namespace: {{ .Release.Namespace }}
 spec:
   rules:
   - services: ["*"]
