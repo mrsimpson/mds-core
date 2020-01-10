@@ -79,7 +79,6 @@ spec:
     - key: "destination.metadata[namespace]"
       values:
       - {{ .Release.Namespace }}
-
 ---
 apiVersion: rbac.istio.io/v1alpha1
 kind: ServiceRoleBinding
