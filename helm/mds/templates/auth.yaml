@@ -28,6 +28,7 @@ spec:
 ---
 {{- end }}
 {{- end }}
+# This sets up outbound mTLS for intra-namespace requests
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
