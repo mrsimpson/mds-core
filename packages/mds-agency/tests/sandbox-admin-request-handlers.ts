@@ -51,10 +51,10 @@ describe('Sandbox admin request handlers', () => {
       Sinon.replace(db, 'wipeDevice', Sinon.fake.rejects('it-failed'))
       await wipeDevice(
         {
-          params: { device_id },
+          params: { provider_id, device_id },
           query: { cached: false },
           get: Sinon.fake.returns('foo') as any
-        } as AgencyApiRequest<{ device_id: string }>,
+        } as AgencyApiRequest<{ provider_id: string; device_id: string }>,
         res
       )
       assert.equal(statusHandler.calledWith(500), true)
