@@ -55,7 +55,7 @@ async function calcVehicleCounts(
   endTime: Timestamp
 ): Promise<VehicleCountMetricObj> {
   /* Calculate total number of registered vehicles at start of bin */
-  const registeredVehicles = await cache.readKeys('device:*:device')
+  const registeredVehicles = await cache.readKeys(`device:${providerID}:*:device`)
   const registeredCount = registeredVehicles?.length ?? 0
 
   const events = await db.getStates(providerID, vehicleType, startTime, endTime)
@@ -93,6 +93,7 @@ async function calcTripCount(
   startTime: Timestamp,
   endTime: Timestamp
 ): Promise<number> {
+  // TODO: Filter upstream, trips missing trip_starts will not have trip_ids
   const [tripCount] = await db.getTripCount(providerID, vehicleType, startTime, endTime)
   return tripCount.count
 }

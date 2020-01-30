@@ -332,8 +332,12 @@ async function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | 
     await log.error(`hwrite: invalid device_id ${item.device_id}`)
     throw new Error(`hwrite: invalid device_id ${item.device_id}`)
   }
-  const { device_id } = item
-  const key = `device:${device_id}:${suffix}`
+  if (typeof item.provider_id !== 'string') {
+    await log.error(`hwrite: invalid provider_id ${item.provider_id}`)
+    throw new Error(`hwrite: invalid provider_id ${item.provider_id}`)
+  }
+  const { device_id, provider_id } = item
+  const key = `device:${provider_id}:${device_id}:${suffix}`
   const flat: { [key: string]: unknown } = flatten(item)
   const nulls = nullKeys(flat)
   const hmap = stripNulls(flat) as { [key: string]: unknown; device_id: UUID }
@@ -380,11 +384,11 @@ async function getMostRecentEventByProvider(): Promise<{ provider_id: string; ma
   })
 }
 
-async function wipeDevice(device_id: UUID) {
+async function wipeDevice(provider_id: UUID, device_id: UUID) {
   const keys = [
-    decorateKey(`device:${device_id}:event`),
-    decorateKey(`device:${device_id}:telemetry`),
-    decorateKey(`device:${device_id}:device`)
+    decorateKey(`device:${provider_id}:${device_id}:event`),
+    decorateKey(`device:${provider_id}:${device_id}:telemetry`),
+    decorateKey(`device:${provider_id}:${device_id}:device`)
   ]
   if (keys.length > 0) {
     log.info('del', ...keys)
@@ -399,7 +403,7 @@ async function writeEvent(event: VehicleEvent) {
   // log.info('redis write event', event.device_id)
   try {
     if (event.event_type === 'deregister') {
-      return await wipeDevice(event.device_id)
+      return await wipeDevice(event.provider_id, event.device_id)
     }
     const prev_event = parseEvent((await hread('event', event.device_id)) as StringifiedEventWithTelemetry)
     if (prev_event.timestamp < event.timestamp) {

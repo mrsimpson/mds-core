@@ -17,9 +17,9 @@ export const getCacheInfo = async (req: AgencyApiRequest, res: AgencyApiResponse
 
 export const wipeDevice = async (req: AgencyApiRequest, res: AgencyApiResponse) => {
   try {
-    const { device_id } = req.params
+    const { provider_id, device_id } = req.params
     await log.info('about to wipe', device_id)
-    const cacheResult = await cache.wipeDevice(device_id)
+    const cacheResult = await cache.wipeDevice(provider_id, device_id)
     await log.info('cache wiped', cacheResult)
     const dbResult = await db.wipeDevice(device_id)
     await log.info('db wiped', dbResult)
