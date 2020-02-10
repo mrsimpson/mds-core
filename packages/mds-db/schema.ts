@@ -355,7 +355,7 @@ const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {
   [COLUMN.event_time_violations]: 'jsonb NOT NULL',
   [COLUMN.event_type]: 'varchar(31)',
   [COLUMN.event_type_reason]: 'varchar(31)',
-  [COLUMN.events]: 'jsonb[] NOT NULL',
+  [COLUMN.events]: 'jsonb NOT NULL',
   [COLUMN.geography]: 'varchar(64)',
   [COLUMN.geography_id]: 'uuid NOT NULL',
   [COLUMN.geography_json]: 'json NOT NULL',
