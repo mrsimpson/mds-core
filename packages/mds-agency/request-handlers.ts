@@ -295,13 +295,7 @@ export const submitVehicleEvent = async (req: AgencyApiRequest, res: AgencyApiRe
   }
 
   async function finish() {
-    if (event.telemetry) {
-      event.telemetry.recorded = recorded
-      await writeTelemetry(event.telemetry)
-      await success()
-    } else {
-      await success()
-    }
+    await success()
   }
 
   // TODO switch to cache for speed?
@@ -325,6 +319,11 @@ export const submitVehicleEvent = async (req: AgencyApiRequest, res: AgencyApiRe
 
     // make a note of the service area
     event.service_area_id = getServiceArea(event)
+
+    if (event.telemetry) {
+      event.telemetry.recorded = recorded
+      await writeTelemetry(event.telemetry)
+    }
 
     // database write is crucial; failures of cache/stream should be noted and repaired
     const recorded_event = await db.writeEvent(event)
