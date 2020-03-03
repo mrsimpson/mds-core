@@ -1,6 +1,7 @@
 # Overview
 
-Repo for LADOT MDS implementation for contribution to the Open Mobility Foundation.  It represents what is currently up and running for Los Angeles production MDS as well as new features under development.
+Repo for a reference implementation of MDS services intended for hosting by cities.  Includes implementations of
+Agency and Policy services, as well as Compliance and Audit services, plus some other tools and shared libraries.
 
 ## Contents
 
@@ -14,16 +15,25 @@ Repo for LADOT MDS implementation for contribution to the Open Mobility Foundati
 1. MDS-Agency `/stops` [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/430)
 2. MDS-Audit [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
 3. MDS-Compliance [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
-4. MDS-Config
-5. MDS-Daily
-6. MDS-Metrics
-7. MDS-Metrics-Sheet
-8. MDS-Policy-Author
-9. MDS-Web-Sockets
-#### Backend Services
-1. MDS-Event-Processor
-2. MDS-Provider-Processor
-3. MDS-Trip-Processor
+4. MDS-Policy-Author TODO docs
+5. MDS-Daily TODO docs
+6. MDS-Web-Sockets TODO docs
+
+#### TO BE REMOVED BEFORE MERGE
+1. MDS-Event-Processor (REMOVE)
+2. MDS-Provider-Processor (REMOVE)
+3. MDS-Trip-Processor (REMOVE)
+4. MDS-Config (REMOVE)
+5. MDS-Metrics (REMOVE)
+6. MDS-Metrics-Sheet (REMOVE)
+
+## Contributing
+
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md)
+
+## Security
+
+To commit code, you will need the pre-commit tool, which can be installed via `brew install pre-commit`.  For more information, see [SECURITY.md](.github/SECURITY.md)
 
 ## Installation
 
@@ -299,10 +309,5 @@ Display the complete set of operations:
 % ./bin/mdsctl uninstall:mds uninstall
 ```
 
-## Other
 
-To commit code, you will need the pre-commit tool, which can be installed via `brew install pre-commit`.  For more information, see [SECURITY.md](.github/SECURITY.md)
 
-## Contributing
-
-See [CONTRIBUTING.md](.github/CONTRIBUTING.md)
