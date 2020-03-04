@@ -95,7 +95,6 @@ spec:
   # allow presenters of JWT tokens based one or more properties of the token
   # (audience, claims, etc.)
   # https://archive.istio.io/v1.3/docs/reference/config/authorization/constraints-and-properties/#supported-properties
-  # Lacuna: add as many constraints here as apply
   - properties:
       request.auth.audiences: {{ . | quote }}
       request.auth.claims[iss]: {{ $.Values.jwt.issuer }}
