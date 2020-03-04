@@ -24,6 +24,11 @@ apis:
     pathPrefix: /daily
     version: latest
     migration: false
+  mds-jurisdiction:
+    enabled: true
+    pathPrefix: /jurisdiction
+    version: latest
+    migration: false
   mds-metrics:
     enabled: true
     pathPrefix: /metrics
@@ -49,25 +54,22 @@ apis:
     pathPrefix: /web-sockets
     version: latest
     migration: false
-processors:
   mds-event-processor:
     enabled: true
+    pathPrefix: /event-processor
     version: latest
     migration: false
-    triggeredBy:
-      trigger: [event, telemetry]
+cronjobs:
   mds-trip-processor:
     enabled: true
     version: latest
     migration: false
-    triggeredBy:
-      cron: '0 * * * *'
+    schedule: '0 * * * *'
   mds-provider-processor:
     enabled: true
     version: latest
     migration: false
-    triggeredBy:
-      cron: '0 * * * *'
+    schedule: '0 * * * *'
 tenantId:
 timezone: America/Los_Angeles
 registry:
