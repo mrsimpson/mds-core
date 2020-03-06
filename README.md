@@ -37,11 +37,15 @@ mds-core is an open source project with all development taking place on GitHub. 
 
 You can also get involved in development by joining an OMF working group. The working groups maintain the OMF GitHub repositories and work through issues and pull requests. Each working group has its own mailing list for non-technical discussion and planning:
 
-| Working Group     | Mailing List                                                                                                               | Description                                                                                                                                                                      |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| City Services     | [mds-city-services](https://groups.google.com/a/groups.openmobilityfoundation.org/forum/#!forum/mds-city-services)         | Manages the [`mds-core`](https://github.com/openmobilityfoundation/mds-core) reference implementation, as well as the [`agency`][agency] and [`policy`][policy] APIs within MDS. |
-| Provider Services | [mds-provider-services](https://groups.google.com/a/groups.openmobilityfoundation.org/forum/#!forum/mds-provider-services) | Manages the [`provider`][provider] API within MDS.                                                                                                                               |
+| Working Group | Mailing List | Description
+| ------------- | ------------ | --------
+| City Services | [mds-city-services](https://groups.google.com/a/groups.openmobilityfoundation.org/forum/#!forum/mds-city-services) | Manages the [`mds-core`](https://github.com/openmobilityfoundation/mds-core) reference implementation, as well as the [`agency`][agency] and [`policy`][policy] APIs within MDS.
+| Provider Services | [mds-provider-services](https://groups.google.com/a/groups.openmobilityfoundation.org/forum/#!forum/mds-provider-services) | Manages the [`provider`][provider] API within MDS.
 
 You can view info about past releases and planning calls in the [wiki](https://github.com/openmobilityfoundation/mobility-data-specification/wiki).
 
 For questions about MDS please contact [info@openmobilityfoundation.org](mailto:info@openmobilityfoundation.org). Media inquiries to [media@openmobilityfoundation.org](mailto:media@openmobilityfoundation.org)
+
+[agency]: https://github.com/openmobilityfoundation/mobility-data-specification/tree/master/agency/README.md
+[provider]: https://github.com/openmobilityfoundation/mobility-data-specification/tree/master/provider/README.md
+[policy]: https://github.com/openmobilityfoundation/mobility-data-specification/tree/master/policy/README.md
