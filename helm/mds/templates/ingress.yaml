@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: mds-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      {{- range $name, $api := .Values.apis }} {{- if $api.enabled }}
+      - path: {{ $api.basePath }}
+        backend:
+          serviceName: {{ $name }}
+          servicePort: 4000
+      {{- end }} {{- end }}
