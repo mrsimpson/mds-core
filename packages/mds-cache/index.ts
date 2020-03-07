@@ -182,7 +182,7 @@ async function getVehicleProvider(deviceID: UUID): Promise<UUID | null> {
 
 async function readDeviceState(field: UUID): Promise<StateEntry | null> {
   const deviceState = await hget('device:state', field)
-  return deviceState ? parseDeviceState(deviceState as StringifiedStateEntry) : null
+  return deviceState ? parseDeviceState(JSON.parse(deviceState) as StringifiedStateEntry) : null
 }
 
 /* TODO: Increase performance with provider pattern based fetch */

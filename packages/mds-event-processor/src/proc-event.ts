@@ -72,10 +72,10 @@ export async function processTripTelemetry(deviceState: StateEntry): Promise<boo
   /* Check if associated to an event or telemetry post */
   const tripId = type === 'telemetry' ? await getTripId(deviceState) : trip_id
   if (tripId) {
-    const tripCache = await cache.readTripTelemetry(`${provider_id}:${device_id}:${trip_id}`)
+    const tripCache = await cache.readTripTelemetry(`${provider_id}:${device_id}:${tripId}`)
     const trip = tripCache || []
     trip.push(tripTelemetry)
-    await cache.writeTripTelemetry(`${provider_id}:${device_id}:${trip_id}`, trip)
+    await cache.writeTripTelemetry(`${provider_id}:${device_id}:${tripId}`, trip)
     return true
   }
   return false
@@ -199,7 +199,7 @@ export async function eventProcessor(type: string, data: VehicleEvent & Telemetr
         }
       }
       /* Only update cache (device:state) with most recent event */
-      if (!lastState || lastState.timestamp < deviceState.timestamp) {
+      if (!lastState || lastState.timestamp <= deviceState.timestamp) {
         await cache.writeDeviceState(`${provider_id}:${device_id}`, deviceState)
       }
       await db.insertDeviceStates(deviceState)

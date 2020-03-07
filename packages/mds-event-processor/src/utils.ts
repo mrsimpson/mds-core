@@ -14,7 +14,8 @@ export const findTripStart = (tripEvents: TripEvent[]): TripEvent => {
 
 export const getSortedTripStarts = (tripsEvents: TripsEvents) => {
   const startEventEntries = Object.entries(tripsEvents).map(entry => {
-    const [tripId, tripEvents] = entry
+    const [cacheTripId, tripEvents] = entry
+    const tripId = cacheTripId.split(':').pop()
     return { tripId, tripStart: findTripStart(tripEvents) }
   })
   const sortedStartEvents = startEventEntries.sort((a, b) => {

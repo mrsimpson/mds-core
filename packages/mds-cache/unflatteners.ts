@@ -35,6 +35,7 @@ import {
 
 function parseDeviceState(deviceState: StringifiedStateEntry): StateEntry {
   try {
+    // TODO all 0 conditionals result false
     return {
       vehicle_type: deviceState.vehicle_type as VEHICLE_TYPE,
       type: deviceState.type,
@@ -50,14 +51,14 @@ function parseDeviceState(deviceState: StringifiedStateEntry): StateEntry {
         ? {
             lat: Number(deviceState.gps.lat),
             lng: Number(deviceState.gps.lng),
-            altitude: deviceState.gps.altitude ? Number(deviceState.gps.altitude) : null,
-            heading: deviceState.gps.heading ? Number(deviceState.gps.heading) : null,
-            speed: deviceState.gps.speed ? Number(deviceState.gps.speed) : null,
-            accuracy: deviceState.gps.accuracy ? Number(deviceState.gps.accuracy) : null
+            altitude: deviceState.gps.altitude !== null ? Number(deviceState.gps.altitude) : null,
+            heading: deviceState.gps.heading !== null ? Number(deviceState.gps.heading) : null,
+            speed: deviceState.gps.speed !== null ? Number(deviceState.gps.speed) : null,
+            accuracy: deviceState.gps.accuracy !== null ? Number(deviceState.gps.accuracy) : null
           }
         : null,
       service_area_id: deviceState.service_area_id ? deviceState.service_area_id : null,
-      charge: deviceState.charge ? Number(deviceState.charge) : null,
+      charge: deviceState.charge !== null ? Number(deviceState.charge) : null,
       state: deviceState.state ? (deviceState.state as VEHICLE_STATUS) : null,
       event_type: deviceState.event_type ? (deviceState.event_type as VEHICLE_EVENT) : null,
       event_type_reason: deviceState.event_type_reason ? (deviceState.event_type_reason as VEHICLE_REASON) : null,
@@ -99,10 +100,10 @@ function parseTripEvents(tripEventsStr: StringifiedTripEvents): TripEvent[] {
           ? {
               lat: Number(tripEvent.gps.lat),
               lng: Number(tripEvent.gps.lng),
-              altitude: tripEvent.gps.altitude ? Number(tripEvent.gps.altitude) : null,
-              heading: tripEvent.gps.heading ? Number(tripEvent.gps.heading) : null,
-              speed: tripEvent.gps.speed ? Number(tripEvent.gps.speed) : null,
-              accuracy: tripEvent.gps.accuracy ? Number(tripEvent.gps.accuracy) : null
+              altitude: tripEvent.gps.altitude !== null ? Number(tripEvent.gps.altitude) : null,
+              heading: tripEvent.gps.heading !== null ? Number(tripEvent.gps.heading) : null,
+              speed: tripEvent.gps.speed !== null ? Number(tripEvent.gps.speed) : null,
+              accuracy: tripEvent.gps.accuracy !== null ? Number(tripEvent.gps.accuracy) : null
             }
           : null,
         service_area_id: tripEvent.service_area_id ? tripEvent.service_area_id : null
@@ -120,8 +121,8 @@ function parseTripTelemetry(tripTelemetryStr: StringifiedTripTelemetries): TripT
     const result: TripTelemetry[] = tripTelemetry.map(telemetry => {
       return {
         timestamp: Number(telemetry.timestamp),
-        latitude: telemetry.latitude ? Number(telemetry.latitude) : null,
-        longitude: telemetry.longitude ? Number(telemetry.longitude) : null,
+        latitude: telemetry.latitude !== null ? Number(telemetry.latitude) : null,
+        longitude: telemetry.longitude !== null ? Number(telemetry.longitude) : null,
         annotation_version: Number(telemetry.annotation_version),
         annotation: telemetry.annotation
           ? {
