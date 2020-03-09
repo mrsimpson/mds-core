@@ -12,3 +12,7 @@ See [Quick Start](../../README.md#Installation)
 
 ## Build Deployment Package
 See [Build](../../README.md#Build)
+
+## Design
+
+TODO MAX
