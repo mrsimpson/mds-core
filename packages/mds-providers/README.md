@@ -1,0 +1,1 @@
+Code form of the [list of mobility provider info](https://github.com/openmobilityfoundation/mobility-data-specification/blob/dev/providers.csv).  Must be kept updated with changes to that document to stay useful.  Also has some test `provider_id` values.

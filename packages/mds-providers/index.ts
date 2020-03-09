@@ -1,7 +1,7 @@
 import { Provider } from '@mds-core/mds-types'
 
 // Officially recognized providers, from:
-// https://github.com/CityOfLosAngeles/mobility-data-specification/blob/dev/providers.csv
+// https://github.com/openmobilityfoundation/mobility-data-specification/blob/dev/providers.csv
 export const JUMP_PROVIDER_ID = 'c20e08cf-8488-46a6-a66c-5d8fb827f7e0'
 export const LIME_PROVIDER_ID = '63f13c48-34ff-49d2-aca7-cf6a5b6171c3'
 export const BIRD_PROVIDER_ID = '2411d395-04f2-47c9-ab66-d09e9e3c3251'

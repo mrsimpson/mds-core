@@ -1,3 +1,5 @@
+# NOT FOR CONTRIBUTION
+
 # Event Streaming Processor
 Included in this repo is the stream processor for vehicle event and telemetry data sent via cloudevents with Knative eventing:
 
