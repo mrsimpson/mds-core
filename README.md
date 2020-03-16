@@ -33,7 +33,7 @@ mds-core: An open source reference implementation of the Mobility Data Specifica
 
 To stay up to date on MDS releases, meetings, and events, please **subscribe to the [mds-announce](https://groups.google.com/a/groups.openmobilityfoundation.org/forum/#!forum/mds-announce) mailing list.**
 
-mds-core is an open source project with all development taking place on GitHub. Comments and ideas can be shared by [creating an issue](https://github.com/openmobilityfoundation/mds-core/issues), and specific changes can be suggested by [opening a pull request](https://github.com/openmobilityfoundation/mds-core/pulls). Before contributing, please review our [CONTRIBUTING page](CONTRIBUTING.md) to understand guidelines and policies for participation and our [CODE OF CONDUCT page](CODE_OF_CONDUCT.md).
+mds-core is an open source project with all development taking place on GitHub. Comments and ideas can be shared by [creating an issue](https://github.com/openmobilityfoundation/mds-core/issues), and specific changes can be suggested by [opening a pull request](https://github.com/openmobilityfoundation/mds-core/pulls). Before contributing, please review our [CONTRIBUTING page](CONTRIBUTING.md), [Release Guidelines page](ReleaseGuidelines.md), and [CODE OF CONDUCT page](CODE_OF_CONDUCT.md) to understand guidelines and policies for participation.
 
 You can also get involved in development by joining an OMF working group. The working groups maintain the OMF GitHub repositories and work through issues and pull requests. Each working group has its own mailing list for non-technical discussion and planning:
 
