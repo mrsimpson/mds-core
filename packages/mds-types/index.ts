@@ -188,7 +188,7 @@ export interface MetricsTableRow {
     // TODO: per day???
     min_trip_start_count: number
     /** Minumum number of trip_end events. */
-    // Typical SLA: 100 events???
+    // Typical SLA: 10u events???
     // TODO: per day???
     min_trip_end_count: number
     /** Minumum number of telemetry events. */
@@ -453,7 +453,11 @@ export interface AuditDetails extends Audit {
   }
 }
 
-interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
+export interface PolicyMessage {
+  [key: string]: string
+}
+
+interface BaseRule<RuleType = 'count' | 'speed' | 'time' | 'user'> {
   name: string
   rule_id: UUID
   geographies: UUID[]
@@ -467,11 +471,12 @@ interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   days?: DAY_OF_WEEK[] | null
   /* eslint-reason TODO: message types haven't been defined well yet */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  messages?: any
+  messages?: PolicyMessage
   value_url?: URL | null
 }
 
 export type CountRule = BaseRule<'count'>
+export type UserRule = BaseRule<'user'>
 
 export interface TimeRule extends BaseRule<'time'> {
   rule_units: 'minutes' | 'hours'
@@ -481,7 +486,7 @@ export interface SpeedRule extends BaseRule<'speed'> {
   rule_units: 'kph' | 'mph'
 }
 
-export type Rule = CountRule | TimeRule | SpeedRule
+export type Rule = CountRule | TimeRule | SpeedRule | UserRule
 
 export interface Policy {
   name: string
