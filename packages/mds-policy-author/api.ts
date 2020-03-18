@@ -110,7 +110,8 @@ function api(app: express.Express): express.Express {
 
       try {
         await db.editPolicy(policy)
-        return res.status(200).send({ result: `successfully edited policy ${policy}` })
+        const edited_policy = await db.readPolicy(policy.policy_id)
+        return res.status(200).send(edited_policy)
       } catch (err) {
         if (err instanceof NotFoundError) {
           return res.status(404).send({ error: 'not found' })

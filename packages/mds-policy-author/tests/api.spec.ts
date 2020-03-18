@@ -190,14 +190,15 @@ describe('Tests app', () => {
     it('edits one current policy', async () => {
       const policy = clone(POLICY_JSON)
       policy.name = 'a shiny new name'
-      await request
+      const result = await request
         .put(`/policies/${POLICY_UUID}`)
         .set('Authorization', POLICIES_WRITE_SCOPE)
         .send(policy)
         .expect(200)
 
-      const [result] = await db.readPolicies({ policy_id: policy.policy_id, get_unpublished: true })
-      test.value(result.name).is('a shiny new name')
+//      const [result] = await db.readPolicies({ policy_id: policy.policy_id, get_unpublished: true })
+      test.value(result.body.name).is('a shiny new name')
+      test.value(result.body.policy_id).is(POLICY_JSON.policy_id)
     })
 
     it('creates one past policy', done => {
