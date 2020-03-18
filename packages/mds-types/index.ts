@@ -453,7 +453,7 @@ export interface AuditDetails extends Audit {
   }
 }
 
-export interface PolicyMessage {
+interface PolicyMessage {
   [key: string]: string
 }
 
