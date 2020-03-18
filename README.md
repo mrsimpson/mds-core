@@ -49,3 +49,17 @@ For questions about MDS please contact [info@openmobilityfoundation.org](mailto:
 [agency]: https://github.com/openmobilityfoundation/mobility-data-specification/tree/master/agency/README.md
 [provider]: https://github.com/openmobilityfoundation/mobility-data-specification/tree/master/provider/README.md
 [policy]: https://github.com/openmobilityfoundation/mobility-data-specification/tree/master/policy/README.md
+
+
+TODO where should this go?  Seems out of place in this trimmed-down doc.  @seanr
+
+### Experimental Content
+#### APIs
+1. MDS-Agency `/stops` [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/430)
+2. MDS-Audit [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
+3. MDS-Compliance [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
+4. MDS-Config
+5. MDS-Daily
+6. MDS-Metrics-Sheet
+7. MDS-Policy-Author
+8. MDS-Web-Sockets
