@@ -10,8 +10,8 @@ mds-core: An open source reference implementation of the Mobility Data Specifica
 
 - Agency service to ingest data from providers
 - Policy service to express vehicle rules and geofences
-- Audit service to support field verification of data (\*)
-- Compliance service to measure adherence to policies (\*)
+- Audit service to support field verification of data
+- Compliance service to measure adherence to policies
 - Daily report generator
 - Shared libraries used by multiple services
 - Deployment scripts for Kubernetes and Istio
@@ -28,6 +28,27 @@ mds-core: An open source reference implementation of the Mobility Data Specifica
 - where the specification is officially defined (that’s [here](https://github.com/openmobilityfoundation/mobility-data-specification))
 - a place to define local policies or performance metrics
 - a service that will be operated by the OMF
+
+# Running and Testing mds-core
+
+- Operators and developers that want to run mds-core locally use the [Developers Workstation Setup Guide](DevWorkstationSetup.md)
+- Operators that want to want to run mds-core remotely follow the instructions by infrastructure types
+   * Bare metal servers
+   * Amazon Web Services
+   * Azure
+- Developers that want to test mds-core code changes [follow the instructions in the Developers Workstation Setup Guide](DevWorkstationSetup.md#debugging-with-visual-studio-code)
+
+# Contributing to Experimental Content
+
+There are various parts of mds-core in development. Here is a partial list:
+1. [Updating MDS-Agency API with `/stops` PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/430)
+2. [Adding MDS-Audit API PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
+3. [Adding MDS-Compliance API PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
+4. MDS-Config **pending**
+5. MDS-Daily **pending**
+6. MDS-Metrics-Sheet **pending**
+7. MDS-Policy-Author **pending**
+8. MDS-Web-Sockets **pending**
 
 # Learn More / Get Involved / Contributing
 
@@ -49,17 +70,3 @@ For questions about MDS please contact [info@openmobilityfoundation.org](mailto:
 [agency]: https://github.com/openmobilityfoundation/mobility-data-specification/tree/master/agency/README.md
 [provider]: https://github.com/openmobilityfoundation/mobility-data-specification/tree/master/provider/README.md
 [policy]: https://github.com/openmobilityfoundation/mobility-data-specification/tree/master/policy/README.md
-
-
-TODO where should this go?  Seems out of place in this trimmed-down doc.  @seanr
-
-### Experimental Content
-#### APIs
-1. MDS-Agency `/stops` [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/430)
-2. MDS-Audit [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
-3. MDS-Compliance [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
-4. MDS-Config
-5. MDS-Daily
-6. MDS-Metrics-Sheet
-7. MDS-Policy-Author
-8. MDS-Web-Sockets
