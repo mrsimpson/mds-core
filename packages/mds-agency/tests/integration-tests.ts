@@ -41,7 +41,7 @@ import {
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-cache'
 import stream from '@mds-core/mds-stream'
-import { makeDevices, makeEvents } from '@mds-core/mds-test-data'
+import { makeDevices, makeEvents, JUMP_TEST_DEVICE_1 } from '@mds-core/mds-test-data'
 import { ApiServer } from '@mds-core/mds-api-server'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
 import { api } from '../api'
@@ -121,6 +121,8 @@ const AUTH_UNKNOWN_UUID_PROVIDER = `basic ${Buffer.from(
   `c8f984c5-62a5-4453-b1f7-3b7704a95cfe|${PROVIDER_SCOPES}`
 ).toString('base64')}`
 const AUTH_NO_SCOPE = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}`).toString('base64')}`
+
+const JUMP_TEST_DEVICE_1_ID = JUMP_TEST_DEVICE_1.device_id
 
 before(async () => {
   await Promise.all([db.initialize(), cache.initialize(), stream.initialize()])
@@ -1344,6 +1346,41 @@ describe('Tests API', () => {
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
+  })
+
+  it('verifies get device defaults to `deregister` if cache misses reads for associated events', async () => {
+    await request
+      .post('/vehicles')
+      .set('Authorization', AUTH)
+      .send(JUMP_TEST_DEVICE_1)
+      .expect(201)
+
+    await request
+      .post(`/vehicles/${JUMP_TEST_DEVICE_1_ID}/event`)
+      .set('Authorization', AUTH)
+      .send({ device_id: JUMP_TEST_DEVICE_1, timestamp: now(), event_type: VEHICLE_EVENTS.deregister })
+      .expect(201)
+
+    const result = await request
+      .get(`/vehicles/${JUMP_TEST_DEVICE_1_ID}`)
+      .set('Authorization', AUTH)
+      .expect(200)
+    test.assert(result.body.status === VEHICLE_STATUSES.inactive)
+    test.assert(result.body.prev_event === VEHICLE_EVENTS.deregister)
+  })
+
+  it('get multiple devices endpoint has vehicle status default to `inactive` if event is missing for a device', async () => {
+    const result = await request
+      .get(`/vehicles/`)
+      .set('Authorization', AUTH)
+      .expect(200)
+    const ids = result.body.vehicles.map((device: any) => device.device_id)
+    test.assert(ids.includes(JUMP_TEST_DEVICE_1_ID))
+    result.body.vehicles.map((device: any) => {
+      if (device.device_id === JUMP_TEST_DEVICE_1_ID) {
+        test.assert(device.status === VEHICLE_STATUSES.inactive)
+      }
+    })
   })
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
