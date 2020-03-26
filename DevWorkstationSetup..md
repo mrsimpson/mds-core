@@ -3,48 +3,36 @@
 Repo for a reference implementation of MDS services intended for hosting by cities.  Includes implementations of
 Agency and Policy services, as well as Compliance and Audit services, plus some other tools and shared libraries.
 
-## Contents
-
-### Stable Content
-#### APIs
-1. MDS-Agency 0.4.0 Implementation
-2. MDS-Policy 0.4.0 Implementation
-
-### Experimental Content
-#### APIs
-1. MDS-Agency `/stops` [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/430)
-2. MDS-Audit [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
-3. MDS-Compliance [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
-4. MDS-Policy-Author TODO docs
-5. MDS-Daily TODO docs
-6. MDS-Web-Sockets TODO docs
-
-#### TO BE REMOVED BEFORE MERGE
-1. MDS-Event-Processor (REMOVE)
-2. MDS-Provider-Processor (REMOVE)
-3. MDS-Trip-Processor (REMOVE)
-4. MDS-Config (REMOVE)
-5. MDS-Metrics (REMOVE)
-6. MDS-Metrics-Sheet (REMOVE)
-
-## Contributing
-
-See [CONTRIBUTING.md](.github/CONTRIBUTING.md)
-
-## Security
+[More information on contributing found here](README.md#learn-more--get-involved--contributing)
 
 To commit code, you will need the pre-commit tool, which can be installed via `brew install pre-commit`.  For more information, see [SECURITY.md](.github/SECURITY.md)
 
-## Installation
+# Install Dependencies
 
-### Dependencies
+- [PostgreSQL and Redis](#PostgreSQL-and-Redis)
+- [Yarn](#Yarn)
+- [NVM](#NVM)
+- [Lerna](#Lerna)
+- [Docker](#Docker)
+- [mds-core codebase](#mds-core-codebase)
+- [Kubernetes](#Kubernetes)
+- [Okteto](#Okteto)
 
-* PostgreSQL
-* Redis
-* [Yarn](https://yarnpkg.com/en/docs/install#mac-stable)
-* [NVM](https://github.com/nvm-sh/nvm#installation-and-update)
+# Operations to support development
 
-#### Database config on macOS
+- [Build mds-core](#build-mds-core)
+- [Run mds-core](#run-mds-core)
+- [mds-core Operations](#mds-core-operations)
+- [Additional Considerations](#additional-considerations)
+
+<!--reminder to add (or pointer to service docs) verification and (removal/ reinstallation if services are running to each section-->
+
+# Contents
+
+## PostgreSQL and Redis
+
+### MacOS
+
 If you haven't installed PostegreSQL and Redis you can install them with homebrew on macOS
 ```
 brew install postgresql
@@ -68,11 +56,20 @@ To run tests, you will need this:
 
 Then add `export PG_NAME=mdstest` to your shell's environment file.  (The name is not important, but you'll need to point it somehwere.)
 
-#### Node setup
+### Yarn
+
+[Installing Yarn](https://yarnpkg.com/en/docs/install#mac-stable)
+
+### NVM
+
+[Installing NVM](https://github.com/nvm-sh/nvm#installation-and-update)
 
 You should have NVM already installed from the link above.  The top level directory of the project has a `.nvmrc` file and you should be able to run `nvm install` to get the right version of Node.
 
-#### Package setup
+### Lerna
+
+#### MacOS
+
 Install [Lerna](https://lerna.js.org/)
 
 ```sh
@@ -100,7 +97,7 @@ You can also run all tests from the project root with
 yarn test
 ```
 
-### Package Management - Lerna
+#### Package Management - Lerna
 
 This repository is a monorepo and uses Lerna for working with its packages.
 
@@ -136,25 +133,21 @@ Format all files
 lerna run prettier
 ```
 
-## Debugging with Visual Studio Code
+#### Debugging with Visual Studio Code
 
-### Node.js: Express Server
+##### Node.js: Express Server
 
 * Select the `Node.js Express Server` debug configuration
 * Select the file that implements the Node/Express server for a package (typically `server.ts`) in the Explorer panel
 * Press `F5`
 
-### Mocha Tests
+##### Mocha Tests
 
 * Select the `Node.js: Mocha Tests` debug configuration
 * Select any one of the files in a package's test folder
 * Press `F5`
 
-### Kubernetes
-
-MDS can readily be provisioned to a [Kubernetes](https://kubernetes.io) capable cluster, be it a local or remote. The following steps describe how to build, deploy and operate against a local MDS cluster.
-
-#### Prerequisites
+## mds-core codebase
 
 Obtain a local working copy of MDS:
 
@@ -162,8 +155,9 @@ Obtain a local working copy of MDS:
 % git clone https://github.com/lacuna-tech/mds-core
 % cd mds-core
 ```
+## Docker
 
-OSX (Linux and Windows tbd)
+### MacOS
 
 Install [Docker Desktop](https://download.docker.com/mac/stable/Docker.dmg):
 
@@ -177,7 +171,13 @@ Start Docker-Desktop:
 % open /Applications/Docker.app
 ```
 
-Lastly, configure Kubernetes:
+## Kubernetes
+
+<!--reminder to add or point to k8 native install?, remote-->
+
+MDS can readily be provisioned to a [Kubernetes](https://kubernetes.io) capable cluster, be it a local or remote. The following steps describe how to build, deploy and operate against a local MDS cluster.
+
+### Kubernetes through Docker:
 
 ```txt
 select the 'Preferences' option
@@ -199,7 +199,7 @@ Verify:
 % kubectl cluster-info
 ```
 
-#### Bootstrap : install operational dependencies
+### Bootstrap : install operational dependencies
 
 In order to build and operate MDS, a number of suporting technologies are leveraged by ensuring they are installed and operational via a one-time `bootstap` process:
 
@@ -217,9 +217,9 @@ Verify:
 % k9s &
 ```
 
-#### Build : compile source into deployable images
+## Build mds-core
 
-Compiling and packaging MDS into a deployable form is achived as follows:
+Compiling and packaging MDS into a deployable images is as follows:
 
 ```sh
 % ./bin/mdsctl build
@@ -231,7 +231,7 @@ Verify:
 % docker images | grep mds*
 ```
 
-#### Run : install MDS
+## Run mds-core
 
 (tbd: ?best profile?)
 
@@ -245,7 +245,7 @@ Verify:
 % curl localhost/agency
 ```
 
-#### In-Cluster Development
+## Okteto
 Due to the nature of MDS-Core being a highly portable Typescript project that compiles down into minified javascript for its images, rapidly development in-cluster can be quite challenging. MDS-Core utilizes [Okteto](https://okteto.com) to enable developers to actively develop their code in-cluster.
 
 After following the above steps to set up a local MDS cluster, you can override an existing service's deployment with these steps.
@@ -265,13 +265,13 @@ After following the above steps to set up a local MDS cluster, you can override 
 5. This session is now safe to close, and you can reattach with the `okteto.${SERVICE_NAME}` ssh profile automatically added for you using the VSCode `Remote - SSH` package.
 6. When you're completely done with your session, run `> Okteto Down` from the VSCode command palette, or `okteto down` from terminal to revert the changes made by Okteto, and return your service to its previous deployment.
 
-#### MDS Operations
+## mds-core Operations
 
 MDS operates atop the following services: [Kubernetes](https://kubernetes.io), [Istio](https://istio.io), [NATS](https://nats.io), [PostgreSQL](https://www.postgresql.org) and [Redis](https://redis.io).
 
 (tbd)
 
-#### Additional Considerations
+## Additional Considerations
 
 Access the database:
 
@@ -303,7 +303,7 @@ Display the complete set of operations:
 % ./bin/mdsctl
 ```
 
-#### Cleanup
+### Cleanup
 
 ```sh
 % ./bin/mdsctl uninstall:mds uninstall

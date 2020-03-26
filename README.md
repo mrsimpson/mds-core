@@ -38,12 +38,16 @@ mds-core: An open source reference implementation of the Mobility Data Specifica
    * Azure
 - Developers that want to test mds-core code changes [follow the instructions in the Developers Workstation Setup Guide](DevWorkstationSetup.md#debugging-with-visual-studio-code)
 
-# Contributing to Experimental Content
+## Stable Content
+1. MDS-Agency 0.4.0 Implementation
+2. MDS-Policy 0.4.0 Implementation
+
+## Contributing to Experimental Content
 
 There are various parts of mds-core in development. Here is a partial list:
-1. [Updating MDS-Agency API with `/stops` PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/430)
-2. [Adding MDS-Audit API PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
-3. [Adding MDS-Compliance API PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
+1. [Updating MDS-Agency API with `/stops` PR #430](https://github.com/openmobilityfoundation/mobility-data-specification/pull/430)
+2. [Adding MDS-Audit API PR #326](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
+3. [Adding MDS-Compliance API PR #333](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
 4. MDS-Config **pending**
 5. MDS-Daily **pending**
 6. MDS-Metrics-Sheet **pending**
