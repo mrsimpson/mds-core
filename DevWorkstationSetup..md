@@ -1,14 +1,12 @@
-# Overview
+# Making Your First mds-core Contribution
 
-Repo for a reference implementation of MDS services intended for hosting by cities.  Includes implementations of
-Agency and Policy services, as well as Compliance and Audit services, plus some other tools and shared libraries.
-
-[More information on contributing found here](README.md#learn-more--get-involved--contributing)
-
-To commit code, you will need the pre-commit tool, which can be installed via `brew install pre-commit`.  For more information, see [SECURITY.md](.github/SECURITY.md)
+This document will guide you through making your first mds-core contribution. Before you follow these steps, make sure you understand the mobility data specification core and community supporting it.
+- [What is mds-core](README.md#mds-core-project-overview)
+- [Learn More / Get Involved / Contributing](README.md#learn-more--get-involved--contributing)
 
 # Install Dependencies
 
+- [Pre-commit](#pre-commit)
 - [PostgreSQL and Redis](#PostgreSQL-and-Redis)
 - [Yarn](#Yarn)
 - [NVM](#NVM)
@@ -28,6 +26,12 @@ To commit code, you will need the pre-commit tool, which can be installed via `b
 <!--reminder to add (or pointer to service docs) verification and (removal/ reinstallation if services are running to each section-->
 
 # Contents
+
+## Pre-commit 
+
+To commit code, you will need the pre-commit tool, which can be installed via `brew install pre-commit`.  For more information, see [SECURITY.md](.github/SECURITY.md)
+
+[Back to top](#install-dependencies)
 
 ## PostgreSQL and Redis
 
@@ -55,20 +59,26 @@ To run tests, you will need this:
 `createdb -h localhost mdstest`
 
 Then add `export PG_NAME=mdstest` to your shell's environment file.  (The name is not important, but you'll need to point it somehwere.)
+ 
+ [Back to top](#install-dependencies)
 
-### Yarn
+## Yarn
 
 [Installing Yarn](https://yarnpkg.com/en/docs/install#mac-stable)
 
-### NVM
+[Back to top](#install-dependencies)
+
+## NVM
 
 [Installing NVM](https://github.com/nvm-sh/nvm#installation-and-update)
 
 You should have NVM already installed from the link above.  The top level directory of the project has a `.nvmrc` file and you should be able to run `nvm install` to get the right version of Node.
 
-### Lerna
+[Back to top](#install-dependencies)
 
-#### MacOS
+## Lerna
+
+### MacOS
 
 Install [Lerna](https://lerna.js.org/)
 
@@ -147,6 +157,8 @@ lerna run prettier
 * Select any one of the files in a package's test folder
 * Press `F5`
 
+[Back to top](#install-dependencies)
+
 ## mds-core codebase
 
 Obtain a local working copy of MDS:
@@ -155,6 +167,9 @@ Obtain a local working copy of MDS:
 % git clone https://github.com/lacuna-tech/mds-core
 % cd mds-core
 ```
+
+[Back to top](#install-dependencies)
+
 ## Docker
 
 ### MacOS
@@ -170,6 +185,8 @@ Start Docker-Desktop:
 ```sh
 % open /Applications/Docker.app
 ```
+
+[Back to top](#install-dependencies)
 
 ## Kubernetes
 
@@ -217,6 +234,8 @@ Verify:
 % k9s &
 ```
 
+[Back to top](#install-dependencies)
+
 ## Build mds-core
 
 Compiling and packaging MDS into a deployable images is as follows:
@@ -245,7 +264,10 @@ Verify:
 % curl localhost/agency
 ```
 
+[Back to top](#install-dependencies)
+
 ## Okteto
+
 Due to the nature of MDS-Core being a highly portable Typescript project that compiles down into minified javascript for its images, rapidly development in-cluster can be quite challenging. MDS-Core utilizes [Okteto](https://okteto.com) to enable developers to actively develop their code in-cluster.
 
 After following the above steps to set up a local MDS cluster, you can override an existing service's deployment with these steps.
@@ -265,11 +287,15 @@ After following the above steps to set up a local MDS cluster, you can override 
 5. This session is now safe to close, and you can reattach with the `okteto.${SERVICE_NAME}` ssh profile automatically added for you using the VSCode `Remote - SSH` package.
 6. When you're completely done with your session, run `> Okteto Down` from the VSCode command palette, or `okteto down` from terminal to revert the changes made by Okteto, and return your service to its previous deployment.
 
+[Back to top](#install-dependencies)
+
 ## mds-core Operations
 
 MDS operates atop the following services: [Kubernetes](https://kubernetes.io), [Istio](https://istio.io), [NATS](https://nats.io), [PostgreSQL](https://www.postgresql.org) and [Redis](https://redis.io).
 
 (tbd)
+
+[Back to top](#install-dependencies)
 
 ## Additional Considerations
 
@@ -309,5 +335,4 @@ Display the complete set of operations:
 % ./bin/mdsctl uninstall:mds uninstall
 ```
 
-
-
+[Back to top](#install-dependencies)
