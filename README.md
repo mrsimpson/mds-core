@@ -16,6 +16,7 @@ mds-core: An open source reference implementation of the Mobility Data Specifica
 - Shared libraries used by multiple services
 - Deployment scripts for Kubernetes and Istio
 
+
 # mds-core is…
 
 - a reference MDS implementation usable by cities
@@ -28,6 +29,11 @@ mds-core: An open source reference implementation of the Mobility Data Specifica
 - where the specification is officially defined (that’s [here](https://github.com/openmobilityfoundation/mobility-data-specification))
 - a place to define local policies or performance metrics
 - a service that will be operated by the OMF
+
+# Technical Details
+ - [mds-core architecture](ARCHITECTURE.md)
+ - COMING SOON - Vehicle states and event types explained through their implementations
+ - Provider and Agency API specification reconcilation [notes](https://docs.google.com/document/d/1-KggZnPtdmiDvJJOzb4NWa8v7MfdNK88quWc0y7dzyo/edit?usp=sharing) and [spreadsheet](https://docs.google.com/spreadsheets/d/1rs6pGI3LudXIFQfZLkqE5sJ4A6_WfM1439hG4IK6B0Y/edit#gid=0). These are histortical documents that show how much time and effort is going into maintaining the specification resulting from real world implementations. 
 
 # Running and Testing mds-core
 

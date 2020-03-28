@@ -3,6 +3,16 @@
 This document will guide you through making your first mds-core contribution. Before you follow these steps, make sure you understand the mobility data specification core and community supporting it.
 - [What is mds-core](README.md#mds-core-project-overview)
 - [Learn More / Get Involved / Contributing](README.md#learn-more--get-involved--contributing)
+- [Technical Details](README/md#technical-details)
+
+# Assumptions
+
+All operations assume you have:
+
+- Linux (Red Hat or Debian based), Windows, or macOS
+- git
+- homebrew (macOS)
+- yum or apt-get (Linux)
 
 # Install Dependencies
 
@@ -35,7 +45,7 @@ To commit code, you will need the pre-commit tool, which can be installed via `b
 
 ## PostgreSQL and Redis
 
-### MacOS
+### macOS
 
 If you haven't installed PostegreSQL and Redis you can install them with homebrew on macOS
 ```
@@ -78,7 +88,7 @@ You should have NVM already installed from the link above.  The top level direct
 
 ## Lerna
 
-### MacOS
+### macOS
 
 Install [Lerna](https://lerna.js.org/)
 
@@ -172,7 +182,7 @@ Obtain a local working copy of MDS:
 
 ## Docker
 
-### MacOS
+### macOS
 
 Install [Docker Desktop](https://download.docker.com/mac/stable/Docker.dmg):
 
