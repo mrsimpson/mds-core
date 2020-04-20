@@ -24,10 +24,13 @@ This document will guide you through making your first mds-core contribution. Be
 # Operations to support development
 
 - [Bootstrap Operational Dependancies](#bootstrap-operational-dependencies)
+- [Bootstrap script Help](#bootstrap-script-help)
+- [In case of Bootstrap script install errors, break glass](#in-case-of-bootstrap-script-install-errors-break-glass)
 - [Build mds-core](#build-mds-core)
+- [In case of Bootstrap script build errors, break glass](#in-case-of-bootstrap-script-build-errors-break-glass)
 - [Run mds-core](#run-mds-core)
 - [Okteto](#Okteto)
-- [mds-core Operations (under development)](#mds-core-operations)
+- [mds-core Operations](#mds-core-operations)
 - [Launching a local server for a package](#launching-a-local-server-for-a-package)
 - [Package Management with Lerna](#package-management-with-lerna)
 - [Debugging with Visual Studio Code](#debugging-with-visual-studio-code)
@@ -243,7 +246,21 @@ While in the mds-core repository
 ```
 - Accept Helm accepting incoming network connection notice.
 
-The principle tools are: [homebrew](https://brew.sh), [bash-4.x+](https://www.gnu.org/software/bash/), [oq](https://github.com/Blacksmoke16/oq), [jq](https://stedolan.github.io/jq/), [yarn](https://yarnpkg.com/), [nvm](https://github.com/nvm-sh/nvm), [helm-2.14.1](https://helm.sh), [k9s](https://github.com/derailed/k9s), [kubectx](https://github.com/ahmetb/kubectx), [git](https://git-scm.com/), [gcloud](https://cloud.google.com/sdk/) and [awscli](https://aws.amazon.com/cli/). Additionally the [istio](https://istio.io) and [nats](https://nats.io) services are provisioned.
+The principle tools are: 
+- [homebrew](https://brew.sh)
+- [bash-4.x+](https://www.gnu.org/software/bash/)
+- [oq](https://github.com/Blacksmoke16/oq)
+- [jq](https://stedolan.github.io/jq/)
+- [yarn](https://yarnpkg.com/)
+- [nvm](https://github.com/nvm-sh/nvm)
+- [helm-2.14.1](https://helm.sh)
+- [k9s](https://github.com/derailed/k9s)
+- [kubectx](https://github.com/ahmetb/kubectx)
+- [git](https://git-scm.com/)
+- [gcloud](https://cloud.google.com/sdk/)
+- [awscli](https://aws.amazon.com/cli/). 
+- [istio](https://istio.io)
+- [nats](https://nats.io)
 
 Verify the installation was successful
 
@@ -278,6 +295,131 @@ nats-streaming-stateful-0       0/1     CrashLoopBackOff   5          4m49s
 
 [Back to top](#using-natively-installed-development-tools-for-macOS-linux)
 
+## Bootstrap script Help
+
+```
+$ ./mdsctl --help
+
+usage: mdsctl [--options] [commands]
+
+options:
+  [-c | --configure] [{key}={value}[,{key}={value}]   : set configuration value(s) by key(s)
+                   [{key}+={value}[,{key}+={value}]   : append configuraiton value(s) by key(s)
+                   [{key}=                            : clear configuration value(s) by key(s)
+  [-p | --preset] [preset-key[,preset-key]]           : preset configuration(s)
+  [-w | --workdir] [WORK-DIR]                         : specify working directory
+  [-s | --sleep] [PAUSE]                              : specify pause time
+  [-q | --quiet]                                      : less verbose
+  [-h | --help]                                       : usage
+
+where preset-key in:
+  minimal                                             : minimal service deployment; default: preset(local) + mds-agency, postgresql, redis
+  local                                               : local resource (cpu, memory) deployment; default: limitsCpu=200m, limitsMemory=200Mi, requestsCpu=20m, requestsMemory=32Mi
+  disabled                                            : disable service deployment; default: all
+  no-persistence                                      : disable persistence
+
+commands:
+  bootstrap                                           : install dependencies; default: helm,pgcli,helm,istio,nats,stan
+  build                                               : build project
+  install[:{service[,{service}]}]                     : install specified service; default: mds
+  cycle[]:[app[,app]]]                                : restart app; default: cycle all services
+  test[:unit,integration]                             : preform specified tests; default: unit,integration
+  open:[app[,{app}]]                                  : opens a browser for the provided application(s)
+  forward[:{app[,{app}]}]                             : register port-forwarding for the provided application(s); default: default
+  unforward[:{app[,{app}]}]                           : deregister port-forwarding for the provided application(s)
+  cli:[postgresql,redis]                              : create a cli console for the provided service
+  uninstall[:{service[,{service}]}]                   : uninstall specified service(s); default: logging,mds,stan,nats,istio,helm
+  reinstall[:{service[,{service}]}]                   : reinstall specified service(s); default: mds
+  home                                                : return installation directory
+  completion                                          : return bash-completion
+
+where service in:
+  helm
+  kiali
+  istio
+  mds
+  fallbackCertificate                                 : requires ingress domain; eg: -c:ingress-domain=[DOMAIN]
+  ingressGatewayCertificate                           : requires certificate path; eg: -c:ingress-gateway-key-path=[KEY-PATH],ingress-gateway-certificate-path=[CERT-PATH]
+  metricsAdapter
+  logging
+  metrics
+  nats
+  stan
+  grafana
+  dns
+  curl
+
+where app in:
+  mds-agency
+  mds-audit
+  mds-compliance
+  mds-daily
+  mds-event-processor
+  mds-geography
+  mds-geography-author
+  mds-native
+  mds-policy
+  mds-policy-author
+  mds-postgresql
+  mds-redis-headless
+  grafana                                             : grafana; see: https://grafana.com
+  kibana                                              : kibana; see https://www.elastic.co/products/kibana
+  prometheus                                          : prometheus; see https://prometheus.io
+  jaeger                                              : jaeger; see https://www.jaegertracing.io
+  kiali                                               : kiali; see https://www.kiali.io
+
+example:
+  % ./bin/mdsctl bootstrap build install:mds test:integration
+
+pre-requisites:
+  docker desktop with kubernetes                      : see https://www.docker.com/products/docker-desktop
+
+```
+
+[Back to top](#using-natively-installed-development-tools-for-macOS-linux)
+
+## In case of Bootstrap script install errors, break glass
+
+Bootstrap commands one by one
+
+`Note that we could fully document the bootstrap script inline as an alternative to here.`
+
+First, if the file package.json text is not
+```
+"engines": {
+    "node": "12.14.1"
+```
+then reset back to these values or yarn will not install the packages. You can attempt to use `./bin/mdsctl bootstrap` again.
+
+1. brew install -oq jq envsubst yarn nvm helm k9s kubectx git awscli
+1. brew-cask install -gcloud
+1. nvm install -12.14.1
+1. nvm alias default -12.14.1
+1. yarn lerna --version
+1. yarn cypress --version
+1. yarn mocha --version
+1. yarn chai --version
+1. yarn mochawesome --version
+1. helm init --force-upgrade || usage "helm intialization failure"
+1. helm repo add https://kubernetes-charts.storage.googleapis.com
+1. helm repo add https://storage.googleapis.com/istio-release/releases/1.3.6/charts
+1. helm repo add https://kubernetes-charts.banzaicloud.com
+1. helm repo add https://helm.elastic.co
+1. helm repo add https://charts.bitnami.com/bitnami
+1. helm dependency update [[ $(helm plugin list | grep unittest) ]] || helm plugin install https://github.com/lrills/helm-unittest
+1. mkdir /tmp/mds/tools 
+1. cd /tmp/mds/tools
+1. curl -L https://git.io/getLatestIstio  | ISTIO_VERSION=1.3.6
+
+`Continue working on this manual bootstrap. Stopped at line 528`
+
+1. nats
+1. stan
+
+
+
+[Back to top](#using-natively-installed-development-tools-for-macOS-linux)
+
 ## Build mds-core
 
 Compiling and packaging mds-core into a deployable images
@@ -308,6 +450,12 @@ mds-geography                        0.0.1-docs-omf-release-0-1-9c71905f    d352
 mds-geography-author                 0.0.1-docs-omf-release-0-1-9c71905f    7859d3d522e9        11 minutes ago      87.5MB
 mds-config                           0.0.2-docs-omf-release-0-1-9c71905f    aa2a1a99ecde        11 minutes ago      87.2MB
 ```
+
+[Back to top](#using-natively-installed-development-tools-for-macOS-linux)
+
+## In case of Bootstrap script build errors, break glass
+
+`TBD`
 
 [Back to top](#using-natively-installed-development-tools-for-macOS-linux)
 
@@ -356,7 +504,7 @@ yarn start
 
 MDS operates atop the following services: [Kubernetes](https://kubernetes.io), [Istio](https://istio.io), [NATS](https://nats.io), [PostgreSQL](https://www.postgresql.org) and [Redis](https://redis.io).
 
-More details to follow
+`More details to follow`
 
 [Back to top](#using-natively-installed-development-tools-for-macOS-linux)
 
