@@ -31,11 +31,11 @@ spec:
         imagePullPolicy: {{ default "IfNotPresent" $.Values.imagePullPolicy }}
         resources:
           limits:
-            cpu: {{ $api.resourcesLimitsCpu | default ($.Values.resourcesLimitsCpu | default "500m") }}
-            memory: {{ $api.resourcesLimitsMemory | default ($.Values.resourcesLimitsMemory | default "512Mi") }}
+            cpu: {{ default "500m" $api.resourcesLimitsCpu }}
+            memory: {{ default "512Mi" $api.resourcesLimitsMemory }}
           requests:
-            cpu: {{ $api.resourcesRequestsCpu | default ($.Values.resourcesRequestsCpu | default "50m") }}
-            memory: {{ $api.resourcesRequestsMemory | default ($.Values.resourcesRequestsMemory | default "128Mi") }}
+            cpu: {{ default "50m" $api.resourcesRequestsCpu }}
+            memory: {{ default "128Mi" $api.resourcesRequestsMemory }}
         ports:
         - containerPort: 4000
           name: user-port
