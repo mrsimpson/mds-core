@@ -18,12 +18,6 @@ spec:
       labels:
         app: {{ $name }}
     spec:
-      volumes:
-        {{- if and $.Values.nats.enabled $.Values.nats.credentials }}
-        - name: creds-volume
-          secret:
-            secretName: nats-creds
-        {{- end }}
       containers:
       - name: {{ $name }}
         image: {{ default $name $api.image }}
@@ -40,84 +34,22 @@ spec:
         - containerPort: 4000
           name: user-port
           protocol: TCP
-        volumeMounts:
-        {{- if and $.Values.nats.enabled $.Values.nats.credentials }}
-        - name: creds-volume
-          mountPath: /var/run/nats/secrets
-        {{- end }}
+
+        envFrom:
+          - configMapRef:
+              name: mds-env
         env:
           - name: PATH_PREFIX
             value: /{{ trimPrefix "mds-" $name }}
           - name: PORT
             value: "4000"
-          - name: PATH_PREFIX
-            value: {{ $api.pathPrefix }}
-          - name: TIMEZONE
-            value: {{ $.Values.timezone }}
-          - name: PG_USER
-            value: {{ $.Values.postgresql.postgresqlUsername }}
-          - name: PG_NAME
-            value: {{ $.Values.postgresql.postgresqlDatabase }}
           - name: PG_PASS
             valueFrom:
               secretKeyRef:
                 name: mds-secrets
                 key: postgresql-password
-          - name: PG_HOST
-          {{- if $.Values.postgresql.internal }}
-            value: {{ $.Release.Name }}-postgresql.{{ $.Release.Namespace }}.svc.cluster.local
-          {{- else }}
-            value: {{ $.Values.postgresql.host }}
-          {{- end }}
-          {{- if $.Values.postgresql.hostReader }}
-          - name: PG_HOST_READER
-            value: {{ $.Values.postgresql.hostReader }}
-          {{- end }}
-          {{- if $.Values.postgresql.port }}
-          - name: PG_PORT
-            value: {{ $.Values.postgresql.port | quote }}
-          {{- end}}
-          {{- if $api.migration }}
-          - name: PG_MIGRATIONS
-            value: {{ $api.migration | quote }}
-          {{- end }}
-          - name: REDIS_HOST
-          {{- if $.Values.redis.internal }}
-            value: {{ $.Release.Name }}-redis-master.{{ $.Release.Namespace }}.svc.cluster.local
-          {{- else }}
-            value: {{ $.Values.redis.host }}
-          {{- end }}
-          - name: REDIS_PORT
-            value: {{ $.Values.redis.port | quote }}
-          {{- if $.Values.nats.enabled }}
-          - name: NATS
-            value: {{ default "nats" $.Values.natsNamespace }}-nats-server.{{ default "nats" $.Values.natsNamespace }}.svc.cluster.local
-#            value: nats-cluster-mgmt.{{ default "nats" $.Values.natsNamespace }}.svc.cluster.local
-          {{- end }}
-          - name: KAFKA_HOST
-            value: host.docker.internal:9092
-          - name: TENANT_ID
-          {{- if hasKey $.Values "tenantId" }}
-            value: {{ $.Values.tenantId }}
-          {{- else }}
-            value: {{ $.Release.Namespace }}
-          {{- end }}
-          {{- if $.Values.slack.channel }}
-          - name: SLACK_CHANNEL
-            value: {{ $.Values.slack.channel }}
-          - name: SLACK_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: mds-secrets
-                key: slack-token
-          {{- end }}
           {{- if $api.env }}
 {{ toYaml $api.env | indent 10 }}
-          {{- end }}
-          {{- if hasKey $.Values "global" }}
-          {{- if hasKey $.Values.global "env" }}
-{{ toYaml $.Values.global.env | indent 10 }}
-          {{- end }}
           {{- end }}
   {{- end }}
 {{- end }}
@@ -128,21 +60,5 @@ metadata:
   name: mds-secrets
   namespace: {{ $.Release.Namespace }}
 data:
-  {{- if .Values.slack.channel }}
-  slack-token: {{ .Values.slack.token | b64enc }}
-  {{- end }}
-  {{- if .Values.postgresql.password }}
-  postgresql-password: {{ .Values.postgresql.password | b64enc }}
-  {{- end }}
+  postgresql-password: {{ default "CHANGEME" .Values.postgresql.password | b64enc }}
 type: Opaque
-{{- if and $.Values.nats.enabled $.Values.nats.credentials }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: nats-creds
-  namespace: {{ $.Release.Namespace }}
-data:
-  sys.creds: {{ $.Values.nats | b64enc }}
-type: Opaque
-{{- end }}

@@ -56,6 +56,9 @@ redis:
     disableCommands: []
   slave:
     disableCommands: []
-slack:
-  channel:
-  token:
+nats:
+  enabled: true
+  credentials: false
+kafka:
+  enabled: false
+  host:

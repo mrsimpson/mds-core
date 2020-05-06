@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mds-env
+data:
+  TIMEZONE: {{ .Values.timezone }}
+  PG_USER: {{ .Values.postgresql.postgresqlUsername }}
+  PG_NAME: {{ .Values.postgresql.postgresqlDatabase }}
+  PG_HOST: {{ default (printf "%s-postgresql" .Release.Name) .Values.postgresql.host }}
+  {{- if .Values.postgresql.hostReader }} #TODO: make sure we can do without this var
+  PG_HOST_READER: {{ .Values.postgresql.hostReader }}
+  {{- end }}
+  PG_PORT: {{ default "5432" .Values.postgresql.port | quote }}
+  REDIS_HOST: {{ default (printf "%s-redis-master" .Release.Name) .Values.redis.host }}
+  REDIS_PORT: {{ default "6379" .Values.redis.port | quote }}
+  NATS: {{ .Values.nats.host }}
+  KAFKA_HOST: {{ .Values.kafka.host }}
+  TENANT_ID: {{ .Values.tenantId }}
+{{- if hasKey $.Values "global" }}
+{{- if hasKey $.Values.global "env" }}  #TODO: update values in cloud-ops
+{{ toYaml $.Values.global.env | indent 2 }}
+{{- end }}
+{{- end }}
