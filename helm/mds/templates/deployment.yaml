@@ -26,10 +26,9 @@ spec:
         {{- end }}
       containers:
       - name: {{ $name }}
-        image: {{ if $.Values.registry }}{{ printf "%s/" $.Values.registry }}{{- end}}{{ $name }}:{{ $api.version }}
-        {{- if $.Values.registry }}
-        imagePullPolicy: IfNotPresent
-        {{- end }}
+        image: {{ default $name $api.image }}
+
+        imagePullPolicy: {{ default "IfNotPresent" $.Values.imagePullPolicy }}
         resources:
           limits:
             cpu: {{ $api.resourcesLimitsCpu | default ($.Values.resourcesLimitsCpu | default "500m") }}
@@ -47,6 +46,8 @@ spec:
           mountPath: /var/run/nats/secrets
         {{- end }}
         env:
+          - name: PATH_PREFIX
+            value: /{{ trimPrefix "mds-" $name }}
           - name: PORT
             value: "4000"
           - name: PATH_PREFIX

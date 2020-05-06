@@ -1,62 +1,26 @@
 apis:
   mds-agency:
     enabled: true
-    pathPrefix: /agency
-    version: latest
-    migration: false
   mds-audit:
     enabled: true
-    pathPrefix: /audit
-    version: latest
-    migration: false
   mds-policy:
     enabled: true
-    pathPrefix: /policy
-    version: latest
-    migration: false
   mds-compliance:
     enabled: true
-    pathPrefix: /compliance
-    version: latest
-    migration: false
   mds-daily:
     enabled: true
-    pathPrefix: /daily
-    version: latest
-    migration: false
   mds-jurisdiction:
     enabled: true
-    pathPrefix: /jurisdiction
-    version: latest
-    migration: false
   mds-jurisdiction-service:
     enabled: true
-    pathPrefix: /jurisdiction-service
-    version: latest
-    migration: false
   mds-policy-author:
     enabled: true
-    pathPrefix: /policy-author
-    version: latest
-    migration: false
   mds-web-sockets:
     enabled: true
-    pathPrefix: /web-sockets
-    version: latest
-    migration: false
   mds-geography:
     enabled: true
-    pathPrefix: /geography
-    version: latest
-    migration: false
   mds-geography-author:
     enabled: true
-    pathPrefix: /geography-author
-    version: latest
-    migration: false
-nats:
-  enabled: true
-  credentials: false
 tenantId:
 timezone: America/Los_Angeles
 registry:

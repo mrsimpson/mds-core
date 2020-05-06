@@ -423,7 +423,14 @@ installImages() {
 }
 
 buildImage() {
-  docker build -t ${1}$(getBranchSuffix)$(getCommitHash) .
+  if [[ -n "$DEV_BUILD" ]]; then
+    image=$(echo $1 | sed 's/:.*//')  # remove tag
+    docker build -t ${image}:latest .
+  elif [[ -n "$REGISTRY" ]]; then
+    docker build -t $REGISTRY/${1}$(getBranchSuffix)$(getCommitHash) .
+  else
+    docker build -t ${1}$(getBranchSuffix)$(getCommitHash) .
+  fi
 }
 
 getBranchSuffix() {
@@ -458,9 +465,15 @@ templateValues() {
 
   for directory in container-images/mds-*; do
     api=$(basename $directory)
-    version=$(jq -r '.version' < $directory/package.json)
-    varname="$(echo $api | sed -e 's/^mds-//' -e 's/-/_/g' | tr a-z A-Z)_VERSION"
-    export $varname=${version}${suffix}
+    version=$(jq -r '.version' < container-images/$api/package.json)
+    varname="$(echo $api | sed -e 's/^mds-//' -e 's/-/_/g' | tr a-z A-Z)_IMAGE"
+    if [[ -n "$DEV_BUILD" ]]; then
+      export $varname=${api}:latest
+    elif [[ -n "$REGISTRY" ]]; then
+      export $varname=${REGISTRY}/${api}:${version}${suffix}
+    else
+      export $varname=$api:${version}${suffix}
+    fi
   done
   mkdir -p dist
   envsubst < helm/mds/values.yaml.tpl > dist/values.yaml
