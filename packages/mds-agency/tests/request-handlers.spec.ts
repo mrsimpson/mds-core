@@ -5,7 +5,12 @@ import { Device, VEHICLE_TYPES } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
-import { AgencyApiRequest, AgencyApiResponse, AgencyGetVehiclesByProviderResponse } from '../types'
+import {
+  AgencyApiRequest,
+  AgencyApiResponse,
+  AGENCY_API_DEFAULT_VERSION,
+  AgencyGetVehiclesByProviderResponse
+} from '../types'
 import {
   registerVehicle,
   getVehicleById,
@@ -243,6 +248,7 @@ describe('Agency API request handlers', () => {
       } as any)
       res.status = statusHandler
       res.locals = getLocals(provider_id) as any
+      res.locals.version = AGENCY_API_DEFAULT_VERSION
 
       const stubbedResponse = { total: 0, links: { first: '0', last: '0', prev: null, next: null }, vehicles: [] }
       Sinon.replace(utils, 'getVehicles', Sinon.fake.resolves(stubbedResponse))
@@ -255,7 +261,7 @@ describe('Agency API request handlers', () => {
         res
       )
       assert.equal(statusHandler.calledWith(200), true)
-      assert.equal(sendHandler.calledWith({ ...stubbedResponse }), true)
+      assert.equal(sendHandler.calledWith({ ...stubbedResponse, version: AGENCY_API_DEFAULT_VERSION }), true)
       Sinon.restore()
     })
   })
@@ -285,7 +291,10 @@ describe('Agency API request handlers', () => {
           'not found'
         )
         assert.equal(statusHandler.calledWith(404), true)
-        assert.equal(sendHandler.called, true)
+        assert.equal(
+          sendHandler.called,
+          true
+        )
         Sinon.restore()
       })
 
@@ -345,7 +354,10 @@ describe('Agency API request handlers', () => {
           'not found'
         )
         assert.equal(statusHandler.calledWith(404), true)
-        assert.equal(sendHandler.called, true)
+        assert.equal(
+          sendHandler.called,
+          true
+        )
         Sinon.restore()
       })
 

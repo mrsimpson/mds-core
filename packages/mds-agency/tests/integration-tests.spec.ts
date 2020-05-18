@@ -49,6 +49,7 @@ import { ApiServer } from '@mds-core/mds-api-server'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
 
 import { api } from '../api'
+import { AGENCY_API_DEFAULT_VERSION } from '../types'
 
 /* eslint-disable-next-line no-console */
 const log = console.log.bind(console)
@@ -332,6 +333,7 @@ describe('Tests API', () => {
       .expect(201)
       .end((err, result) => {
         log('err', err, 'body', result.body)
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -343,6 +345,7 @@ describe('Tests API', () => {
       .expect(200)
       .end((err, result) => {
         // log(result.body)
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.string(result.body.vehicles[0].vehicle_id).is('test-id-1')
         test.string(result.body.vehicles[0].status).is('removed')
         test.string(result.body.links.first).contains('http')
@@ -358,6 +361,7 @@ describe('Tests API', () => {
       .expect(200)
       .end((err, result) => {
         // log('----------', result.body)
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
         test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
         test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATUSES.removed)
@@ -372,6 +376,7 @@ describe('Tests API', () => {
       .expect(200)
       .end((err, result) => {
         // log('----------', result.body)
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
         test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
         test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATUSES.removed)
@@ -426,6 +431,7 @@ describe('Tests API', () => {
       .end((err, result) => {
         // log('----> err', err, 'body', result.body)
         // test.string(result.body.error).contains('already_registered')
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -450,6 +456,7 @@ describe('Tests API', () => {
       .set('Authorization', AUTH)
       .expect(200)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.object(result.body).match((obj: Device) => obj.vehicle_id === NEW_VEHICLE_ID)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
@@ -461,6 +468,7 @@ describe('Tests API', () => {
       .set('Authorization', AUTH)
       .expect(200)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.object(result.body).match((obj: Device) => obj.vehicle_id === NEW_VEHICLE_ID)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
@@ -548,6 +556,7 @@ describe('Tests API', () => {
       .expect(201)
       .end((err, result) => {
         testTimestamp += 20000
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.string(result.body.status).is('available')
         done(err)
       })
@@ -560,6 +569,7 @@ describe('Tests API', () => {
       .expect(200)
       .end((err, result) => {
         log(result.body)
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.string(result.body.vehicles[0].vehicle_id).is('new-vehicle-id')
         test.string(result.body.vehicles[0].status).is('available')
         test.string(result.body.links.first).contains('http')
@@ -579,6 +589,7 @@ describe('Tests API', () => {
       })
       .expect(201)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         test.string(result.body.status).is('unavailable')
         done(err)
       })
@@ -593,6 +604,7 @@ describe('Tests API', () => {
       .expect(201)
       .end((err, result) => {
         log('post deregister response:', JSON.stringify(result.body))
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -693,6 +705,8 @@ describe('Tests API', () => {
       })
       .expect(201)
       .end((err, result) => {
+        // log('post event', result.body)
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -761,6 +775,7 @@ describe('Tests API', () => {
       })
       .expect(201)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -792,6 +807,7 @@ describe('Tests API', () => {
       })
       .expect(201)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -807,6 +823,7 @@ describe('Tests API', () => {
       })
       .expect(201)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -822,6 +839,7 @@ describe('Tests API', () => {
       })
       .expect(201)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -844,6 +862,7 @@ describe('Tests API', () => {
       })
       .expect(201)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -859,6 +878,7 @@ describe('Tests API', () => {
       })
       .expect(201)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -1066,6 +1086,7 @@ describe('Tests API', () => {
       })
       .expect(201)
       .end((err, result) => {
+        test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -1116,6 +1137,7 @@ describe('Tests API', () => {
           log('telemetry err', err)
         } else {
           // log('telemetry result', result)
+          test.object(result.body).hasProperty('version', AGENCY_API_DEFAULT_VERSION)
         }
         done(err)
       })
