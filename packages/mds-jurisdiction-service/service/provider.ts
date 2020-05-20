@@ -14,29 +14,13 @@
     limitations under the License.
  */
 
-import { ServiceProvider } from '@mds-core/mds-service-helpers'
+import { ServiceProvider, ProcessController } from '@mds-core/mds-service-helpers'
 import { JurisdictionRepository } from './repository'
-import { JurisdictionServiceInterface } from '../@types'
-import {
-  CreateJurisdictionsHandler,
-  CreateJurisdictionHandler,
-  UpdateJurisdictionHandler,
-  DeleteJurisdictionHandler,
-  GetJurisdictionHandler,
-  GetJurisdictionsHandler
-} from './handlers'
+import { JurisdictionService } from '../@types'
+import * as handlers from './handlers'
 
-export const JurisdictionServiceProvider: ServiceProvider<JurisdictionServiceInterface> = {
-  initialize: async () => {
-    await JurisdictionRepository.initialize()
-  },
-  createJurisdictions: CreateJurisdictionsHandler,
-  createJurisdiction: CreateJurisdictionHandler,
-  updateJurisdiction: UpdateJurisdictionHandler,
-  deleteJurisdiction: DeleteJurisdictionHandler,
-  getJurisdictions: GetJurisdictionsHandler,
-  getJurisdiction: GetJurisdictionHandler,
-  shutdown: async () => {
-    await JurisdictionRepository.shutdown()
-  }
+export const JurisdictionServiceProvider: ServiceProvider<JurisdictionService> & ProcessController = {
+  start: JurisdictionRepository.initialize,
+  stop: JurisdictionRepository.shutdown,
+  ...handlers
 }

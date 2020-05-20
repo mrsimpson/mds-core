@@ -15,24 +15,30 @@
  */
 
 import logger from '@mds-core/mds-logger'
-import { hours, NotFoundError, ValidationError, ConflictError } from '@mds-core/mds-utils'
+import { hours, minutes, seconds, NotFoundError, ValidationError, ConflictError } from '@mds-core/mds-utils'
 import { Nullable } from '@mds-core/mds-types'
-import { ServiceProvider, ServiceResultType, ServiceErrorDescriptor, ServiceErrorType } from '../@types'
+import retry, { Options as RetryOptions } from 'async-retry'
+import { ServiceResultType, ServiceErrorDescriptor, ServiceErrorType, ProcessController } from '../@types'
 
-type ProcessMonitorOptions = Partial<{
-  interval: number
-  signals: NodeJS.Signals[]
-}>
+type ProcessMonitorOptions = Partial<
+  Omit<RetryOptions, 'onRetry'> & {
+    interval: number
+    signals: NodeJS.Signals[]
+  }
+>
 
-type ProcessMonitor = {
-  stop: () => Promise<void>
-}
-
-const ServiceMonitor = async <TServiceInterface>(
-  service: ServiceProvider<TServiceInterface>,
+const ProcessMonitor = async (
+  controller: ProcessController,
   options: ProcessMonitorOptions = {}
-): Promise<ProcessMonitor> => {
-  const { interval = hours(1), signals = ['SIGINT', 'SIGTERM'] } = options
+): Promise<ProcessController> => {
+  const {
+    interval = hours(1),
+    signals = ['SIGINT', 'SIGTERM'],
+    retries = 15,
+    minTimeout = seconds(2),
+    maxTimeout = minutes(2),
+    ...retryOptions
+  } = options
 
   const {
     env: { npm_package_name, npm_package_version, npm_package_git_commit }
@@ -40,44 +46,71 @@ const ServiceMonitor = async <TServiceInterface>(
 
   const version = `${npm_package_name} v${npm_package_version} (${npm_package_git_commit ?? 'local'})`
 
-  logger.info(`Initializing service ${version}`)
-
   // Initialize the service
-  await service.initialize()
+  try {
+    await retry(
+      async () => {
+        logger.info(`Initializing process ${version}`)
+        await controller.start()
+      },
+      {
+        retries,
+        minTimeout,
+        maxTimeout,
+
+        ...retryOptions,
+        onRetry: (error, attempt) => {
+          /* istanbul ignore next */
+          logger.error(
+            `Initializing process ${version} failed: ${error.message}, Retrying ${attempt} of ${retries}....`
+          )
+        }
+      }
+    )
+  } catch (error) /* istanbul ignore next */ {
+    logger.error(`Initializing process ${version} failed: ${error.message}, Exiting...`)
+    await controller.stop()
+    process.exit(1)
+  }
 
   // Keep NodeJS process alive
-  logger.info(`Monitoring service ${version} for ${signals.join(', ')}`)
+  logger.info(`Monitoring process ${version} for ${signals.join(', ')}`)
   const timeout = setInterval(() => {
-    logger.info(`Monitoring service ${version} for ${signals.join(', ')}`)
+    logger.info(`Monitoring process ${version} for ${signals.join(', ')}`)
   }, interval)
 
-  const shutdown = async (signal: NodeJS.Signals) => {
+  const terminate = async (signal: NodeJS.Signals) => {
     clearInterval(timeout)
-    logger.info(`Terminating service ${version} on ${signal}`)
-    await service.shutdown()
+    logger.info(`Terminating process ${version} on ${signal}`)
+    await controller.stop()
+    process.exit(0)
   }
 
   // Monitor process for signals
   signals.forEach(signal =>
     process.on(signal, async () => {
-      await shutdown(signal)
+      await terminate(signal)
     })
   )
 
-  return { stop: async () => shutdown('SIGUSR1') }
+  return {
+    start: async () => undefined,
+    stop: async () => terminate('SIGUSR1')
+  }
 }
 
-export const ServiceManager = {
-  run: <TServiceInterface>(service: ServiceProvider<TServiceInterface>, options: ProcessMonitorOptions = {}) => {
+export const ProcessManager = (controller: ProcessController, options: ProcessMonitorOptions = {}) => ({
+  monitor: () => {
+    // eslint-reason disable in this one location until top-level await
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    ServiceMonitor(service, options)
+    ProcessMonitor(controller, options)
   },
-  controller: <TServiceInterface>(service: ServiceProvider<TServiceInterface>, options: ProcessMonitorOptions = {}) => {
-    let monitor: Nullable<ProcessMonitor> = null
+  controller: (): ProcessController => {
+    let monitor: Nullable<ProcessController> = null
     return {
       start: async () => {
         if (!monitor) {
-          monitor = await ServiceMonitor(service, options)
+          monitor = await ProcessMonitor(controller, options)
         }
       },
       stop: async () => {
@@ -88,12 +121,14 @@ export const ServiceManager = {
       }
     }
   }
-}
+})
 
 export const ServiceResult = <R>(result: R): ServiceResultType<R> => ({ error: null, result })
 
-export const ServiceError = (error: Omit<ServiceErrorDescriptor, 'name'>): ServiceErrorType => ({
-  error: { name: '__ServiceErrorDescriptor__', ...error }
+export const ServiceError = <E extends string>(
+  error: Omit<ServiceErrorDescriptor<E>, 'isServiceError'>
+): ServiceErrorType<E> => ({
+  error: { isServiceError: true, ...error }
 })
 
 export const ServiceException = (message: string, error?: unknown) => {

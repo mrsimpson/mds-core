@@ -32,6 +32,8 @@ tls:
 jwt:
   issuer:
   enabled: false
+  bypassInternal: false
+  firstInstall: false
   audiences: []
 postgresql:
   internal: true

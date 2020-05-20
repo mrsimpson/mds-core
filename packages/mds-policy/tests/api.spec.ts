@@ -41,7 +41,8 @@ import {
   START_ONE_WEEK_AGO,
   PROVIDER_SCOPES,
   GEOGRAPHY2_UUID,
-  veniceSpecOps
+  veniceSpecOps,
+  SCOPED_AUTH
 } from '@mds-core/mds-test-data'
 
 import { la_city_boundary } from './la-city-boundary'
@@ -54,9 +55,10 @@ const log = console.log.bind(console)
 
 const request = supertest(ApiServer(api))
 
-const APP_JSON = 'application/vnd.mds.policy+json; charset=utf-8; version=0.1'
+const APP_JSON = 'application/vnd.mds.policy+json; charset=utf-8; version=0.4'
 
 const AUTH = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}|${PROVIDER_SCOPES}`).toString('base64')}`
+const POLICIES_READ_SCOPE = SCOPED_AUTH(['policies:read'])
 
 describe('Tests app', () => {
   before('Initialize the DB', async () => {
@@ -82,18 +84,18 @@ describe('Tests app', () => {
     log('read back one policy response:', body)
     test.value(body.version).is(POLICY_API_DEFAULT_VERSION)
     test.value(result).hasHeader('content-type', APP_JSON)
-    // TODO verify contents
+    test.value(result.body.data.policy.policies, POLICY_UUID)
   })
 
   it('reads back all active policies', async () => {
     const result = await request.get(`/policies`).set('Authorization', AUTH).expect(200)
     const body = result.body
     log('read back all policies response:', body)
-    test.value(body.policies.length).is(1) // only one should be currently valid
-    test.value(body.policies[0].policy_id).is(POLICY_UUID)
+    test.value(body.data.policies.length).is(1) // only one should be currently valid
+    test.value(body.data.policies[0].policy_id).is(POLICY_UUID)
     test.value(body.version).is(POLICY_API_DEFAULT_VERSION)
     test.value(result).hasHeader('content-type', APP_JSON)
-    // TODO verify contents
+    test.value(result.body.data.policies, [POLICY_JSON])
   })
 
   it('read back all published policies and no superseded ones', async () => {
@@ -108,7 +110,6 @@ describe('Tests app', () => {
     await db.publishPolicy(POLICY2_JSON.policy_id)
     await db.writePolicy(POLICY3_JSON)
     await db.publishPolicy(POLICY3_JSON.policy_id)
-    await db.writePolicy(POLICY4_JSON)
     await db.writePolicy(SUPERSEDING_POLICY_JSON)
     await db.publishPolicy(SUPERSEDING_POLICY_JSON.policy_id)
     const result = await request
@@ -116,14 +117,15 @@ describe('Tests app', () => {
       .set('Authorization', AUTH)
       .expect(200)
     const body = result.body
+    const policies = result.body.data.policies
     log('read back all published policies response:', body)
-    test.value(body.policies.length).is(3)
+    test.value(policies.length).is(3)
     test.value(body.version).is(POLICY_API_DEFAULT_VERSION)
     test.value(result).hasHeader('content-type', APP_JSON)
-    const isSupersededPolicyPresent = body.policies.some((policy: Policy) => {
+    const isSupersededPolicyPresent = policies.some((policy: Policy) => {
       return policy.policy_id === POLICY_JSON.policy_id
     })
-    const isSupersedingPolicyPresent = body.policies.some((policy: Policy) => {
+    const isSupersedingPolicyPresent = policies.some((policy: Policy) => {
       return policy.policy_id === SUPERSEDING_POLICY_JSON.policy_id
     })
     test.value(isSupersededPolicyPresent).is(false)
@@ -136,12 +138,12 @@ describe('Tests app', () => {
       .set('Authorization', AUTH)
       .expect(200)
     const body = result.body
+    const policies = body.data.policies
     log('read back all policies response:', body)
-    test.value(body.policies.length).is(1) // only one
-    test.value(body.policies[0].policy_id).is(POLICY2_UUID)
+    test.value(policies.length).is(1) // only one
+    test.value(policies[0].policy_id).is(POLICY2_UUID)
     test.value(body.version).is(POLICY_API_DEFAULT_VERSION)
     test.value(result).hasHeader('content-type', APP_JSON)
-    // TODO verify contents
   })
 
   it('read back current and future policies', async () => {
@@ -151,7 +153,7 @@ describe('Tests app', () => {
       .expect(200)
     const body = result.body
     log('read back all policies response:', body)
-    test.value(body.policies.length).is(2) // current and future
+    test.value(body.data.policies.length).is(2) // current and future
     test.value(body.version).is(POLICY_API_DEFAULT_VERSION)
     test.value(result).hasHeader('content-type', APP_JSON)
   })
@@ -169,5 +171,21 @@ describe('Tests app', () => {
   it('tries to read non-UUID policy', async () => {
     const result = await request.get('/policies/notarealpolicy').set('Authorization', AUTH).expect(400)
     test.value(result.body.result === 'not found')
+  })
+
+  it('can GET all unpublished policies', async () => {
+    await db.writePolicy(POLICY4_JSON)
+    const result = await request
+      .get(`/policies?get_unpublished=true`)
+      .set('Authorization', POLICIES_READ_SCOPE)
+      .expect(200)
+    test.assert(result.body.data.policies.length === 1)
+  })
+
+  it('can GET one unpublished policy', async () => {
+    await request
+      .get(`/policies/${POLICY4_JSON.policy_id}?get_unpublished=true`)
+      .set('Authorization', POLICIES_READ_SCOPE)
+      .expect(200)
   })
 })
