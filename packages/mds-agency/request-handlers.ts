@@ -11,7 +11,6 @@ import {
   Telemetry,
   ErrorObject,
   DeviceID,
-  VEHICLE_STATUSES,
   EVENT_STATUS_MAP,
   VEHICLE_EVENT,
   VEHICLE_REASON,
@@ -56,7 +55,7 @@ export const registerVehicle = async (req: AgencyApiRequest, res: AgencyRegister
 
   const status = 'removed'
 
-  const device = {
+  const device: Device = {
     provider_id,
     device_id,
     vehicle_id,

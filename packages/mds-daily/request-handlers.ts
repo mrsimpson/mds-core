@@ -2,15 +2,7 @@ import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers'
 import { now, inc, ServerError, filterDefined } from '@mds-core/mds-utils'
-import {
-  UUID,
-  VehicleEvent,
-  VEHICLE_STATUSES,
-  EVENT_STATUS_MAP,
-  VEHICLE_EVENT,
-  TripsStats,
-  Device
-} from '@mds-core/mds-types'
+import { UUID, VehicleEvent, EVENT_STATUS_MAP, VEHICLE_EVENT, TripsStats, Device } from '@mds-core/mds-types'
 import { DailyApiRequest, DailyApiResponse, ProviderInfo } from './types'
 import {
   getTimeSinceLastEvent,

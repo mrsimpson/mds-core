@@ -18,9 +18,7 @@ import {
   Telemetry,
   ErrorObject,
   isEnum,
-  VEHICLE_EVENTS,
   VEHICLE_TYPES,
-  VEHICLE_STATUSES,
   VEHICLE_REASONS,
   PROPULSION_TYPES,
   EVENT_STATUS_MAP,
@@ -92,7 +90,7 @@ export function badDevice(device: Device): { error: string; error_description: s
       error_description: 'missing enum field "type"'
     }
   }
-  if (!isEnum(VEHICLE_TYPES, device.type)) {
+  if (!VEHICLE_TYPES.includes(device.type)) {
     return {
       error: 'bad_param',
       error_description: `invalid device type ${device.type}`

@@ -30,9 +30,7 @@ import {
   WithGpsProperty,
   BoundingBox,
   EVENT_STATUS_MAP,
-  VEHICLE_EVENT,
-  VEHICLE_EVENTS,
-  VEHICLE_STATUSES
+  VEHICLE_EVENT
 } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 import { now } from '@mds-core/mds-utils'

@@ -31,9 +31,8 @@ import {
   Timestamp,
   AUDIT_EVENT_TYPES,
   PROPULSION_TYPES,
-  VEHICLE_EVENTS,
   VEHICLE_REASONS,
-  VEHICLE_TYPES
+  VehicleEvent
 } from '@mds-core/mds-types'
 import { makeEventsWithTelemetry, makeDevices, makeTelemetryInArea, SCOPED_AUTH } from '@mds-core/mds-test-data'
 import { NotFoundError, now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
@@ -79,7 +78,7 @@ before('Initializing Database', async () => {
 
 describe('Testing API', () => {
   before(done => {
-    const baseEvent = {
+    const baseEvent: VehicleEvent = {
       provider_id,
       device_id: provider_device_id,
       event_type: 'agency_drop_off',
@@ -108,7 +107,7 @@ describe('Testing API', () => {
       provider_id,
       vehicle_id: provider_vehicle_id,
       propulsion: [PROPULSION_TYPES.electric],
-      type: VEHICLE_TYPES.scooter,
+      type: 'scooter',
       recorded: AUDIT_START
     }).then(() => {
       db.writeEvent({
@@ -693,7 +692,7 @@ describe('Testing API', () => {
           provider_id,
           vehicle_id: provider_vehicle_id,
           propulsion: [PROPULSION_TYPES.electric],
-          type: VEHICLE_TYPES.scooter,
+          type: 'scooter',
           recorded: AUDIT_START
         })
         await db.writeAudit(audit)

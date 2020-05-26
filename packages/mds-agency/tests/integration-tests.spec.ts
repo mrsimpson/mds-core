@@ -29,17 +29,7 @@
 
 import supertest from 'supertest'
 import test from 'unit.js'
-import {
-  VEHICLE_EVENTS,
-  VEHICLE_STATUSES,
-  VEHICLE_TYPES,
-  PROPULSION_TYPES,
-  Timestamp,
-  Device,
-  VehicleEvent,
-  Geography,
-  Stop
-} from '@mds-core/mds-types'
+import { PROPULSION_TYPES, Timestamp, Device, VehicleEvent, Geography, Stop } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
@@ -95,7 +85,7 @@ const TEST_VEHICLE = {
   device_id: DEVICE_UUID,
   provider_id: TEST1_PROVIDER_ID,
   vehicle_id: 'test-id-1',
-  type: VEHICLE_TYPES.bicycle,
+  type: 'bicycle',
   propulsion: [PROPULSION_TYPES.human],
   year: 2018,
   mfgr: 'Schwinn',

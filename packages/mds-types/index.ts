@@ -55,7 +55,7 @@ export const MICRO_VEHICLE_STATUSES = [
   'elsewhere'
 ] as const
 
-export const TAXI_VEHICLE_STATUSES = ['available', 'unavailable', 'reserved', 'trip', 'stopped', 'elsewhere']
+export const TAXI_VEHICLE_STATUSES = ['available', 'unavailable', 'reserved', 'trip', 'stopped', 'elsewhere'] as const
 
 export const VEHICLE_STATUSES = [...MICRO_VEHICLE_STATUSES, ...TAXI_VEHICLE_STATUSES]
 export type VEHICLE_STATUS = typeof VEHICLE_STATUSES[number]
@@ -146,7 +146,9 @@ export const EVENT_STATUS_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATUS } = {
   trip_resume: 'trip'
 }
 
-export const STATUS_EVENT_MAP: { [S in VEHICLE_STATUS]: Partial<typeof VEHICLE_EVENTS> } = {
+const StatusEventMap = <T extends { [S in VEHICLE_STATUS]: Partial<typeof VEHICLE_EVENTS> }>(map: T) => map
+
+export const STATUS_EVENT_MAP = StatusEventMap({
   available: [
     'service_start',
     'provider_drop_off',
@@ -162,7 +164,7 @@ export const STATUS_EVENT_MAP: { [S in VEHICLE_STATUS]: Partial<typeof VEHICLE_E
   removed: ['register', 'provider_pick_up', 'agency_pick_up', 'depot_enter'],
   inactive: ['deregister'],
   stopped: ['reserve_stop', 'trip_stop']
-}
+})
 
 export const DAYS_OF_WEEK = Enum('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
 export type DAY_OF_WEEK = keyof typeof DAYS_OF_WEEK
@@ -320,7 +322,7 @@ interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   name: string
   rule_id: UUID
   geographies: UUID[]
-  statuses: Partial<{ [S in VEHICLE_STATUS]: typeof STATUS_EVENT_MAP[S][] | [] }> | null
+  statuses: Partial<{ [S in VEHICLE_STATUS]: typeof STATUS_EVENT_MAP[S] | [] }> | null
   rule_type: RuleType
   vehicle_types?: VEHICLE_TYPE[] | null
   maximum?: number | null

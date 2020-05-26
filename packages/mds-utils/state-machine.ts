@@ -12,13 +12,16 @@ const stateTransitionDict: {
     deregister: 'inactive',
     agency_pick_up: 'removed',
     service_end: 'unavailable',
-    trip_start: 'trip'
+    trip_start: 'trip',
+    service_leave: 'elsewhere'
   },
   elsewhere: {
     trip_enter: 'trip',
     provider_pick_up: 'removed',
     deregister: 'inactive',
-    provider_drop_off: 'available'
+    provider_drop_off: 'available',
+    service_enter: 'available',
+    reserve_enter: 'reserved'
   },
   inactive: {
     register: 'removed'
@@ -26,21 +29,30 @@ const stateTransitionDict: {
   removed: {
     trip_enter: 'trip',
     provider_drop_off: 'available',
-    deregister: 'inactive'
+    deregister: 'inactive',
+    depot_leave: 'unavailable'
   },
   reserved: {
     trip_start: 'trip',
-    cancel_reservation: 'available'
+    cancel_reservation: 'available',
+    reserve_stop: 'stopped'
   },
   trip: {
     trip_leave: 'elsewhere',
-    trip_end: 'available'
+    trip_end: 'available',
+    trip_stop: 'stopped'
   },
   unavailable: {
     service_start: 'available',
     deregister: 'inactive',
     agency_pick_up: 'removed',
-    provider_pick_up: 'removed'
+    provider_pick_up: 'removed',
+    depot_enter: 'removed'
+  },
+  stopped: {
+    trip_start: 'trip',
+    trip_resume: 'trip',
+    trip_end: 'available'
   }
 }
 

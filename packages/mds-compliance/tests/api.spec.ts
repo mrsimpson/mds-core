@@ -29,7 +29,6 @@ import {
   VehicleEvent,
   UUID,
   RULE_TYPES,
-  VEHICLE_TYPES,
   PROPULSION_TYPES
 } from '@mds-core/mds-types'
 import MockDate from 'mockdate'
@@ -107,7 +106,7 @@ const COUNT_POLICY_JSON: Policy = {
   ]
 }
 
-const SCOPED_COUNT_POLICY_JSON = {
+const SCOPED_COUNT_POLICY_JSON: Policy = {
   name: 'LADOT Mobility Caps',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: COUNT_POLICY_UUID,
@@ -237,7 +236,7 @@ const TIME_POLICY_JSON: Policy = {
       rule_units: 'minutes',
       geographies: [GEOGRAPHY_UUID],
       statuses: { available: [] },
-      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      vehicle_types: ['bicycle', 'scooter'],
       maximum: 7200
     }
   ]
@@ -713,7 +712,7 @@ describe('Tests Compliance API:', () => {
             rule_type: RULE_TYPES.count,
             geographies: veniceSpecOpsPointIds,
             statuses: { available: ['provider_drop_off'] },
-            vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter]
+            vehicle_types: ['bicycle', 'scooter']
           },
           {
             name: 'Drop-off No-Fly Zones',
@@ -721,7 +720,7 @@ describe('Tests Compliance API:', () => {
             rule_type: RULE_TYPES.count,
             geographies: ['e0e4a085-7a50-43e0-afa4-6792ca897c5a'],
             statuses: { available: ['provider_drop_off'] },
-            vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+            vehicle_types: ['bicycle', 'scooter'],
             maximum: 0
           }
         ]
