@@ -30,7 +30,11 @@ import {
   VEHICLE_STATUS,
   BBox,
   VEHICLE_EVENT,
-  SingleOrArray
+  SingleOrArray,
+  TAXI_EVENTS,
+  MICRO_EVENTS,
+  MICRO_EVENT,
+  TAXI_EVENT
 } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 import { MultiPolygon, Polygon, FeatureCollection, Geometry, Feature } from 'geojson'
@@ -512,6 +516,14 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
     : true
 }
 
+function isMicroEvent(event: VehicleEvent): boolean {
+  return MICRO_EVENTS.includes(event.event_type as MICRO_EVENT)
+}
+
+function isTaxiEvent(event: VehicleEvent): boolean {
+  return TAXI_EVENTS.includes(event.event_type as TAXI_EVENT)
+}
+
 function routeDistance(coordinates: { lat: number; lng: number }[]): number {
   const R = 6371000 // Earth's mean radius in meters
   return (coordinates || [])
@@ -633,6 +645,8 @@ export {
   head,
   tail,
   isStateTransitionValid,
+  isMicroEvent,
+  isTaxiEvent,
   pointInGeometry,
   getPolygon,
   isInStatesOrEvents,

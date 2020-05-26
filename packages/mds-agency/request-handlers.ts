@@ -54,7 +54,7 @@ export const registerVehicle = async (req: AgencyApiRequest, res: AgencyRegister
   const { provider_id } = res.locals
   const { device_id, vehicle_id, type, propulsion, year, mfgr, model } = body
 
-  const status = VEHICLE_STATUSES.removed
+  const status = 'removed'
 
   const device = {
     provider_id,
@@ -291,7 +291,7 @@ export const submitVehicleEvent = async (req: AgencyApiRequest, res: AgencySubmi
     if (event.telemetry) {
       event.telemetry.device_id = event.device_id
     }
-    const failure = (await badEvent(event)) || (event.telemetry ? badTelemetry(event.telemetry) : null)
+    const failure = (await badEvent(event, device)) || (event.telemetry ? badTelemetry(event.telemetry) : null)
     // TODO unify with fail() above
     if (failure) {
       logger.info(name, 'event failure', failure, event)

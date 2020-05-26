@@ -110,7 +110,7 @@ export async function getVehicleCounts(req: DailyApiRequest, res: DailyApiRespon
         items.filter(filterDefined({ warnOnEmpty: true })).map(async item => {
           const event = eventMap[item.device_id]
           inc(stat.event_type, event ? event.event_type : 'default')
-          const status = event ? EVENT_STATUS_MAP[event.event_type] : VEHICLE_STATUSES.removed
+          const status = event ? EVENT_STATUS_MAP[event.event_type] : 'removed'
           inc(stat.status, status)
         })
       })

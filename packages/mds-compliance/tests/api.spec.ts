@@ -70,7 +70,7 @@ const TEST_VEHICLE = {
   device_id: DEVICE_UUID,
   provider_id: TEST1_PROVIDER_ID,
   vehicle_id: 'test-id-1',
-  type: VEHICLE_TYPES.bicycle,
+  type: 'bicycle',
   propulsion: [PROPULSION_TYPES.human],
   year: 2018,
   mfgr: 'Schwinn',
@@ -100,7 +100,7 @@ const COUNT_POLICY_JSON: Policy = {
       rule_type: RULE_TYPES.count,
       geographies: [GEOGRAPHY_UUID],
       statuses: { available: [], unavailable: [], reserved: [], trip: [] },
-      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      vehicle_types: ['bicycle', 'scooter'],
       maximum: 10,
       minimum: 5
     }
@@ -122,7 +122,7 @@ const SCOPED_COUNT_POLICY_JSON = {
       rule_type: RULE_TYPES.count,
       geographies: [GEOGRAPHY_UUID],
       statuses: { available: [], unavailable: [], reserved: [], trip: [] },
-      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      vehicle_types: ['bicycle', 'scooter'],
       maximum: 10,
       minimum: 5
     }
@@ -166,7 +166,7 @@ const COUNT_POLICY_JSON_3: Policy = {
       rule_type: RULE_TYPES.count,
       geographies: [GEOGRAPHY_UUID],
       statuses: { available: ['service_start'], unavailable: [], reserved: [], trip: [] },
-      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      vehicle_types: ['bicycle', 'scooter'],
       maximum: 10
     }
   ]

@@ -25,8 +25,14 @@ export const Enum = <T extends string>(...keys: T[]) =>
 export const isEnum = (enums: { [key: string]: string }, value: unknown) =>
   typeof value === 'string' && typeof enums === 'object' && enums[value] === value
 
-export const VEHICLE_TYPES = Enum('car', 'bicycle', 'scooter', 'moped', 'recumbent')
-export type VEHICLE_TYPE = keyof typeof VEHICLE_TYPES
+export const MICRO_VEHICLE_TYPES = ['car', 'bicycle', 'scooter', 'moped', 'recumbent'] as const
+export type MICRO_VEHICLE_TYPE = typeof MICRO_VEHICLE_TYPES[number]
+
+export const TAXI_VEHICLE_TYPES = ['taxi'] as const
+export type TAXI_VECHICLE_TYPE = typeof TAXI_VEHICLE_TYPES[number]
+
+export const VEHICLE_TYPES = [...MICRO_VEHICLE_TYPES, ...TAXI_VEHICLE_TYPES] as const
+export type VEHICLE_TYPE = typeof VEHICLE_TYPES[number]
 
 export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
 export type RULE_TYPE = keyof typeof RULE_TYPES
@@ -39,12 +45,24 @@ export const RULE_UNIT_MAP = {
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
-export const VEHICLE_STATUSES = Enum('available', 'reserved', 'unavailable', 'removed', 'inactive', 'trip', 'elsewhere')
-export type VEHICLE_STATUS = keyof typeof VEHICLE_STATUSES
+export const MICRO_VEHICLE_STATUSES = [
+  'available',
+  'reserved',
+  'unavailable',
+  'removed',
+  'inactive',
+  'trip',
+  'elsewhere'
+] as const
+
+export const TAXI_VEHICLE_STATUSES = ['available', 'unavailable', 'reserved', 'trip', 'stopped', 'elsewhere']
+
+export const VEHICLE_STATUSES = [...MICRO_VEHICLE_STATUSES, ...TAXI_VEHICLE_STATUSES]
+export type VEHICLE_STATUS = typeof VEHICLE_STATUSES[number]
 
 export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
 
-export const VEHICLE_EVENTS = Enum(
+export const MICRO_EVENTS = [
   'register',
   'service_start',
   'service_end',
@@ -59,9 +77,33 @@ export const VEHICLE_EVENTS = Enum(
   'trip_leave',
   'trip_end',
   'deregister'
-)
+] as const
 
-export type VEHICLE_EVENT = keyof typeof VEHICLE_EVENTS
+export type MICRO_EVENT = typeof MICRO_EVENTS[number]
+
+export const TAXI_EVENTS = [
+  'service_start',
+  'service_end',
+  'service_enter',
+  'service_leave',
+  'depot_enter',
+  'depot_leave',
+  'reserve',
+  'reserve_enter',
+  'cancel_reservation',
+  'reserve_stop',
+  'trip_stop',
+  'trip_start',
+  'trip_resume',
+  'trip_leave',
+  'trip_enter'
+] as const
+
+export type TAXI_EVENT = typeof TAXI_EVENTS[number]
+
+export const VEHICLE_EVENTS = [...MICRO_EVENTS, ...TAXI_EVENTS]
+
+export type VEHICLE_EVENT = typeof VEHICLE_EVENTS[number]
 
 export const VEHICLE_REASONS = Enum(
   'battery_charged',
@@ -80,38 +122,47 @@ export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'tele
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
 
 export const EVENT_STATUS_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATUS } = {
-  register: VEHICLE_STATUSES.removed,
-  service_start: VEHICLE_STATUSES.available,
-  service_end: VEHICLE_STATUSES.unavailable,
-  provider_drop_off: VEHICLE_STATUSES.available,
-  provider_pick_up: VEHICLE_STATUSES.removed,
-  agency_pick_up: VEHICLE_STATUSES.removed,
-  agency_drop_off: VEHICLE_STATUSES.available,
-  reserve: VEHICLE_STATUSES.reserved,
-  cancel_reservation: VEHICLE_STATUSES.available,
-  trip_start: VEHICLE_STATUSES.trip,
-  trip_enter: VEHICLE_STATUSES.trip,
-  trip_leave: VEHICLE_STATUSES.elsewhere,
-  trip_end: VEHICLE_STATUSES.available,
-  deregister: VEHICLE_STATUSES.inactive
+  register: 'removed',
+  service_start: 'available',
+  service_end: 'unavailable',
+  provider_drop_off: 'available',
+  provider_pick_up: 'removed',
+  agency_pick_up: 'removed',
+  agency_drop_off: 'available',
+  reserve: 'reserved',
+  reserve_stop: 'stopped',
+  cancel_reservation: 'available',
+  trip_start: 'trip',
+  trip_enter: 'trip',
+  trip_leave: 'elsewhere',
+  trip_end: 'available',
+  deregister: 'inactive',
+  service_enter: 'available',
+  service_leave: 'elsewhere',
+  depot_enter: 'removed',
+  depot_leave: 'unavailable',
+  reserve_enter: 'reserved',
+  trip_stop: 'stopped',
+  trip_resume: 'trip'
 }
 
-const StatusEventMap = <T extends { [S in VEHICLE_STATUS]: Partial<typeof VEHICLE_EVENTS> }>(map: T) => map
-
-export const STATUS_EVENT_MAP = StatusEventMap({
-  available: Enum(
-    VEHICLE_EVENTS.service_start,
-    VEHICLE_EVENTS.provider_drop_off,
-    VEHICLE_EVENTS.cancel_reservation,
-    VEHICLE_EVENTS.agency_drop_off
-  ),
-  reserved: Enum(VEHICLE_EVENTS.reserve),
-  unavailable: Enum(VEHICLE_EVENTS.service_end, VEHICLE_EVENTS.trip_end),
-  trip: Enum(VEHICLE_EVENTS.trip_start, VEHICLE_EVENTS.trip_enter),
-  elsewhere: Enum(VEHICLE_EVENTS.trip_leave),
-  removed: Enum(VEHICLE_EVENTS.register, VEHICLE_EVENTS.provider_pick_up, VEHICLE_EVENTS.agency_pick_up),
-  inactive: Enum(VEHICLE_EVENTS.deregister)
-})
+export const STATUS_EVENT_MAP: { [S in VEHICLE_STATUS]: Partial<typeof VEHICLE_EVENTS> } = {
+  available: [
+    'service_start',
+    'provider_drop_off',
+    'cancel_reservation',
+    'agency_drop_off',
+    'trip_end',
+    'service_enter'
+  ],
+  reserved: ['reserve', 'reserve_enter'],
+  unavailable: ['service_end', 'depot_leave'],
+  trip: ['trip_start', 'trip_enter', 'trip_resume'],
+  elsewhere: ['trip_leave', 'service_leave'],
+  removed: ['register', 'provider_pick_up', 'agency_pick_up', 'depot_enter'],
+  inactive: ['deregister'],
+  stopped: ['reserve_stop', 'trip_stop']
+}
 
 export const DAYS_OF_WEEK = Enum('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
 export type DAY_OF_WEEK = keyof typeof DAYS_OF_WEEK
@@ -269,7 +320,7 @@ interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   name: string
   rule_id: UUID
   geographies: UUID[]
-  statuses: Partial<{ [S in VEHICLE_STATUS]: (keyof typeof STATUS_EVENT_MAP[S])[] | [] }> | null
+  statuses: Partial<{ [S in VEHICLE_STATUS]: typeof STATUS_EVENT_MAP[S][] | [] }> | null
   rule_type: RuleType
   vehicle_types?: VEHICLE_TYPE[] | null
   maximum?: number | null

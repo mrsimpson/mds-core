@@ -417,7 +417,7 @@ async function readDevicesStatus(query: {
       try {
         const parsedItem = parseEvent(item)
         if (
-          EVENT_STATUS_MAP[parsedItem.event_type] === VEHICLE_STATUSES.removed ||
+          EVENT_STATUS_MAP[parsedItem.event_type] === 'removed' ||
           !parsedItem.telemetry ||
           (strictChecking && !isInsideBoundingBox(parsedItem.telemetry, query.bbox))
         )

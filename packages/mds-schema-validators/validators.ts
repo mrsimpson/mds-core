@@ -403,23 +403,18 @@ export const validateEvent = (event: unknown) => {
   if (isValidEvent(event, { allowUnknown: true })) {
     const { event_type } = event
 
-    const TRIP_EVENTS: string[] = [
-      VEHICLE_EVENTS.trip_start,
-      VEHICLE_EVENTS.trip_end,
-      VEHICLE_EVENTS.trip_enter,
-      VEHICLE_EVENTS.trip_leave
-    ]
+    const TRIP_EVENTS: string[] = ['trip_start', 'trip_end', 'trip_enter', 'trip_leave']
 
     if (TRIP_EVENTS.includes(event_type)) {
       return validateTripEvent(event)
     }
-    if (event_type === VEHICLE_EVENTS.provider_pick_up) {
+    if (event_type === 'provider_pick_up') {
       return validateProviderPickUpEvent(event)
     }
-    if (event_type === VEHICLE_EVENTS.service_end) {
+    if (event_type === 'service_end') {
       return validateServiceEndEvent(event)
     }
-    if (event_type === VEHICLE_EVENTS.deregister) {
+    if (event_type === 'deregister') {
       return validateDeregisterEvent(event)
     }
 

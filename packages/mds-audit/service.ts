@@ -181,7 +181,7 @@ export async function getVehicle(provider_id: UUID, vehicle_id: string) {
   await Promise.all(
     devices.map(async device => {
       const deviceStatus = (await cache.readDeviceStatus(device.device_id)) as (VehicleEvent & Device) | null
-      if (deviceStatus === null || deviceStatus.event_type === VEHICLE_EVENTS.deregister) {
+      if (deviceStatus === null || deviceStatus.event_type === 'deregister') {
         const { device_id } = device
         logger.info('Bad vehicle status', { deviceStatus, provider_id, vehicle_id, device_id })
         deviceStatusMap.inactive.push(device)
@@ -216,7 +216,7 @@ export async function getVehicles(
   const start = now()
   const statusesSuperset = ((await cache.readDevicesStatus({ bbox, strict })) as (VehicleEvent & Device)[]).filter(
     status =>
-      EVENT_STATUS_MAP[status.event_type as VEHICLE_EVENT] !== VEHICLE_STATUSES.removed &&
+      EVENT_STATUS_MAP[status.event_type as VEHICLE_EVENT] !== 'removed' &&
       (!provider_id || status.provider_id === provider_id)
   )
   const statusesSubset = statusesSuperset.slice(skip, skip + take)

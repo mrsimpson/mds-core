@@ -1,5 +1,6 @@
-import { VEHICLE_STATUSES, VEHICLE_EVENTS, VEHICLE_STATUS, VEHICLE_EVENT } from '@mds-core/mds-types'
+import { VEHICLE_STATUSES, VEHICLE_STATUS, VEHICLE_EVENT } from '@mds-core/mds-types'
 
+/* FIXME: Update to support Taxi */
 const stateTransitionDict: {
   [S in VEHICLE_STATUS]: Partial<
     {
@@ -7,39 +8,39 @@ const stateTransitionDict: {
     }
   >
 } = {
-  [VEHICLE_STATUSES.available]: {
-    [VEHICLE_EVENTS.deregister]: VEHICLE_STATUSES.inactive,
-    [VEHICLE_EVENTS.agency_pick_up]: VEHICLE_STATUSES.removed,
-    [VEHICLE_EVENTS.service_end]: VEHICLE_STATUSES.unavailable,
-    [VEHICLE_EVENTS.trip_start]: VEHICLE_STATUSES.trip
+  available: {
+    deregister: 'inactive',
+    agency_pick_up: 'removed',
+    service_end: 'unavailable',
+    trip_start: 'trip'
   },
-  [VEHICLE_STATUSES.elsewhere]: {
-    [VEHICLE_EVENTS.trip_enter]: VEHICLE_STATUSES.trip,
-    [VEHICLE_EVENTS.provider_pick_up]: VEHICLE_STATUSES.removed,
-    [VEHICLE_EVENTS.deregister]: VEHICLE_STATUSES.inactive,
-    [VEHICLE_EVENTS.provider_drop_off]: VEHICLE_STATUSES.available
+  elsewhere: {
+    trip_enter: 'trip',
+    provider_pick_up: 'removed',
+    deregister: 'inactive',
+    provider_drop_off: 'available'
   },
-  [VEHICLE_STATUSES.inactive]: {
-    [VEHICLE_EVENTS.register]: VEHICLE_STATUSES.removed
+  inactive: {
+    register: 'removed'
   },
-  [VEHICLE_STATUSES.removed]: {
-    [VEHICLE_EVENTS.trip_enter]: VEHICLE_STATUSES.trip,
-    [VEHICLE_EVENTS.provider_drop_off]: VEHICLE_STATUSES.available,
-    [VEHICLE_EVENTS.deregister]: VEHICLE_STATUSES.inactive
+  removed: {
+    trip_enter: 'trip',
+    provider_drop_off: 'available',
+    deregister: 'inactive'
   },
-  [VEHICLE_STATUSES.reserved]: {
-    [VEHICLE_EVENTS.trip_start]: VEHICLE_STATUSES.trip,
-    [VEHICLE_EVENTS.cancel_reservation]: VEHICLE_STATUSES.available
+  reserved: {
+    trip_start: 'trip',
+    cancel_reservation: 'available'
   },
-  [VEHICLE_STATUSES.trip]: {
-    [VEHICLE_EVENTS.trip_leave]: VEHICLE_STATUSES.elsewhere,
-    [VEHICLE_EVENTS.trip_end]: VEHICLE_STATUSES.available
+  trip: {
+    trip_leave: 'elsewhere',
+    trip_end: 'available'
   },
-  [VEHICLE_STATUSES.unavailable]: {
-    [VEHICLE_EVENTS.service_start]: VEHICLE_STATUSES.available,
-    [VEHICLE_EVENTS.deregister]: VEHICLE_STATUSES.inactive,
-    [VEHICLE_EVENTS.agency_pick_up]: VEHICLE_STATUSES.removed,
-    [VEHICLE_EVENTS.provider_pick_up]: VEHICLE_STATUSES.removed
+  unavailable: {
+    service_start: 'available',
+    deregister: 'inactive',
+    agency_pick_up: 'removed',
+    provider_pick_up: 'removed'
   }
 }
 
