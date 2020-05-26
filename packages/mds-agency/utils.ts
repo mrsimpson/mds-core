@@ -28,7 +28,7 @@ import {
   MICRO_VEHICLE_TYPES,
   TAXI_VEHICLE_TYPES,
   MICRO_VEHICLE_TYPE,
-  TAXI_VECHICLE_TYPE
+  TAXI_VEHICLE_TYPE
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -299,7 +299,7 @@ export async function badEvent(event: VehicleEvent, device: Device) {
 
   if (
     (MICRO_VEHICLE_TYPES.includes(device.type as MICRO_VEHICLE_TYPE) && !isMicroEvent(event)) ||
-    (TAXI_VEHICLE_TYPES.includes(device.type as TAXI_VECHICLE_TYPE) && !isTaxiEvent(event))
+    (TAXI_VEHICLE_TYPES.includes(device.type as TAXI_VEHICLE_TYPE) && !isTaxiEvent(event))
   ) {
     return {
       error: 'bad_param',
