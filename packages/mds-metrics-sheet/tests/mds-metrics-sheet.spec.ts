@@ -13,7 +13,8 @@ const getStatus = (): VehicleCountRow['status'] => {
     removed: 0,
     inactive: 3,
     trip: 5,
-    elsewhere: 17
+    elsewhere: 17,
+    stopped: 0
   }
 }
 
@@ -139,7 +140,8 @@ describe('MDS Metrics Sheet', () => {
         removed: 126,
         reserved: 42,
         trip: 84,
-        unavailable: 42
+        unavailable: 42,
+        stopped: 0
       }
       assert.deepStrictEqual(result, expected)
     })
