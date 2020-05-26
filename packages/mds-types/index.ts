@@ -29,7 +29,7 @@ export const MICRO_VEHICLE_TYPES = ['car', 'bicycle', 'scooter', 'moped', 'recum
 export type MICRO_VEHICLE_TYPE = typeof MICRO_VEHICLE_TYPES[number]
 
 export const TAXI_VEHICLE_TYPES = ['taxi'] as const
-export type TAXI_VECHICLE_TYPE = typeof TAXI_VEHICLE_TYPES[number]
+export type TAXI_VEHICLE_TYPE = typeof TAXI_VEHICLE_TYPES[number]
 
 export const VEHICLE_TYPES = [...MICRO_VEHICLE_TYPES, ...TAXI_VEHICLE_TYPES] as const
 export type VEHICLE_TYPE = typeof VEHICLE_TYPES[number]
