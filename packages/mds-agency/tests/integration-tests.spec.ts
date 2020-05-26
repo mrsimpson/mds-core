@@ -29,7 +29,18 @@
 
 import supertest from 'supertest'
 import test from 'unit.js'
-import { PROPULSION_TYPES, Timestamp, Device, VehicleEvent, Geography, Stop } from '@mds-core/mds-types'
+import {
+  PROPULSION_TYPES,
+  Timestamp,
+  Device,
+  VehicleEvent,
+  Geography,
+  Stop,
+  TAXI_EVENTS,
+  EVENT_STATUS_MAP,
+  MICRO_EVENTS,
+  TAXI_EVENT
+} from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
@@ -81,7 +92,7 @@ const TEST_TELEMETRY2 = {
   timestamp: now() + 1000
 }
 
-const TEST_VEHICLE = {
+const TEST_BICYCLE: Omit<Device, 'recorded'> = {
   device_id: DEVICE_UUID,
   provider_id: TEST1_PROVIDER_ID,
   vehicle_id: 'test-id-1',
@@ -90,6 +101,17 @@ const TEST_VEHICLE = {
   year: 2018,
   mfgr: 'Schwinn',
   model: 'Mantaray'
+}
+
+const TEST_TAXI: Omit<Device, 'recorded'> = {
+  device_id: 'e6aa73ec-9fbc-4cbd-9a43-a9ad9737897b',
+  provider_id: TEST1_PROVIDER_ID,
+  vehicle_id: 'test-taxi-id',
+  type: 'taxi',
+  propulsion: [PROPULSION_TYPES.combustion],
+  year: 2020,
+  mfgr: 'FakeMfgr',
+  model: 'DreamMachine'
 }
 
 let testTimestamp = now()
@@ -175,7 +197,7 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device bad device id', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     badVehicle.device_id = 'bad'
     request
       .post('/vehicles')
@@ -203,7 +225,7 @@ describe('Tests API', () => {
   //         })
   // })
   it('verifies post device missing propulsion', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     delete badVehicle.propulsion
     request
       .post('/vehicles')
@@ -219,7 +241,7 @@ describe('Tests API', () => {
   })
 
   it('verifies post device bad propulsion', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     // @ts-ignore: Spoofing garbage data
     badVehicle.propulsion = ['hamster']
     request
@@ -249,7 +271,7 @@ describe('Tests API', () => {
   //         })
   // })
   it('verifies post device bad year', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     // @ts-ignore: Spoofing garbage data
     badVehicle.year = 'hamster'
     request
@@ -266,7 +288,7 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device out-of-range year', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     badVehicle.year = 3000
     request
       .post('/vehicles')
@@ -282,7 +304,7 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device missing type', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     delete badVehicle.type
     request
       .post('/vehicles')
@@ -297,7 +319,7 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device bad type', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     // @ts-ignore: Spoofing garbage data
     badVehicle.type = 'hamster'
     request
@@ -318,7 +340,7 @@ describe('Tests API', () => {
     request
       .post('/vehicles')
       .set('Authorization', AUTH)
-      .send(TEST_VEHICLE)
+      .send(TEST_BICYCLE)
       .expect(201)
       .end((err, result) => {
         log('err', err, 'body', result.body)
@@ -395,7 +417,7 @@ describe('Tests API', () => {
     request
       .post('/vehicles')
       .set('Authorization', AUTH)
-      .send(TEST_VEHICLE)
+      .send(TEST_BICYCLE)
       .expect(409)
       .end((err, result) => {
         log('err', err, 'body', result.body)
@@ -407,7 +429,7 @@ describe('Tests API', () => {
   const NEW_VEHICLE_ID = 'new-vehicle-id'
   it('verifies put update success', done => {
     request
-      .put(`/vehicles/${TEST_VEHICLE.device_id}`)
+      .put(`/vehicles/${TEST_BICYCLE.device_id}`)
       .set('Authorization', AUTH)
       .send({
         vehicle_id: NEW_VEHICLE_ID
@@ -422,7 +444,7 @@ describe('Tests API', () => {
   })
   it('verifies put update failure (provider mismatch)', done => {
     request
-      .put(`/vehicles/${TEST_VEHICLE.device_id}`)
+      .put(`/vehicles/${TEST_BICYCLE.device_id}`)
       .set('Authorization', AUTH2)
       .send({
         vehicle_id: NEW_VEHICLE_ID
@@ -1349,7 +1371,7 @@ describe('Tests API', () => {
   })
   it('wipes a vehicle via admin', done => {
     request
-      .get(`/admin/wipe/${TEST_VEHICLE.device_id}`)
+      .get(`/admin/wipe/${TEST_BICYCLE.device_id}`)
       .set('Authorization', AUTH)
       .expect(200)
       .end((err, result) => {
@@ -1359,7 +1381,7 @@ describe('Tests API', () => {
   })
   it('wipes a vehicle via admin that has already been wiped', done => {
     request
-      .get(`/admin/wipe/${TEST_VEHICLE.device_id}`)
+      .get(`/admin/wipe/${TEST_BICYCLE.device_id}`)
       .set('Authorization', AUTH)
       .expect(404)
       .end((err, result) => {
@@ -1509,4 +1531,73 @@ describe('Tests Stops', async () => {
         done(err)
       })
   })
+})
+
+describe('Tests for taxi modality', async () => {
+  before(async () => {
+    await Promise.all([db.initialize(), cache.initialize()])
+  })
+
+  it('verifies post taxi success', done => {
+    request
+      .post('/vehicles')
+      .set('Authorization', AUTH)
+      .send(TEST_TAXI)
+      .expect(201)
+      .end((err, result) => {
+        log('err', err, 'body', result.body)
+        test.value(result).hasHeader('content-type', APP_JSON)
+        done(err)
+      })
+  })
+
+  for (const taxiEvent of TAXI_EVENTS) {
+    it(`verifies ${taxiEvent} success`, done => {
+      const { device_id } = TEST_TAXI
+      let trip_id
+      if (taxiEvent.startsWith('trip_')) {
+        trip_id = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc6b'
+      }
+      const body = {
+        event_type: taxiEvent,
+        telemetry: TEST_TELEMETRY,
+        timestamp: now(),
+        trip_id
+      }
+      request
+        .post(`/vehicles/${device_id}/event`)
+        .set('Authorization', AUTH)
+        .send(body)
+        .expect(201)
+        .end((err, result) => {
+          test.string(result.body.status).is(EVENT_STATUS_MAP[taxiEvent])
+          done(err)
+        })
+    })
+  }
+
+  /* We want to test for all micromobility events which
+   * are not included in the valid Taxi events.
+   */
+  const MICRO_EVENTS_NOT_IN_TAXI_EVENTS = MICRO_EVENTS.filter(item => TAXI_EVENTS.indexOf(item as TAXI_EVENT) < 0)
+
+  for (const microEvent of MICRO_EVENTS_NOT_IN_TAXI_EVENTS) {
+    it('verifies cannot send micro-mobility type event for a taxi', done => {
+      const { device_id } = TEST_TAXI
+      request
+        .post(`/vehicles/${device_id}/event`)
+        .set('Authorization', AUTH)
+        .send({
+          event_type: microEvent,
+          telemetry: TEST_TELEMETRY,
+          timestamp: now()
+        })
+        .expect(400)
+        .end((err, result) => {
+          test.string(result.body.error).contains('bad_param')
+          test.string(result.body.error_description).contains('invalid event_type')
+          done(err)
+        })
+    })
+  }
 })
