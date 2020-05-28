@@ -71,19 +71,16 @@ spec:
       request.auth.audiences: {{ . | quote }}
       request.auth.claims[iss]: {{ $.Values.jwt.issuer }}
   {{- end }}
-{{- if .Values.jwt.firstInstall }}
 ---
-# THIS MUST BE IN PLACE FOR JWT TO FUNCTION CORRECTLY
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ClusterRbacConfig
 metadata:
-  name: default
+  name: {{ .Release.Name }}-jwt
 spec:
   mode: 'ON_WITH_INCLUSION'
   inclusion:
     namespaces:
       - {{ .Release.Namespace }}
-{{- end }}
 {{- else }} # use old jwt configuration
 {{- range $name, $api := .Values.apis }}
 {{- if $api.enabled }}

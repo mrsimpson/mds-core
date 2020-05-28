@@ -1,5 +1,5 @@
 {{- range $name, $api := .Values.apis }}
-  {{- if $api.enabled }}
+{{- if $api.enabled }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -28,8 +28,8 @@ spec:
             cpu: {{ default "500m" $api.resourcesLimitsCpu }}
             memory: {{ default "512Mi" $api.resourcesLimitsMemory }}
           requests:
-            cpu: {{ default "50m" $api.resourcesRequestsCpu }}
-            memory: {{ default "128Mi" $api.resourcesRequestsMemory }}
+            cpu: {{ default "10m" $api.resourcesRequestsCpu }}
+            memory: {{ default "64Mi" $api.resourcesRequestsMemory }}
         ports:
         - containerPort: 4000
           name: user-port
@@ -40,9 +40,7 @@ spec:
               name: mds-env
         env:
           - name: PATH_PREFIX
-            value: /{{ trimPrefix "mds-" $name }}
-          - name: PORT
-            value: "4000"
+            value: {{ $api.pathPrefix }}
           - name: PG_PASS
             valueFrom:
               secretKeyRef:
@@ -51,7 +49,7 @@ spec:
           {{- if $api.env }}
 {{ toYaml $api.env | indent 10 }}
           {{- end }}
-  {{- end }}
+{{- end }}
 {{- end }}
 ---
 apiVersion: v1
