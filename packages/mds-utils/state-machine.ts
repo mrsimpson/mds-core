@@ -1,6 +1,5 @@
 import { VEHICLE_STATUSES, VEHICLE_STATUS, VEHICLE_EVENT } from '@mds-core/mds-types'
 
-/* FIXME: Update to support Taxi */
 const stateTransitionDict: {
   [S in VEHICLE_STATUS]: Partial<
     {
