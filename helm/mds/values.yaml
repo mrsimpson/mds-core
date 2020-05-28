@@ -1,30 +1,40 @@
 apis:
   mds-agency:
     enabled: true
+    pathPrefix: /agency
   mds-audit:
     enabled: true
+    pathPrefix: /audit
   mds-policy:
     enabled: true
+    pathPrefix: /policy
   mds-compliance:
     enabled: true
+    pathPrefix: /compliance
   mds-daily:
     enabled: true
+    pathPrefix: /daily
   mds-jurisdiction:
     enabled: true
+    pathPrefix: /jurisdiction
   mds-jurisdiction-service:
     enabled: true
+    pathPrefix: /jurisdiction
   mds-policy-author:
     enabled: true
+    pathPrefix: /policy
   mds-web-sockets:
     enabled: true
+    pathPrefix: /web
   mds-geography:
     enabled: true
+    pathPrefix: /geography
   mds-geography-author:
     enabled: true
-tenantId:
+    pathPrefix: /geography-author
+tenantId: default
 timezone: America/Los_Angeles
-registry:
-useLatestImage: true
+imagePullPolicy: IfNotPresent
 domain: "*"
 tls:
   enabled: false
@@ -59,8 +69,10 @@ redis:
   slave:
     disableCommands: []
 nats:
-  enabled: true
-  credentials: false
+  internal: true
+  clusterAuth:
+    enabled: false
+  host:
 kafka:
-  enabled: false
+  internal: true
   host:

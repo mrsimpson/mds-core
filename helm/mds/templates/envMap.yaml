@@ -13,9 +13,10 @@ data:
   PG_PORT: {{ default "5432" .Values.postgresql.port | quote }}
   REDIS_HOST: {{ default (printf "%s-redis-master" .Release.Name) .Values.redis.host }}
   REDIS_PORT: {{ default "6379" .Values.redis.port | quote }}
-  NATS: {{ .Values.nats.host }}
-  KAFKA_HOST: {{ .Values.kafka.host }}
+  NATS: {{ default (printf "%s-nats-client:4222" .Release.Name) .Values.nats.host }}
+  KAFKA_HOST: {{ default (printf "%s-kafka:9092" .Release.Name) .Values.kafka.host }}
   TENANT_ID: {{ .Values.tenantId }}
+  PORT: "4000"
 {{- if hasKey $.Values "global" }}
 {{- if hasKey $.Values.global "env" }}  #TODO: update values in cloud-ops
 {{ toYaml $.Values.global.env | indent 2 }}
