@@ -82,14 +82,17 @@ const JUMP_TEST_DEVICE_1: Device = {
 }
 
 const START_YESTERDAY = now() - (now() % days(1))
+const START_TOMORROW = now() + (now() % days(1))
+const START_NOW = now()
 
 const POLICY_JSON: Policy = {
   // TODO guts
   name: 'Policy 1',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: POLICY_UUID,
-  start_date: START_YESTERDAY,
+  start_date: START_TOMORROW,
   end_date: null,
+  publish_date: START_NOW,
   prev_policies: null,
   provider_ids: [],
   rules: [
@@ -254,6 +257,28 @@ const POLICY5_JSON: Policy = {
   ]
 }
 
+const PUBLISH_DATE_VALIDATION_JSON: Policy = {
+  policy_id: '682ab342-0127-4eed-8c26-fb674c25af74',
+  name: 'Future Policy',
+  description: 'just here to help show that publish_date must be before start_date',
+  start_date: START_ONE_MONTH_AGO,
+  end_date: null,
+  prev_policies: null,
+  provider_ids: [],
+  rules: [
+    {
+      name: 'Greater LA',
+      rule_id: uuid(),
+      rule_type: 'speed',
+      rule_units: 'mph',
+      geographies: [GEOGRAPHY_UUID],
+      statuses: { trip: [] },
+      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      maximum: 25
+    }
+  ]
+}
+
 const POLICY_JSON_MISSING_POLICY_ID = {
   name: 'I have no identity woe is me',
   description: 'LADOT Pilot Speed Limit Limitations',
@@ -276,7 +301,7 @@ const POLICY_JSON_MISSING_POLICY_ID = {
 }
 
 const POLICY_WITH_DUPE_RULE: Policy = {
-  policy_id: uuid(),
+  policy_id: 'ddb4fbc7-0f3d-49cf-869d-f9c1d0b5471f',
   name: 'I am a no good copycat',
   description: 'LADOT Pilot Speed Limit Limitations',
   start_date: now(),
@@ -298,7 +323,7 @@ const POLICY_WITH_DUPE_RULE: Policy = {
 }
 
 const PUBLISHED_POLICY: Policy = {
-  policy_id: uuid(),
+  policy_id: 'a337afd5-f8a9-4291-b176-11f965bc9f3d',
   name: 'I am published but do not do much',
   description: 'LADOT Pilot Speed Limit Limitations',
   start_date: START_ONE_MONTH_AGO,
@@ -315,6 +340,28 @@ const PUBLISHED_POLICY: Policy = {
       geographies: [GEOGRAPHY_UUID],
       statuses: { trip: [] },
       vehicle_types: ['bicycle', 'scooter'],
+      maximum: 25
+    }
+  ]
+}
+
+const DELETEABLE_POLICY: Policy = {
+  policy_id: '55396abd-e32b-4370-ac02-7f3294eef49e',
+  name: 'I am published but do not do much',
+  description: 'LADOT Pilot Speed Limit Limitations',
+  start_date: START_ONE_MONTH_AGO,
+  end_date: null,
+  prev_policies: null,
+  provider_ids: [],
+  rules: [
+    {
+      name: 'Greater LA',
+      rule_id: uuid(),
+      rule_type: 'speed',
+      rule_units: 'mph',
+      geographies: [GEOGRAPHY_UUID],
+      statuses: { trip: [] },
+      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
       maximum: 25
     }
   ]
@@ -564,8 +611,10 @@ export {
   POLICY5_JSON,
   POLICY_JSON_MISSING_POLICY_ID,
   POLICY_WITH_DUPE_RULE,
+  PUBLISH_DATE_VALIDATION_JSON,
   POLICY_UUID,
   PUBLISHED_POLICY,
+  DELETEABLE_POLICY,
   SUPERSEDING_POLICY_UUID,
   POLICY2_UUID,
   POLICY3_UUID,
@@ -573,6 +622,7 @@ export {
   GEOGRAPHY2_UUID,
   START_ONE_MONTH_AGO,
   START_ONE_WEEK_AGO,
+  START_ONE_MONTH_FROM_NOW,
   PROVIDER_SCOPES,
   LA_CITY_BOUNDARY,
   DISTRICT_SEVEN,
