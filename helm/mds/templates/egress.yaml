@@ -107,3 +107,19 @@ spec:
   location: MESH_EXTERNAL
 ---
 {{- end }}
+# {{- if hasKey .Values "auth0" }}
+# apiVersion: networking.istio.io/v1alpha3
+# kind: ServiceEntry
+# metadata:
+#   name: auth0
+#   namespace: {{ .Release.Namespace }}
+# spec:
+#   hosts:
+#   - {{ .Values.auth0.host }}
+#   ports:
+#   - number: 443
+#     name: https
+#     protocol: HTTPS
+#   location: MESH_EXTERNAL
+# ---
+# {{- end }}

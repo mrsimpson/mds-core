@@ -273,7 +273,7 @@ const PUBLISH_DATE_VALIDATION_JSON: Policy = {
       rule_units: 'mph',
       geographies: [GEOGRAPHY_UUID],
       statuses: { trip: [] },
-      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      vehicle_types: ['bicycle', 'scooter'],
       maximum: 25
     }
   ]
@@ -361,7 +361,7 @@ const DELETEABLE_POLICY: Policy = {
       rule_units: 'mph',
       geographies: [GEOGRAPHY_UUID],
       statuses: { trip: [] },
-      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      vehicle_types: ['bicycle', 'scooter'],
       maximum: 25
     }
   ]
