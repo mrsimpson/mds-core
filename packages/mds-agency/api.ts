@@ -161,12 +161,8 @@ function api(app: express.Express): express.Express {
 
   app.get(pathsFor('/stops'), readStops)
 
-  /* Experimental Endpoint, restricting scope to admin:all for now */
-  app.post(
-    pathsFor('/trips'),
-    checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
-    writeTripMetadata
-  )
+  /* Experimental Endpoint */
+  app.post(pathsFor('/trips'), writeTripMetadata)
 
   return app
 }
