@@ -1,4 +1,14 @@
-import { UUID, Device, VehicleEvent, Telemetry, Timestamp, Recorded, VEHICLE_STATUS, Stop } from '@mds-core/mds-types'
+import {
+  UUID,
+  Device,
+  VehicleEvent,
+  Telemetry,
+  Timestamp,
+  Recorded,
+  VEHICLE_STATUS,
+  Stop,
+  TripMetadata
+} from '@mds-core/mds-types'
 import { MultiPolygon } from 'geojson'
 import { ApiRequest, ApiClaims, ApiResponse, ApiResponseLocals, ApiRequestParams } from '@mds-core/mds-api-server'
 
@@ -16,6 +26,7 @@ export type AgencyApiSubmitVehicleEventRequest = AgencyApiRequest<VehicleEvent> 
 export type AgencyApiSubmitVehicleTelemetryRequest = AgencyApiRequest<{ data: Telemetry[] }>
 export type AgencyApiRegisterStopRequest = AgencyApiRequest<Stop>
 export type AgencyApiReadStopRequest = AgencyApiRequest & ApiRequestParams<'stop_id'>
+export type AgencyApiPostTripMetadataRequest = AgencyApiRequest<TripMetadata>
 
 export type AgencyApiAccessTokenScopes = 'admin:all' | 'vehicles:read'
 

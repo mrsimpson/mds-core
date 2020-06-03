@@ -30,7 +30,8 @@ import {
   submitVehicleTelemetry,
   registerStop,
   readStop,
-  readStops
+  readStops,
+  writeTripMetadata
 } from './request-handlers'
 import { readAllVehicleIds } from './agency-candidate-request-handlers'
 import { getCacheInfo, wipeDevice, refreshCache } from './sandbox-admin-request-handlers'
@@ -159,6 +160,13 @@ function api(app: express.Express): express.Express {
   app.get(pathsFor('/stops/:stop_id'), readStop)
 
   app.get(pathsFor('/stops'), readStops)
+
+  /* Experimental Endpoint, restricting scope to admin:all for now */
+  app.post(
+    pathsFor('/trips'),
+    checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
+    writeTripMetadata
+  )
 
   return app
 }

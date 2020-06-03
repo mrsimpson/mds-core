@@ -461,3 +461,34 @@ export type Json = Nullable<JsonValue>
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type AnyFunction<A = any> = (...args: any[]) => A
 export type AnyConstructor<A = object> = new (...args: any[]) => A
+
+const ACCESSIBILITY_OPTIONS = ['wheelchair_boarding'] as const
+type ACCESSIBILITY_OPTION = typeof ACCESSIBILITY_OPTIONS[number]
+
+const PAYMENT_METHODS = ['cash', 'debit', 'credit', 'equity_program']
+type PAYMENT_METHOD = typeof PAYMENT_METHODS[number]
+
+const RESERVATION_METHODS = ['app', 'street_hail', 'phone_dispatch']
+type RESERVATION_METHOD = typeof RESERVATION_METHODS[number]
+
+const RESERVATION_TYPES = ['on_demand', 'scheduled']
+type RESERVATION_TYPE = typeof RESERVATION_TYPES[number]
+
+export interface TripMetadata {
+  trip_id: UUID
+  reserve_time: Timestamp
+  dispatch_time: Timestamp
+  trip_start_time: Timestamp
+  trip_end_time: Timestamp
+  distance: number // Distance in meters
+  accessibility_options_used: ACCESSIBILITY_OPTION[]
+  fare: {
+    quoted_cost: number
+    actual_cost: number
+    components: { [entity: string]: number } // e.g. entity = 'LAX_AIRPORT_FEE'
+    currency: string
+    payment_methods: Partial<{ [method in PAYMENT_METHOD]: number }>
+  }
+  reservation_method: RESERVATION_METHOD
+  reservation_type: RESERVATION_TYPE
+}

@@ -37,7 +37,9 @@ import {
   AgencyApiSubmitVehicleTelemetryRequest,
   AgencyApiRegisterStopRequest,
   AgencyApiReadStopRequest,
-  AgencyApiRegisterVehicleRequest
+  AgencyApiRegisterVehicleRequest,
+  AgencyApiResponse,
+  AgencyApiPostTripMetadataRequest
 } from './types'
 import {
   badDevice,
@@ -494,4 +496,15 @@ export const readStops = async (req: AgencyApiRequest, res: AgencyApiReadStopsRe
   } catch (err) {
     return res.status(500).send({ error: new ServerError() })
   }
+}
+
+/* Experimental Handler */
+export const writeTripMetadata = async (req: AgencyApiPostTripMetadataRequest, res: AgencyApiResponse) => {
+  const tripMetadata = req.body
+
+  /* TODO Add validation once trip metadata proposal is solidified */
+
+  await stream.writeTripMetadata(tripMetadata)
+
+  return res.status(201).send(tripMetadata)
 }

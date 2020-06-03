@@ -17,7 +17,7 @@
 import logger from '@mds-core/mds-logger'
 import redis from 'redis'
 import bluebird from 'bluebird'
-import { Device, VehicleEvent, Telemetry } from '@mds-core/mds-types'
+import { Device, VehicleEvent, Telemetry, TripMetadata } from '@mds-core/mds-types'
 import {
   Stream,
   StreamItem,
@@ -187,6 +187,19 @@ async function writeTelemetry(telemetry: Telemetry[]) {
   }
 }
 
+async function writeTripMetadata(tripMetadata: TripMetadata) {
+  if (env.NATS) {
+    await AgencyStreamNats.writeTripMetadata(tripMetadata)
+  }
+
+  /* Not currently writing to Kafka */
+  // if (env.KAFKA_HOST) {
+  //   await AgencyStreamKafka.writeEvent(event)
+  // }
+
+  return writeStream(DEVICE_RAW_STREAM, 'event', tripMetadata)
+}
+
 async function readStream(
   stream: Stream,
   id: StreamItemID,
@@ -299,5 +312,6 @@ export default {
   KafkaStreamProducer,
   NatsStreamConsumer,
   NatsStreamProducer,
-  mockStream
+  mockStream,
+  writeTripMetadata
 }

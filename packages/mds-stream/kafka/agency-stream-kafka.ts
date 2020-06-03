@@ -26,7 +26,7 @@ const deviceProducer = KafkaStreamProducer<Device>(`${TENANT_ID}.device`)
 const eventProducer = KafkaStreamProducer<VehicleEvent>(`${TENANT_ID}.event`)
 const telemetryProducer = KafkaStreamProducer<Telemetry>(`${TENANT_ID}.telemetry`)
 
-export const AgencyStreamKafka: AgencyStreamInterface = {
+export const AgencyStreamKafka: Omit<AgencyStreamInterface, 'writeTripMetadata'> = {
   initialize: async () => {
     await Promise.all([deviceProducer.initialize(), eventProducer.initialize(), telemetryProducer.initialize()])
   },
