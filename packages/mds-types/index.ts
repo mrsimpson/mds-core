@@ -94,6 +94,7 @@ export const TAXI_EVENTS = [
   'reserve_stop',
   'trip_stop',
   'trip_start',
+  'trip_end',
   'trip_resume',
   'trip_leave',
   'trip_enter'
