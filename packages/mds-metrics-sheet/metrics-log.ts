@@ -27,7 +27,7 @@ import {
   SHERPA_LA_PROVIDER_ID,
   BOLT_PROVIDER_ID
 } from '@mds-core/mds-providers'
-import { VEHICLE_EVENT, EVENT_STATUS_MAP, VEHICLE_STATUS } from '@mds-core/mds-types'
+import { EVENT_STATUS_MAP, VEHICLE_STATUS, MICRO_EVENT } from '@mds-core/mds-types'
 import { requestPromiseExceptionHelper, MAX_TIMEOUT_MS } from './utils'
 import { VehicleCountResponse, LastDayStatsResponse, MetricsSheetRow, VehicleCountRow } from './types'
 
@@ -57,8 +57,8 @@ export function percent(a: number, total: number) {
   return Math.round(((total - a) / total) * 10000) / 10000
 }
 
-export function eventCountsToStatusCounts(events: { [s in VEHICLE_EVENT]: number }) {
-  return (Object.keys(events) as VEHICLE_EVENT[]).reduce(
+export function eventCountsToStatusCounts(events: { [s in MICRO_EVENT]: number }) {
+  return (Object.keys(events) as MICRO_EVENT[]).reduce(
     (acc: { [s in VEHICLE_STATUS]: number }, event) => {
       const status = EVENT_STATUS_MAP[event]
       return Object.assign(acc, {
@@ -72,7 +72,8 @@ export function eventCountsToStatusCounts(events: { [s in VEHICLE_EVENT]: number
       trip: 0,
       removed: 0,
       inactive: 0,
-      elsewhere: 0
+      elsewhere: 0,
+      stopped: 0
     }
   )
 }
@@ -96,7 +97,12 @@ export const mapProviderToPayload = (provider: VehicleCountRow, last: LastDaySta
     provider.provider_id
   ]
   if (event_counts_last_24h) {
-    event_counts = event_counts_last_24h
+    event_counts = event_counts_last_24h as {
+      service_start: number
+      provider_drop_off: number
+      trip_start: number
+      trip_end: number
+    }
     status_counts = eventCountsToStatusCounts(event_counts_last_24h)
     starts = event_counts_last_24h.trip_start || 0
     ends = event_counts_last_24h.trip_end || 0

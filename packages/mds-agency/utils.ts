@@ -1,7 +1,15 @@
 import express from 'express'
 import { Query } from 'express-serve-static-core'
 
-import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox } from '@mds-core/mds-utils'
+import {
+  isUUID,
+  isPct,
+  isTimestamp,
+  isFloat,
+  isInsideBoundingBox,
+  isMicroEvent,
+  isTaxiEvent
+} from '@mds-core/mds-utils'
 import stream from '@mds-core/mds-stream'
 import {
   UUID,
@@ -10,15 +18,17 @@ import {
   Telemetry,
   ErrorObject,
   isEnum,
-  VEHICLE_EVENTS,
   VEHICLE_TYPES,
-  VEHICLE_STATUSES,
   VEHICLE_REASONS,
   PROPULSION_TYPES,
   EVENT_STATUS_MAP,
   BoundingBox,
   VEHICLE_STATUS,
-  VEHICLE_EVENT
+  VEHICLE_EVENT,
+  MICRO_VEHICLE_TYPES,
+  TAXI_VEHICLE_TYPES,
+  MICRO_VEHICLE_TYPE,
+  TAXI_VEHICLE_TYPE
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -80,7 +90,7 @@ export function badDevice(device: Device): { error: string; error_description: s
       error_description: 'missing enum field "type"'
     }
   }
-  if (!isEnum(VEHICLE_TYPES, device.type)) {
+  if (!VEHICLE_TYPES.includes(device.type)) {
     return {
       error: 'bad_param',
       error_description: `invalid device type ${device.type}`
@@ -142,7 +152,7 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
-    const status = event ? EVENT_STATUS_MAP[event.event_type] : VEHICLE_STATUSES.inactive
+    const status = event ? EVENT_STATUS_MAP[event.event_type] : 'inactive'
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
     return [...acc, { ...device, status, telemetry, updated }]
@@ -266,7 +276,7 @@ export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObje
 }
 
 // TODO Joi
-export async function badEvent(event: VehicleEvent) {
+export async function badEvent(event: VehicleEvent, device: Device) {
   if (event.timestamp === undefined) {
     return {
       error: 'missing_param',
@@ -279,6 +289,7 @@ export async function badEvent(event: VehicleEvent) {
       error_description: `invalid timestamp ${event.timestamp}`
     }
   }
+
   if (event.event_type === undefined) {
     return {
       error: 'missing_param',
@@ -286,10 +297,13 @@ export async function badEvent(event: VehicleEvent) {
     }
   }
 
-  if (!isEnum(VEHICLE_EVENTS, event.event_type)) {
+  if (
+    (MICRO_VEHICLE_TYPES.includes(device.type as MICRO_VEHICLE_TYPE) && !isMicroEvent(event)) ||
+    (TAXI_VEHICLE_TYPES.includes(device.type as TAXI_VEHICLE_TYPE) && !isTaxiEvent(event))
+  ) {
     return {
       error: 'bad_param',
-      error_description: `invalid event_type ${event.event_type}`
+      error_description: `invalid event_type ${event.event_type} for vehicle of type ${device.type}`
     }
   }
 
@@ -326,23 +340,23 @@ export async function badEvent(event: VehicleEvent) {
 
   // event-specific checking goes last
   switch (event.event_type) {
-    case VEHICLE_EVENTS.trip_start:
+    case 'trip_start':
       return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_end:
+    case 'trip_end':
       return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_enter:
+    case 'trip_enter':
       return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_leave:
+    case 'trip_leave':
       return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.service_start:
-    case VEHICLE_EVENTS.service_end:
-    case VEHICLE_EVENTS.provider_pick_up:
-    case VEHICLE_EVENTS.provider_drop_off:
+    case 'service_start':
+    case 'service_end':
+    case 'provider_pick_up':
+    case 'provider_drop_off':
       return badTelemetry(event.telemetry)
-    case VEHICLE_EVENTS.register:
-    case VEHICLE_EVENTS.deregister:
-    case VEHICLE_EVENTS.reserve:
-    case VEHICLE_EVENTS.cancel_reservation:
+    case 'register':
+    case 'deregister':
+    case 'reserve':
+    case 'cancel_reservation':
       return null
     default:
       logger.warn(`unsure how to validate mystery event_type ${event.event_type}`)
@@ -417,7 +431,7 @@ export async function writeRegisterEvent(device: Device, recorded: number) {
   const event: VehicleEvent = {
     device_id: device.device_id,
     provider_id: device.provider_id,
-    event_type: VEHICLE_EVENTS.register,
+    event_type: 'register',
     event_type_reason: null,
     telemetry: null,
     timestamp: recorded,
@@ -452,8 +466,8 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
     composite.updated = event.timestamp
     composite.status = (EVENT_STATUS_MAP[event.event_type as VEHICLE_EVENT] || 'unknown') as VEHICLE_STATUS
   } else {
-    composite.status = VEHICLE_STATUSES.inactive
-    composite.prev_event = VEHICLE_EVENTS.deregister
+    composite.status = 'inactive'
+    composite.prev_event = 'deregister'
   }
   if (telemetry) {
     if (telemetry.gps) {

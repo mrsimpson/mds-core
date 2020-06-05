@@ -18,16 +18,7 @@ import logger from '@mds-core/mds-logger'
 
 import flatten from 'flat'
 import { NotFoundError, nullKeys, stripNulls, now, isInsideBoundingBox, routeDistance } from '@mds-core/mds-utils'
-import {
-  UUID,
-  Timestamp,
-  Device,
-  VehicleEvent,
-  Telemetry,
-  BoundingBox,
-  EVENT_STATUS_MAP,
-  VEHICLE_STATUSES
-} from '@mds-core/mds-types'
+import { UUID, Timestamp, Device, VehicleEvent, Telemetry, BoundingBox, EVENT_STATUS_MAP } from '@mds-core/mds-types'
 import redis from 'redis'
 import bluebird from 'bluebird'
 
@@ -417,7 +408,7 @@ async function readDevicesStatus(query: {
       try {
         const parsedItem = parseEvent(item)
         if (
-          EVENT_STATUS_MAP[parsedItem.event_type] === VEHICLE_STATUSES.removed ||
+          EVENT_STATUS_MAP[parsedItem.event_type] === 'removed' ||
           !parsedItem.telemetry ||
           (strictChecking && !isInsideBoundingBox(parsedItem.telemetry, query.bbox))
         )

@@ -28,7 +28,7 @@
 
 import supertest from 'supertest'
 import test from 'unit.js'
-import { VEHICLE_EVENTS, Timestamp, Device, VehicleEvent, Telemetry } from '@mds-core/mds-types'
+import { Timestamp, Device, VehicleEvent, Telemetry } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import { makeDevices } from '@mds-core/mds-test-data'
@@ -77,7 +77,7 @@ before(done => {
     {
       provider_id: TEST1_PROVIDER_ID,
       device_id: devices[0].device_id,
-      event_type: VEHICLE_EVENTS.provider_pick_up,
+      event_type: 'provider_pick_up',
       recorded: testTimestampNow - 90,
       timestamp: testTimestampNow - 90,
       telemetry: TEST_TELEMETRY
@@ -85,7 +85,7 @@ before(done => {
     {
       provider_id: TEST1_PROVIDER_ID,
       device_id: devices[0].device_id,
-      event_type: VEHICLE_EVENTS.trip_enter,
+      event_type: 'trip_enter',
       trip_id: TRIP_UUID,
       recorded: testTimestampNow - 80,
       timestamp: testTimestampNow - 80,
@@ -94,7 +94,7 @@ before(done => {
     {
       provider_id: TEST1_PROVIDER_ID,
       device_id: devices[0].device_id,
-      event_type: VEHICLE_EVENTS.trip_leave,
+      event_type: 'trip_leave',
       trip_id: TRIP_UUID,
       recorded: testTimestampNow - 70,
       timestamp: testTimestampNow - 70,
@@ -103,7 +103,7 @@ before(done => {
     {
       provider_id: TEST1_PROVIDER_ID,
       device_id: devices[0].device_id,
-      event_type: VEHICLE_EVENTS.provider_pick_up,
+      event_type: 'provider_pick_up',
       recorded: testTimestampNow - 60,
       timestamp: testTimestampNow - 60,
       telemetry: TEST_TELEMETRY
@@ -111,7 +111,7 @@ before(done => {
     {
       provider_id: TEST1_PROVIDER_ID,
       device_id: devices[0].device_id,
-      event_type: VEHICLE_EVENTS.service_start,
+      event_type: 'service_start',
       recorded: testTimestampNow - 50,
       timestamp: testTimestampNow - 50,
       telemetry: TEST_TELEMETRY
@@ -119,7 +119,7 @@ before(done => {
     {
       provider_id: TEST1_PROVIDER_ID,
       device_id: devices[0].device_id,
-      event_type: VEHICLE_EVENTS.trip_leave,
+      event_type: 'trip_leave',
       trip_id: TRIP_UUID,
       recorded: testTimestampNow - 40,
       timestamp: testTimestampNow - 40,
@@ -128,7 +128,7 @@ before(done => {
     {
       provider_id: TEST1_PROVIDER_ID,
       device_id: devices[0].device_id,
-      event_type: VEHICLE_EVENTS.trip_start,
+      event_type: 'trip_start',
       trip_id: TRIP_UUID,
       recorded: testTimestampNow - 30,
       timestamp: testTimestampNow - 30,
@@ -137,7 +137,7 @@ before(done => {
     {
       provider_id: TEST1_PROVIDER_ID,
       device_id: devices[0].device_id,
-      event_type: VEHICLE_EVENTS.provider_pick_up,
+      event_type: 'provider_pick_up',
       recorded: testTimestampNow - 20,
       timestamp: testTimestampNow - 20,
       telemetry: TEST_TELEMETRY

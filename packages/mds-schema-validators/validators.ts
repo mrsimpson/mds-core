@@ -148,13 +148,13 @@ const geographiesSchema = Joi.array().items(geographySchema)
 
 const eventsSchema = Joi.array().items()
 
-const vehicleEventTypeSchema = stringSchema.valid(Object.keys(VEHICLE_EVENTS))
+const vehicleEventTypeSchema = stringSchema.valid(VEHICLE_EVENTS)
 
-const vehicleTypeSchema = stringSchema.valid(Object.keys(VEHICLE_TYPES))
+const vehicleTypeSchema = stringSchema.valid(VEHICLE_TYPES)
 
 const propulsionTypeSchema = stringSchema.valid(Object.keys(PROPULSION_TYPES))
 
-const vehicleStatusSchema = stringSchema.valid(Object.keys(VEHICLE_STATUSES))
+const vehicleStatusSchema = stringSchema.valid(VEHICLE_STATUSES)
 
 const eventSchema = Joi.object().keys({
   device_id: uuidSchema.required(),
@@ -403,23 +403,18 @@ export const validateEvent = (event: unknown) => {
   if (isValidEvent(event, { allowUnknown: true })) {
     const { event_type } = event
 
-    const TRIP_EVENTS: string[] = [
-      VEHICLE_EVENTS.trip_start,
-      VEHICLE_EVENTS.trip_end,
-      VEHICLE_EVENTS.trip_enter,
-      VEHICLE_EVENTS.trip_leave
-    ]
+    const TRIP_EVENTS: string[] = ['trip_start', 'trip_end', 'trip_enter', 'trip_leave']
 
     if (TRIP_EVENTS.includes(event_type)) {
       return validateTripEvent(event)
     }
-    if (event_type === VEHICLE_EVENTS.provider_pick_up) {
+    if (event_type === 'provider_pick_up') {
       return validateProviderPickUpEvent(event)
     }
-    if (event_type === VEHICLE_EVENTS.service_end) {
+    if (event_type === 'service_end') {
       return validateServiceEndEvent(event)
     }
-    if (event_type === VEHICLE_EVENTS.deregister) {
+    if (event_type === 'deregister') {
       return validateDeregisterEvent(event)
     }
 

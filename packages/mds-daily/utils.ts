@@ -1,5 +1,5 @@
 import { isTimestamp, now, days, inc, head, tail } from '@mds-core/mds-utils'
-import { UUID, CountMap, TripsStats, VEHICLE_EVENTS, VehicleEvent } from '@mds-core/mds-types'
+import { UUID, CountMap, TripsStats, VehicleEvent } from '@mds-core/mds-types'
 import cache from '@mds-core/mds-agency-cache'
 import logger from '@mds-core/mds-logger'
 
@@ -69,21 +69,21 @@ export function categorizeTrips(perTripId: TripsData): { [s: string]: TripsStats
       inc(counts, 'single') // single: one-off
       perProvider[pid].singles = perProvider[pid].singles || {}
       inc(perProvider[pid].singles, head(events))
-    } else if (head(events) === VEHICLE_EVENTS.trip_start && tail(events) === VEHICLE_EVENTS.trip_end) {
+    } else if (head(events) === 'trip_start' && tail(events) === 'trip_end') {
       inc(counts, 'simple') // simple: starts with start, ends with end
-    } else if (head(events) === VEHICLE_EVENTS.trip_start) {
-      if (tail(events) === VEHICLE_EVENTS.trip_leave) {
+    } else if (head(events) === 'trip_start') {
+      if (tail(events) === 'trip_leave') {
         inc(counts, 'left') // left: started with start, ends with leave
       } else {
         inc(counts, 'noEnd') // noEnd: started with start, did not end with end or leave
       }
-    } else if (tail(events) === VEHICLE_EVENTS.trip_end) {
-      if (head(events) === VEHICLE_EVENTS.trip_enter) {
+    } else if (tail(events) === 'trip_end') {
+      if (head(events) === 'trip_enter') {
         inc(counts, 'entered') // entered: started with enter, ends with end
       } else {
         inc(counts, 'noStart') // noStart: weird start, ends with end
       }
-    } else if (head(events) === VEHICLE_EVENTS.trip_enter && tail(events) === VEHICLE_EVENTS.trip_leave) {
+    } else if (head(events) === 'trip_enter' && tail(events) === 'trip_leave') {
       inc(counts, 'flyby') // flyby: starts with enter, ends with leave
     } else {
       inc(counts, 'mystery') // mystery: weird non-conforming trip

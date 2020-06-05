@@ -87,7 +87,7 @@ describe('Tests Utilities', () => {
 
   describe('State machine', () => {
     it('Tests state transitions', () => {
-      const events = Object.keys(VEHICLE_EVENTS)
+      const events = VEHICLE_EVENTS
       for (const event_type_A of events) {
         for (const event_type_B of events) {
           const eventA = { event_type: event_type_A } as VehicleEvent
