@@ -134,7 +134,7 @@ function api(app: express.Express): express.Express {
   app.use(AuditApiVersionMiddleware)
 
   app.use(async (req: AuditApiRequest, res: AuditApiResponse, next) => {
-    if (!(req.path.includes('/health') || req.path === '/')) {
+    if (!req.path.includes('/health')) {
       if (res.locals.claims) {
         // verify presence of subject_id
         const { principalId, user_email } = res.locals.claims
@@ -624,16 +624,34 @@ function api(app: express.Express): express.Express {
    */
   app.get(
     pathsFor('/trips'),
-    checkAuditApiAccess(scopes => scopes.includes('audits:read')),
+    checkAuditApiAccess(scopes => scopes.includes('audits:read') || scopes.includes('audits:read:provider')),
     async (req: AuditApiGetTripsRequest, res: GetAuditTripsDetailsResponse) => {
       try {
+        const { scopes } = res.locals
         const { skip, take } = parsePagingQueryParams(req)
+
+        const { provider_id: queried_provider_id, provider_vehicle_id, audit_subject_id } = parseRequest(req).query(
+          'provider_id',
+          'provider_vehicle_id',
+          'audit_subject_id'
+        )
+
+        const provider_id = scopes.includes('audits:read') ? queried_provider_id : res.locals.claims?.provider_id
+
+        if (provider_id === null) {
+          /* This should never happen -- a client with just the audits:read:provider scope
+           * should *always* have a provider_id claim in their token.
+           */
+          return res.status(500).send({ error: 'internal_server_error' })
+        }
 
         const query = {
           ...parseRequest(req, { parser: Number }).query('start_time', 'end_time'),
-          ...parseRequest(req).query('provider_id', 'provider_vehicle_id', 'audit_subject_id'),
           skip,
-          take
+          take,
+          provider_id,
+          provider_vehicle_id,
+          audit_subject_id
         }
 
         // Query the audits
@@ -669,7 +687,7 @@ function api(app: express.Express): express.Express {
   app.get(
     pathsFor('/vehicles'),
     checkAuditApiAccess(scopes => scopes.includes('audits:vehicles:read')),
-    async (req, res: GetAuditVehiclesResponse) => {
+    async (req: AuditApiGetVehicleRequest, res: GetAuditVehiclesResponse) => {
       const { skip, take } = { skip: 0, take: 10000 }
       const { strict = true, bbox, provider_id } = {
         ...parseRequest(req, { parser: JSON.parse }).query('strict', 'bbox'),

@@ -37,11 +37,6 @@ export type VEHICLE_TYPE = typeof VEHICLE_TYPES[number]
 export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
 export type RULE_TYPE = keyof typeof RULE_TYPES
 
-export const RULE_UNIT_MAP = {
-  minutes: 60,
-  hours: 60 * 60
-}
-
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
@@ -187,6 +182,7 @@ export type NullableProperties<T extends object> = {
 }
 export type SingleOrArray<T> = T | T[]
 export type Optional<T, P extends keyof T> = Omit<T, P> & Partial<Pick<T, P>>
+export type NonEmptyArray<T> = [T, ...T[]]
 
 // Represents a row in the "devices" table
 export interface Device {

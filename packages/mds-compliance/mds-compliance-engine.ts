@@ -30,14 +30,13 @@ import {
   VehicleEvent,
   MatchedVehicle,
   EVENT_STATUS_MAP,
-  RULE_UNIT_MAP,
   DAY_OF_WEEK,
   VEHICLE_STATUS,
   TIME_FORMAT,
   DAYS_OF_WEEK,
   UUID
 } from '@mds-core/mds-types'
-import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError } from '@mds-core/mds-utils'
+import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
 import { MatchedVehiclePlusRule, VehicleEventWithTelemetry } from './types'
 
@@ -384,7 +383,9 @@ function processPolicy(
   }
 }
 
-function filterPolicies(policies: Policy[]): Policy[] {
+// Take a list of policies, and eliminate all those that have been superseded. Returns
+// policies that have not been superseded.
+function getSupersedingPolicies(policies: Policy[]): Policy[] {
   const prev_policies: string[] = policies.reduce((prev_policies_acc: string[], policy: Policy) => {
     if (policy.prev_policies) {
       prev_policies_acc.push(...policy.prev_policies)
@@ -396,11 +397,11 @@ function filterPolicies(policies: Policy[]): Policy[] {
   })
 }
 
-function filterEvents(events: VehicleEvent[], end_time = now()): VehicleEvent[] {
+function getRecentEvents(events: VehicleEvent[], end_time = now()): VehicleEvent[] {
   return events.filter((event: VehicleEvent) => {
     /* Keep events that are less than two days old */
     return event.timestamp > end_time - TWO_DAYS_IN_MS
   })
 }
 
-export { processPolicy, filterPolicies, filterEvents }
+export { processPolicy, getSupersedingPolicies, getRecentEvents }

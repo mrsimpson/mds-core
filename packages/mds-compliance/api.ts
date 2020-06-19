@@ -30,27 +30,29 @@ import {
   BadParamsError,
   AuthorizationError
 } from '@mds-core/mds-utils'
-import { Geography, Device, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID, BLUE_SYSTEMS_PROVIDER_ID, providerName } from '@mds-core/mds-providers'
+import { Geography, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { providerName } from '@mds-core/mds-providers'
 import { Geometry, FeatureCollection } from 'geojson'
 import { parseRequest } from '@mds-core/mds-api-helpers'
 import * as compliance_engine from './mds-compliance-engine'
 import {
   ComplianceApiRequest,
   ComplianceApiResponse,
-  ComplianceSnapshotApiResponse,
-  ComplianceCountApiResponse
+  ComplianceApiSnapshotResponse,
+  ComplianceApiCountResponse,
+  ComplianceApiSnapshotRequest,
+  ComplianceApiCountRequest
 } from './types'
 import { ComplianceApiVersionMiddleware } from './middleware'
-
-const AllowedProviderIDs = [TEST1_PROVIDER_ID, TEST2_PROVIDER_ID, BLUE_SYSTEMS_PROVIDER_ID]
+import { AllowedProviderIDs } from './constants'
+import { clientCanViewPolicyCompliance, getComplianceInputs } from './helpers'
 
 function api(app: express.Express): express.Express {
   app.use(ComplianceApiVersionMiddleware)
   app.use(async (req: ComplianceApiRequest, res: ComplianceApiResponse, next: express.NextFunction) => {
     try {
       // verify presence of provider_id
-      if (!(req.path.includes('/health') || req.path === '/')) {
+      if (!req.path.includes('/health')) {
         if (res.locals.claims) {
           const { provider_id } = res.locals.claims
 
@@ -83,82 +85,66 @@ function api(app: express.Express): express.Express {
     next()
   })
 
-  app.get(pathsFor('/snapshot/:policy_uuid'), async (req: ComplianceApiRequest, res: ComplianceSnapshotApiResponse) => {
-    const { provider_id, version } = res.locals
-    const { provider_id: queried_provider_id, timestamp } = {
-      ...parseRequest(req).query('provider_id'),
-      ...parseRequest(req, { parser: Number }).query('timestamp')
-    }
-
-    // default to now() if no timestamp supplied
-    const query_date = timestamp || now()
-
-    const { policy_uuid } = req.params
-
-    if (!isUUID(policy_uuid)) {
-      return res.status(400).send({ error: new BadParamsError('Bad policy UUID') })
-    }
-
-    try {
-      const all_policies = await db.readActivePolicies(query_date)
-      const policy = compliance_engine.filterPolicies(all_policies).find(p => {
-        return p.policy_id === policy_uuid
-      })
-      if (!policy) {
-        return res.status(404).send({ error: new NotFoundError('Policy not found') })
+  app.get(
+    pathsFor('/snapshot/:policy_uuid'),
+    async (req: ComplianceApiSnapshotRequest, res: ComplianceApiSnapshotResponse) => {
+      const { provider_id, version } = res.locals
+      const { provider_id: queried_provider_id, timestamp } = {
+        ...parseRequest(req).query('provider_id'),
+        ...parseRequest(req, { parser: Number }).query('timestamp')
       }
 
-      if (
-        policy &&
-        ((policy.provider_ids && policy.provider_ids.includes(provider_id)) ||
-          !policy.provider_ids ||
-          (AllowedProviderIDs.includes(provider_id) &&
-            ((policy.provider_ids &&
-              policy.provider_ids.length !== 0 &&
-              queried_provider_id &&
-              policy.provider_ids.includes(queried_provider_id)) ||
-              !policy.provider_ids ||
-              policy.provider_ids.length === 0)))
-      ) {
-        const target_provider_id = AllowedProviderIDs.includes(provider_id) ? queried_provider_id : provider_id
-        if (
-          compliance_engine
-            .filterPolicies(all_policies)
-            .map(p => p.policy_id)
-            .includes(policy.policy_id)
-        ) {
-          const [geographies, deviceRecords] = await Promise.all([
-            db.readGeographies() as Promise<Geography[]>,
-            db.readDeviceIds(target_provider_id)
-          ])
-          const deviceIdSubset = deviceRecords.map((record: { device_id: UUID; provider_id: UUID }) => record.device_id)
-          const devices = await cache.readDevices(deviceIdSubset)
-          // if a timestamp was supplied, the data we want is probably old enough it's going to be in the db
-          const events = timestamp
-            ? await db.readHistoricalEvents({ provider_id: target_provider_id, end_date: timestamp })
-            : await cache.readEvents(deviceIdSubset)
+      // default to now() if no timestamp supplied
+      const query_date = timestamp || now()
 
-          const deviceMap = devices.reduce((map: { [d: string]: Device }, device) => {
-            return device ? Object.assign(map, { [device.device_id]: device }) : map
-          }, {})
+      const { policy_uuid } = req.params
 
-          const filteredEvents = compliance_engine.filterEvents(events)
-          const result = compliance_engine.processPolicy(policy, filteredEvents, geographies, deviceMap)
-          if (result === undefined) {
-            return res.status(400).send({ error: new BadParamsError('Unable to process compliance results') })
-          }
+      if (!isUUID(policy_uuid)) {
+        return res.status(400).send({ error: new BadParamsError('Bad policy UUID') })
+      }
 
-          return res.status(200).send({ ...result, timestamp: query_date, version })
+      try {
+        /* Get all published policies that fulfill the conditions start_date <= query_date,
+         * and end_date >= query_date.
+         */
+        const all_policies = await db.readActivePolicies(query_date)
+        const policy = compliance_engine.getSupersedingPolicies(all_policies).find(p => {
+          return p.policy_id === policy_uuid
+        })
+        if (!policy) {
+          return res.status(404).send({ error: new NotFoundError('Policy not found') })
         }
-      } else {
-        return res.status(401).send({ error: new AuthorizationError() })
-      }
-    } catch (err) {
-      return res.status(500).send({ error: new ServerError() })
-    }
-  })
 
-  app.get(pathsFor('/count/:rule_id'), async (req: ComplianceApiRequest, res: ComplianceCountApiResponse) => {
+        if (clientCanViewPolicyCompliance(provider_id, queried_provider_id, policy)) {
+          /* If the client is one of the allowed providers, they can query for an arbitrary provider's vehicles. Otherwise, they may
+           only see compliance results for their own devices.
+           */
+          const target_provider_id = AllowedProviderIDs.includes(provider_id) ? queried_provider_id : provider_id
+          if (
+            // Check to see if the policy for which a snapshot is desired has been superseded or not.
+            compliance_engine
+              .getSupersedingPolicies(all_policies)
+              .map(p => p.policy_id)
+              .includes(policy.policy_id)
+          ) {
+            const { filteredEvents, geographies, deviceMap } = await getComplianceInputs(target_provider_id, timestamp)
+            const result = compliance_engine.processPolicy(policy, filteredEvents, geographies, deviceMap)
+            if (result === undefined) {
+              return res.status(400).send({ error: new BadParamsError('Unable to process compliance results') })
+            }
+
+            return res.status(200).send({ ...result, timestamp: query_date, version })
+          }
+        } else {
+          return res.status(401).send({ error: new AuthorizationError() })
+        }
+      } catch (err) {
+        return res.status(500).send({ error: new ServerError() })
+      }
+    }
+  )
+
+  app.get(pathsFor('/count/:rule_id'), async (req: ComplianceApiCountRequest, res: ComplianceApiCountResponse) => {
     const { timestamp } = {
       ...parseRequest(req, { parser: Number }).query('timestamp')
     }
@@ -202,7 +188,7 @@ function api(app: express.Express): express.Express {
       const filteredVehicleEvents = events.filter(
         (event): event is VehicleEvent => event !== null && isInStatesOrEvents(rule, event)
       )
-      const filteredEvents = compliance_engine.filterEvents(filteredVehicleEvents)
+      const filteredEvents = compliance_engine.getRecentEvents(filteredVehicleEvents)
 
       const count = filteredEvents.reduce((count_acc, event) => {
         return (
