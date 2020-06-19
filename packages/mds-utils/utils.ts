@@ -418,8 +418,12 @@ function capitalizeFirst(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-function nullKeys<T>(obj: { [key: string]: T }): string[] {
-  return Object.keys(obj).filter(key => obj[key] === null || obj[key] === undefined)
+function nullKeys(obj: { [key: string]: unknown }): string[] {
+  return Object.entries(obj).reduce(
+    (keys, [key, value]) =>
+      (Array.isArray(value) && value.length === 0) || value === null || value === undefined ? [...keys, key] : keys,
+    [] as string[]
+  )
 }
 
 function stripNulls<T extends {}>(obj: { [x: string]: unknown }): Partial<T> {

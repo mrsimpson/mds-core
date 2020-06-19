@@ -186,6 +186,7 @@ export type NonEmptyArray<T> = [T, ...T[]]
 
 // Represents a row in the "devices" table
 export interface Device {
+  accessibility_options?: string[]
   device_id: UUID
   provider_id: UUID
   vehicle_id: string
@@ -193,6 +194,7 @@ export interface Device {
   propulsion: PROPULSION_TYPE[]
   year?: number | null
   mfgr?: string | null
+  modality: string
   model?: string | null
   recorded: Timestamp
   status?: VEHICLE_STATUS | null
