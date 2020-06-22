@@ -17,7 +17,7 @@ data:
   NATS: {{ .Values.nats.host }}
   {{- end }}
   {{- if .Values.kafka.enabled }}
-  KAFKA_HOST: {{ .Values.kafka.host }}
+  KAFKA_HOST: {{ .Values.kafka.host }}:{{ default "9092" .Values.kafka.port }}
   {{- end }}
   TENANT_ID: {{ .Values.tenantId }}
   PORT: "4000"
