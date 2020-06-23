@@ -25,10 +25,10 @@ spec:
         imagePullPolicy: {{ default "IfNotPresent" $.Values.imagePullPolicy }}
         resources:
           limits:
-            cpu: {{ default "500m" $api.resourcesLimitsCpu }}
-            memory: {{ default "512Mi" $api.resourcesLimitsMemory }}
+            cpu: {{ default "1000m" $api.resourcesLimitsCpu }}
+            memory: {{ default "1024Mi" $api.resourcesLimitsMemory }}
           requests:
-            cpu: {{ default "10m" $api.resourcesRequestsCpu }}
+            cpu: {{ default "5m" $api.resourcesRequestsCpu }}
             memory: {{ default "64Mi" $api.resourcesRequestsMemory }}
         ports:
         - containerPort: 4000
