@@ -78,6 +78,7 @@ const JUMP_TEST_DEVICE_1: Device = {
   year: 2018,
   mfgr: 'Schwinn',
   model: 'whoknows',
+  modality: 'micro-mobility',
   recorded: now()
 }
 
@@ -581,6 +582,7 @@ function makeDevices(count: number, timestamp: Timestamp, provider_id = TEST1_PR
       device_id,
       provider_id,
       vehicle_id: `test-vin-${Math.round(Math.random() * 1000000)}`,
+      modality: 'micro-mobility',
       type,
       propulsion,
       year,

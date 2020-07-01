@@ -67,6 +67,7 @@ function parseDevice(device: StringifiedCacheReadDeviceResult): Device {
       year: device.year ? Number(device.year) : null,
       mfgr: device.mfgr ? device.mfgr : null,
       model: device.model ? device.model : null,
+      modality: device.modality ? device.modality : 'micro-mobility',
       recorded: Number(device.recorded),
       status: device.status ? (device.status as VEHICLE_STATUS) : null
     }
