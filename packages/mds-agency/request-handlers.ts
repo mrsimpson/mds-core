@@ -61,7 +61,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   const recorded = now()
 
   const { provider_id } = res.locals
-  const { device_id, vehicle_id, type, propulsion, year, mfgr, model, modality } = body
+  const { device_id, vehicle_id, type, propulsion, year, mfgr, model, modality = 'micro-mobility' } = body
 
   const status = 'removed'
 
