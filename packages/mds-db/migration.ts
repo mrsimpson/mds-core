@@ -187,7 +187,7 @@ async function dropAuditEventsColumnsMigration(exec: SqlExecuterFunction) {
 
 async function alterDeviceColumnsAddModalityAndAccessibilityOptions(exec: SqlExecuterFunction) {
   await exec(`ALTER TABLE ${schema.TABLE.devices} ADD COLUMN ${schema.COLUMN.accessibility_options} varchar(255)[]`)
-  await exec(`UPDATE ${schema.TABLE.devices} SET ${schema.COLUMN.accessibility_options} = []`)
+  await exec(`UPDATE ${schema.TABLE.devices} SET ${schema.COLUMN.accessibility_options} = {}`)
   await exec(`ALTER TABLE ${schema.TABLE.devices} ALTER COLUMN ${schema.COLUMN.accessibility_options} SET NOT NULL`)
 
   await exec(`ALTER TABLE ${schema.TABLE.devices} ADD COLUMN ${schema.COLUMN.modality} varchar(255)`)
