@@ -12,7 +12,8 @@ const MIGRATIONS = [
   'dropDeprecatedProviderTables',
   'dropReadOnlyGeographyColumn',
   'dropAuditEventsColumns',
-  'alterReportsTripsMigration'
+  'alterReportsTripsMigration',
+  'alterDeviceColumnsAddModalityAndAccessibilityOptions'
 ] as const
 type MIGRATION = typeof MIGRATIONS[number]
 
@@ -184,6 +185,16 @@ async function dropAuditEventsColumnsMigration(exec: SqlExecuterFunction) {
   await exec(`ALTER TABLE ${schema.TABLE.audit_events} DROP COLUMN provider_event_type_reason`)
 }
 
+async function alterDeviceColumnsAddModalityAndAccessibilityOptions(exec: SqlExecuterFunction) {
+  await exec(`ALTER TABLE ${schema.TABLE.devices} ADD COLUMN ${schema.COLUMN.accessibility_options} varchar(255)[]`)
+  await exec(`UPDATE ${schema.TABLE.devices} SET ${schema.COLUMN.accessibility_options} = []`)
+  await exec(`ALTER TABLE ${schema.TABLE.devices} ALTER COLUMN ${schema.COLUMN.accessibility_options} SET NOT NULL`)
+
+  await exec(`ALTER TABLE ${schema.TABLE.devices} ADD COLUMN ${schema.COLUMN.modality} varchar(255)`)
+  await exec(`UPDATE ${schema.TABLE.devices} SET ${schema.COLUMN.modality} = 'micro_mobility'`)
+  await exec(`ALTER TABLE ${schema.TABLE.devices} ALTER COLUMN ${schema.COLUMN.modality} SET NOT NULL`)
+}
+
 async function doMigrations(client: MDSPostgresClient) {
   const exec = SqlExecuter(client)
   await doMigration(exec, 'alterGeographiesColumns', alterGeographiesColumnsMigration)
@@ -192,6 +203,11 @@ async function doMigrations(client: MDSPostgresClient) {
   await doMigration(exec, 'dropDeprecatedProviderTables', dropDeprecatedProviderTablesMigration)
   await doMigration(exec, 'dropReadOnlyGeographyColumn', dropReadOnlyGeographyColumnMigration)
   await doMigration(exec, 'dropAuditEventsColumns', dropAuditEventsColumnsMigration)
+  await doMigration(
+    exec,
+    'alterDeviceColumnsAddModalityAndAccessibilityOptions',
+    alterDeviceColumnsAddModalityAndAccessibilityOptions
+  )
 }
 
 async function updateSchema(client: MDSPostgresClient) {

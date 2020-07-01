@@ -99,6 +99,11 @@ function days(n: number) {
   return hours(n) * 24
 }
 
+export const RULE_UNIT_MAP = {
+  minutes: minutes(1),
+  hours: hours(1)
+}
+
 // Based on a bin size (in ms), calculate the start/end of
 // the frame containing the timestamp.
 function timeframe(size: Timestamp, timestamp: Timestamp) {
@@ -413,8 +418,12 @@ function capitalizeFirst(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-function nullKeys<T>(obj: { [key: string]: T }): string[] {
-  return Object.keys(obj).filter(key => obj[key] === null || obj[key] === undefined)
+function nullKeys(obj: { [key: string]: unknown }): string[] {
+  return Object.entries(obj).reduce(
+    (keys, [key, value]) =>
+      (Array.isArray(value) && value.length === 0) || value === null || value === undefined ? [...keys, key] : keys,
+    [] as string[]
+  )
 }
 
 function stripNulls<T extends {}>(obj: { [x: string]: unknown }): Partial<T> {

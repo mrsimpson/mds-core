@@ -95,7 +95,8 @@ export async function readDeviceList(device_ids: UUID[]): Promise<Recorded<Devic
   return result.rows
 }
 
-export async function writeDevice(device: Device): Promise<Recorded<Device>> {
+export async function writeDevice(model: Device): Promise<Recorded<Device>> {
+  const device = { modality: 'micro_mobility', accessibility_options: [], ...model }
   const client = await getWriteableClient()
   const sql = `INSERT INTO ${schema.TABLE.devices} (${cols_sql(schema.TABLE_COLUMNS.devices)}) VALUES (${vals_sql(
     schema.TABLE_COLUMNS.devices

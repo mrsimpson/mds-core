@@ -37,11 +37,6 @@ export type VEHICLE_TYPE = typeof VEHICLE_TYPES[number]
 export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
 export type RULE_TYPE = keyof typeof RULE_TYPES
 
-export const RULE_UNIT_MAP = {
-  minutes: 60,
-  hours: 60 * 60
-}
-
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
@@ -193,6 +188,7 @@ export type NonEmptyArray<T> = [T, ...T[]]
 
 // Represents a row in the "devices" table
 export interface Device {
+  accessibility_options?: string[]
   device_id: UUID
   provider_id: UUID
   vehicle_id: string
@@ -200,6 +196,7 @@ export interface Device {
   propulsion: PROPULSION_TYPE[]
   year?: number | null
   mfgr?: string | null
+  modality: string
   model?: string | null
   recorded: Timestamp
   status?: VEHICLE_STATUS | null
@@ -371,53 +368,6 @@ export interface Policy {
 export interface PolicyMetadata {
   policy_id: UUID
   policy_metadata: Record<string, any>
-}
-
-export interface MatchedVehicle {
-  device_id: UUID
-  provider_id: UUID
-  vehicle_id: string
-  vehicle_type: VEHICLE_TYPE
-  vehicle_status: VEHICLE_STATUS
-  gps: {
-    lat: number
-    lng: number
-  }
-}
-
-export interface CountMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicles: MatchedVehicle[]
-}
-
-export interface TimeMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-export interface SpeedMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-export interface ReducedMatch {
-  measured: number
-  geography_id: UUID
-}
-
-export interface Compliance {
-  rule: Rule
-  matches: ReducedMatch[] | CountMatch[] | TimeMatch[] | SpeedMatch[]
-}
-
-export interface ComplianceResponse {
-  policy: Policy
-  compliance: Compliance[]
-  total_violations: number
-  vehicles_in_violation: { device_id: UUID; rule_id: UUID }[]
 }
 
 // We don't put the publish_date into the geography_json column
