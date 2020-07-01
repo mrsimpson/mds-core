@@ -108,6 +108,7 @@ describe('Testing API', () => {
       vehicle_id: provider_vehicle_id,
       propulsion: [PROPULSION_TYPES.electric],
       type: 'scooter',
+      modality: 'micro-mobility',
       recorded: AUDIT_START
     }).then(() => {
       db.writeEvent({
@@ -693,7 +694,8 @@ describe('Testing API', () => {
           vehicle_id: provider_vehicle_id,
           propulsion: [PROPULSION_TYPES.electric],
           type: 'scooter',
-          recorded: AUDIT_START
+          recorded: AUDIT_START,
+          modality: 'micro-mobility'
         })
         await db.writeAudit(audit)
         await db.writeAttachment(attachment)

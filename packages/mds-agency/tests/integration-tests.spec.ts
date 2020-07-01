@@ -100,7 +100,8 @@ const TEST_BICYCLE: Omit<Device, 'recorded'> = {
   propulsion: [PROPULSION_TYPES.human],
   year: 2018,
   mfgr: 'Schwinn',
-  model: 'Mantaray'
+  model: 'Mantaray',
+  modality: 'micro-mobility'
 }
 
 const TEST_TAXI: Omit<Device, 'recorded'> = {
@@ -111,7 +112,8 @@ const TEST_TAXI: Omit<Device, 'recorded'> = {
   propulsion: [PROPULSION_TYPES.combustion],
   year: 2020,
   mfgr: 'FakeMfgr',
-  model: 'DreamMachine'
+  model: 'DreamMachine',
+  modality: 'taxi'
 }
 
 let testTimestamp = now()
