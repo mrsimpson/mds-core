@@ -25,7 +25,7 @@ export const Enum = <T extends string>(...keys: T[]) =>
 export const isEnum = (enums: { [key: string]: string }, value: unknown) =>
   typeof value === 'string' && typeof enums === 'object' && enums[value] === value
 
-export const VEHICLE_TYPES = Enum('car', 'bicycle', 'scooter', 'moped', 'recumbent')
+export const VEHICLE_TYPES = Enum('car', 'bicycle', 'scooter', 'moped', 'other')
 export type VEHICLE_TYPE = keyof typeof VEHICLE_TYPES
 
 // TODO rate
@@ -38,13 +38,13 @@ export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 // export const VEHICLE_STATUSES = Enum('available', 'reserved', 'unavailable', 'removed', 'inactive', 'trip', 'elsewhere')
 // export type VEHICLE_STATUS = keyof typeof VEHICLE_STATUSES
 export const VEHICLE_STATES = Enum(
-  'available',
-  'reserved',
-  'non_operational',
   'removed',
-  'unknown',
+  'available',
+  'non_operational',
+  'reserved',
   'on_trip',
-  'elsewhere'
+  'elsewhere',
+  'unknown'
 )
 export type VEHICLE_STATE = keyof typeof VEHICLE_STATES
 
@@ -68,35 +68,47 @@ export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 
 //   'deregister'
 // )
 export const VEHICLE_EVENTS = Enum(
-  'register',
-  'service_start',
-  'service_end',
+  'battery_charged',
+  'on_hours',
   'provider_drop_off',
-  'provider_pick_up',
-  'agency_pick_up',
   'agency_drop_off',
-  'reserve',
-  'cancel_reservation',
+  'maintenance',
+  'trip_end',
+  'reservation_cancel',
+  'trip_cancel',
+  'system_resume',
+  'comms_restored',
+  'unspecified',
+  'reservation_start',
   'trip_start',
-  'trip_enter',
-  'trip_leave',
-  'trip_end'
+  'trip_enter_jurisdiction',
+  'trip_leave_jurisdiction',
+  'battery_low',
+  'off_hours',
+  'system_suspend',
+  'rebalance_pick_up',
+  'maintenance_pick_up',
+  'agency_pick_up',
+  'compliance_pick_up',
+  'decommissioned',
+  'missing',
+  'comms_lost'
 )
 
 export type VEHICLE_EVENT = keyof typeof VEHICLE_EVENTS
 
-export const VEHICLE_REASONS = Enum(
-  'battery_charged',
-  'charge',
-  'compliance',
-  'decommissioned',
-  'low_battery',
-  'maintenance',
-  'missing',
-  'off_hours',
-  'rebalance'
-)
-export type VEHICLE_REASON = keyof typeof VEHICLE_REASONS
+// export const VEHICLE_REASONS = Enum(
+//   'battery_charged',
+//   'charge',
+//   'compliance',
+//   'decommissioned',
+//   'low_battery',
+//   'maintenance',
+//   'missing',
+//   'off_hours',
+//   'rebalance'
+// )
+// export type VEHICLE_REASON = keyof typeof VEHICLE_REASONS
 
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
@@ -118,28 +130,39 @@ export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
 //   deregister: VEHICLE_STATES.inactive
 // }
 
-// TODO update for new states
 export const EVENT_STATE_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE } = {
-  register: VEHICLE_STATES.removed,
-  service_start: VEHICLE_STATES.available,
-  service_end: VEHICLE_STATES.non_operational,
+  battery_charged: VEHICLE_STATES.available,
+  on_hours: VEHICLE_STATES.available,
   provider_drop_off: VEHICLE_STATES.available,
-  provider_pick_up: VEHICLE_STATES.removed,
-  agency_pick_up: VEHICLE_STATES.removed,
   agency_drop_off: VEHICLE_STATES.available,
-  reserve: VEHICLE_STATES.reserved,
-  cancel_reservation: VEHICLE_STATES.available,
+  maintenance: VEHICLE_STATES.available,
+  trip_end: VEHICLE_STATES.available,
+  reservation_cancel: VEHICLE_STATES.available,
+  trip_cancel: VEHICLE_STATES.available,
+  system_resume: VEHICLE_STATES.available,
+  comms_restored: VEHICLE_STATES.available,
+  unspecified: VEHICLE_STATES.unknown, // FIXME not sure this is correct
+  reservation_start: VEHICLE_STATES.reserved,
   trip_start: VEHICLE_STATES.on_trip,
-  trip_enter: VEHICLE_STATES.on_trip,
-  trip_leave: VEHICLE_STATES.elsewhere,
-  trip_end: VEHICLE_STATES.available
+  trip_enter_jurisdiction: VEHICLE_STATES.on_trip,
+  trip_leave_jurisdiction: VEHICLE_STATES.elsewhere,
+  battery_low: VEHICLE_STATES.non_operational,
+  off_hours: VEHICLE_STATES.non_operational,
+  system_suspend: VEHICLE_STATES.non_operational,
+  rebalance_pick_up: VEHICLE_STATES.removed,
+  maintenance_pick_up: VEHICLE_STATES.removed,
+  agency_pick_up: VEHICLE_STATES.removed,
+  compliance_pick_up: VEHICLE_STATES.removed,
+  decommissioned: VEHICLE_STATES.removed,
+  missing: VEHICLE_STATES.unknown,
+  comms_lost: VEHICLE_STATES.unknown
 }
 
 const StatusEventMap = <T extends { [S in VEHICLE_STATE]: Partial<typeof VEHICLE_EVENTS> }>(map: T) => map
 
 // export const STATUS_EVENT_MAP = StatusEventMap({
 //   available: Enum(
-//     VEHICLE_EVENTS.service_start,
+//     VEHICLE_EVENTS.service_start: ,
 //     VEHICLE_EVENTS.provider_drop_off,
 //     VEHICLE_EVENTS.cancel_reservation,
 //     VEHICLE_EVENTS.agency_drop_off
@@ -153,17 +176,29 @@ const StatusEventMap = <T extends { [S in VEHICLE_STATE]: Partial<typeof VEHICLE
 // })
 export const STATE_EVENT_MAP = StatusEventMap({
   available: Enum(
-    VEHICLE_EVENTS.service_start,
+    VEHICLE_EVENTS.battery_charged,
+    VEHICLE_EVENTS.on_hours,
     VEHICLE_EVENTS.provider_drop_off,
-    VEHICLE_EVENTS.cancel_reservation,
+    VEHICLE_EVENTS.agency_drop_off,
+    VEHICLE_EVENTS.reservation_cancel,
+    VEHICLE_EVENTS.maintenance_pick_up,
+    VEHICLE_EVENTS.trip_end,
+    VEHICLE_EVENTS.comms_restored,
+    VEHICLE_EVENTS.system_resume,
     VEHICLE_EVENTS.agency_drop_off
   ),
-  reserved: Enum(VEHICLE_EVENTS.reserve),
-  unavailable: Enum(VEHICLE_EVENTS.service_end, VEHICLE_EVENTS.trip_end),
-  trip: Enum(VEHICLE_EVENTS.trip_start, VEHICLE_EVENTS.trip_enter),
-  elsewhere: Enum(VEHICLE_EVENTS.trip_leave),
-  removed: Enum(VEHICLE_EVENTS.register, VEHICLE_EVENTS.provider_pick_up, VEHICLE_EVENTS.agency_pick_up),
-  unknown: Enum() // TODO 1.0
+  reserved: Enum(VEHICLE_EVENTS.reservation_start),
+  non_operational: Enum(VEHICLE_EVENTS.off_hours, VEHICLE_EVENTS.battery_low, VEHICLE_EVENTS.system_suspend),
+  on_trip: Enum(VEHICLE_EVENTS.trip_start, VEHICLE_EVENTS.trip_enter_jurisdiction),
+  elsewhere: Enum(VEHICLE_EVENTS.trip_leave_jurisdiction),
+  removed: Enum(
+    VEHICLE_EVENTS.maintenance_pick_up,
+    VEHICLE_EVENTS.rebalance_pick_up,
+    VEHICLE_EVENTS.compliance_pick_up,
+    VEHICLE_EVENTS.agency_pick_up,
+    VEHICLE_EVENTS.decommissioned
+  ),
+  unknown: Enum(VEHICLE_EVENTS.comms_lost, VEHICLE_EVENTS.missing) // TODO 1.0
 })
 
 export const DAYS_OF_WEEK = Enum('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
