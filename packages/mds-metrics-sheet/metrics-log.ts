@@ -27,7 +27,7 @@ import {
   SHERPA_LA_PROVIDER_ID,
   BOLT_PROVIDER_ID
 } from '@mds-core/mds-providers'
-import { VEHICLE_EVENT, EVENT_STATUS_MAP, VEHICLE_STATUS } from '@mds-core/mds-types'
+import { VEHICLE_EVENT, EVENT_STATUS_MAP, VEHICLE_STATE } from '@mds-core/mds-types'
 import { requestPromiseExceptionHelper, MAX_TIMEOUT_MS } from './utils'
 import { VehicleCountResponse, LastDayStatsResponse, MetricsSheetRow, VehicleCountRow } from './types'
 
@@ -59,7 +59,7 @@ export function percent(a: number, total: number) {
 
 export function eventCountsToStatusCounts(events: { [s in VEHICLE_EVENT]: number }) {
   return (Object.keys(events) as VEHICLE_EVENT[]).reduce(
-    (acc: { [s in VEHICLE_STATUS]: number }, event) => {
+    (acc: { [s in VEHICLE_STATE]: number }, event) => {
       const status = EVENT_STATUS_MAP[event]
       return Object.assign(acc, {
         [status]: acc[status] + events[event]

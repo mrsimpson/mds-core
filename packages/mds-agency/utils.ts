@@ -12,12 +12,12 @@ import {
   isEnum,
   VEHICLE_EVENTS,
   VEHICLE_TYPES,
-  VEHICLE_STATUSES,
+  VEHICLE_STATES,
   VEHICLE_REASONS,
   PROPULSION_TYPES,
   EVENT_STATUS_MAP,
   BoundingBox,
-  VEHICLE_STATUS,
+  VEHICLE_STATE,
   VEHICLE_EVENT
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
@@ -142,7 +142,7 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
-    const status = event ? EVENT_STATUS_MAP[event.event_type] : VEHICLE_STATUSES.inactive
+    const status = event ? EVENT_STATUS_MAP[event.event_type] : VEHICLE_STATES.inactive
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
     return [...acc, { ...device, status, telemetry, updated }]
@@ -450,9 +450,9 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
   if (event) {
     composite.prev_event = event.event_type
     composite.updated = event.timestamp
-    composite.status = (EVENT_STATUS_MAP[event.event_type as VEHICLE_EVENT] || 'unknown') as VEHICLE_STATUS
+    composite.status = (EVENT_STATUS_MAP[event.event_type as VEHICLE_EVENT] || 'unknown') as VEHICLE_STATE
   } else {
-    composite.status = VEHICLE_STATUSES.inactive
+    composite.status = VEHICLE_STATES.inactive
     composite.prev_event = VEHICLE_EVENTS.deregister
   }
   if (telemetry) {

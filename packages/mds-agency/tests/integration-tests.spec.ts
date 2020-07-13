@@ -31,7 +31,7 @@ import supertest from 'supertest'
 import test from 'unit.js'
 import {
   VEHICLE_EVENTS,
-  VEHICLE_STATUSES,
+  VEHICLE_STATES,
   VEHICLE_TYPES,
   PROPULSION_TYPES,
   Timestamp,
@@ -360,7 +360,7 @@ describe('Tests API', () => {
         // log('----------', result.body)
         test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
         test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
-        test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATUSES.removed)
+        test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATES.removed)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -374,7 +374,7 @@ describe('Tests API', () => {
         // log('----------', result.body)
         test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
         test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
-        test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATUSES.removed)
+        test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATES.removed)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -1286,7 +1286,7 @@ describe('Tests API', () => {
         test.value(deviceA.device_id).is(DEVICE_UUID)
         test.value(deviceA.provider_id).is(TEST1_PROVIDER_ID)
         test.value(deviceA.gps.lat).is(TEST_TELEMETRY.gps.lat)
-        test.value(deviceA.status).is(VEHICLE_STATUSES.available)
+        test.value(deviceA.status).is(VEHICLE_STATES.available)
         test.value(deviceA.prev_event).is(VEHICLE_EVENTS.cancel_reservation)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
@@ -1304,7 +1304,7 @@ describe('Tests API', () => {
         test.value(deviceB.device_id).is(DEVICE_UUID)
         test.value(deviceB.provider_id).is(TEST1_PROVIDER_ID)
         test.value(deviceB.gps.lat).is(TEST_TELEMETRY.gps.lat)
-        test.value(deviceB.status).is(VEHICLE_STATUSES.available)
+        test.value(deviceB.status).is(VEHICLE_STATES.available)
         test.value(deviceB.prev_event).is(VEHICLE_EVENTS.cancel_reservation)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
@@ -1321,7 +1321,7 @@ describe('Tests API', () => {
       .expect(201)
 
     const result = await request.get(`/vehicles/${JUMP_TEST_DEVICE_1_ID}`).set('Authorization', AUTH).expect(200)
-    test.assert(result.body.status === VEHICLE_STATUSES.inactive)
+    test.assert(result.body.status === VEHICLE_STATES.inactive)
     test.assert(result.body.prev_event === VEHICLE_EVENTS.deregister)
   })
 
@@ -1331,7 +1331,7 @@ describe('Tests API', () => {
     test.assert(ids.includes(JUMP_TEST_DEVICE_1_ID))
     result.body.vehicles.map((device: any) => {
       if (device.device_id === JUMP_TEST_DEVICE_1_ID) {
-        test.assert(device.status === VEHICLE_STATUSES.inactive)
+        test.assert(device.status === VEHICLE_STATES.inactive)
       }
     })
   })

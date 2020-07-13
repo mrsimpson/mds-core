@@ -26,7 +26,7 @@ import {
   Telemetry,
   BoundingBox,
   EVENT_STATUS_MAP,
-  VEHICLE_STATUSES
+  VEHICLE_STATES
 } from '@mds-core/mds-types'
 import redis from 'redis'
 import bluebird from 'bluebird'
@@ -417,7 +417,7 @@ async function readDevicesStatus(query: {
       try {
         const parsedItem = parseEvent(item)
         if (
-          EVENT_STATUS_MAP[parsedItem.event_type] === VEHICLE_STATUSES.removed ||
+          EVENT_STATUS_MAP[parsedItem.event_type] === VEHICLE_STATES.removed ||
           !parsedItem.telemetry ||
           (strictChecking && !isInsideBoundingBox(parsedItem.telemetry, query.bbox))
         )

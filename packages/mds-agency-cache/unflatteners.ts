@@ -1,4 +1,4 @@
-import { VEHICLE_TYPE, VEHICLE_EVENT, VEHICLE_STATUS, Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import { VEHICLE_TYPE, VEHICLE_EVENT, VEHICLE_STATE, Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
 
 import { ParseError } from '@mds-core/mds-utils'
 import { HasPropertyAssertion } from '@mds-core/mds-schema-validators'
@@ -68,7 +68,7 @@ function parseDevice(device: StringifiedCacheReadDeviceResult): Device {
       mfgr: device.mfgr ? device.mfgr : null,
       model: device.model ? device.model : null,
       recorded: Number(device.recorded),
-      status: device.status ? (device.status as VEHICLE_STATUS) : null
+      status: device.status ? (device.status as VEHICLE_STATE) : null
     }
   }
   return device

@@ -11,7 +11,7 @@ import {
   Telemetry,
   ErrorObject,
   DeviceID,
-  VEHICLE_STATUSES,
+  VEHICLE_STATES,
   EVENT_STATUS_MAP,
   VEHICLE_EVENT,
   VEHICLE_REASON,
@@ -59,11 +59,24 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   const { body } = req
   const recorded = now()
 
-  const { provider_id } = res.locals
-  const { device_id, vehicle_id, type, propulsion, year, mfgr, model } = body
+  const { provider_id, version } = res.locals
+  // const { device_id, vehicle_id, type, propulsion, year, mfgr, model } = body
+  const { device_id, vehicle_id, vehicle_types, propulsion_types, year, mfgr, model } = body
 
-  const status = VEHICLE_STATUSES.removed
+  const status = VEHICLE_STATES.removed
 
+  // const device = {
+  //   provider_id,
+  //   device_id,
+  //   vehicle_id,
+  //   type,
+  //   propulsion,
+  //   year,
+  //   mfgr,
+  //   model,
+  //   recorded,
+  //   status
+  // }
   const device = {
     provider_id,
     device_id,

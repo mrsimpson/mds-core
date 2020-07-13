@@ -27,7 +27,7 @@ import {
   Geography,
   Rule,
   EVENT_STATUS_MAP,
-  VEHICLE_STATUS,
+  VEHICLE_STATE,
   BBox,
   VEHICLE_EVENT,
   SingleOrArray
@@ -508,7 +508,7 @@ function getPolygon(geographies: Geography[], geography: string): Geometry | Fea
 }
 
 function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
-  const status = rule.statuses ? rule.statuses[EVENT_STATUS_MAP[event.event_type] as VEHICLE_STATUS] : null
+  const status = rule.statuses ? rule.statuses[EVENT_STATUS_MAP[event.event_type] as VEHICLE_STATE] : null
   return status !== null
     ? rule.statuses !== null &&
         Object.keys(rule.statuses).includes(EVENT_STATUS_MAP[event.event_type]) &&

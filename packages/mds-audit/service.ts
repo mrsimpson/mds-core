@@ -32,7 +32,7 @@ import {
   EVENT_STATUS_MAP,
   VEHICLE_EVENT,
   VEHICLE_EVENTS,
-  VEHICLE_STATUSES
+  VEHICLE_STATES
 } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 import { now } from '@mds-core/mds-utils'
@@ -216,7 +216,7 @@ export async function getVehicles(
   const start = now()
   const statusesSuperset = ((await cache.readDevicesStatus({ bbox, strict })) as (VehicleEvent & Device)[]).filter(
     status =>
-      EVENT_STATUS_MAP[status.event_type as VEHICLE_EVENT] !== VEHICLE_STATUSES.removed &&
+      EVENT_STATUS_MAP[status.event_type as VEHICLE_EVENT] !== VEHICLE_STATES.removed &&
       (!provider_id || status.provider_id === provider_id)
   )
   const statusesSubset = statusesSuperset.slice(skip, skip + take)

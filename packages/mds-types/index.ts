@@ -28,17 +28,45 @@ export const isEnum = (enums: { [key: string]: string }, value: unknown) =>
 export const VEHICLE_TYPES = Enum('car', 'bicycle', 'scooter', 'moped', 'recumbent')
 export type VEHICLE_TYPE = keyof typeof VEHICLE_TYPES
 
+// TODO rate
 export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
 export type RULE_TYPE = keyof typeof RULE_TYPES
 
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
-export const VEHICLE_STATUSES = Enum('available', 'reserved', 'unavailable', 'removed', 'inactive', 'trip', 'elsewhere')
-export type VEHICLE_STATUS = keyof typeof VEHICLE_STATUSES
+// export const VEHICLE_STATUSES = Enum('available', 'reserved', 'unavailable', 'removed', 'inactive', 'trip', 'elsewhere')
+// export type VEHICLE_STATUS = keyof typeof VEHICLE_STATUSES
+export const VEHICLE_STATES = Enum(
+  'available',
+  'reserved',
+  'non_operational',
+  'removed',
+  'unknown',
+  'on_trip',
+  'elsewhere'
+)
+export type VEHICLE_STATE = keyof typeof VEHICLE_STATES
 
-export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
+// export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
+export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip']
 
+// export const VEHICLE_EVENTS = Enum(
+//   'register',
+//   'service_start',
+//   'service_end',
+//   'provider_drop_off',
+//   'provider_pick_up',
+//   'agency_pick_up',
+//   'agency_drop_off',
+//   'reserve',
+//   'cancel_reservation',
+//   'trip_start',
+//   'trip_enter',
+//   'trip_leave',
+//   'trip_end',
+//   'deregister'
+// )
 export const VEHICLE_EVENTS = Enum(
   'register',
   'service_start',
@@ -52,8 +80,7 @@ export const VEHICLE_EVENTS = Enum(
   'trip_start',
   'trip_enter',
   'trip_leave',
-  'trip_end',
-  'deregister'
+  'trip_end'
 )
 
 export type VEHICLE_EVENT = keyof typeof VEHICLE_EVENTS
@@ -74,26 +101,57 @@ export type VEHICLE_REASON = keyof typeof VEHICLE_REASONS
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
 
-export const EVENT_STATUS_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATUS } = {
-  register: VEHICLE_STATUSES.removed,
-  service_start: VEHICLE_STATUSES.available,
-  service_end: VEHICLE_STATUSES.unavailable,
-  provider_drop_off: VEHICLE_STATUSES.available,
-  provider_pick_up: VEHICLE_STATUSES.removed,
-  agency_pick_up: VEHICLE_STATUSES.removed,
-  agency_drop_off: VEHICLE_STATUSES.available,
-  reserve: VEHICLE_STATUSES.reserved,
-  cancel_reservation: VEHICLE_STATUSES.available,
-  trip_start: VEHICLE_STATUSES.trip,
-  trip_enter: VEHICLE_STATUSES.trip,
-  trip_leave: VEHICLE_STATUSES.elsewhere,
-  trip_end: VEHICLE_STATUSES.available,
-  deregister: VEHICLE_STATUSES.inactive
+// export const EVENT_STATUS_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE } = {
+//   register: VEHICLE_STATES.removed,
+//   service_start: VEHICLE_STATES.available,
+//   service_end: VEHICLE_STATES.unavailable,
+//   provider_drop_off: VEHICLE_STATES.available,
+//   provider_pick_up: VEHICLE_STATES.removed,
+//   agency_pick_up: VEHICLE_STATES.removed,
+//   agency_drop_off: VEHICLE_STATES.available,
+//   reserve: VEHICLE_STATES.reserved,
+//   cancel_reservation: VEHICLE_STATES.available,
+//   trip_start: VEHICLE_STATES.trip,
+//   trip_enter: VEHICLE_STATES.trip,
+//   trip_leave: VEHICLE_STATES.elsewhere,
+//   trip_end: VEHICLE_STATES.available,
+//   deregister: VEHICLE_STATES.inactive
+// }
+
+// TODO update for new states
+export const EVENT_STATE_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE } = {
+  register: VEHICLE_STATES.removed,
+  service_start: VEHICLE_STATES.available,
+  service_end: VEHICLE_STATES.non_operational,
+  provider_drop_off: VEHICLE_STATES.available,
+  provider_pick_up: VEHICLE_STATES.removed,
+  agency_pick_up: VEHICLE_STATES.removed,
+  agency_drop_off: VEHICLE_STATES.available,
+  reserve: VEHICLE_STATES.reserved,
+  cancel_reservation: VEHICLE_STATES.available,
+  trip_start: VEHICLE_STATES.on_trip,
+  trip_enter: VEHICLE_STATES.on_trip,
+  trip_leave: VEHICLE_STATES.elsewhere,
+  trip_end: VEHICLE_STATES.available
 }
 
-const StatusEventMap = <T extends { [S in VEHICLE_STATUS]: Partial<typeof VEHICLE_EVENTS> }>(map: T) => map
+const StatusEventMap = <T extends { [S in VEHICLE_STATE]: Partial<typeof VEHICLE_EVENTS> }>(map: T) => map
 
-export const STATUS_EVENT_MAP = StatusEventMap({
+// export const STATUS_EVENT_MAP = StatusEventMap({
+//   available: Enum(
+//     VEHICLE_EVENTS.service_start,
+//     VEHICLE_EVENTS.provider_drop_off,
+//     VEHICLE_EVENTS.cancel_reservation,
+//     VEHICLE_EVENTS.agency_drop_off
+//   ),
+//   reserved: Enum(VEHICLE_EVENTS.reserve),
+//   unavailable: Enum(VEHICLE_EVENTS.service_end, VEHICLE_EVENTS.trip_end),
+//   trip: Enum(VEHICLE_EVENTS.trip_start, VEHICLE_EVENTS.trip_enter),
+//   elsewhere: Enum(VEHICLE_EVENTS.trip_leave),
+//   removed: Enum(VEHICLE_EVENTS.register, VEHICLE_EVENTS.provider_pick_up, VEHICLE_EVENTS.agency_pick_up),
+//   inactive: Enum(VEHICLE_EVENTS.deregister)
+// })
+export const STATE_EVENT_MAP = StatusEventMap({
   available: Enum(
     VEHICLE_EVENTS.service_start,
     VEHICLE_EVENTS.provider_drop_off,
@@ -105,7 +163,7 @@ export const STATUS_EVENT_MAP = StatusEventMap({
   trip: Enum(VEHICLE_EVENTS.trip_start, VEHICLE_EVENTS.trip_enter),
   elsewhere: Enum(VEHICLE_EVENTS.trip_leave),
   removed: Enum(VEHICLE_EVENTS.register, VEHICLE_EVENTS.provider_pick_up, VEHICLE_EVENTS.agency_pick_up),
-  inactive: Enum(VEHICLE_EVENTS.deregister)
+  unknown: Enum() // TODO 1.0
 })
 
 export const DAYS_OF_WEEK = Enum('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
@@ -141,7 +199,7 @@ export interface Device {
   mfgr?: string | null
   model?: string | null
   recorded: Timestamp
-  status?: VEHICLE_STATUS | null
+  status?: VEHICLE_STATE | null
 }
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
@@ -261,11 +319,29 @@ export interface PolicyMessage {
   [key: string]: string
 }
 
+// interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
+//   name: string
+//   rule_id: UUID
+//   geographies: UUID[]
+//   statuses: Partial<{ [S in VEHICLE_STATE]: (keyof typeof STATUS_EVENT_MAP[S])[] | [] }> | null
+//   rule_type: RuleType
+//   vehicle_types?: VEHICLE_TYPE[] | null
+//   maximum?: number | null
+//   minimum?: number | null
+//   start_time?: string | null
+//   end_time?: string | null
+//   days?: DAY_OF_WEEK[] | null
+//   /* eslint-reason TODO: message types haven't been defined well yet */
+//   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+//   messages?: PolicyMessage
+//   value_url?: URL | null
+// }
 interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
+  // TODO 'rate'
   name: string
   rule_id: UUID
   geographies: UUID[]
-  statuses: Partial<{ [S in VEHICLE_STATUS]: (keyof typeof STATUS_EVENT_MAP[S])[] | [] }> | null
+  states: Partial<{ [S in VEHICLE_STATE]: (keyof typeof STATE_EVENT_MAP[S])[] | [] }> | null
   rule_type: RuleType
   vehicle_types?: VEHICLE_TYPE[] | null
   maximum?: number | null

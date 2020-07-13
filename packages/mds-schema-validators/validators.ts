@@ -31,7 +31,7 @@ import {
   Telemetry,
   Stop,
   PROPULSION_TYPES,
-  VEHICLE_STATUSES,
+  VEHICLE_STATES,
   Device
 } from '@mds-core/mds-types'
 import * as Joi from '@hapi/joi'
@@ -154,7 +154,7 @@ const vehicleTypeSchema = stringSchema.valid(Object.keys(VEHICLE_TYPES))
 
 const propulsionTypeSchema = stringSchema.valid(Object.keys(PROPULSION_TYPES))
 
-const vehicleStatusSchema = stringSchema.valid(Object.keys(VEHICLE_STATUSES))
+const vehicleStatusSchema = stringSchema.valid(Object.keys(VEHICLE_STATES))
 
 const eventSchema = Joi.object().keys({
   device_id: uuidSchema.required(),

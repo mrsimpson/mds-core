@@ -1,10 +1,10 @@
-import { UUID, Device, VehicleEvent, Telemetry, Timestamp, Recorded, VEHICLE_STATUS, Stop } from '@mds-core/mds-types'
+import { UUID, Device, VehicleEvent, Telemetry, Timestamp, Recorded, VEHICLE_STATE, Stop } from '@mds-core/mds-types'
 import { MultiPolygon } from 'geojson'
-import { ApiRequest, ApiClaims, ApiResponse, ApiResponseLocals, ApiRequestParams } from '@mds-core/mds-api-server'
+import { ApiRequest, ApiClaims, ApiVersionedResponse, ApiResponseLocals, ApiRequestParams } from '@mds-core/mds-api-server'
 
-export const AGENCY_API_SUPPORTED_VERSIONS = ['0.4.1'] as const
+export const AGENCY_API_SUPPORTED_VERSIONS = ['0.4.1', '1.0.0'] as const
 export type AGENCY_API_SUPPORTED_VERSION = typeof AGENCY_API_SUPPORTED_VERSIONS[number]
-export const [AGENCY_API_DEFAULT_VERSION] = AGENCY_API_SUPPORTED_VERSIONS
+export const [AGENCY_API_DEFAULT_VERSION] = AGENCY_API_SUPPORTED_VERSIONS // default has to be oldest, because we didn't used to require a version
 
 export type AgencyApiRequest<B = {}> = ApiRequest<B>
 
@@ -19,7 +19,7 @@ export type AgencyApiReadStopRequest = AgencyApiRequest & ApiRequestParams<'stop
 
 export type AgencyApiAccessTokenScopes = 'admin:all' | 'vehicles:read'
 
-export type AgencyApiResponse<B = {}> = ApiResponse<B> &
+export type AgencyApiResponse<B = {}> = ApiVersionedResponse<AGENCY_API_SUPPORTED_VERSION, B> &
   ApiResponseLocals<
     ApiClaims<AgencyApiAccessTokenScopes> & {
       provider_id: UUID
@@ -33,7 +33,7 @@ export type AgencyApiGetVehiclesByProviderResponse = AgencyApiResponse<Paginated
 export type AgencyApiUpdateVehicleResponse = AgencyApiResponse
 export type AgencyApiSubmitVehicleEventResponse = AgencyApiResponse<{
   device_id: UUID
-  status: VEHICLE_STATUS
+  status: VEHICLE_STATE
 }>
 
 export type AgencyApiSubmitVehicleTelemetryResponse = AgencyApiResponse<{

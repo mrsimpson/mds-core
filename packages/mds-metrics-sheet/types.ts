@@ -1,10 +1,10 @@
-import { UUID, VEHICLE_STATUS, VEHICLE_EVENT } from '@mds-core/mds-types'
+import { UUID, VEHICLE_STATE, VEHICLE_EVENT } from '@mds-core/mds-types'
 
 export interface VehicleCountRow {
   provider_id: UUID
   provider: string
   count: number
-  status: { [s in VEHICLE_STATUS]: number }
+  status: { [s in VEHICLE_STATE]: number }
   event_type: { [s in VEHICLE_EVENT]: number }
   areas: { [s: string]: number }
 }
