@@ -113,7 +113,7 @@ export type VEHICLE_EVENT = keyof typeof VEHICLE_EVENTS
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
 
-// export const EVENT_STATUS_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE } = {
+// export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE } = {
 //   register: VEHICLE_STATES.removed,
 //   service_start: VEHICLE_STATES.available,
 //   service_end: VEHICLE_STATES.unavailable,
@@ -130,7 +130,7 @@ export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
 //   deregister: VEHICLE_STATES.inactive
 // }
 
-export const EVENT_STATE_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE } = {
+export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE } = {
   battery_charged: VEHICLE_STATES.available,
   on_hours: VEHICLE_STATES.available,
   provider_drop_off: VEHICLE_STATES.available,
@@ -248,7 +248,7 @@ export interface VehicleEvent {
   timestamp_long?: string | null
   delta?: Timestamp | null
   event_type: VEHICLE_EVENT
-  event_type_reason?: VEHICLE_REASON | null
+  // event_type_reason?: VEHICLE_REASON | null
   telemetry_timestamp?: Timestamp | null
   telemetry?: Telemetry | null
   trip_id?: UUID | null

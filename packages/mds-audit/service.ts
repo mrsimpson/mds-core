@@ -29,7 +29,7 @@ import {
   TelemetryData,
   WithGpsProperty,
   BoundingBox,
-  EVENT_STATUS_MAP,
+  EVENT_STATES_MAP,
   VEHICLE_EVENT,
   VEHICLE_EVENTS,
   VEHICLE_STATES
@@ -186,7 +186,7 @@ export async function getVehicle(provider_id: UUID, vehicle_id: string) {
         logger.info('Bad vehicle status', { deviceStatus, provider_id, vehicle_id, device_id })
         deviceStatusMap.inactive.push(device)
       } else {
-        const status = EVENT_STATUS_MAP[deviceStatus.event_type as VEHICLE_EVENT]
+        const status = EVENT_STATES_MAP[deviceStatus.event_type as VEHICLE_EVENT]
         const updated = deviceStatus.timestamp
         deviceStatusMap.active.push({ ...device, ...deviceStatus, status, updated })
       }
@@ -216,12 +216,12 @@ export async function getVehicles(
   const start = now()
   const statusesSuperset = ((await cache.readDevicesStatus({ bbox, strict })) as (VehicleEvent & Device)[]).filter(
     status =>
-      EVENT_STATUS_MAP[status.event_type as VEHICLE_EVENT] !== VEHICLE_STATES.removed &&
+      EVENT_STATES_MAP[status.event_type as VEHICLE_EVENT] !== VEHICLE_STATES.removed &&
       (!provider_id || status.provider_id === provider_id)
   )
   const statusesSubset = statusesSuperset.slice(skip, skip + take)
   const devices = statusesSubset.reduce((acc: (VehicleEvent & Device)[], item) => {
-    const status = EVENT_STATUS_MAP[item.event_type as VEHICLE_EVENT]
+    const status = EVENT_STATES_MAP[item.event_type as VEHICLE_EVENT]
     const updated = item.timestamp
     return [...acc, { ...item, status, updated }]
   }, [])

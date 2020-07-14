@@ -26,7 +26,7 @@ import {
   BoundingBox,
   Geography,
   Rule,
-  EVENT_STATUS_MAP,
+  EVENT_STATES_MAP,
   VEHICLE_STATE,
   BBox,
   VEHICLE_EVENT,
@@ -492,7 +492,7 @@ function isStateTransitionValid(
   eventA: VehicleEvent & { event_type: VEHICLE_EVENT },
   eventB: VehicleEvent & { event_type: VEHICLE_EVENT }
 ) {
-  const currState = EVENT_STATUS_MAP[eventA.event_type]
+  const currState = EVENT_STATES_MAP[eventA.event_type]
   const nextState = getNextState(currState, eventB.event_type)
   return nextState !== undefined
 }
@@ -508,10 +508,10 @@ function getPolygon(geographies: Geography[], geography: string): Geometry | Fea
 }
 
 function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
-  const status = rule.statuses ? rule.statuses[EVENT_STATUS_MAP[event.event_type] as VEHICLE_STATE] : null
+  const status = rule.states ? rule.states[EVENT_STATES_MAP[event.event_type] as VEHICLE_STATE] : null
   return status !== null
-    ? rule.statuses !== null &&
-        Object.keys(rule.statuses).includes(EVENT_STATUS_MAP[event.event_type]) &&
+    ? rule.states !== null &&
+        Object.keys(rule.states).includes(EVENT_STATES_MAP[event.event_type]) &&
         status !== undefined &&
         (status.length === 0 || (status as string[]).includes(event.event_type))
     : true

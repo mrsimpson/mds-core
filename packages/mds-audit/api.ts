@@ -48,7 +48,7 @@ import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import {
   AUDIT_EVENT_TYPES,
   AuditEvent,
-  EVENT_STATUS_MAP,
+  EVENT_STATES_MAP,
   Timestamp,
   Telemetry,
   TelemetryData,
@@ -551,7 +551,7 @@ function api(app: express.Express): express.Express {
                 provider_vehicle_id: device.vehicle_id,
                 provider_event_type: providerEvent[0]?.event_type,
                 provider_event_type_reason: providerEvent[0]?.event_type_reason,
-                provider_status: EVENT_STATUS_MAP[providerEvent[0]?.event_type as VEHICLE_EVENT],
+                provider_status: EVENT_STATES_MAP[providerEvent[0]?.event_type as VEHICLE_EVENT],
                 provider_telemetry: providerEvent[0]?.telemetry,
                 provider_event_time: providerEvent[0]?.timestamp,
                 events: auditEvents.map(withGpsProperty),

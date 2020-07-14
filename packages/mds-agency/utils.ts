@@ -13,9 +13,9 @@ import {
   VEHICLE_EVENTS,
   VEHICLE_TYPES,
   VEHICLE_STATES,
-  VEHICLE_REASONS,
+  // VEHICLE_REASONS,
   PROPULSION_TYPES,
-  EVENT_STATUS_MAP,
+  EVENT_STATES_MAP,
   BoundingBox,
   VEHICLE_STATE,
   VEHICLE_EVENT
@@ -142,7 +142,7 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
-    const status = event ? EVENT_STATUS_MAP[event.event_type] : VEHICLE_STATES.inactive
+    const status = event ? EVENT_STATES_MAP[event.event_type] : VEHICLE_STATES.removed
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
     return [...acc, { ...device, status, telemetry, updated }]
@@ -293,12 +293,12 @@ export async function badEvent(event: VehicleEvent) {
     }
   }
 
-  if (event.event_type_reason && !isEnum(VEHICLE_REASONS, event.event_type_reason)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid event_type_reason ${event.event_type_reason}`
-    }
-  }
+  // if (event.event_type_reason && !isEnum(VEHICLE_REASONS, event.event_type_reason)) {
+  //   return {
+  //     error: 'bad_param',
+  //     error_description: `invalid event_type_reason ${event.event_type_reason}`
+  //   }
+  // }
 
   if (event.trip_id === '') {
     /* eslint-reason TODO remove eventually -- Lime is spraying empty-string values */
@@ -325,24 +325,20 @@ export async function badEvent(event: VehicleEvent) {
   }
 
   // event-specific checking goes last
+  // TODO update events here
   switch (event.event_type) {
     case VEHICLE_EVENTS.trip_start:
       return badTelemetry(event.telemetry) || missingTripId()
     case VEHICLE_EVENTS.trip_end:
       return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_enter:
+    case VEHICLE_EVENTS.trip_enter_jurisdiction:
       return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_leave:
+    case VEHICLE_EVENTS.trip_leave_jurisdiction:
       return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.service_start:
-    case VEHICLE_EVENTS.service_end:
-    case VEHICLE_EVENTS.provider_pick_up:
     case VEHICLE_EVENTS.provider_drop_off:
       return badTelemetry(event.telemetry)
-    case VEHICLE_EVENTS.register:
-    case VEHICLE_EVENTS.deregister:
-    case VEHICLE_EVENTS.reserve:
-    case VEHICLE_EVENTS.cancel_reservation:
+    case VEHICLE_EVENTS.reservation_start:
+    case VEHICLE_EVENTS.reservation_cancel:
       return null
     default:
       logger.warn(`unsure how to validate mystery event_type ${event.event_type}`)
@@ -450,10 +446,10 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
   if (event) {
     composite.prev_event = event.event_type
     composite.updated = event.timestamp
-    composite.status = (EVENT_STATUS_MAP[event.event_type as VEHICLE_EVENT] || 'unknown') as VEHICLE_STATE
+    composite.status = (EVENT_STATES_MAP[event.event_type as VEHICLE_EVENT] || 'unknown') as VEHICLE_STATE
   } else {
-    composite.status = VEHICLE_STATES.inactive
-    composite.prev_event = VEHICLE_EVENTS.deregister
+    composite.status = VEHICLE_STATES.removed
+    composite.prev_event = VEHICLE_EVENTS.decommissioned
   }
   if (telemetry) {
     if (telemetry.gps) {

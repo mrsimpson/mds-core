@@ -151,7 +151,7 @@ export type GetAuditTripDetailsResponse = AuditApiResponse<
     attachments: AttachmentSummary[]
     provider_event_type?: VEHICLE_EVENT
     provider_event_type_reason?: VEHICLE_REASON | null
-    provider_status?: VEHICLE_STATE // any //  EVENT_STATUS_MAP[providerEvent[0]?.event_type as VEHICLE_EVENT],
+    provider_status?: VEHICLE_STATE // any //  EVENT_STATES_MAP[providerEvent[0]?.event_type as VEHICLE_EVENT],
     provider_telemetry?: Telemetry | null //  providerEvent[0]?.telemetry,
     provider_event_time?: Timestamp // providerEvent[0]?.timestamp,
     provider: {

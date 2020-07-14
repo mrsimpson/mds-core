@@ -12,9 +12,9 @@ import {
   ErrorObject,
   DeviceID,
   VEHICLE_STATES,
-  EVENT_STATUS_MAP,
+  EVENT_STATES_MAP,
   VEHICLE_EVENT,
-  VEHICLE_REASON,
+  // VEHICLE_REASON,
   UUID
 } from '@mds-core/mds-types'
 import urls from 'url'
@@ -268,7 +268,7 @@ export const submitVehicleEvent = async (
     function fin() {
       res.status(201).send({
         device_id,
-        status: EVENT_STATUS_MAP[event.event_type]
+        status: EVENT_STATES_MAP[event.event_type]
       })
     }
     const delta = now() - recorded
