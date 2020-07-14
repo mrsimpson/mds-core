@@ -60,8 +60,11 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   const recorded = now()
 
   const { provider_id, version } = res.locals
+  if (!version || version === '0.4.1') {
+    // convert old body into new body
+  }
   // const { device_id, vehicle_id, type, propulsion, year, mfgr, model } = body
-  const { device_id, vehicle_id, vehicle_types, propulsion_types, year, mfgr, model } = body
+  const { device_id, vehicle_id, vehicle_type, propulsion_types, year, mfgr, model } = body
 
   const status = VEHICLE_STATES.removed
 
@@ -81,8 +84,8 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     provider_id,
     device_id,
     vehicle_id,
-    type,
-    propulsion,
+    vehicle_type,
+    propulsion_types,
     year,
     mfgr,
     model,
@@ -245,7 +248,7 @@ export const submitVehicleEvent = async (
     device_id: req.params.device_id,
     provider_id: res.locals.provider_id,
     event_type: lower(req.body.event_type) as VEHICLE_EVENT,
-    event_type_reason: req.body.event_type_reason ? (lower(req.body.event_type_reason) as VEHICLE_REASON) : undefined,
+    // event_type_reason: req.body.event_type_reason ? (lower(req.body.event_type_reason) as VEHICLE_REASON) : undefined,
     telemetry: req.body.telemetry ? { ...req.body.telemetry, provider_id: res.locals.provider_id } : null,
     timestamp: req.body.timestamp,
     trip_id: req.body.trip_id,

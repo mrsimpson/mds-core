@@ -228,8 +228,8 @@ export interface Device {
   device_id: UUID
   provider_id: UUID
   vehicle_id: string
-  type: VEHICLE_TYPE
-  propulsion: PROPULSION_TYPE[]
+  vehicle_type: VEHICLE_TYPE // changed name in 1.0
+  propulsion_types: PROPULSION_TYPE[] // changed name in 1.0
   year?: number | null
   mfgr?: string | null
   model?: string | null

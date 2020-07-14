@@ -40,13 +40,13 @@ export function badDevice(device: Device): { error: string; error_description: s
     }
   }
   // propulsion is a list
-  if (!Array.isArray(device.propulsion)) {
+  if (!Array.isArray(device.propulsion_types)) {
     return {
       error: 'missing_param',
       error_description: 'missing propulsion types'
     }
   }
-  for (const prop of device.propulsion) {
+  for (const prop of device.propulsion_types) {
     if (!isEnum(PROPULSION_TYPES, prop)) {
       return {
         error: 'bad_param',
@@ -74,16 +74,16 @@ export function badDevice(device: Device): { error: string; error_description: s
       }
     }
   }
-  if (device.type === undefined) {
+  if (device.vehicle_type === undefined) {
     return {
       error: 'missing_param',
       error_description: 'missing enum field "type"'
     }
   }
-  if (!isEnum(VEHICLE_TYPES, device.type)) {
+  if (!isEnum(VEHICLE_TYPES, device.vehicle_type)) {
     return {
       error: 'bad_param',
-      error_description: `invalid device type ${device.type}`
+      error_description: `invalid device type ${device.vehicle_type}`
     }
   }
   // if (device.mfgr === undefined) {
@@ -409,12 +409,13 @@ export async function validateDeviceId(req: express.Request, res: express.Respon
   next()
 }
 
+// TODO: should we retire "register"?
 export async function writeRegisterEvent(device: Device, recorded: number) {
   const event: VehicleEvent = {
     device_id: device.device_id,
     provider_id: device.provider_id,
     event_type: VEHICLE_EVENTS.register,
-    event_type_reason: null,
+    // event_type_reason: null,
     telemetry: null,
     timestamp: recorded,
     trip_id: null,
