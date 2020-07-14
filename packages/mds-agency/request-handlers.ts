@@ -46,7 +46,6 @@ import {
   writeTelemetry,
   badEvent,
   badTelemetry,
-  writeRegisterEvent,
   readPayload,
   computeCompositeVehicleData
 } from './utils'
@@ -114,11 +113,6 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
       logger.error('failed to write device stream/cache', err)
     }
     logger.info('new', providerName(res.locals.provider_id), 'vehicle added', device)
-    try {
-      await writeRegisterEvent(device, recorded)
-    } catch (err) {
-      logger.error('writeRegisterEvent failure', err)
-    }
     res.status(201).send({})
   } catch (err) {
     if (String(err).includes('duplicate')) {
