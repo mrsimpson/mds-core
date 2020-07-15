@@ -458,7 +458,7 @@ export const submitVehicleTelemetry = async (
     res.status(500).send({
       error: 'server_error',
       error_description: 'None of the provided data was valid',
-      error_details: [` device_id ${data[0].device_id}: not found`]
+      error_details: [`device_id ${data[0].device_id}: not found`]
     })
   }
 }
