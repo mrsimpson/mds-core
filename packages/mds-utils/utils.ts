@@ -467,9 +467,9 @@ function inc(map: { [key: string]: number }, key: string) {
   return Object.assign(map, { [key]: map[key] ? map[key] + 1 : 1 })
 }
 
-function pathsFor(path: string): string[] {
+function pathPrefix(path: string): string {
   const { PATH_PREFIX } = process.env
-  return [path, PATH_PREFIX + path, `${PATH_PREFIX}/dev${path}`]
+  return PATH_PREFIX ? `${PATH_PREFIX}${path}` : path
 }
 
 function isInsideBoundingBox(telemetry: Telemetry | undefined | null, bbox: BoundingBox): boolean {
@@ -633,7 +633,7 @@ export {
   yesterday,
   csv,
   inc,
-  pathsFor,
+  pathPrefix,
   isInsideBoundingBox,
   head,
   tail,
