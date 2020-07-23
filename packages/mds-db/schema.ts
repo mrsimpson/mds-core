@@ -42,8 +42,9 @@ const COLUMN = Enum(
   'device_id',
   'effective_date',
   'end_time',
-  'event_type',
-  'event_type_reason',
+  'event_type', // deprecated 1.0 for event_types
+  'event_types', // new in 1.0
+  'event_type_reason', // deprecated 1.0, removed entirely
   'geography_id',
   'geography_json',
   'geography_metadata',
@@ -70,7 +71,8 @@ const COLUMN = Enum(
   'post_code',
   'prev_geographies',
   'propulsion',
-  'propulsion_type',
+  'propulsion_type', // deprecated 1.0 for propulsion_types
+  'propulsion_types', // new in 1.0
   'provider_device_id',
   'provider_id',
   'provider_name',
@@ -90,7 +92,9 @@ const COLUMN = Enum(
   'timestamp',
   'timezone',
   'trip_id',
-  'type',
+  'type', // deprecated 1.0 for vehicle_type
+  'vehicle_state', // new in 1.0
+  'vehicle_type', // new in 1.0
   'vehicle_id',
   'wheelchair_boarding',
   'year',
@@ -147,8 +151,10 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
     COLUMN.device_id,
     COLUMN.provider_id,
     COLUMN.vehicle_id,
-    COLUMN.type,
-    COLUMN.propulsion,
+    // COLUMN.type, // deprecated 1.0
+    COLUMN.vehicle_type, // added 1.0
+    // COLUMN.propulsion, // deprecated 1.0
+    COLUMN.propulsion_types, // added 1.0
     COLUMN.year,
     COLUMN.mfgr,
     COLUMN.model,
@@ -159,8 +165,10 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
     COLUMN.device_id,
     COLUMN.provider_id,
     COLUMN.timestamp,
-    COLUMN.event_type,
-    COLUMN.event_type_reason,
+    // COLUMN.event_type, // deprecated 1.0
+    COLUMN.event_types, // added 1.0
+    // COLUMN.event_type_reason, // deprecated 1.0
+    COLUMN.vehicle_state, // added 1.0
     COLUMN.telemetry_timestamp,
     COLUMN.trip_id,
     COLUMN.service_area_id,
@@ -257,6 +265,7 @@ const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {
   [COLUMN.effective_date]: 'bigint',
   [COLUMN.end_time]: 'bigint',
   [COLUMN.event_type]: 'varchar(31)',
+  [COLUMN.event_types]: 'varchar(31)[] NOT NULL',
   [COLUMN.event_type_reason]: 'varchar(31)',
   [COLUMN.geography_id]: 'uuid NOT NULL',
   [COLUMN.geography_json]: 'json NOT NULL',
@@ -285,6 +294,7 @@ const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {
   [COLUMN.prev_geographies]: 'uuid[]',
   [COLUMN.propulsion]: 'varchar(31)[] NOT NULL',
   [COLUMN.propulsion_type]: 'varchar(31)[] NOT NULL',
+  [COLUMN.propulsion_types]: 'varchar(31)[] NOT NULL',
   [COLUMN.provider_device_id]: 'uuid', // May be null if can't find
   [COLUMN.provider_id]: 'uuid NOT NULL',
   [COLUMN.provider_name]: 'varchar(127) NOT NULL',
@@ -306,6 +316,8 @@ const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {
   [COLUMN.trip_id]: 'uuid',
   [COLUMN.type]: 'varchar(31) NOT NULL',
   [COLUMN.vehicle_id]: 'varchar(255) NOT NULL',
+  [COLUMN.vehicle_state]: 'varchar(31) NOT NULL',
+  [COLUMN.vehicle_type]: 'varchar(31) NOT NULL',
   [COLUMN.wheelchair_boarding]: 'bool DEFAULT FALSE',
   [COLUMN.year]: 'smallint',
   [COLUMN.zone_id]: 'varchar(255)'
