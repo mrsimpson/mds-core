@@ -29,14 +29,13 @@ import {
   EVENT_STATES_MAP,
   VEHICLE_STATE,
   BBox,
-  VEHICLE_EVENT,
   SingleOrArray
 } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 import { MultiPolygon, Polygon, FeatureCollection, Geometry, Feature } from 'geojson'
 
 import { isArray } from 'util'
-import { getNextState } from './state-machine'
+import { getNextStates, isEventSequenceValid } from './state-machine'
 import { parseRelative, getCurrentDate } from './date-time-utils'
 
 const RADIUS = 30.48 // 100 feet, in meters
@@ -488,15 +487,6 @@ function isInsideBoundingBox(telemetry: Telemetry | undefined | null, bbox: Boun
   return false
 }
 
-function isStateTransitionValid(
-  eventA: VehicleEvent & { event_type: VEHICLE_EVENT },
-  eventB: VehicleEvent & { event_type: VEHICLE_EVENT }
-) {
-  const currState = EVENT_STATES_MAP[eventA.event_type]
-  const nextState = getNextState(currState, eventB.event_type)
-  return nextState !== undefined
-}
-
 function getPolygon(geographies: Geography[], geography: string): Geometry | FeatureCollection {
   const res = geographies.find((location: Geography) => {
     return location.geography_id === geography
@@ -507,14 +497,42 @@ function getPolygon(geographies: Geography[], geography: string): Geometry | Fea
   return res.geography_json
 }
 
+function areThereCommonElements<T>(arr1: T[], arr2: T[]) {
+  const set = new Set([...arr1, ...arr2])
+  return set.size !== arr1.length + arr2.length
+}
+
 function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
-  const status = rule.states ? rule.states[EVENT_STATES_MAP[event.event_type] as VEHICLE_STATE] : null
-  return status !== null
-    ? rule.states !== null &&
-        Object.keys(rule.states).includes(EVENT_STATES_MAP[event.event_type]) &&
-        status !== undefined &&
-        (status.length === 0 || (status as string[]).includes(event.event_type))
-    : true
+  const { states } = rule
+  // If no states are specified, then the rule applies to all VehicleStates.
+  if (states === null || states === undefined) {
+    return true
+  }
+
+  // States that it is possible to transition into with event.event_type
+  const possibleStates: VEHICLE_STATE[] = event.event_types.reduce((acc: VEHICLE_STATE[], event_type) => {
+    return acc.concat(EVENT_STATES_MAP[event_type])
+  }, [])
+  // The last element, assuming the provider didn't make a mistake, should be equivalent
+  // to the state of the event.
+  possibleStates.pop()
+  const result = possibleStates.reduce((acc, state) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const matchableEvents: any = states[state as VEHICLE_STATE]
+    /* If there's a match between the event_type's transitionable events, and the
+     rule doesn't specify any events, or if there is a match between the rule and the specified
+     events, the rule matches this event. e.g. if the rule says { `available`: [`comms_lost`]} or
+     { `available`: [] }, it would match an event with event_type `comm_lost`.
+    */
+    if (
+      matchableEvents !== undefined &&
+      (matchableEvents.length === 0 || areThereCommonElements(matchableEvents, event.event_types))
+    ) {
+      return acc + 1
+    }
+    return acc
+  }, 0)
+  return result > 0
 }
 
 function routeDistance(coordinates: { lat: number; lng: number }[]): number {
@@ -637,7 +655,8 @@ export {
   isInsideBoundingBox,
   head,
   tail,
-  isStateTransitionValid,
+  isEventSequenceValid,
+  getNextStates,
   pointInGeometry,
   getPolygon,
   isInStatesOrEvents,
