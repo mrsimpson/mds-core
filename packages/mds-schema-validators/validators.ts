@@ -410,10 +410,11 @@ export const validateEvent = (event: unknown) => {
       VEHICLE_EVENTS.trip_leave_jurisdiction
     ]
 
-    if (TRIP_EVENTS.includes(event_type)) {
+    // TODO what if there are more than one event in event_types?
+    if (TRIP_EVENTS.includes(event_types[0])) {
       return validateTripEvent(event)
     }
-    if (event_type === VEHICLE_EVENTS.provider_pick_up) {
+    if (event_types[0] === VEHICLE_EVENTS.maintenance_pick_up) {
       return validateProviderPickUpEvent(event)
     }
     if (event_type === VEHICLE_EVENTS.service_end) {
