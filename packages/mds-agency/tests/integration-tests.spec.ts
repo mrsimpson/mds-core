@@ -598,7 +598,7 @@ describe('Tests API', () => {
   })
   it('verifies read-back of post device status deregister success (db)', async () => {
     const event = await db.readEvent(DEVICE_UUID, test_event.timestamp)
-    test.assert(event.event_type === VEHICLE_EVENTS.decommissioned)
+    test.assert(event.event_types[0] === VEHICLE_EVENTS.decommissioned)
     test.assert(event.device_id === DEVICE_UUID)
   })
 

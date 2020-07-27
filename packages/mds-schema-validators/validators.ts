@@ -401,13 +401,13 @@ const validateDeregisterEvent = (event: VehicleEvent) => ValidateSchema(event, d
 
 export const validateEvent = (event: unknown) => {
   if (isValidEvent(event, { allowUnknown: true })) {
-    const { event_type } = event
+    const { event_types } = event
 
     const TRIP_EVENTS: string[] = [
       VEHICLE_EVENTS.trip_start,
       VEHICLE_EVENTS.trip_end,
-      VEHICLE_EVENTS.trip_enter,
-      VEHICLE_EVENTS.trip_leave
+      VEHICLE_EVENTS.trip_enter_jurisdiction,
+      VEHICLE_EVENTS.trip_leave_jurisdiction
     ]
 
     if (TRIP_EVENTS.includes(event_type)) {
