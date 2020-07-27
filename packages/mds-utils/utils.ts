@@ -27,7 +27,7 @@ import {
   Geography,
   Rule,
   EVENT_STATES_MAP,
-  VEHICLE_STATE,
+  // VEHICLE_STATE,
   BBox,
   VEHICLE_EVENT,
   SingleOrArray
@@ -508,12 +508,12 @@ function getPolygon(geographies: Geography[], geography: string): Geometry | Fea
 }
 
 function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
-  const status = rule.states ? rule.states[EVENT_STATES_MAP[event.event_type] as VEHICLE_STATE] : null
-  return status !== null
+  const states = rule.states ? rule.states[event.vehicle_state] : null
+  return states !== null
     ? rule.states !== null &&
-        Object.keys(rule.states).includes(EVENT_STATES_MAP[event.event_type]) &&
-        status !== undefined &&
-        (status.length === 0 || (status as string[]).includes(event.event_type))
+        Object.keys(rule.states).includes(event.vehicle_state) &&
+        states !== undefined &&
+        (states.length === 0 || event.event_types.includes(states)) // TODO this is wrong. intersection?
     : true
 }
 

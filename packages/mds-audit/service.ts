@@ -181,7 +181,7 @@ export async function getVehicle(provider_id: UUID, vehicle_id: string) {
   await Promise.all(
     devices.map(async device => {
       const deviceStatus = (await cache.readDeviceStatus(device.device_id)) as (VehicleEvent & Device) | null
-      if (deviceStatus === null || deviceStatus.event_type === VEHICLE_EVENTS.deregister) {
+      if (deviceStatus === null || deviceStatus.event_type === VEHICLE_EVENTS.decommissioned) {
         const { device_id } = device
         logger.info('Bad vehicle status', { deviceStatus, provider_id, vehicle_id, device_id })
         deviceStatusMap.inactive.push(device)

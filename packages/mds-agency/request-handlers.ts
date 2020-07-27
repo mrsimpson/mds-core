@@ -12,9 +12,7 @@ import {
   ErrorObject,
   DeviceID,
   VEHICLE_STATES,
-  EVENT_STATES_MAP,
   VEHICLE_EVENT,
-  // VEHICLE_REASON,
   UUID
 } from '@mds-core/mds-types'
 import urls from 'url'
@@ -241,7 +239,8 @@ export const submitVehicleEvent = async (
   const event: VehicleEvent = {
     device_id: req.params.device_id,
     provider_id: res.locals.provider_id,
-    event_type: lower(req.body.event_type) as VEHICLE_EVENT,
+    event_types: req.body.event_types.map(et => lower(et)) as VEHICLE_EVENT[],
+    vehicle_state: req.body.vehicle_state,
     // event_type_reason: req.body.event_type_reason ? (lower(req.body.event_type_reason) as VEHICLE_REASON) : undefined,
     telemetry: req.body.telemetry ? { ...req.body.telemetry, provider_id: res.locals.provider_id } : null,
     timestamp: req.body.timestamp,
@@ -265,7 +264,7 @@ export const submitVehicleEvent = async (
     function fin() {
       res.status(201).send({
         device_id,
-        status: EVENT_STATES_MAP[event.event_type]
+        state: event.vehicle_state
       })
     }
     const delta = now() - recorded
@@ -282,13 +281,13 @@ export const submitVehicleEvent = async (
   async function fail(err: Error | Partial<{ message: string }>): Promise<void> {
     const message = err.message || String(err)
     if (message.includes('duplicate')) {
-      logger.info(name, 'duplicate event', event.event_type)
+      logger.info(name, 'duplicate event', event.event_types)
       res.status(400).send({
         error: 'bad_param',
         error_description: 'An event with this device_id and timestamp has already been received'
       })
     } else if (message.includes('not found') || message.includes('unregistered')) {
-      logger.info(name, 'event for unregistered', event.device_id, event.event_type)
+      logger.info(name, 'event for unregistered', event.device_id, event.event_types)
       res.status(400).send({
         error: 'unregistered',
         error_description: 'The specified device_id has not been registered'

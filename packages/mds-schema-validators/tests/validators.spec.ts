@@ -189,7 +189,7 @@ describe('Tests validators', () => {
         validateEvent({
           device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
           provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
-          event_type: 'deregister',
+          event_type: 'decommissioned',
           telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
           timestamp: Date.now()
         }),
@@ -224,7 +224,7 @@ describe('Tests validators', () => {
           validateEvent({
             device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
             provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
-            event_type: 'deregister',
+            event_type: 'decommissioned',
             event_type_reason,
             telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
             timestamp: Date.now()

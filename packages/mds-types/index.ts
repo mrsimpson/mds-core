@@ -172,7 +172,7 @@ const StatusEventMap = <T extends { [S in VEHICLE_STATE]: Partial<typeof VEHICLE
 //   trip: Enum(VEHICLE_EVENTS.trip_start, VEHICLE_EVENTS.trip_enter),
 //   elsewhere: Enum(VEHICLE_EVENTS.trip_leave),
 //   removed: Enum(VEHICLE_EVENTS.register, VEHICLE_EVENTS.provider_pick_up, VEHICLE_EVENTS.agency_pick_up),
-//   inactive: Enum(VEHICLE_EVENTS.deregister)
+//   inactive: Enum(VEHICLE_EVENTS.decommissioned)
 // })
 export const STATE_EVENT_MAP = StatusEventMap({
   available: Enum(
@@ -234,7 +234,7 @@ export interface Device {
   mfgr?: string | null
   model?: string | null
   recorded: Timestamp
-  status?: VEHICLE_STATE | null
+  state?: VEHICLE_STATE | null
 }
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
@@ -247,8 +247,9 @@ export interface VehicleEvent {
   timestamp: Timestamp
   timestamp_long?: string | null
   delta?: Timestamp | null
-  event_type: VEHICLE_EVENT
-  // event_type_reason?: VEHICLE_REASON | null
+  event_types: VEHICLE_EVENT[] // changed to array in 1.0
+  vehicle_state: VEHICLE_STATE
+  // event_type_reason?: VEHICLE_REASON | null // deprecated in .
   telemetry_timestamp?: Timestamp | null
   telemetry?: Telemetry | null
   trip_id?: UUID | null
@@ -337,9 +338,8 @@ export interface AuditEvent extends TelemetryData {
 
 export interface AuditDetails extends Audit {
   events: WithGpsProperty<AuditEvent>[]
-  provider_event_type?: string | null
-  provider_event_type_reason?: string | null
-  provider_status?: string | null
+  provider_event_types?: string[] | null
+  provider_vehicle_state?: string | null
   provider_telemetry?: Telemetry | null
   provider_event_time?: Timestamp | null
   attachments: AttachmentSummary[]

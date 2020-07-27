@@ -495,7 +495,7 @@ function makeTelemetryStream(origin: Telemetry, steps: number) {
   return stream
 }
 
-function makeEvents(devices: Device[], timestamp: Timestamp, event_type = VEHICLE_EVENTS.deregister): VehicleEvent[] {
+function makeEvents(devices: Device[], timestamp: Timestamp, event_type = VEHICLE_EVENTS.decommissioned): VehicleEvent[] {
   if (!event_type) {
     throw new Error('empty event_type')
   }

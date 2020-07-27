@@ -15,10 +15,8 @@ import {
   VEHICLE_STATES,
   // VEHICLE_REASONS,
   PROPULSION_TYPES,
-  EVENT_STATES_MAP,
   BoundingBox,
-  VEHICLE_STATE,
-  VEHICLE_EVENT
+  VEHICLE_STATE
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -142,10 +140,10 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
-    const status = event ? EVENT_STATES_MAP[event.event_type] : VEHICLE_STATES.removed
+    const state = event ? event.vehicle_state : VEHICLE_STATES.removed
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
-    return [...acc, { ...device, status, telemetry, updated }]
+    return [...acc, { ...device, state, telemetry, updated }]
   }, [])
 
   const noNext = skip + take >= deviceIdSuperset.length
@@ -279,20 +277,22 @@ export async function badEvent(event: VehicleEvent) {
       error_description: `invalid timestamp ${event.timestamp}`
     }
   }
-  if (event.event_type === undefined) {
+  if (event.event_types === undefined) {
     return {
       error: 'missing_param',
       error_description: 'missing enum field "event_type"'
     }
   }
 
-  if (!isEnum(VEHICLE_EVENTS, event.event_type)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid event_type ${event.event_type}`
+  for (const event_type of event.event_types) {
+    if (!isEnum(VEHICLE_EVENTS, event_type)) {
+      // FIXME probably should look at all? does that exist?
+      return {
+        error: 'bad_param',
+        error_description: `invalid event_type ${event_type}`
+      }
     }
   }
-
   // if (event.event_type_reason && !isEnum(VEHICLE_REASONS, event.event_type_reason)) {
   //   return {
   //     error: 'bad_param',
@@ -326,22 +326,24 @@ export async function badEvent(event: VehicleEvent) {
 
   // event-specific checking goes last
   // TODO update events here
-  switch (event.event_type) {
-    case VEHICLE_EVENTS.trip_start:
-      return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_end:
-      return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_enter_jurisdiction:
-      return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_leave_jurisdiction:
-      return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.provider_drop_off:
-      return badTelemetry(event.telemetry)
-    case VEHICLE_EVENTS.reservation_start:
-    case VEHICLE_EVENTS.reservation_cancel:
-      return null
+  // TODO handle multiple event types
+  switch (event.event_types) {
+    // FIXME no really
+    // case VEHICLE_EVENTS.trip_start:
+    //   return badTelemetry(event.telemetry) || missingTripId()
+    // case VEHICLE_EVENTS.trip_end:
+    //   return badTelemetry(event.telemetry) || missingTripId()
+    // case VEHICLE_EVENTS.trip_enter_jurisdiction:
+    //   return badTelemetry(event.telemetry) || missingTripId()
+    // case VEHICLE_EVENTS.trip_leave_jurisdiction:
+    //   return badTelemetry(event.telemetry) || missingTripId()
+    // case VEHICLE_EVENTS.provider_drop_off:
+    //   return badTelemetry(event.telemetry)
+    // case VEHICLE_EVENTS.reservation_start:
+    // case VEHICLE_EVENTS.reservation_cancel:
+    //   return null
     default:
-      logger.warn(`unsure how to validate mystery event_type ${event.event_type}`)
+      logger.warn(`unsure how to validate mystery event_type in ${event.event_types}`)
       break
   }
   return null // we good
@@ -417,11 +419,11 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
   }
 
   if (event) {
-    composite.prev_event = event.event_type
+    composite.prev_event = event.event_types[event.event_types.length - 1] // TODO function?
     composite.updated = event.timestamp
-    composite.status = (EVENT_STATES_MAP[event.event_type as VEHICLE_EVENT] || 'unknown') as VEHICLE_STATE
+    composite.state = (event.vehicle_state || 'unknown') as VEHICLE_STATE
   } else {
-    composite.status = VEHICLE_STATES.removed
+    composite.state = VEHICLE_STATES.removed
     composite.prev_event = VEHICLE_EVENTS.decommissioned
   }
   if (telemetry) {

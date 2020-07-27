@@ -419,7 +419,7 @@ export const validateEvent = (event: unknown) => {
     if (event_type === VEHICLE_EVENTS.service_end) {
       return validateServiceEndEvent(event)
     }
-    if (event_type === VEHICLE_EVENTS.deregister) {
+    if (event_type === VEHICLE_EVENTS.decommissioned) {
       return validateDeregisterEvent(event)
     }
 

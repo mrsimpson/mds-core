@@ -27,7 +27,7 @@ import {
   SHERPA_LA_PROVIDER_ID,
   BOLT_PROVIDER_ID
 } from '@mds-core/mds-providers'
-import { VEHICLE_EVENT, EVENT_STATES_MAP, VEHICLE_STATE } from '@mds-core/mds-types'
+import { VEHICLE_EVENT, VEHICLE_STATE } from '@mds-core/mds-types'
 import { requestPromiseExceptionHelper, MAX_TIMEOUT_MS } from './utils'
 import { VehicleCountResponse, LastDayStatsResponse, MetricsSheetRow, VehicleCountRow } from './types'
 
@@ -60,18 +60,18 @@ export function percent(a: number, total: number) {
 export function eventCountsToStatusCounts(events: { [s in VEHICLE_EVENT]: number }) {
   return (Object.keys(events) as VEHICLE_EVENT[]).reduce(
     (acc: { [s in VEHICLE_STATE]: number }, event) => {
-      const status = EVENT_STATES_MAP[event]
+      const state = event.vehicle_state
       return Object.assign(acc, {
-        [status]: acc[status] + events[event]
+        [state]: acc[state] + events[event]
       })
     },
     {
       available: 0,
-      unavailable: 0,
+      non_operational: 0,
       reserved: 0,
       trip: 0,
       removed: 0,
-      inactive: 0,
+      unknown: 0,
       elsewhere: 0
     }
   )
@@ -83,13 +83,13 @@ export const mapProviderToPayload = (provider: VehicleCountRow, last: LastDaySta
   const d = new Date()
   let [enters, leaves, starts, ends, start_sla, end_sla, telems, telem_sla] = [0, 0, 0, 0, 0, 0, 0, 0]
   let event_counts = { service_start: 0, provider_drop_off: 0, trip_start: 0, trip_end: 0 }
-  let status_counts = {
+  let state_counts = {
     available: 0,
-    unavailable: 0,
+    non_operational: 0,
     reserved: 0,
     trip: 0,
     removed: 0,
-    inactive: 0,
+    unknown: 0,
     elsewhere: 0
   }
   const { event_counts_last_24h, late_event_counts_last_24h, late_telemetry_counts_last_24h } = last[
@@ -97,11 +97,11 @@ export const mapProviderToPayload = (provider: VehicleCountRow, last: LastDaySta
   ]
   if (event_counts_last_24h) {
     event_counts = event_counts_last_24h
-    status_counts = eventCountsToStatusCounts(event_counts_last_24h)
+    state_counts = eventCountsToStatusCounts(event_counts_last_24h)
     starts = event_counts_last_24h.trip_start || 0
     ends = event_counts_last_24h.trip_end || 0
-    enters = event_counts_last_24h.trip_enter || 0
-    leaves = event_counts_last_24h.trip_leave || 0
+    enters = event_counts_last_24h.trip_enter_jurisdiction || 0
+    leaves = event_counts_last_24h.trip_leave_jurisdiction || 0
     telems = last[provider.provider_id].telemetry_counts_last_24h || 0
     if (late_telemetry_counts_last_24h !== undefined && late_telemetry_counts_last_24h !== null) {
       telem_sla = telems ? percent(late_telemetry_counts_last_24h, telems) : 0
@@ -116,8 +116,12 @@ export const mapProviderToPayload = (provider: VehicleCountRow, last: LastDaySta
     name: provider.provider,
     registered: provider.count || 0,
     deployed:
-      sum([provider.status.available, provider.status.unavailable, provider.status.trip, provider.status.reserved]) ||
-      0,
+      sum([
+        provider.status.available,
+        provider.status.non_operational,
+        provider.status.on_trip,
+        provider.status.reserved
+      ]) || 0,
     validtrips: 'tbd', // Placeholder for next day valid trip analysis
     trips: last[provider.provider_id].trips_last_24h || 0,
     servicestart: event_counts.service_start || 0,
@@ -130,13 +134,7 @@ export const mapProviderToPayload = (provider: VehicleCountRow, last: LastDaySta
     telemetrysla: telem_sla,
     tripstartsla: start_sla,
     tripendsla: end_sla,
-    available: status_counts.available,
-    unavailable: status_counts.unavailable,
-    reserved: status_counts.reserved,
-    trip: status_counts.trip,
-    removed: status_counts.removed,
-    inactive: status_counts.inactive,
-    elsewhere: status_counts.elsewhere
+    ...state_counts
   }
 }
 
