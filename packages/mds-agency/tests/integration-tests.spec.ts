@@ -106,7 +106,8 @@ let testTimestamp = now()
 
 const test_event = {
   device_id: DEVICE_UUID,
-  event_type: VEHICLE_EVENTS.deregister,
+  event_type: [VEHICLE_EVENTS.decommissioned],
+  vehicle_state: VEHICLE_STATES,
   timestamp: testTimestamp
 }
 
@@ -568,22 +569,6 @@ describe('Tests API', () => {
       })
   })
 
-  it('verifies service_end success', done => {
-    request
-      .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
-      .set('Authorization', AUTH)
-      .send({
-        event_type: VEHICLE_EVENTS.service_end,
-        telemetry: TEST_TELEMETRY,
-        timestamp: testTimestamp
-      })
-      .expect(201)
-      .end((err, result) => {
-        test.string(result.body.status).is('unavailable')
-        done(err)
-      })
-  })
-
   // status
   it('verifies post device status deregister success', done => {
     request
@@ -596,9 +581,10 @@ describe('Tests API', () => {
         done(err)
       })
   })
-  it('verifies read-back of post device status deregister success (db)', async () => {
+
+  it('verifies read-back of post device status decomissioned success (db)', async () => {
     const event = await db.readEvent(DEVICE_UUID, test_event.timestamp)
-    test.assert(event.event_type === VEHICLE_EVENTS.deregister)
+    test.assert(event.event_types[0] === VEHICLE_EVENTS.decommissioned)
     test.assert(event.device_id === DEVICE_UUID)
   })
 
