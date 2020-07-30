@@ -35,7 +35,6 @@ import {
   Device
 } from '@mds-core/mds-types'
 import * as Joi from '@hapi/joi'
-import { ExtensionBoundSchema, State as JoiState, ValidationOptions as JoiValidationOptions } from 'hapi__joi'
 
 import joiToJsonSchema from 'joi-to-json-schema'
 
@@ -171,94 +170,6 @@ const eventSchema = Joi.object().keys({
 
 const tripEventSchema = eventSchema.keys({
   trip_id: uuidSchema.required()
-})
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const eventClassificationSchema = Joi.extend((joi: any) => ({
-  base: joi.array(),
-  name: 'eventClassifier',
-  language: {
-    serviceEnd: 'last event_type is not a valid serviceEnd event_type'
-  },
-  pre(value: VEHICLE_EVENT, state: JoiState, options: JoiValidationOptions) {
-    return value[value.length - 1]
-  },
-  rules: [
-    {
-      name: 'serviceEndSchema',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setup(params: any) {
-        // eslint-disable-next-line no-underscore-dangle, no-param-reassign
-        joi._flags.correctType = true
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      validate(params: any, value: any, state: JoiState, options: JoiValidationOptions) {
-        // 'low_battery', 'maintenance', 'compliance', 'off_hours'
-        if (
-          ![
-            'battery_low',
-            'unspecified',
-            'decommissioned',
-            'maintenance',
-            'maintenance_pick_up',
-            'compliance_pick_up',
-            'rebalance_pick_up',
-            'agency_pick_up',
-            'system_suspend',
-            'off_hours'
-          ].includes(value)
-        ) {
-          return joi.createError('eventClassifier.serviceEnd', { v: value }, state, options)
-        }
-        return value
-      }
-    },
-
-    {
-      name: 'providerPickUpEventSchema',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setup(params: any) {
-        // eslint-disable-next-line no-underscore-dangle, no-param-reassign
-        joi._flags.correctType = true
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      validate(params: any, value: any, state: JoiState, options: JoiValidationOptions) {
-        // event_type_reason: stringSchema.valid(['rebalance', 'maintenance', 'charge', 'compliance']).required()
-        if (!['maintenance', 'maintenance_pick_up', 'rebalance_pick_up', 'compliance_pick_up'].includes(value)) {
-          return joi.createError('eventClassifier.serviceEnd', { v: value }, state, options)
-        }
-        return value
-      }
-    },
-    {
-      name: 'deregisterEventSchema',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setup(params: any) {
-        // eslint-disable-next-line no-underscore-dangle, no-param-reassign
-        joi._flags.correctType = true
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      validate(params: any, value: any, state: JoiState, options: JoiValidationOptions) {
-        // event_types: stringSchema.valid(['missing', 'decomissioned']).required()
-        if (!['missing', 'decommissioned'].includes(value)) {
-          return joi.createError('eventClassifier.serviceEnd', { v: value }, state, options)
-        }
-        return value
-      }
-    }
-  ]
-}))
-
-const serviceEndEventSchema = eventSchema.keys({
-  event_type: eventClassificationSchema.eventClassifier.serviceEnd().required()
-})
-
-const providerPickUpEventSchema = eventSchema.keys({
-  event_types: eventClassificationSchema.providerPickUpEventSchema().required()
-})
-
-const deregisterEventSchema = eventSchema.keys({
-  event_types: eventClassificationSchema.deregisterEventSchema().required()
 })
 
 const auditEventTypeSchema = (accept?: AUDIT_EVENT_TYPE[]): Joi.StringSchema =>
@@ -401,11 +312,11 @@ export const isValidDevice = (value: unknown, options: Partial<ValidatorOptions>
 export const isValidEvent = (value: unknown, options: Partial<ValidatorOptions> = {}): value is VehicleEvent =>
   ValidateSchema(value, eventSchema, options)
 
-export const isValidVehicleEventType = (
+export const isValidVehicleEventTypes = (
   value: unknown,
   options: Partial<ValidatorOptions> = {}
-): value is VEHICLE_EVENT =>
-  ValidateSchema(value, vehicleEventTypesSchema, { property: 'vehicle_event_type', ...options })
+): value is VEHICLE_EVENT[] =>
+  ValidateSchema(value, vehicleEventTypesSchema, { property: 'vehicle_event_types', ...options })
 
 export const isValidAuditIssueCode = (value: unknown, options: Partial<ValidatorOptions> = {}): value is string =>
   ValidateSchema(value, auditIssueCodeSchema, { property: 'audit_issue_code', ...options })
@@ -471,12 +382,6 @@ export function rawValidatePolicy(policy: Policy): Joi.ValidationResult<Policy> 
 
 const validateTripEvent = (event: VehicleEvent) => ValidateSchema(event, tripEventSchema, {})
 
-const validateProviderPickUpEvent = (event: VehicleEvent) => ValidateSchema(event, providerPickUpEventSchema, {})
-
-const validateServiceEndEvent = (event: VehicleEvent) => ValidateSchema(event, serviceEndEventSchema, {})
-
-const validateDeregisterEvent = (event: VehicleEvent) => ValidateSchema(event, deregisterEventSchema, {})
-
 export const validateEvent = (event: unknown) => {
   if (isValidEvent(event, { allowUnknown: true })) {
     const event_type = tail(event.event_types)
@@ -486,16 +391,6 @@ export const validateEvent = (event: unknown) => {
     if (TRIP_EVENTS.includes(event_type)) {
       return validateTripEvent(event)
     }
-    if (event_type === VEHICLE_EVENTS.provider_pick_up) {
-      return validateProviderPickUpEvent(event)
-    }
-    if (event_type === VEHICLE_EVENTS.service_end) {
-      return validateServiceEndEvent(event)
-    }
-    if (event_type === VEHICLE_EVENTS.deregister) {
-      return validateDeregisterEvent(event)
-    }
-
     return ValidateSchema(event, eventSchema, {})
   }
 }

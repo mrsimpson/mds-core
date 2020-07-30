@@ -1,7 +1,7 @@
 import express from 'express'
 import { Query } from 'express-serve-static-core'
 
-import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox } from '@mds-core/mds-utils'
+import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox, tail } from '@mds-core/mds-utils'
 import stream from '@mds-core/mds-stream'
 import {
   UUID,
@@ -13,12 +13,9 @@ import {
   VEHICLE_EVENTS,
   VEHICLE_TYPES,
   VEHICLE_STATES,
-  // VEHICLE_REASONS,
   PROPULSION_TYPES,
-  EVENT_STATES_MAP,
   BoundingBox,
-  VEHICLE_STATE,
-  VEHICLE_EVENT
+  VEHICLE_STATE
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -142,7 +139,7 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
-    const status = event ? EVENT_STATES_MAP[event.event_type] : VEHICLE_STATES.removed
+    const status = event ? event.vehicle_state : VEHICLE_STATES.removed
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
     return [...acc, { ...device, status, telemetry, updated }]
@@ -279,17 +276,21 @@ export async function badEvent(event: VehicleEvent) {
       error_description: `invalid timestamp ${event.timestamp}`
     }
   }
-  if (event.event_type === undefined) {
+  if (event.event_types === undefined) {
     return {
       error: 'missing_param',
       error_description: 'missing enum field "event_type"'
     }
   }
 
-  if (!isEnum(VEHICLE_EVENTS, event.event_type)) {
+  const invalidEventTypes = event.event_types.filter(function isInValidEventType(event_type) {
+    return !isEnum(VEHICLE_EVENTS, event_type)
+  })
+
+  if (invalidEventTypes.length > 0) {
     return {
       error: 'bad_param',
-      error_description: `invalid event_type ${event.event_type}`
+      error_description: `invalid event_type(s) ${invalidEventTypes.join(', ')}`
     }
   }
 
@@ -326,7 +327,7 @@ export async function badEvent(event: VehicleEvent) {
 
   // event-specific checking goes last
   // TODO update events here
-  switch (event.event_type) {
+  switch (tail(event.event_types)) {
     case VEHICLE_EVENTS.trip_start:
       return badTelemetry(event.telemetry) || missingTripId()
     case VEHICLE_EVENTS.trip_end:
@@ -341,7 +342,7 @@ export async function badEvent(event: VehicleEvent) {
     case VEHICLE_EVENTS.reservation_cancel:
       return null
     default:
-      logger.warn(`unsure how to validate mystery event_type ${event.event_type}`)
+      logger.warn(`unsure how to validate mystery event_type ${tail(event.event_types)}`)
       break
   }
   return null // we good
@@ -417,12 +418,12 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
   }
 
   if (event) {
-    composite.prev_event = event.event_type
+    composite.prev_events = event.event_types
     composite.updated = event.timestamp
-    composite.status = (EVENT_STATES_MAP[event.event_type as VEHICLE_EVENT] || 'unknown') as VEHICLE_STATE
+    composite.status = event.vehicle_state as VEHICLE_STATE
   } else {
     composite.status = VEHICLE_STATES.removed
-    composite.prev_event = VEHICLE_EVENTS.decommissioned
+    composite.prev_events = [VEHICLE_EVENTS.decommissioned]
   }
   if (telemetry) {
     if (telemetry.gps) {

@@ -20,7 +20,7 @@ import { AUDIT_EVENT_TYPES, VEHICLE_EVENTS } from '@mds-core/mds-types'
 import { providers } from '@mds-core/mds-providers' // map of uuids -> obj
 import {
   isValidAuditTripId,
-  isValidVehicleEventType,
+  isValidVehicleEventTypes,
   isValidTelemetry,
   isValidDeviceId,
   isValidAuditDeviceId,
@@ -168,101 +168,11 @@ describe('Tests validators', () => {
   })
 
   it('verifies Vehicle Event Type validator', done => {
-    test.assert.throws(() => isValidVehicleEventType(undefined), ValidationError)
-    test.assert.throws(() => isValidVehicleEventType(null), ValidationError)
-    test.assert.throws(() => isValidVehicleEventType('invalid'), ValidationError)
-    test.value(isValidVehicleEventType(AUDIT_EVENT_TYPES.telemetry, { assert: false })).is(false)
-    test.value(isValidVehicleEventType(VEHICLE_EVENTS.trip_end)).is(true)
-    done()
-  })
-
-  it('verifies Vehicle Event validator', done => {
-    const DEREGISTER_EVENT_TYPE_REASONS = ['missing', 'decomissioned']
-    const PROVIDER_PICK_UP_EVENT_TYPE_REASONS = ['rebalance', 'maintenance', 'charge', 'compliance']
-    const SERVICE_END_EVENT_TYPE_REASONS = ['low_battery', 'maintenance', 'compliance', 'off_hours']
-
-    test.assert.throws(() => validateEvent(undefined), ValidationError)
-    test.assert.throws(() => validateEvent(null), ValidationError)
-    test.assert.throws(() => validateEvent('invalid'), ValidationError)
-    test.assert.throws(
-      () =>
-        validateEvent({
-          device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
-          provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
-          event_type: 'deregister',
-          telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
-          timestamp: Date.now()
-        }),
-      ValidationError
-    )
-    test.assert.throws(
-      () =>
-        validateEvent({
-          device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
-          provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
-          event_type: 'provider_pick_up',
-          telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
-          timestamp: Date.now()
-        }),
-      ValidationError
-    )
-    test.assert.throws(
-      () =>
-        validateEvent({
-          device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
-          provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
-          event_type: 'service_end',
-          telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
-          timestamp: Date.now()
-        }),
-      ValidationError
-    )
-
-    DEREGISTER_EVENT_TYPE_REASONS.forEach(event_type_reason => {
-      test
-        .value(
-          validateEvent({
-            device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
-            provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
-            event_type: 'deregister',
-            event_type_reason,
-            telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
-            timestamp: Date.now()
-          })
-        )
-        .is(true)
-    })
-
-    PROVIDER_PICK_UP_EVENT_TYPE_REASONS.forEach(event_type_reason => {
-      test
-        .value(
-          validateEvent({
-            device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
-            provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
-            event_type: 'provider_pick_up',
-            event_type_reason,
-            telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
-            timestamp: Date.now()
-          })
-        )
-        .is(true)
-    })
-
-    SERVICE_END_EVENT_TYPE_REASONS.forEach(event_type_reason => {
-      test
-        .value(
-          validateEvent({
-            device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
-            provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
-            event_type: 'service_end',
-            event_type_reason,
-            telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
-            timestamp: Date.now()
-          })
-        )
-        .is(true)
-    })
-
+    test.assert.throws(() => isValidVehicleEventTypes(undefined), ValidationError)
+    test.assert.throws(() => isValidVehicleEventTypes(null), ValidationError)
+    test.assert.throws(() => isValidVehicleEventTypes('invalid'), ValidationError)
+    test.value(isValidVehicleEventTypes([AUDIT_EVENT_TYPES.telemetry], { assert: false })).is(false)
+    test.value(isValidVehicleEventTypes([VEHICLE_EVENTS.trip_end])).is(true)
     done()
   })
 

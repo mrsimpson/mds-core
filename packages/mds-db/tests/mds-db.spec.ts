@@ -61,8 +61,8 @@ function makeTrip(device: Device): Trip {
     provider_name: device.provider_id,
     device_id: device.device_id,
     vehicle_id: device.vehicle_id,
-    vehicle_type: device.type,
-    propulsion_type: device.propulsion,
+    vehicle_type: device.vehicle_type,
+    propulsion_types: device.propulsion_types,
     provider_trip_id: uuid(),
     trip_duration: rangeRandomInt(5),
     trip_distance: rangeRandomInt(5),
@@ -104,7 +104,7 @@ async function seedDB() {
     devices.slice(0, 9),
     startTime + 10,
     shapeUUID,
-    VEHICLE_EVENTS.deregister
+    VEHICLE_EVENTS.decommissioned
   )
   const tripEndEvent: VehicleEvent[] = makeEventsWithTelemetry(
     devices.slice(9, 10),
@@ -214,7 +214,7 @@ if (pg_info.database) {
       it('.getEventCountsPerProviderSince', async () => {
         const result = await MDSDBPostgres.getEventCountsPerProviderSince()
         assert.deepEqual(result[0].provider_id, JUMP_PROVIDER_ID)
-        assert.deepEqual(result[0].event_type, VEHICLE_EVENTS.deregister)
+        assert.deepEqual(result[0].event_type, VEHICLE_EVENTS.decommissioned)
         assert.deepEqual(result[0].count, 9)
         assert.deepEqual(result[1].provider_id, JUMP_PROVIDER_ID)
         assert.deepEqual(result[1].event_type, VEHICLE_EVENTS.trip_end)
@@ -227,7 +227,7 @@ if (pg_info.database) {
         const firstResult = result[0]
         assert(firstResult.provider_id)
         assert(firstResult.device_id)
-        assert(firstResult.event_type)
+        assert(firstResult.event_types)
         assert(firstResult.recorded)
         assert(firstResult.timestamp)
       })
