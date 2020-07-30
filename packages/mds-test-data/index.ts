@@ -522,13 +522,13 @@ function makeEventsWithTelemetry(
   devices: Device[],
   timestamp: Timestamp,
   area: UUID | Geometry,
-  speed = rangeRandomInt(10),
-  makeEventsWithTelemetryOptions: { event_types: VEHICLE_EVENT[]; vehicle_state: VEHICLE_STATE } = {
+  makeEventsWithTelemetryOptions: { event_types: VEHICLE_EVENT[]; vehicle_state: VEHICLE_STATE; speed: number } = {
     event_types: ['trip_start'],
-    vehicle_state: 'on_trip'
+    vehicle_state: 'on_trip',
+    speed: rangeRandomInt(10)
   }
 ): VehicleEvent[] {
-  const { event_types, vehicle_state } = makeEventsWithTelemetryOptions
+  const { event_types, vehicle_state, speed } = makeEventsWithTelemetryOptions
 
   return devices.map(device => {
     return {
