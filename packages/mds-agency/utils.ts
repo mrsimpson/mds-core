@@ -13,7 +13,6 @@ import {
   VEHICLE_EVENTS,
   VEHICLE_TYPES,
   VEHICLE_STATES,
-  // VEHICLE_REASONS,
   PROPULSION_TYPES,
   BoundingBox
 } from '@mds-core/mds-types'
