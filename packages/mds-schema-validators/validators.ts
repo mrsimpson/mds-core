@@ -37,7 +37,7 @@ import {
 import * as Joi from '@hapi/joi'
 import joiToJson from 'joi-to-json'
 
-import { ValidationError } from '@mds-core/mds-utils'
+import { ValidationError, areThereCommonElements } from '@mds-core/mds-utils'
 
 export { ValidationError }
 
@@ -173,18 +173,6 @@ const eventSchema = Joi.object().keys({
 
 const tripEventSchema = eventSchema.keys({
   trip_id: uuidSchema.required()
-})
-
-const serviceEndEventSchema = eventSchema.keys({
-  event_type_reason: stringSchema.valid('low_battery', 'maintenance', 'compliance', 'off_hours').required()
-})
-
-const providerPickUpEventSchema = eventSchema.keys({
-  event_type_reason: stringSchema.valid('rebalance', 'maintenance', 'charge', 'compliance').required()
-})
-
-const deregisterEventSchema = eventSchema.keys({
-  event_type_reason: stringSchema.valid('missing', 'decomissioned').required()
 })
 
 const auditEventTypeSchema = (accept?: AUDIT_EVENT_TYPE[]): Joi.StringSchema =>
@@ -397,34 +385,19 @@ export function rawValidatePolicy(policy: Policy): Joi.ValidationResult {
 
 const validateTripEvent = (event: VehicleEvent) => ValidateSchema(event, tripEventSchema, {})
 
-const validateProviderPickUpEvent = (event: VehicleEvent) => ValidateSchema(event, providerPickUpEventSchema, {})
-
-const validateServiceEndEvent = (event: VehicleEvent) => ValidateSchema(event, serviceEndEventSchema, {})
-
-const validateDeregisterEvent = (event: VehicleEvent) => ValidateSchema(event, deregisterEventSchema, {})
-
 export const validateEvent = (event: unknown) => {
   if (isValidEvent(event, { allowUnknown: true })) {
-    const { event_type } = event
+    const { event_types } = event
 
     const TRIP_EVENTS: string[] = [
       VEHICLE_EVENTS.trip_start,
       VEHICLE_EVENTS.trip_end,
-      VEHICLE_EVENTS.trip_enter,
-      VEHICLE_EVENTS.trip_leave
+      VEHICLE_EVENTS.trip_enter_jurisdiction,
+      VEHICLE_EVENTS.trip_leave_jurisdiction
     ]
 
-    if (TRIP_EVENTS.includes(event_type)) {
+    if (areThereCommonElements(TRIP_EVENTS, event_types)) {
       return validateTripEvent(event)
-    }
-    if (event_type === VEHICLE_EVENTS.provider_pick_up) {
-      return validateProviderPickUpEvent(event)
-    }
-    if (event_type === VEHICLE_EVENTS.service_end) {
-      return validateServiceEndEvent(event)
-    }
-    if (event_type === VEHICLE_EVENTS.deregister) {
-      return validateDeregisterEvent(event)
     }
 
     return ValidateSchema(event, eventSchema, {})

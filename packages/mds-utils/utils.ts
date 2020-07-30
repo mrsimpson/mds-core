@@ -497,7 +497,7 @@ function getPolygon(geographies: Geography[], geography: string): Geometry | Fea
   return res.geography_json
 }
 
-function areThereCommonElements<T>(arr1: T[], arr2: T[]) {
+function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
   const set = new Set([...arr1, ...arr2])
   return set.size !== arr1.length + arr2.length
 }
@@ -662,5 +662,6 @@ export {
   getEnvVar,
   asArray,
   pluralize,
-  filterDefined
+  filterDefined,
+  areThereCommonElements
 }
