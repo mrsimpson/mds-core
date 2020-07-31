@@ -76,7 +76,7 @@ function parseDevice(device: StringifiedCacheReadDeviceResult): Device {
       mfgr: device.mfgr ? device.mfgr : null,
       model: device.model ? device.model : null,
       recorded: Number(device.recorded),
-      status: device.status ? (device.status as VEHICLE_STATE) : null
+      state: device.state ? (device.state as VEHICLE_STATE) : null
     }
   }
   return device
