@@ -361,7 +361,7 @@ describe('Tests API', () => {
         // log('----------', result.body)
         test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
         test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
-        test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATES.removed)
+        test.object(result.body).match((obj: Device) => obj.state === VEHICLE_STATES.removed)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -375,7 +375,7 @@ describe('Tests API', () => {
         // log('----------', result.body)
         test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
         test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
-        test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATES.removed)
+        test.object(result.body).match((obj: Device) => obj.state === VEHICLE_STATES.removed)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -608,7 +608,7 @@ describe('Tests API', () => {
       .post(pathPrefix('/vehicles/' + 'bogus' + '/event'))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: VEHICLE_EVENTS.maintenance_pick_up,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
       })
@@ -624,7 +624,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH2)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: VEHICLE_EVENTS.maintenance_pick_up,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
       })
@@ -640,7 +640,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: VEHICLE_EVENTS.maintenance_pick_up,
         telemetry: TEST_TELEMETRY
       })
       .expect(400)
@@ -673,7 +673,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: VEHICLE_EVENTS.maintenance_pick_up,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
       })
@@ -687,7 +687,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: VEHICLE_EVENTS.maintenance_pick_up,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp - 1
       })
@@ -705,7 +705,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${TRIP_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: VEHICLE_EVENTS.maintenance_pick_up,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp
       })
@@ -721,7 +721,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: VEHICLE_EVENTS.maintenance_pick_up,
         event_type_reason: 'not_an_event_type',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp
@@ -1291,7 +1291,7 @@ describe('Tests API', () => {
         test.value(deviceB.provider_id).is(TEST1_PROVIDER_ID)
         test.value(deviceB.gps.lat).is(TEST_TELEMETRY.gps.lat)
         test.value(deviceB.status).is(VEHICLE_STATES.available)
-        test.value(deviceB.prev_event).is(VEHICLE_EVENTS.cancel_reservation)
+        test.value(deviceB.prev_event).is(VEHICLE_EVENTS.reservation_cancel)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -1303,15 +1303,15 @@ describe('Tests API', () => {
     await request
       .post(pathPrefix(`/vehicles/${JUMP_TEST_DEVICE_1_ID}/event`))
       .set('Authorization', AUTH)
-      .send({ device_id: JUMP_TEST_DEVICE_1, timestamp: now(), event_type: VEHICLE_EVENTS.deregister })
+      .send({ device_id: JUMP_TEST_DEVICE_1, timestamp: now(), event_type: VEHICLE_EVENTS.decommissioned })
       .expect(201)
 
     const result = await request
       .get(pathPrefix(`/vehicles/${JUMP_TEST_DEVICE_1_ID}`))
       .set('Authorization', AUTH)
       .expect(200)
-    test.assert(result.body.status === VEHICLE_STATES.inactive)
-    test.assert(result.body.prev_event === VEHICLE_EVENTS.deregister)
+    test.assert(result.body.status === VEHICLE_STATES.removed)
+    test.assert(result.body.prev_event === VEHICLE_EVENTS.decommissioned)
   })
 
   it('get multiple devices endpoint has vehicle status default to `inactive` if event is missing for a device', async () => {
@@ -1320,7 +1320,7 @@ describe('Tests API', () => {
     test.assert(ids.includes(JUMP_TEST_DEVICE_1_ID))
     result.body.vehicles.map((device: any) => {
       if (device.device_id === JUMP_TEST_DEVICE_1_ID) {
-        test.assert(device.status === VEHICLE_STATES.inactive)
+        test.assert(device.status === VEHICLE_STATES.removed)
       }
     })
   })

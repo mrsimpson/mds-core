@@ -40,7 +40,7 @@ export type AgencyApiGetVehiclesByProviderResponse = AgencyApiResponse<Paginated
 export type AgencyApiUpdateVehicleResponse = AgencyApiResponse
 export type AgencyApiSubmitVehicleEventResponse = AgencyApiResponse<{
   device_id: UUID
-  status: VEHICLE_STATE
+  state: VEHICLE_STATE
 }>
 
 export type AgencyApiSubmitVehicleTelemetryResponse = AgencyApiResponse<{

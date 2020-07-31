@@ -148,6 +148,9 @@ function api(app: express.Express): express.Express {
     const { timestamp } = {
       ...parseRequest(req).single({ parser: Number }).query('timestamp')
     }
+    if (timestamp) {
+      return res.status(400).send({ error: new BadParamsError('timestamp deprecated') })
+    }
     const query_date = timestamp || now()
     if (!AllowedProviderIDs.includes(res.locals.provider_id)) {
       return res.status(401).send({ error: new AuthorizationError('Unauthorized') })
@@ -182,7 +185,7 @@ function api(app: express.Express): express.Express {
         return [...acc, getPolygon(geographies, geography.geography_id)]
       }, [])
 
-      const events = timestamp ? await db.readHistoricalEvents({ end_date: timestamp }) : await cache.readAllEvents()
+      const events = await cache.readAllEvents()
 
       // https://stackoverflow.com/a/51577579 to remove nulls in typesafe way
       const filteredVehicleEvents = events.filter(

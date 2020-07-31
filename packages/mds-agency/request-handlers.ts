@@ -263,7 +263,7 @@ export const submitVehicleEvent = async (
     function fin() {
       res.status(201).send({
         device_id,
-        status: event.vehicle_state
+        state: event.vehicle_state
       })
     }
     const delta = now() - recorded

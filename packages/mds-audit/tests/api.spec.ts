@@ -32,7 +32,7 @@ import {
   AUDIT_EVENT_TYPES,
   PROPULSION_TYPES,
   VEHICLE_EVENTS,
-  VEHICLE_REASONS,
+  VEHICLE_STATES,
   VEHICLE_TYPES
 } from '@mds-core/mds-types'
 import { makeEventsWithTelemetry, makeDevices, makeTelemetryInArea, SCOPED_AUTH } from '@mds-core/mds-test-data'
@@ -82,8 +82,8 @@ describe('Testing API', () => {
     const baseEvent = {
       provider_id,
       device_id: provider_device_id,
-      event_type: VEHICLE_EVENTS.agency_drop_off,
-      event_type_reason: VEHICLE_REASONS.rebalance,
+      event_types: [VEHICLE_EVENTS.agency_drop_off],
+      vehicle_state: VEHICLE_STATES.available,
       telemetry_timestamp: AUDIT_START,
       trip_id: uuid(),
       timestamp: AUDIT_START,
@@ -366,7 +366,6 @@ describe('Testing API', () => {
         test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
         test.value(result.body.events.length).is(7)
         test.value(result.body.provider_event_type).is(VEHICLE_EVENTS.agency_drop_off)
-        test.value(result.body.provider_event_type_reason).is(VEHICLE_REASONS.rebalance)
         test.value(result.body.provider_status).is('available')
         test.value(result.body.provider_telemetry.charge).is(0.5)
         test.value(result.body.provider_event_time).is(AUDIT_START)

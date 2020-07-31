@@ -72,18 +72,18 @@ export function categorizeTrips(perTripId: TripsData): { [s: string]: TripsStats
     } else if (head(events) === VEHICLE_EVENTS.trip_start && tail(events) === VEHICLE_EVENTS.trip_end) {
       inc(counts, 'simple') // simple: starts with start, ends with end
     } else if (head(events) === VEHICLE_EVENTS.trip_start) {
-      if (tail(events) === VEHICLE_EVENTS.trip_leave) {
+      if (tail(events) === VEHICLE_EVENTS.trip_leave_jurisdiction) {
         inc(counts, 'left') // left: started with start, ends with leave
       } else {
         inc(counts, 'noEnd') // noEnd: started with start, did not end with end or leave
       }
     } else if (tail(events) === VEHICLE_EVENTS.trip_end) {
-      if (head(events) === VEHICLE_EVENTS.trip_enter) {
+      if (head(events) === VEHICLE_EVENTS.trip_enter_jurisdiction) {
         inc(counts, 'entered') // entered: started with enter, ends with end
       } else {
         inc(counts, 'noStart') // noStart: weird start, ends with end
       }
-    } else if (head(events) === VEHICLE_EVENTS.trip_enter && tail(events) === VEHICLE_EVENTS.trip_leave) {
+    } else if (head(events) === VEHICLE_EVENTS.trip_enter_jurisdiction && tail(events) === VEHICLE_EVENTS.trip_leave_jurisdiction) {
       inc(counts, 'flyby') // flyby: starts with enter, ends with leave
     } else {
       inc(counts, 'mystery') // mystery: weird non-conforming trip

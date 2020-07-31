@@ -238,7 +238,7 @@ export interface Device {
   mfgr?: string | null
   model?: string | null
   recorded: Timestamp
-  status?: VEHICLE_STATE | null
+  state?: VEHICLE_STATE | null
 }
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
@@ -340,9 +340,8 @@ export interface AuditEvent extends TelemetryData {
 
 export interface AuditDetails extends Audit {
   events: WithGpsProperty<AuditEvent>[]
-  provider_event_type?: string | null
-  provider_event_type_reason?: string | null
-  provider_status?: string | null
+  provider_event_types?: string[] | null
+  provider_vehicle_state?: string | null
   provider_telemetry?: Telemetry | null
   provider_event_time?: Timestamp | null
   attachments: AttachmentSummary[]

@@ -14,7 +14,8 @@ import {
   VEHICLE_TYPES,
   VEHICLE_STATES,
   PROPULSION_TYPES,
-  BoundingBox
+  BoundingBox,
+  VEHICLE_STATE
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -138,10 +139,10 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
-    const status = event.vehicle_state
+    const state = event ? event.vehicle_state : VEHICLE_STATES.removed
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
-    return [...acc, { ...device, status, telemetry, updated }]
+    return [...acc, { ...device, state, telemetry, updated }]
   }, [])
 
   const noNext = skip + take >= deviceIdSuperset.length
@@ -405,9 +406,9 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
   if (event) {
     composite.prev_events = event.event_types
     composite.updated = event.timestamp
-    composite.status = event.vehicle_state
+    composite.state = event.vehicle_state
   } else {
-    composite.status = VEHICLE_STATES.removed
+    composite.state = VEHICLE_STATES.removed
     composite.prev_events = [VEHICLE_EVENTS.decommissioned]
   }
   if (telemetry) {
