@@ -275,11 +275,18 @@ export async function badEvent(event: VehicleEvent) {
       error_description: `invalid timestamp ${event.timestamp}`
     }
   }
-  if (event.event_types === undefined) {
+
+  console.log(event)
+
+  if (!event.event_types) {
     return {
       error: 'missing_param',
       error_description: 'missing enum field "event_type"'
     }
+  }
+
+  if (!Array.isArray(event.event_types)) {
+    return { error: 'bad_param', error_description: `invalid event_types ${event.event_types}` }
   }
 
   if (event.event_types.length === 0) {
@@ -289,10 +296,18 @@ export async function badEvent(event: VehicleEvent) {
     }
   }
 
-  event.event_types.forEach(event_type => {
+  for (const event_type of event.event_types) {
     if (!isEnum(VEHICLE_EVENTS, event_type))
       return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }
-  })
+  }
+
+  if (!event.vehicle_state) {
+    return { error: 'missing_param', error_description: 'missing enum field "vehicle_state"' }
+  }
+
+  if (!isEnum(VEHICLE_STATES, event.vehicle_state)) {
+    return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
+  }
 
   if (event.trip_id === '') {
     /* eslint-reason TODO remove eventually -- Lime is spraying empty-string values */
@@ -326,7 +341,7 @@ export async function badEvent(event: VehicleEvent) {
       event.event_types
     )
   )
-    return !badTelemetry(event.telemetry) && !missingTripId()
+    return badTelemetry(event.telemetry) || missingTripId()
 
   if (event.event_types.includes('provider_drop_off')) return badTelemetry(event.telemetry)
 
