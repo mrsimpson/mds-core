@@ -276,8 +276,6 @@ export async function badEvent(event: VehicleEvent) {
     }
   }
 
-  console.log(event)
-
   if (!event.event_types) {
     return {
       error: 'missing_param',
