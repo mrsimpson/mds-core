@@ -107,8 +107,8 @@ describe('Testing API', () => {
       device_id: provider_device_id,
       provider_id,
       vehicle_id: provider_vehicle_id,
-      propulsion: [PROPULSION_TYPES.electric],
-      type: VEHICLE_TYPES.scooter,
+      propulsion_types: [PROPULSION_TYPES.electric],
+      vehicle_type: VEHICLE_TYPES.scooter,
       recorded: AUDIT_START
     }).then(() => {
       db.writeEvent({
@@ -552,12 +552,20 @@ describe('Testing API', () => {
     let devices_c: Device[] // No events or telemetry
     before(done => {
       devices_a = makeDevices(10, now(), MOCHA_PROVIDER_ID)
-      const events_a = makeEventsWithTelemetry(devices_a, now(), SAN_FERNANDO_VALLEY, VEHICLE_EVENTS.trip_start)
+      const events_a = makeEventsWithTelemetry(devices_a, now(), SAN_FERNANDO_VALLEY, {
+        event_types: ['trip_start'],
+        vehicle_state: 'on_trip',
+        speed: rangeRandomInt(10)
+      })
       const telemetry_a = devices_a.map(device =>
         makeTelemetryInArea(device, now(), SAN_FERNANDO_VALLEY, rangeRandomInt(10))
       )
       devices_b = makeDevices(10, now(), MOCHA_PROVIDER_ID)
-      const events_b = makeEventsWithTelemetry(devices_b, now(), CANALS, VEHICLE_EVENTS.trip_start)
+      const events_b = makeEventsWithTelemetry(devices_b, now(), CANALS, {
+        event_types: ['trip_start'],
+        vehicle_state: 'on_trip',
+        speed: rangeRandomInt(10)
+      })
       const telemetry_b = devices_b.map(device => makeTelemetryInArea(device, now(), CANALS, rangeRandomInt(10)))
       devices_c = makeDevices(10, now(), MOCHA_PROVIDER_ID)
 
@@ -691,8 +699,8 @@ describe('Testing API', () => {
           device_id: provider_device_id,
           provider_id,
           vehicle_id: provider_vehicle_id,
-          propulsion: [PROPULSION_TYPES.electric],
-          type: VEHICLE_TYPES.scooter,
+          propulsion_types: [PROPULSION_TYPES.electric],
+          vehicle_type: VEHICLE_TYPES.scooter,
           recorded: AUDIT_START
         })
         await db.writeAudit(audit)
