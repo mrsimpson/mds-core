@@ -14,8 +14,7 @@ import {
   VEHICLE_TYPES,
   VEHICLE_STATES,
   PROPULSION_TYPES,
-  BoundingBox,
-  VEHICLE_STATE
+  BoundingBox
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'

@@ -823,7 +823,8 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.reserve,
+        event_types: [VEHICLE_EVENTS.reservation_start],
+        vehicle_state: 'reserved',
         trip_id: TRIP_UUID,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
@@ -838,7 +839,8 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.cancel_reservation,
+        event_type: [VEHICLE_EVENTS.reservation_cancel],
+        vehicle_state: 'available',
         trip_id: TRIP_UUID,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
@@ -1040,13 +1042,13 @@ describe('Tests API', () => {
   // make sure it's ok to do so
   const lateTimestamp = testTimestamp - 200000 // 2000s before
   log('lateTimestamp', lateTimestamp)
-  it('verifies late-event service-end (rebalance) success', done => {
+  it('verifies late-event off-hours success', done => {
     request
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.service_end,
-        event_type_reason: 'rebalance',
+        event_type: [VEHICLE_EVENTS.off_hours],
+        vehicle_state: 'unavailable',
         telemetry: TEST_TELEMETRY,
         timestamp: lateTimestamp
       })
@@ -1057,17 +1059,17 @@ describe('Tests API', () => {
   })
 
   // read back posted event (cache should not work; it should only have latest)
-  it('verifies late-event read-back of service_end (rebalance) success (db)', async () => {
+  it('verifies late-event read-back of off-hours success (db)', async () => {
     const timestamp = lateTimestamp
 
     const event = await db.readEvent(DEVICE_UUID, timestamp)
-    test.object(event).match((obj: VehicleEvent) => obj.event_type_reason === 'rebalance')
+    test.object(event).match((obj: VehicleEvent) => obj.event_types[0] === 'off_hours')
   })
 
   // make sure we read back the latest event, not the past event
   it('verifies out-of-order event reads back latest (cache)', async () => {
     const event = await db.readEvent(DEVICE_UUID, 0)
-    test.assert(event.event_type === 'cancel_reservation')
+    test.assert(event.event_types[0] === 'reservation_cancel')
   })
 
   const WEIRD_UUID = '034e1c90-9f84-4292-a750-e8f395e4869d'
@@ -1077,8 +1079,8 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${WEIRD_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.service_end,
-        event_type_reason: 'rebalance',
+        event_type: [VEHICLE_EVENTS.off_hours],
+        vehicle_state: 'unavailable',
         telemetry: TEST_TELEMETRY,
         timestamp: lateTimestamp
       })
@@ -1273,7 +1275,7 @@ describe('Tests API', () => {
         test.value(deviceA.provider_id).is(TEST1_PROVIDER_ID)
         test.value(deviceA.gps.lat).is(TEST_TELEMETRY.gps.lat)
         test.value(deviceA.status).is(VEHICLE_STATES.available)
-        test.value(deviceA.prev_event).is(VEHICLE_EVENTS.cancel_reservation)
+        test.value(deviceA.prev_event).is(VEHICLE_EVENTS.reservation_cancel)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
