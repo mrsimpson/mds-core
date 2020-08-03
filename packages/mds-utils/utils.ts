@@ -525,8 +525,9 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
     [vehicle_state]
   )
 
-  const result = possibleStates.reduce((acc, state) => {
+  return possibleStates.some(state => {
     const matchableEvents: string[] | undefined = states[state as VEHICLE_STATE]
+
     /* If there's a match between the event_type's transitionable events, and the
      * rule doesn't specify any events, or if there is a match between the rule and the specified
      * events, the rule matches this event. e.g. if the rule says { `available`: [`on_hours`]} or
@@ -536,11 +537,10 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
       matchableEvents !== undefined &&
       (matchableEvents.length === 0 || areThereCommonElements(matchableEvents, event.event_types))
     ) {
-      return acc + 1
+      return true
     }
-    return acc
-  }, 0)
-  return result > 0
+    return false
+  })
 }
 
 function routeDistance(coordinates: { lat: number; lng: number }[]): number {
