@@ -509,13 +509,16 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
     return true
   }
 
-  // States that it is possible to transition into with event.event_type
-  const possibleStates: VEHICLE_STATE[] = event.event_types.reduce((acc: VEHICLE_STATE[], event_type) => {
+  const transientEventTypes = event.event_types.splice(0, -1)
+
+  // States that it is possible to transition into with transient event_types
+  const possibleStates: VEHICLE_STATE[] = transientEventTypes.reduce((acc: VEHICLE_STATE[], event_type) => {
     return acc.concat(EVENT_STATES_MAP[event_type])
   }, [])
-  // The last element, assuming the provider didn't make a mistake, should be equivalent
-  // to the state of the event.
-  possibleStates.pop()
+
+  // Add the vehicle state for the non-transient event_types
+  possibleStates.push(event.vehicle_state)
+
   const result = possibleStates.reduce((acc, state) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const matchableEvents: any = states[state as VEHICLE_STATE]
