@@ -521,8 +521,7 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
   possibleStates.push(event.vehicle_state)
 
   const result = possibleStates.reduce((acc, state) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const matchableEvents: any = states[state as VEHICLE_STATE]
+    const matchableEvents: string[] | undefined = states[state as VEHICLE_STATE]
     /* If there's a match between the event_type's transitionable events, and the
      rule doesn't specify any events, or if there is a match between the rule and the specified
      events, the rule matches this event. e.g. if the rule says { `available`: [`comms_lost`]} or
