@@ -509,6 +509,7 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
     return true
   }
 
+  // All event_types except the last
   const transientEventTypes = event.event_types.splice(0, -1)
 
   // States that it is possible to transition into with transient event_types
@@ -516,7 +517,7 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
     return acc.concat(EVENT_STATES_MAP[event_type])
   }, [])
 
-  // Add the vehicle state for the non-transient event_types
+  // Add the vehicle state for the non-transient event_types (the last or only event in event.event_types)
   possibleStates.push(event.vehicle_state)
 
   const result = possibleStates.reduce((acc, state) => {
