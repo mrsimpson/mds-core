@@ -524,8 +524,8 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
     const matchableEvents: string[] | undefined = states[state as VEHICLE_STATE]
     /* If there's a match between the event_type's transitionable events, and the
      rule doesn't specify any events, or if there is a match between the rule and the specified
-     events, the rule matches this event. e.g. if the rule says { `available`: [`comms_lost`]} or
-     { `available`: [] }, it would match an event with event_type `comm_lost`.
+     events, the rule matches this event. e.g. if the rule says { `available`: [`on_hours`]} or
+     { `available`: [] }, it would match an event with event_type `on_hours`.
     */
     if (
       matchableEvents !== undefined &&
