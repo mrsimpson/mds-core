@@ -11,8 +11,7 @@ import {
   makeTelemetryInArea,
   restrictedAreas,
   veniceSpecOps,
-  LA_CITY_BOUNDARY,
-  START_ONE_MONTH_AGO
+  LA_CITY_BOUNDARY
 } from '@mds-core/mds-test-data'
 import test from 'unit.js'
 import { api as agency } from '@mds-core/mds-agency'
@@ -170,28 +169,6 @@ const COUNT_POLICY_JSON_3: Policy = {
       geographies: [GEOGRAPHY_UUID],
       states: { available: ['on_hours'], non_operational: [], reserved: [], on_trip: [] },
       vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
-      maximum: 10
-    }
-  ]
-}
-
-const COUNT_POLICY_JSON_4: Policy = {
-  name: 'LADOT Mobility Caps',
-  description: 'Mobility caps as described in the One-Year Permit',
-  policy_id: COUNT_POLICY_UUID_4,
-  publish_date: 1558389669540,
-  start_date: 1558389669540,
-  end_date: null,
-  prev_policies: null,
-  provider_ids: [],
-  rules: [
-    {
-      name: 'Greater LA',
-      rule_id: '04dc545b-41d8-401d-89bd-bfac9247b555',
-      rule_type: RULE_TYPES.count,
-      geographies: [GEOGRAPHY_UUID],
-      states: { on_trip: [] },
-      vehicle_types: ['bicycle', 'scooter'],
       maximum: 10
     }
   ]
