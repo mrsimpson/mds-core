@@ -511,11 +511,11 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
 
   const { event_types, vehicle_state } = event
 
-  // All event_types except the last
+  // All event_types except the last (in most cases this will be an empty list)
   const transientEventTypes = event_types.splice(0, -1)
 
   /**
-   * State encoded in the event payload (default in reducer) + states that it is
+   * State encoded in the event payload (default acc in the reducer) + states that it is
    * possible to transition into with any transient event_types
    */
   const possibleStates: VEHICLE_STATE[] = transientEventTypes.reduce(
