@@ -15,7 +15,6 @@
  */
 
 import {
-  VEHICLE_EVENTS,
   PROPULSION_TYPE,
   VEHICLE_EVENT,
   VEHICLE_TYPES,
@@ -502,7 +501,7 @@ function makeEvents(
   makeEventsOptions: {
     event_types: VEHICLE_EVENT[]
     vehicle_state: VEHICLE_STATE
-  } = { event_types: [VEHICLE_EVENTS.trip_start], vehicle_state: 'on_trip' }
+  } = { event_types: ['trip_start'], vehicle_state: 'on_trip' }
 ): VehicleEvent[] {
   const { event_types, vehicle_state } = makeEventsOptions
 
