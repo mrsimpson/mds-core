@@ -17,7 +17,16 @@
 import logger from '@mds-core/mds-logger'
 
 import flatten from 'flat'
-import { NotFoundError, nullKeys, stripNulls, now, isInsideBoundingBox, routeDistance, tail } from '@mds-core/mds-utils'
+import {
+  NotFoundError,
+  nullKeys,
+  stripNulls,
+  now,
+  isInsideBoundingBox,
+  routeDistance,
+  tail,
+  setEmptyArraysToUndefined
+} from '@mds-core/mds-utils'
 import { UUID, Timestamp, Device, VehicleEvent, Telemetry, BoundingBox } from '@mds-core/mds-types'
 import redis from 'redis'
 import bluebird from 'bluebird'
@@ -192,7 +201,7 @@ async function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | 
   }
   const { device_id } = item
   const key = decorateKey(`device:${device_id}:${suffix}`)
-  const flat: { [key: string]: unknown } = flatten(item)
+  const flat: { [key: string]: unknown } = setEmptyArraysToUndefined(flatten(item))
   const nulls = nullKeys(flat)
   const hmap = stripNulls(flat) as { [key: string]: unknown; device_id: UUID }
   delete hmap.device_id

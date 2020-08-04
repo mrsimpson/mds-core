@@ -448,6 +448,13 @@ function stripNulls<T extends {}>(obj: { [x: string]: unknown }): Partial<T> {
   }, obj) as Partial<T>
 }
 
+const setEmptyArraysToUndefined = <T extends {}>(obj: { [x: string]: unknown }): Partial<T> => {
+  return Object.entries(obj).reduce((acc, [key, val]) => {
+    if (Array.isArray(val) && val.length === 0) return Object.assign(acc, { [key]: undefined })
+    return Object.assign(acc, { [key]: val })
+  }, {}) as Partial<T>
+}
+
 function isFloat(n: unknown): boolean {
   return typeof n === 'number' || (typeof n === 'string' && !Number.isNaN(parseFloat(n)))
 }
@@ -701,5 +708,6 @@ export {
   filterDefined,
   areThereCommonElements,
   isMicroMobilityEvent,
-  isTaxiEvent
+  isTaxiEvent,
+  setEmptyArraysToUndefined
 }

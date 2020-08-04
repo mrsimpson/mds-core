@@ -69,7 +69,9 @@ function parseEvent(
 function parseDevice(device: StringifiedCacheReadDeviceResult): Device {
   if (device) {
     return {
-      accessibility_options: device.accessibility_options as ACCESSIBILITY_OPTION[],
+      accessibility_options: device.accessibility_options
+        ? (device.accessibility_options as ACCESSIBILITY_OPTION[])
+        : [],
       device_id: device.device_id,
       provider_id: device.provider_id,
       vehicle_id: device.vehicle_id,
