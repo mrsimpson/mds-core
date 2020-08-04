@@ -37,7 +37,9 @@ import {
   VehicleEvent,
   Geography,
   Stop,
-  TAXI_VEHICLE_EVENTS
+  TAXI_VEHICLE_EVENTS,
+  TAXI_VEHICLE_EVENT,
+  MICRO_MOBILITY_VEHICLE_EVENTS
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
@@ -607,6 +609,7 @@ describe('Tests API', () => {
       .set('Authorization', AUTH)
       .send({
         event_types: ['BOGUS'],
+        vehicle_state: 'foo',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
       })
@@ -1578,25 +1581,28 @@ describe('Tests for taxi modality', async () => {
   /* We want to test for all micromobility events which
    * are not included in the valid Taxi events.
    */
-  // const MICRO_EVENTS_NOT_IN_TAXI_EVENTS = MICRO_EVENTS.filter(item => TAXI_EVENTS.indexOf(item as TAXI_EVENT) < 0)
+  const MICRO_MOBILITY_EVENTS_NOT_IN_TAXI_EVENTS = MICRO_MOBILITY_VEHICLE_EVENTS.filter(
+    item => TAXI_VEHICLE_EVENTS.indexOf(item as TAXI_VEHICLE_EVENT) < 0
+  )
 
-  // for (const microEvent of MICRO_EVENTS_NOT_IN_TAXI_EVENTS) {
-  //   it('verifies cannot send micro-mobility type event for a taxi', done => {
-  //     const { device_id } = TEST_TAXI
-  //     request
-  //       .post(`/vehicles/${device_id}/event`)
-  //       .set('Authorization', AUTH)
-  //       .send({
-  //         event_type: microEvent,
-  //         telemetry: TEST_TELEMETRY,
-  //         timestamp: now()
-  //       })
-  //       .expect(400)
-  //       .end((err, result) => {
-  //         test.string(result.body.error).contains('bad_param')
-  //         test.string(result.body.error_description).contains('invalid event_type')
-  //         done(err)
-  //       })
-  //   })
-  // }
+  for (const microEvent of MICRO_MOBILITY_EVENTS_NOT_IN_TAXI_EVENTS) {
+    it('verifies cannot send micro-mobility type event for a taxi', done => {
+      const { device_id } = TEST_TAXI
+      request
+        .post(pathPrefix(`/vehicles/${device_id}/event`))
+        .set('Authorization', AUTH)
+        .send({
+          event_types: [microEvent],
+          vehicle_state: 'available',
+          telemetry: TEST_TELEMETRY,
+          timestamp: now()
+        })
+        .expect(400)
+        .end((err, result) => {
+          test.string(result.body.error).contains('bad_param')
+          test.string(result.body.error_description).contains('invalid event_type')
+          done(err)
+        })
+    })
+  }
 })

@@ -1,7 +1,16 @@
 import express from 'express'
 import { Query } from 'express-serve-static-core'
 
-import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox, areThereCommonElements } from '@mds-core/mds-utils'
+import {
+  isUUID,
+  isPct,
+  isTimestamp,
+  isFloat,
+  isInsideBoundingBox,
+  areThereCommonElements,
+  isMicroMobilityEvent,
+  isTaxiEvent
+} from '@mds-core/mds-utils'
 import stream from '@mds-core/mds-stream'
 import {
   UUID,
@@ -10,14 +19,20 @@ import {
   Telemetry,
   ErrorObject,
   isEnum,
-  VEHICLE_EVENTS,
   VEHICLE_TYPES,
-  VEHICLE_STATES,
   PROPULSION_TYPES,
   BoundingBox,
   VEHICLE_STATE,
   ACCESSIBILITY_OPTIONS,
-  MODALITIES
+  MODALITIES,
+  MICRO_MOBILITY_VEHICLE_EVENTS,
+  MICRO_MOBILITY_VEHICLE_STATES,
+  TAXI_VEHICLE_EVENTS,
+  TAXI_VEHICLE_STATES,
+  MICRO_MOBILITY_VEHICLE_EVENT,
+  MICRO_MOBILITY_VEHICLE_STATE,
+  TAXI_VEHICLE_EVENT,
+  TAXI_VEHICLE_STATE
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -287,7 +302,7 @@ export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObje
 }
 
 // TODO Joi
-export async function badEvent(event: VehicleEvent) {
+export async function badEvent(device: Pick<Device, 'modality'>, event: VehicleEvent) {
   if (event.timestamp === undefined) {
     return {
       error: 'missing_param',
@@ -319,17 +334,31 @@ export async function badEvent(event: VehicleEvent) {
     }
   }
 
-  for (const event_type of event.event_types) {
-    if (!VEHICLE_EVENTS.includes(event_type))
-      return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }
-  }
-
   if (!event.vehicle_state) {
     return { error: 'missing_param', error_description: 'missing enum field "vehicle_state"' }
   }
 
-  if (!VEHICLE_STATES.includes(event.vehicle_state)) {
-    return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
+  const { modality } = device
+  if (modality === 'micro-mobility') {
+    for (const event_type of event.event_types) {
+      if (!MICRO_MOBILITY_VEHICLE_EVENTS.includes(event_type as MICRO_MOBILITY_VEHICLE_EVENT))
+        return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }
+    }
+
+    if (!MICRO_MOBILITY_VEHICLE_STATES.includes(event.vehicle_state as MICRO_MOBILITY_VEHICLE_STATE)) {
+      return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
+    }
+  } else if (modality === 'taxi') {
+    for (const event_type of event.event_types) {
+      if (!TAXI_VEHICLE_EVENTS.includes(event_type as TAXI_VEHICLE_EVENT))
+        return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }
+    }
+
+    if (!TAXI_VEHICLE_STATES.includes(event.vehicle_state as TAXI_VEHICLE_STATE)) {
+      return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
+    }
+  } else {
+    return { error: 'bad_param', error_description: `invalid event_types in ${event.event_types}` }
   }
 
   if (event.trip_id === '') {

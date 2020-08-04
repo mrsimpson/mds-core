@@ -327,7 +327,7 @@ export const submitVehicleEvent = async (
     if (event.telemetry) {
       event.telemetry.device_id = event.device_id
     }
-    const failure = (await badEvent(event)) || (event.telemetry ? badTelemetry(event.telemetry) : null)
+    const failure = (await badEvent(device, event)) || (event.telemetry ? badTelemetry(event.telemetry) : null)
     // TODO unify with fail() above
     if (failure) {
       logger.info(name, 'event failure', failure, event)
