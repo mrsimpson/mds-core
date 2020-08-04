@@ -71,7 +71,8 @@ const COMPLIANCE_AUTH =
 
 const BAD_PROVIDER_UUID = '5f7114d1-4091-46ee-b492-e55875f7de99'
 
-const JUMP_TEST_DEVICE_1: Omit<Device, 'accessibility_options'> = {
+const JUMP_TEST_DEVICE_1: Device = {
+  accessibility_options: [],
   provider_id: JUMP_PROVIDER_ID,
   device_id: 'e9edbe74-f7be-48e0-a63a-92f4bc1af5ed',
   vehicle_id: '1230987',
