@@ -1,16 +1,7 @@
 import express from 'express'
 import { Query } from 'express-serve-static-core'
 
-import {
-  isUUID,
-  isPct,
-  isTimestamp,
-  isFloat,
-  isInsideBoundingBox,
-  areThereCommonElements,
-  isMicroMobilityEvent,
-  isTaxiEvent
-} from '@mds-core/mds-utils'
+import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox, areThereCommonElements } from '@mds-core/mds-utils'
 import stream from '@mds-core/mds-stream'
 import {
   UUID,
