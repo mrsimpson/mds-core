@@ -11,7 +11,6 @@ import {
   Telemetry,
   ErrorObject,
   DeviceID,
-  VEHICLE_STATES,
   VEHICLE_EVENT,
   UUID,
   VEHICLE_STATE
@@ -64,7 +63,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   // const { device_id, vehicle_id, type, propulsion, year, mfgr, model } = body
   const { device_id, vehicle_id, vehicle_type, propulsion_types, year, mfgr, model } = body
 
-  const status = VEHICLE_STATES.removed
+  const status: VEHICLE_STATE = 'removed'
 
   // const device = {
   //   provider_id,
@@ -240,7 +239,10 @@ export const submitVehicleEvent = async (
   const event: VehicleEvent = {
     device_id: req.params.device_id,
     provider_id: res.locals.provider_id,
-    event_types: req.body.event_types.map(lower) as VEHICLE_EVENT[],
+    event_types:
+      req.body.event_types && Array.isArray(req.body.event_types)
+        ? (req.body.event_types.map(lower) as VEHICLE_EVENT[])
+        : req.body.event_types, // FIXME: this is super not the best way of doing things. Need to use better validation.
     vehicle_state: req.body.vehicle_state as VEHICLE_STATE,
     telemetry: req.body.telemetry ? { ...req.body.telemetry, provider_id: res.locals.provider_id } : null,
     timestamp: req.body.timestamp,

@@ -14,7 +14,8 @@ import {
   VEHICLE_TYPES,
   VEHICLE_STATES,
   PROPULSION_TYPES,
-  BoundingBox
+  BoundingBox,
+  VEHICLE_STATE
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -138,7 +139,7 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
-    const state = event ? event.vehicle_state : VEHICLE_STATES.removed
+    const state: VEHICLE_STATE = event ? event.vehicle_state : 'removed'
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
     return [...acc, { ...device, state, telemetry, updated }]
@@ -275,11 +276,16 @@ export async function badEvent(event: VehicleEvent) {
       error_description: `invalid timestamp ${event.timestamp}`
     }
   }
-  if (event.event_types === undefined) {
+
+  if (!event.event_types) {
     return {
       error: 'missing_param',
       error_description: 'missing enum field "event_type"'
     }
+  }
+
+  if (!Array.isArray(event.event_types)) {
+    return { error: 'bad_param', error_description: `invalid event_types ${event.event_types}` }
   }
 
   if (event.event_types.length === 0) {
@@ -289,10 +295,18 @@ export async function badEvent(event: VehicleEvent) {
     }
   }
 
-  event.event_types.forEach(event_type => {
-    if (!isEnum(VEHICLE_EVENTS, event_type))
+  for (const event_type of event.event_types) {
+    if (!VEHICLE_EVENTS.includes(event_type))
       return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }
-  })
+  }
+
+  if (!event.vehicle_state) {
+    return { error: 'missing_param', error_description: 'missing enum field "vehicle_state"' }
+  }
+
+  if (!VEHICLE_STATES.includes(event.vehicle_state)) {
+    return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
+  }
 
   if (event.trip_id === '') {
     /* eslint-reason TODO remove eventually -- Lime is spraying empty-string values */
@@ -326,7 +340,7 @@ export async function badEvent(event: VehicleEvent) {
       event.event_types
     )
   )
-    return !badTelemetry(event.telemetry) && !missingTripId()
+    return badTelemetry(event.telemetry) || missingTripId()
 
   if (event.event_types.includes('provider_drop_off')) return badTelemetry(event.telemetry)
 
@@ -407,8 +421,8 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
     composite.updated = event.timestamp
     composite.state = event.vehicle_state
   } else {
-    composite.state = VEHICLE_STATES.removed
-    composite.prev_events = [VEHICLE_EVENTS.decommissioned]
+    composite.state = 'removed'
+    composite.prev_events = ['decommissioned']
   }
   if (telemetry) {
     if (telemetry.gps) {
