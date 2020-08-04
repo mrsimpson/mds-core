@@ -13,7 +13,8 @@ const MIGRATIONS = [
   'dropReadOnlyGeographyColumn',
   'dropAuditEventsColumns',
   'alterReportsTripsMigration',
-  'alterDeviceColumnsAddModalityAndAccessibilityOptions'
+  'alterDeviceColumnsAddModalityAndAccessibilityOptions',
+  'alterEventsColumnsExtendEventTypes'
 ] as const
 type MIGRATION = typeof MIGRATIONS[number]
 
@@ -195,6 +196,10 @@ async function alterDeviceColumnsAddModalityAndAccessibilityOptions(exec: SqlExe
   await exec(`ALTER TABLE ${schema.TABLE.devices} ALTER COLUMN ${schema.COLUMN.modality} SET NOT NULL`)
 }
 
+async function alterEventsColumnsExtendEventTypes(exec: SqlExecuterFunction) {
+  await exec(`ALTER TABLE ${schema.TABLE.devices} SET COLUMN ${schema.COLUMN.accessibility_options} varchar(255)[]`)
+}
+
 async function doMigrations(client: MDSPostgresClient) {
   const exec = SqlExecuter(client)
   await doMigration(exec, 'alterGeographiesColumns', alterGeographiesColumnsMigration)
@@ -208,6 +213,7 @@ async function doMigrations(client: MDSPostgresClient) {
     'alterDeviceColumnsAddModalityAndAccessibilityOptions',
     alterDeviceColumnsAddModalityAndAccessibilityOptions
   )
+  await doMigration(exec, 'alterEventsColumnsExtendEventTypes', alterEventsColumnsExtendEventTypes)
 }
 
 async function updateSchema(client: MDSPostgresClient) {

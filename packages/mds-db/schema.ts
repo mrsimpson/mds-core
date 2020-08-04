@@ -270,7 +270,7 @@ const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {
   [COLUMN.effective_date]: 'bigint',
   [COLUMN.end_time]: 'bigint',
   [COLUMN.event_type]: 'varchar(31)',
-  [COLUMN.event_types]: 'varchar(31)[] NOT NULL',
+  [COLUMN.event_types]: 'varchar(255)[] NOT NULL',
   [COLUMN.event_type_reason]: 'varchar(31)',
   [COLUMN.geography_id]: 'uuid NOT NULL',
   [COLUMN.geography_json]: 'json NOT NULL',
