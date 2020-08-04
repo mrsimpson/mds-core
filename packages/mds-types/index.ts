@@ -124,6 +124,7 @@ export const TAXI_VEHICLE_EVENTS = [
   'reservation_enter_jurisdiction',
   'reservation_leave_jurisdiction',
   'reservation_start',
+  'reservation_stop',
   'shift_resume',
   'shift_start',
   'shift_pause',
@@ -206,11 +207,45 @@ export const MICRO_MOBILITY_EVENT_STATES_MAP: {
   unspecified: ['available', 'non_operational', 'removed']
 }
 
+export const TAXI_EVENT_STATES_MAP: {
+  [P in TAXI_VEHICLE_EVENT]: TAXI_VEHICLE_STATE[]
+} = {
+  available_enter_jurisdiction: ['available'],
+  available_leave_jurisdiction: ['elsewhere'],
+  comms_lost: ['unknown'],
+  comms_restored: ['available', 'non_operational', 'reserved', 'on_trip', 'elsewhere'],
+  decommissioned: ['removed'],
+  depot_enter: ['removed'],
+  depot_leave: ['non_operational'],
+  maintenance: ['available', 'non_operational'],
+  non_operational_enter_jurisdiction: ['non_operational'],
+  non_operational_leave_jurisdiction: ['elsewhere'],
+  reservation_cancel: ['available'],
+  reservation_enter_jurisdiction: ['reserved'],
+  reservation_leave_jurisdiction: ['elsewhere'],
+  reservation_start: ['reserved'],
+  reservation_stop: ['stopped'],
+  shift_resume: ['available'],
+  shift_start: ['available'],
+  shift_pause: ['non_operational'],
+  shift_end: ['non_operational'],
+  trip_cancel: ['available'],
+  trip_end: ['available'],
+  trip_enter_jurisdiction: ['on_trip'],
+  trip_leave_jurisdiction: ['elsewhere'],
+  trip_resume: ['on_trip'],
+  trip_start: ['on_trip'],
+  trip_stop: ['stopped'],
+  unspecified: ['available', 'non_operational', 'removed']
+}
+
 const MicroMobilityStatusEventMap = <
   T extends { [S in MICRO_MOBILITY_VEHICLE_STATE]: Partial<MICRO_MOBILITY_VEHICLE_EVENT[]> }
 >(
   map: T
 ) => map
+
+const TaxiStatusEventMap = <T extends { [S in TAXI_VEHICLE_STATE]: Partial<TAXI_VEHICLE_EVENT[]> }>(map: T) => map
 
 // Given a state, list the valid entry events
 export const MICRO_MOBILITY_STATE_EVENT_MAP = MicroMobilityStatusEventMap({
@@ -241,6 +276,17 @@ export const MICRO_MOBILITY_STATE_EVENT_MAP = MicroMobilityStatusEventMap({
     'unspecified'
   ],
   unknown: ['comms_lost', 'missing']
+})
+
+export const TAXI_STATE_EVENT_MAP = TaxiStatusEventMap({
+  available: ['available_enter_jurisdiction', 'shift_start', 'shift_resume', 'reservation_cancel', 'trip_end'],
+  reserved: ['reservation_start', 'comms_restored'],
+  non_operational: ['depot_leave', 'shift_pause', 'maintenance'],
+  on_trip: ['trip_start', 'trip_enter_jurisdiction', 'comms_restored', 'trip_resume'],
+  elsewhere: ['trip_leave_jurisdiction', 'available_leave_jurisdiction', 'comms_restored'],
+  removed: ['depot_enter', 'maintenance'],
+  unknown: ['comms_lost'],
+  stopped: ['trip_stop', 'reservation_stop']
 })
 
 export const DAYS_OF_WEEK = Enum('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
@@ -432,16 +478,20 @@ export interface PolicyMessage {
 
 // This gets you a type where the keys must be VEHICLE_STATES, such as 'available',
 // and the values are an array of events.
-export type StatesToEvents = { [S in MICRO_MOBILITY_VEHICLE_STATE]: typeof MICRO_MOBILITY_STATE_EVENT_MAP[S] | [] }
-
+export type MicroMobilityStatesToEvents = {
+  [S in MICRO_MOBILITY_VEHICLE_STATE]: typeof MICRO_MOBILITY_STATE_EVENT_MAP[S] | []
+}
+export type TaxiStatesToEvents = {
+  [S in TAXI_VEHICLE_STATE]: typeof TAXI_STATE_EVENT_MAP[S] | []
+}
 interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   // TODO 'rate'
   name: string
   rule_id: UUID
   geographies: UUID[]
-  states: Partial<StatesToEvents> | null
   rule_type: RuleType
   vehicle_types?: VEHICLE_TYPE[] | null
+  modality?: MODALITY
   maximum?: number | null
   minimum?: number | null
   start_time?: string | null
@@ -453,17 +503,29 @@ interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   value_url?: URL | null
 }
 
-export type CountRule = BaseRule<'count'>
+interface MicroMobilityRule<RuleType = 'count' | 'speed' | 'time'> extends BaseRule<RuleType> {
+  modality?: 'micro-mobility'
+  states: Partial<MicroMobilityStatesToEvents> | null
+}
 
-export interface TimeRule extends BaseRule<'time'> {
+interface TaxiRule<RuleType = 'count' | 'speed' | 'time'> extends BaseRule<RuleType> {
+  modality: 'taxi'
+  states: Partial<TaxiStatesToEvents> | null
+}
+
+type ModalityRule<RuleType = 'count' | 'speed' | 'time'> = MicroMobilityRule<RuleType> | TaxiRule<RuleType>
+
+export type CountRule = ModalityRule<'count'>
+
+export type TimeRule = ModalityRule<'time'> & {
   rule_units: 'minutes' | 'hours'
 }
 
-export interface SpeedRule extends BaseRule<'speed'> {
+export type SpeedRule = ModalityRule<'speed'> & {
   rule_units: 'kph' | 'mph'
 }
 
-export type UserRule = BaseRule<'user'>
+export type UserRule = ModalityRule<'user'>
 
 export type Rule = CountRule | TimeRule | SpeedRule | UserRule
 

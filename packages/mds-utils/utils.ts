@@ -33,7 +33,10 @@ import {
   Device,
   MicroMobilityVehicleEvent,
   MICRO_MOBILITY_VEHICLE_EVENTS,
-  TAXI_VEHICLE_EVENTS
+  TAXI_VEHICLE_EVENTS,
+  TAXI_EVENT_STATES_MAP,
+  TAXI_VEHICLE_STATE,
+  TaxiVehicleEvent
 } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 import { MultiPolygon, Polygon, FeatureCollection, Geometry, Feature } from 'geojson'
@@ -60,7 +63,7 @@ const isMicroMobilityEvent = (
   return modality === 'micro-mobility' && isSubset(event_types, MICRO_MOBILITY_VEHICLE_EVENTS)
 }
 
-const isTaxiEvent = (device: Pick<Device, 'modality'>, event: VehicleEvent): event is MicroMobilityVehicleEvent => {
+const isTaxiEvent = (device: Pick<Device, 'modality'>, event: VehicleEvent): event is TaxiVehicleEvent => {
   const { event_types } = event
   const { modality } = device
   return modality === 'taxi' && isSubset(event_types, TAXI_VEHICLE_EVENTS)
@@ -539,12 +542,11 @@ const getPossibleStates = (device: Pick<Device, 'modality'>, event: VehicleEvent
       return acc.concat(MICRO_MOBILITY_EVENT_STATES_MAP[event_type])
     }, [])
   }
-  // FIXME: Uncomment once types figured out in policy
-  // if (isTaxiEvent(device, event)) {
-  //   return event.event_types.reduce((acc: TAXI_VEHICLE_STATE[], event_type) => {
-  //     return acc.concat(MICRO_MOBILITY_EVENT_STATES_MAP[event_type])
-  //   }, [])
-  // }
+  if (isTaxiEvent(device, event)) {
+    return event.event_types.reduce((acc: TAXI_VEHICLE_STATE[], event_type) => {
+      return acc.concat(TAXI_EVENT_STATES_MAP[event_type])
+    }, [])
+  }
 
   return []
 }
