@@ -26,10 +26,14 @@ import {
   BoundingBox,
   Geography,
   Rule,
-  EVENT_STATES_MAP,
-  VEHICLE_STATE,
+  MICRO_MOBILITY_EVENT_STATES_MAP,
+  MICRO_MOBILITY_VEHICLE_STATE,
   BBox,
-  SingleOrArray
+  SingleOrArray,
+  Device,
+  MicroMobilityVehicleEvent,
+  MICRO_MOBILITY_VEHICLE_EVENTS,
+  TAXI_VEHICLE_EVENTS
 } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 import { MultiPolygon, Polygon, FeatureCollection, Geometry, Feature } from 'geojson'
@@ -41,6 +45,26 @@ import { parseRelative, getCurrentDate } from './date-time-utils'
 const RADIUS = 30.48 // 100 feet, in meters
 const NUMBER_OF_EDGES = 32 // Number of edges to add, geojson doesn't support real circles
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
+
+/* Is `as` a subset of `bs`? */
+const isSubset = <T extends Array<string>, U extends Readonly<Array<string>>>(as: T, bs: U) => {
+  return !as.some(a => !bs.includes(a))
+}
+
+const isMicroMobilityEvent = (
+  device: Pick<Device, 'modality'>,
+  event: VehicleEvent
+): event is MicroMobilityVehicleEvent => {
+  const { event_types } = event
+  const { modality } = device
+  return modality === 'micro-mobility' && isSubset(event_types, MICRO_MOBILITY_VEHICLE_EVENTS)
+}
+
+const isTaxiEvent = (device: Pick<Device, 'modality'>, event: VehicleEvent): event is MicroMobilityVehicleEvent => {
+  const { event_types } = event
+  const { modality } = device
+  return modality === 'taxi' && isSubset(event_types, TAXI_VEHICLE_EVENTS)
+}
 
 function isUUID(s: unknown): s is UUID {
   if (typeof s !== 'string') {
@@ -502,7 +526,23 @@ function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
   return set.size !== arr1.length + arr2.length
 }
 
-function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
+const getPossibleStates = (device: Pick<Device, 'modality'>, event: VehicleEvent) => {
+  if (isMicroMobilityEvent(device, event)) {
+    return event.event_types.reduce((acc: MICRO_MOBILITY_VEHICLE_STATE[], event_type) => {
+      return acc.concat(MICRO_MOBILITY_EVENT_STATES_MAP[event_type])
+    }, [])
+  }
+  // FIXME: Uncomment once types figured out in policy
+  // if (isTaxiEvent(device, event)) {
+  //   return event.event_types.reduce((acc: TAXI_VEHICLE_STATE[], event_type) => {
+  //     return acc.concat(MICRO_MOBILITY_EVENT_STATES_MAP[event_type])
+  //   }, [])
+  // }
+
+  return []
+}
+
+function isInStatesOrEvents(rule: Rule, device: Device, event: VehicleEvent): boolean {
   const { states } = rule
   // If no states are specified, then the rule applies to all VehicleStates.
   if (states === null || states === undefined) {
@@ -510,15 +550,11 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
   }
 
   // States that it is possible to transition into with event.event_type
-  const possibleStates: VEHICLE_STATE[] = event.event_types.reduce((acc: VEHICLE_STATE[], event_type) => {
-    return acc.concat(EVENT_STATES_MAP[event_type])
-  }, [])
-  // The last element, assuming the provider didn't make a mistake, should be equivalent
-  // to the state of the event.
-  possibleStates.pop()
+  const possibleStates = getPossibleStates(device, event)
+
   const result = possibleStates.reduce((acc, state) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const matchableEvents: any = states[state as VEHICLE_STATE]
+    const matchableEvents: any = states[state as MICRO_MOBILITY_VEHICLE_STATE] // FIXME
     /* If there's a match between the event_type's transitionable events, and the
      rule doesn't specify any events, or if there is a match between the rule and the specified
      events, the rule matches this event. e.g. if the rule says { `available`: [`comms_lost`]} or
@@ -663,5 +699,7 @@ export {
   asArray,
   pluralize,
   filterDefined,
-  areThereCommonElements
+  areThereCommonElements,
+  isMicroMobilityEvent,
+  isTaxiEvent
 }

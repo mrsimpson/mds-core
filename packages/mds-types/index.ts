@@ -35,9 +35,7 @@ export type RULE_TYPE = keyof typeof RULE_TYPES
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
-// export const VEHICLE_STATUSES = Enum('available', 'reserved', 'unavailable', 'removed', 'inactive', 'trip', 'elsewhere')
-// export type VEHICLE_STATUS = keyof typeof VEHICLE_STATUSES
-export const VEHICLE_STATES = [
+export const MICRO_MOBILITY_VEHICLE_STATES = [
   'available',
   'elsewhere',
   'non_operational',
@@ -46,6 +44,21 @@ export const VEHICLE_STATES = [
   'reserved',
   'unknown'
 ] as const
+export type MICRO_MOBILITY_VEHICLE_STATE = typeof MICRO_MOBILITY_VEHICLE_STATES[number]
+
+export const TAXI_VEHICLE_STATES = [
+  'available',
+  'elsewhere',
+  'non_operational',
+  'on_trip',
+  'removed',
+  'reserved',
+  'stopped',
+  'unknown'
+] as const
+export type TAXI_VEHICLE_STATE = typeof TAXI_VEHICLE_STATES[number]
+
+export const VEHICLE_STATES = [...MICRO_MOBILITY_VEHICLE_STATES, ...TAXI_VEHICLE_STATES] as const
 export type VEHICLE_STATE = typeof VEHICLE_STATES[number]
 
 // export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
@@ -67,7 +80,7 @@ export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 
 //   'trip_end',
 //   'deregister'
 // )
-export const VEHICLE_EVENTS = [
+export const MICRO_MOBILITY_VEHICLE_EVENTS = [
   'agency_drop_off',
   'agency_pick_up',
   'battery_charged',
@@ -94,7 +107,39 @@ export const VEHICLE_EVENTS = [
   'trip_start',
   'unspecified'
 ] as const
+export type MICRO_MOBILITY_VEHICLE_EVENT = typeof MICRO_MOBILITY_VEHICLE_EVENTS[number]
 
+export const TAXI_VEHICLE_EVENTS = [
+  'available_enter_jurisdiction',
+  'available_leave_jurisdiction',
+  'comms_lost',
+  'comms_restored',
+  'decommissioned',
+  'depot_enter',
+  'depot_leave',
+  'maintenance',
+  'non_operational_leave_jurisdiction',
+  'non_operational_enter_jurisdiction',
+  'reservation_cancel',
+  'reservation_enter_jurisdiction',
+  'reservation_leave_jurisdiction',
+  'reservation_start',
+  'shift_resume',
+  'shift_start',
+  'shift_pause',
+  'shift_end',
+  'trip_cancel',
+  'trip_end',
+  'trip_enter_jurisdiction',
+  'trip_leave_jurisdiction',
+  'trip_resume',
+  'trip_start',
+  'trip_stop',
+  'unspecified'
+] as const
+export type TAXI_VEHICLE_EVENT = typeof TAXI_VEHICLE_EVENTS[number]
+
+export const VEHICLE_EVENTS = [...MICRO_MOBILITY_VEHICLE_EVENTS, ...TAXI_VEHICLE_EVENTS] as const
 export type VEHICLE_EVENT = typeof VEHICLE_EVENTS[number]
 
 // export const VEHICLE_REASONS = Enum(
@@ -131,7 +176,9 @@ export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
 // }
 
 // States you transition into based on event_type
-export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE[] } = {
+export const MICRO_MOBILITY_EVENT_STATES_MAP: {
+  [P in MICRO_MOBILITY_VEHICLE_EVENT]: MICRO_MOBILITY_VEHICLE_STATE[]
+} = {
   agency_drop_off: ['available'],
   agency_pick_up: ['removed'],
   battery_charged: ['available'],
@@ -159,10 +206,14 @@ export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE[] } = {
   unspecified: ['available', 'non_operational', 'removed']
 }
 
-const StatusEventMap = <T extends { [S in VEHICLE_STATE]: Partial<VEHICLE_EVENT[]> }>(map: T) => map
+const MicroMobilityStatusEventMap = <
+  T extends { [S in MICRO_MOBILITY_VEHICLE_STATE]: Partial<MICRO_MOBILITY_VEHICLE_EVENT[]> }
+>(
+  map: T
+) => map
 
 // Given a state, list the valid entry events
-export const STATE_EVENT_MAP = StatusEventMap({
+export const MICRO_MOBILITY_STATE_EVENT_MAP = MicroMobilityStatusEventMap({
   available: [
     'battery_charged',
     'on_hours',
@@ -223,6 +274,7 @@ export interface Device {
   propulsion_types: PROPULSION_TYPE[] // changed name in 1.0
   year?: number | null
   mfgr?: string | null
+  modality?: string // FIXME: use enum
   model?: string | null
   recorded: Timestamp
   state?: VEHICLE_STATE | null
@@ -244,6 +296,16 @@ export interface VehicleEvent {
   trip_id?: UUID | null
   vehicle_state: VEHICLE_STATE
   recorded: Timestamp
+}
+
+export interface MicroMobilityVehicleEvent extends VehicleEvent {
+  event_types: MICRO_MOBILITY_VEHICLE_EVENT[]
+  vehicle_state: MICRO_MOBILITY_VEHICLE_STATE
+}
+
+export interface TaxiVehicleEvent extends VehicleEvent {
+  event_types: TAXI_VEHICLE_EVENT[]
+  vehicle_state: TAXI_VEHICLE_STATE
 }
 
 // Standard telemetry columns (used in more than one table)
@@ -363,7 +425,7 @@ export interface PolicyMessage {
 
 // This gets you a type where the keys must be VEHICLE_STATES, such as 'available',
 // and the values are an array of events.
-export type StatesToEvents = { [S in VEHICLE_STATE]: typeof STATE_EVENT_MAP[S] | [] }
+export type StatesToEvents = { [S in MICRO_MOBILITY_VEHICLE_STATE]: typeof MICRO_MOBILITY_STATE_EVENT_MAP[S] | [] }
 
 interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   // TODO 'rate'
