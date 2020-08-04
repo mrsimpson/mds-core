@@ -72,14 +72,14 @@ const stateTransitionDict: {
     [VEHICLE_EVENTS.agency_drop_off]: [VEHICLE_STATES.available],
     [VEHICLE_EVENTS.decommissioned]: [VEHICLE_STATES.removed],
     [VEHICLE_EVENTS.provider_drop_off]: [VEHICLE_STATES.available],
-    [VEHICLE_EVENTS.unspecified]: [VEHICLE_STATES.available, VEHICLE_STATES.unknown]
+    [VEHICLE_EVENTS.unspecified]: [VEHICLE_STATES.unknown]
   },
   [VEHICLE_STATES.reserved]: {
     [VEHICLE_EVENTS.comms_lost]: [VEHICLE_STATES.unknown],
     [VEHICLE_EVENTS.missing]: [VEHICLE_STATES.unknown],
     [VEHICLE_EVENTS.reservation_cancel]: [VEHICLE_STATES.available],
     [VEHICLE_EVENTS.trip_start]: [VEHICLE_STATES.on_trip],
-    [VEHICLE_EVENTS.unspecified]: [VEHICLE_STATES.available, VEHICLE_STATES.unknown]
+    [VEHICLE_EVENTS.unspecified]: [VEHICLE_STATES.unknown]
   },
   [VEHICLE_STATES.unknown]: {
     [VEHICLE_EVENTS.agency_drop_off]: [VEHICLE_STATES.available],
