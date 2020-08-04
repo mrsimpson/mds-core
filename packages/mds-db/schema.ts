@@ -23,6 +23,7 @@ const DEPRECATED_PROVIDER_TABLES = ['status_changes', 'trips']
 
 const COLUMN = Enum(
   'accuracy',
+  'accessibility_options',
   'address',
   'altitude',
   'attachment_filename',
@@ -56,6 +57,7 @@ const COLUMN = Enum(
   'mfgr',
   'migration',
   'mimetype',
+  'modality',
   'model',
   'name',
   'note',
@@ -148,6 +150,7 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
   ],
   [TABLE.devices]: [
     COLUMN.id,
+    COLUMN.accessibility_options,
     COLUMN.device_id,
     COLUMN.provider_id,
     COLUMN.vehicle_id,
@@ -157,6 +160,7 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
     COLUMN.propulsion_types, // added 1.0
     COLUMN.year,
     COLUMN.mfgr,
+    COLUMN.modality,
     COLUMN.model,
     COLUMN.recorded
   ],
@@ -245,6 +249,7 @@ const TABLE_KEY: { [T in TABLE_NAME]: COLUMN_NAME[] } = {
 
 const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {
   [COLUMN.accuracy]: 'real',
+  [COLUMN.accessibility_options]: 'varchar(255)[] NOT NULL',
   [COLUMN.address]: 'varchar(255)',
   [COLUMN.altitude]: 'real',
   [COLUMN.attachment_filename]: 'varchar(64) NOT NULL',
@@ -278,6 +283,7 @@ const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {
   [COLUMN.mfgr]: 'varchar(127)',
   [COLUMN.migration]: 'varchar(255) NOT NULL',
   [COLUMN.mimetype]: 'varchar(255) NOT NULL',
+  [COLUMN.modality]: 'varchar(255) NOT NULL',
   [COLUMN.model]: 'varchar(127)',
   [COLUMN.name]: 'varchar(255)',
   [COLUMN.note]: 'varchar(255)',

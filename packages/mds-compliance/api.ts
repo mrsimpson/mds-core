@@ -30,7 +30,7 @@ import {
   BadParamsError,
   AuthorizationError
 } from '@mds-core/mds-utils'
-import { Geography, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { Geography, UUID, VehicleEvent, Device } from '@mds-core/mds-types'
 import { providerName } from '@mds-core/mds-providers'
 import { Geometry, FeatureCollection } from 'geojson'
 import { parseRequest } from '@mds-core/mds-api-helpers'
@@ -189,7 +189,8 @@ function api(app: express.Express): express.Express {
 
       // https://stackoverflow.com/a/51577579 to remove nulls in typesafe way
       const filteredVehicleEvents = events.filter(
-        (event): event is VehicleEvent => event !== null && isInStatesOrEvents(rule, event)
+        (event): event is VehicleEvent =>
+          event !== null && isInStatesOrEvents(rule, { modality: 'micro-mobility' } as Device, event) // FIXME: Shouldn't be doing casting like this
       )
       const filteredEvents = compliance_engine.getRecentEvents(filteredVehicleEvents)
 

@@ -61,7 +61,17 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     // convert old body into new body
   }
   // const { device_id, vehicle_id, type, propulsion, year, mfgr, model } = body
-  const { device_id, vehicle_id, vehicle_type, propulsion_types, year, mfgr, model } = body
+  const {
+    accessibility_options = [],
+    device_id,
+    vehicle_id,
+    vehicle_type,
+    propulsion_types,
+    year,
+    mfgr,
+    modality = 'micro-mobility',
+    model
+  } = body
 
   const status: VEHICLE_STATE = 'removed'
 
@@ -78,6 +88,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   //   status
   // }
   const device = {
+    accessibility_options,
     provider_id,
     device_id,
     vehicle_id,
@@ -85,6 +96,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     propulsion_types,
     year,
     mfgr,
+    modality,
     model,
     recorded,
     status

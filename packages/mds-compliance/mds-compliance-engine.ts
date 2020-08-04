@@ -94,7 +94,7 @@ function processCountRule(
           (matched_vehicles_acc: MatchedVehicle[], event: VehicleEvent): MatchedVehicle[] => {
             const device: Device | undefined = devices[event.device_id]
             if (event.telemetry && device) {
-              if (isInStatesOrEvents(rule, event) && isInVehicleTypes(rule, device)) {
+              if (isInStatesOrEvents(rule, device, event) && isInVehicleTypes(rule, device)) {
                 const poly = getPolygon(geographies, geography)
                 if (poly && pointInShape(event.telemetry.gps, poly)) {
                   // push devices that are in violation
@@ -132,7 +132,7 @@ function processTimeRule(
         const device: Device | undefined = devices[event.device_id]
         if (event.telemetry && device) {
           if (
-            isInStatesOrEvents(rule, event) &&
+            isInStatesOrEvents(rule, device, event) &&
             isInVehicleTypes(rule, device) &&
             (!rule.maximum || (now() - event.timestamp) / RULE_UNIT_MAP[rule.rule_units] >= rule.maximum)
           ) {
@@ -168,7 +168,7 @@ function processSpeedRule(
         const device: Device | undefined = devices[event.device_id]
         if (event.telemetry && device) {
           if (
-            isInStatesOrEvents(rule, event) &&
+            isInStatesOrEvents(rule, device, event) &&
             isInVehicleTypes(rule, device) &&
             event.telemetry.gps.speed &&
             pointInShape(event.telemetry.gps, getPolygon(geographies, geography)) &&

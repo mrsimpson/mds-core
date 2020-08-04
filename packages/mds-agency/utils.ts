@@ -15,7 +15,9 @@ import {
   VEHICLE_STATES,
   PROPULSION_TYPES,
   BoundingBox,
-  VEHICLE_STATE
+  VEHICLE_STATE,
+  ACCESSIBILITY_OPTIONS,
+  MODALITIES
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -81,6 +83,28 @@ export function badDevice(device: Device): { error: string; error_description: s
     return {
       error: 'bad_param',
       error_description: `invalid device type ${device.vehicle_type}`
+    }
+  }
+  if (!Array.isArray(device.accessibility_options)) {
+    return {
+      error: 'missing_param',
+      error_description: 'missing accessibility_options'
+    }
+  }
+  if (device.accessibility_options.length !== 0) {
+    for (const accessibility_option of device.accessibility_options) {
+      if (!ACCESSIBILITY_OPTIONS.includes(accessibility_option)) {
+        return {
+          error: 'bad_param',
+          error_description: `invalid accessibility_option ${accessibility_option} in accessibility_options list`
+        }
+      }
+    }
+  }
+  if (!MODALITIES.includes(device.modality)) {
+    return {
+      error: 'bad_param',
+      error_description: `invalid modality ${device.modality}`
     }
   }
   // if (device.mfgr === undefined) {

@@ -81,7 +81,7 @@ const TEST_TELEMETRY2 = {
   timestamp: now() + 1000
 }
 
-const TEST_VEHICLE: Omit<Device, 'recorded'> = {
+const TEST_VEHICLE: Omit<Device, 'recorded' | 'accessibility_options'> = {
   device_id: DEVICE_UUID,
   provider_id: TEST1_PROVIDER_ID,
   vehicle_id: 'test-id-1',
@@ -89,6 +89,7 @@ const TEST_VEHICLE: Omit<Device, 'recorded'> = {
   propulsion_types: [PROPULSION_TYPES.human],
   year: 2018,
   mfgr: 'Schwinn',
+  modality: 'micro-mobility',
   model: 'Mantaray'
 }
 

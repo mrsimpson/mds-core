@@ -25,7 +25,8 @@ import {
   Telemetry,
   VehicleEvent,
   Policy,
-  VEHICLE_STATE
+  VEHICLE_STATE,
+  MODALITY
 } from '@mds-core/mds-types'
 import { Geometry } from 'geojson'
 
@@ -70,7 +71,7 @@ const COMPLIANCE_AUTH =
 
 const BAD_PROVIDER_UUID = '5f7114d1-4091-46ee-b492-e55875f7de99'
 
-const JUMP_TEST_DEVICE_1: Device = {
+const JUMP_TEST_DEVICE_1: Omit<Device, 'accessibility_options'> = {
   provider_id: JUMP_PROVIDER_ID,
   device_id: 'e9edbe74-f7be-48e0-a63a-92f4bc1af5ed',
   vehicle_id: '1230987',
@@ -78,6 +79,7 @@ const JUMP_TEST_DEVICE_1: Device = {
   propulsion_types: [PROPULSION_TYPES.electric],
   year: 2018,
   mfgr: 'Schwinn',
+  modality: 'micro-mobility',
   model: 'whoknows',
   recorded: now()
 }
@@ -588,6 +590,7 @@ function makeDevices(count: number, timestamp: Timestamp, provider_id = TEST1_PR
         throw new Error(`unknown type: ${vehicle_type}`)
     }
     const device = {
+      accessibility_options: [],
       device_id,
       provider_id,
       vehicle_id: `test-vin-${Math.round(Math.random() * 1000000)}`,
@@ -595,6 +598,7 @@ function makeDevices(count: number, timestamp: Timestamp, provider_id = TEST1_PR
       propulsion_types,
       year,
       mfgr,
+      modality: 'micro-mobility' as MODALITY,
       model,
       timestamp,
       recorded: now()

@@ -265,8 +265,15 @@ export type SingleOrArray<T> = T | T[]
 export type Optional<T, P extends keyof T> = Omit<T, P> & Partial<Pick<T, P>>
 export type NonEmptyArray<T> = [T, ...T[]]
 
+export const ACCESSIBILITY_OPTIONS = ['wheelchair_boarding'] as const
+export type ACCESSIBILITY_OPTION = typeof ACCESSIBILITY_OPTIONS[number]
+
+export const MODALITIES = ['micro-mobility', 'taxi'] as const
+export type MODALITY = typeof MODALITIES[number]
+
 // Represents a row in the "devices" table
 export interface Device {
+  accessibility_options: ACCESSIBILITY_OPTION[]
   device_id: UUID
   provider_id: UUID
   vehicle_id: string
@@ -274,7 +281,7 @@ export interface Device {
   propulsion_types: PROPULSION_TYPE[] // changed name in 1.0
   year?: number | null
   mfgr?: string | null
-  modality?: string // FIXME: use enum
+  modality: MODALITY
   model?: string | null
   recorded: Timestamp
   state?: VEHICLE_STATE | null

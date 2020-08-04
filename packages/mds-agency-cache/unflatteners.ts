@@ -5,7 +5,9 @@ import {
   Device,
   Telemetry,
   VehicleEvent,
-  PROPULSION_TYPE
+  PROPULSION_TYPE,
+  ACCESSIBILITY_OPTION,
+  MODALITY
 } from '@mds-core/mds-types'
 
 import { ParseError } from '@mds-core/mds-utils'
@@ -67,13 +69,15 @@ function parseEvent(
 function parseDevice(device: StringifiedCacheReadDeviceResult): Device {
   if (device) {
     return {
+      accessibility_options: device.accessibility_options as ACCESSIBILITY_OPTION[],
       device_id: device.device_id,
       provider_id: device.provider_id,
       vehicle_id: device.vehicle_id,
       vehicle_type: device.vehicle_type as VEHICLE_TYPE,
-      propulsion_types: JSON.parse(device.propulsion_types) as PROPULSION_TYPE[],
+      propulsion_types: device.propulsion_types as PROPULSION_TYPE[],
       year: device.year ? Number(device.year) : null,
       mfgr: device.mfgr ? device.mfgr : null,
+      modality: device.modality as MODALITY,
       model: device.model ? device.model : null,
       recorded: Number(device.recorded),
       state: device.state ? (device.state as VEHICLE_STATE) : null
@@ -94,7 +98,7 @@ const isStringifiedCacheReadDeviceResult = (device: unknown): device is Stringif
     'device_id',
     'provider_id',
     'vehicle_type',
-    'propulsion'
+    'propulsion_types'
   )
 
 function parseCachedItem(item: CachedItem): Device | Telemetry | VehicleEvent {
