@@ -32,7 +32,9 @@ import {
   Stop,
   PROPULSION_TYPES,
   VEHICLE_STATES,
-  Device
+  Device,
+  MODALITIES,
+  ACCESSIBILITY_OPTIONS
 } from '@mds-core/mds-types'
 import * as Joi from '@hapi/joi'
 import joiToJson from 'joi-to-json'
@@ -160,6 +162,10 @@ const propulsionTypeSchema = stringSchema.valid(...Object.keys(PROPULSION_TYPES)
 
 const vehicleStatusSchema = stringSchema.valid(...VEHICLE_STATES)
 
+const accessibilityOptionsSchema = stringSchema.valid(...ACCESSIBILITY_OPTIONS)
+
+const modalitySchema = stringSchema.valid(...MODALITIES)
+
 const eventSchema = Joi.object().keys({
   device_id: uuidSchema.required(),
   provider_id: uuidSchema.required(),
@@ -214,13 +220,15 @@ const stopSchema = Joi.object().keys({
 })
 
 const deviceSchema = Joi.object().keys({
+  accessibility_options: Joi.array().items(accessibilityOptionsSchema).required(),
   device_id: uuidSchema.required(),
   provider_id: uuidSchema.required(),
   vehicle_id: stringSchema.required(),
-  type: vehicleTypeSchema.required(),
-  propulsion: Joi.array().items(propulsionTypeSchema).required(),
+  vehicle_type: vehicleTypeSchema.required(),
+  propulsion_types: Joi.array().items(propulsionTypeSchema).required(),
   year: numberSchema.optional(),
   mfgr: stringSchema.optional(),
+  modality: modalitySchema.required(),
   model: stringSchema.optional(),
   recorded: timestampSchema.optional(),
   status: vehicleStatusSchema
