@@ -502,7 +502,33 @@ function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
   return set.size !== arr1.length + arr2.length
 }
 
-function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
+/**
+ * The rule matches this event if a transient event_type and possible resultant states,
+ * or the final event_type and explicitly encoded vehicle_state match with the rule's status definitions.
+ * e.g. if the rule states are { reserved: [] } and there's an event with event_types
+ *      [trip_end, reservation_start, trip_start], there's an implication
+ *      that the vehicle entered the reserved state after reservation_start,
+ *      even if the final state of the event is on_trip, and the rule will match.
+ *
+ * @example <caption> Matching transient event </caption>
+ * // returns true
+ * isInStatesOrEvents({ states: { reserved: [] } }, { event_types: ['trip_end', 'reservation_start', 'trip_start'], vehicle_state: 'on_trip' })
+ * @example <caption> *State* matching for transient event_type 'off_hours', but event_type not matched with explicit event_type in rule </caption>
+ * // returns false
+ * isInStatesOrEvents({ states: { non_operational: ['maintenance'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' })
+ * @example <caption> Match for last event_type and encoded vehicle_state, with explicit event_type in rule </caption>
+ * // returns true
+ * isInStatesOrEvents({ states: { available: ['on_hours'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' })
+ * @example <caption> Match for last event_type and encoded vehicle_state, with catch-all in rule </caption>
+ * // returns true
+ * isInStatesOrEvents({ states: { available: [] } }, { event_types: ['on_hours'], vehicle_state: 'available' })
+ *
+ * @returns boolean
+ */
+function isInStatesOrEvents(
+  rule: Pick<Rule, 'states'>,
+  event: Pick<VehicleEvent, 'event_types' | 'vehicle_state'>
+): boolean {
   const { states } = rule
   // If no states are specified, then the rule applies to all VehicleStates.
   if (states === null || states === undefined) {
@@ -526,12 +552,12 @@ function isInStatesOrEvents(rule: Rule, event: VehicleEvent): boolean {
   )
 
   return possibleStates.some(state => {
+    // Explicit events encoded in rule for that state (if any)
     const matchableEvents: string[] | undefined = states[state as VEHICLE_STATE]
 
-    /* If there's a match between the event_type's transitionable events, and the
-     * rule doesn't specify any events, or if there is a match between the rule and the specified
-     * events, the rule matches this event. e.g. if the rule says { `available`: [`on_hours`]} or
-     * { `available`: [] }, it would match an event with event_type `on_hours`.
+    /**
+     * If event_types not encoded in rule, assume state match.
+     * If event_types encoded in rule, see if event.event_types contains a match.
      */
     if (
       matchableEvents !== undefined &&
