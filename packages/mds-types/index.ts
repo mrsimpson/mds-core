@@ -97,18 +97,18 @@ export const VEHICLE_EVENTS = [
 
 export type VEHICLE_EVENT = typeof VEHICLE_EVENTS[number]
 
-// export const VEHICLE_REASONS = Enum(
-//   'battery_charged',
-//   'charge',
-//   'compliance',
-//   'decommissioned',
-//   'low_battery',
-//   'maintenance',
-//   'missing',
-//   'off_hours',
-//   'rebalance'
-// )
-// export type VEHICLE_REASON = keyof typeof VEHICLE_REASONS
+export const VEHICLE_REASONS_0_4_1 = Enum(
+  'battery_charged',
+  'charge',
+  'compliance',
+  'decommissioned',
+  'low_battery',
+  'maintenance',
+  'missing',
+  'off_hours',
+  'rebalance'
+)
+export type VEHICLE_REASON_0_4_1 = keyof typeof VEHICLE_REASONS_0_4_1
 
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
