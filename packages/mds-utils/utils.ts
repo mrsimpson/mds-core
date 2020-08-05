@@ -510,20 +510,22 @@ function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
  *      that the vehicle entered the reserved state after reservation_start,
  *      even if the final state of the event is on_trip, and the rule will match.
  *
- * @example <caption> Matching transient event </caption>
- * // returns true
- * isInStatesOrEvents({ states: { reserved: [] } }, { event_types: ['trip_end', 'reservation_start', 'trip_start'], vehicle_state: 'on_trip' })
- * @example <caption> *State* matching for transient event_type 'off_hours', but event_type not matched with explicit event_type in rule </caption>
- * // returns false
- * isInStatesOrEvents({ states: { non_operational: ['maintenance'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' })
- * @example <caption> Match for last event_type and encoded vehicle_state, with explicit event_type in rule </caption>
- * // returns true
- * isInStatesOrEvents({ states: { available: ['on_hours'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' })
- * @example <caption> Match for last event_type and encoded vehicle_state, with catch-all in rule </caption>
- * // returns true
- * isInStatesOrEvents({ states: { available: [] } }, { event_types: ['on_hours'], vehicle_state: 'available' })
- *
- * @returns boolean
+ * @example Matching transient `event_type`
+ * ```typescript
+ * isInStatesOrEvents({ states: { reserved: [] } }, { event_types: ['trip_end', 'reservation_start', 'trip_start'], vehicle_state: 'on_trip' }) => true
+ * ```
+ * @example State matching for transient `event_type` 'off_hours', but `event_type` not matched with explicit `event_type` in rule
+ * ```typescript
+ * isInStatesOrEvents({ states: { non_operational: ['maintenance'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' }) => false
+ * ```
+ * @example Match for last `event_type` and encoded `vehicle_state`, with explicit `event_type` in rule
+ * ```typescript
+ * isInStatesOrEvents({ states: { available: ['on_hours'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' }) => true
+ * ```
+ * @example Match for last `event_type` and encoded `vehicle_state`, with catch-all in rule
+ * ```typescript
+ * isInStatesOrEvents({ states: { available: [] } }, { event_types: ['on_hours'], vehicle_state: 'available' }) => true
+ * ```
  */
 function isInStatesOrEvents(
   rule: Pick<Rule, 'states'>,
