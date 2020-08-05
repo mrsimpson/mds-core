@@ -1,11 +1,4 @@
-import {
-  VEHICLE_STATES,
-  VEHICLE_EVENTS,
-  VEHICLE_STATE,
-  VEHICLE_EVENT,
-  EVENT_STATES_MAP,
-  VehicleEvent
-} from '@mds-core/mds-types'
+import { VEHICLE_STATES, VEHICLE_STATE, VEHICLE_EVENT, EVENT_STATES_MAP, VehicleEvent } from '@mds-core/mds-types'
 
 /* Start with a state, then there's a list of valid event_types by which one
  * may transition out, then possible states for each event_type
@@ -17,7 +10,7 @@ const stateTransitionDict: {
     }
   >
 } = {
-  [VEHICLE_STATES.available]: {
+  available: {
     agency_pick_up: ['removed'],
     battery_low: ['non_operational'],
     comms_lost: ['unknown'],
@@ -69,6 +62,8 @@ const stateTransitionDict: {
     unspecified: ['unknown']
   },
   removed: {
+    comms_lost: ['unknown'],
+    missing: ['unknown'],
     agency_drop_off: ['available'],
     decommissioned: ['removed'],
     provider_drop_off: ['available'],
@@ -96,10 +91,7 @@ const getNextStates = (currStatus: VEHICLE_STATE, nextEvent: VEHICLE_EVENT): VEH
 }
 
 // Filter for all states that have this event as a valid exiting event
-function getValidPreviousStates(
-  event: VEHICLE_EVENT,
-  states: VEHICLE_STATE[] = Object.keys(VEHICLE_STATES) as VEHICLE_STATE[]
-) {
+function getValidPreviousStates(event: VEHICLE_EVENT, states: Readonly<VEHICLE_STATE[]> = VEHICLE_STATES) {
   return states.filter(state => {
     return Object.keys(stateTransitionDict[state]).includes(event)
   })
@@ -142,7 +134,7 @@ const generateTransitionLabel = (status: VEHICLE_STATE, nextStatus: VEHICLE_STAT
 // Punch this output into http://www.webgraphviz.com/
 const generateGraph = () => {
   const graphEntries = []
-  const statuses: VEHICLE_STATE[] = Object.values(VEHICLE_STATES)
+  const statuses: Readonly<VEHICLE_STATE[]> = VEHICLE_STATES
   for (const status of statuses) {
     const eventTransitions: VEHICLE_EVENT[] = Object.keys(stateTransitionDict[status]) as VEHICLE_EVENT[]
     for (const event of eventTransitions) {
