@@ -27,7 +27,7 @@ import {
   tail,
   setEmptyArraysToUndefined
 } from '@mds-core/mds-utils'
-import { UUID, Timestamp, Device, VehicleEvent, Telemetry, BoundingBox } from '@mds-core/mds-types'
+import { UUID, Timestamp, Device, VehicleEvent, Telemetry, BoundingBox, TripMetadata } from '@mds-core/mds-types'
 import redis from 'redis'
 import bluebird from 'bluebird'
 
@@ -223,11 +223,20 @@ async function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | 
   return updateVehicleList(device_id)
 }
 
+const writeTripMetadata = async (metadata: TripMetadata) => {
+  const { trip_id } = metadata
+
+  const client = await getClient()
+
+  client.set(decorateKey(`trip:${trip_id}:metadata`), JSON.stringify(metadata))
+}
+
 // put basics of device in the cache
 async function writeDevice(device: Device) {
   if (!device) {
     throw new Error('null device not legal to write')
   }
+
   return hwrite('device', device)
 }
 
@@ -624,5 +633,6 @@ export default {
   wipeDevice,
   updateVehicleList,
   cleanup,
-  getMostRecentEventByProvider
+  getMostRecentEventByProvider,
+  writeTripMetadata
 }

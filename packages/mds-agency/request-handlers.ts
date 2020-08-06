@@ -1,6 +1,20 @@
 import logger from '@mds-core/mds-logger'
-import { isUUID, now, ValidationError, normalizeToArray, NotFoundError, ServerError } from '@mds-core/mds-utils'
-import { isValidStop, isValidDevice, validateEvent, isValidTelemetry } from '@mds-core/mds-schema-validators'
+import {
+  isUUID,
+  now,
+  ValidationError,
+  normalizeToArray,
+  NotFoundError,
+  ServerError,
+  BadParamsError
+} from '@mds-core/mds-utils'
+import {
+  isValidStop,
+  isValidDevice,
+  validateEvent,
+  isValidTelemetry,
+  validateTripMetadata
+} from '@mds-core/mds-schema-validators'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
@@ -525,12 +539,17 @@ export const writeTripMetadata = async (
   req: AgencyApiPostTripMetadataRequest,
   res: AgencyApiPostTripMetadataResponse
 ) => {
-  const { provider_id } = res.locals
-  const tripMetadata = { ...req.body, provider_id }
+  try {
+    const { provider_id } = res.locals
+    /* TODO Add better validation once trip metadata proposal is solidified */
+    const tripMetadata = validateTripMetadata({ ...req.body, provider_id })
 
-  /* TODO Add validation once trip metadata proposal is solidified */
+    await cache.writeTripMetadata(tripMetadata)
+    await stream.writeTripMetadata(tripMetadata)
 
-  await stream.writeTripMetadata(tripMetadata)
-
-  return res.status(201).send(tripMetadata)
+    return res.status(201).send(tripMetadata)
+  } catch (error) {
+    if (error instanceof ValidationError) return res.status(400).send({ error })
+    return res.status(500).send({ error: new ServerError() })
+  }
 }

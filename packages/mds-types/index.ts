@@ -394,7 +394,7 @@ export interface Telemetry extends WithGpsProperty<TelemetryData> {
   recorded?: Timestamp
 }
 
-export type TripMetadata = object
+export type TripMetadata = { trip_id: UUID } & object
 
 // Represents a row in the "attachments" table
 export interface Attachment {
