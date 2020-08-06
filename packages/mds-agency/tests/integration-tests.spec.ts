@@ -41,7 +41,8 @@ import {
   TAXI_VEHICLE_EVENT,
   MICRO_MOBILITY_VEHICLE_EVENTS,
   TAXI_EVENT_STATES_MAP,
-  MICRO_MOBILITY_EVENT_STATES_MAP
+  MICRO_MOBILITY_EVENT_STATES_MAP,
+  TripMetadata
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
@@ -1612,5 +1613,50 @@ describe('Tests for taxi modality', async () => {
           })
       })
     }
+  }
+})
+
+describe('Tests TripMetadata', async () => {
+  const metadata: Omit<TripMetadata, 'provider_id'> = {
+    trip_id: uuid(),
+    reserve_time: now(),
+    dispatch_time: now(),
+    trip_start_time: now(),
+    trip_end_time: now(),
+    distance: 100,
+    accessibility_options_used: [],
+    fare: {
+      quoted_cost: 2000,
+      actual_cost: 2500,
+      components: {},
+      currency: 'USD',
+      payment_methods: {
+        cash: 1250,
+        credit: 1250
+      }
+    },
+    reservation_type: 'on_demand',
+    reservation_method: 'app'
+  }
+
+  it('Tests valid payload returns success code', async () => {
+    await request.post(pathPrefix('/trips')).set('Authorization', AUTH).send(metadata).expect(201)
+  })
+
+  for (const key of Object.keys(metadata) as (keyof Omit<TripMetadata, 'provider_id'>)[]) {
+    it(`Tests invalid TripMetadata payload without ${key}`, async () => {
+      const { [key]: foo, ...subsetMetadata } = metadata
+
+      // eslint-disable-next-line no-await-in-loop
+      const result = await request
+        .post(pathPrefix('/trips'))
+        .set('Authorization', AUTH)
+        .send(subsetMetadata)
+        .expect(400)
+
+      console.log(result.body)
+      test.string(result.body.error.reason).is('invalid_value')
+      test.string(result.body.error.info.details).contains(`value.${key} is required`)
+    })
   }
 })

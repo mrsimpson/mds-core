@@ -24,7 +24,7 @@ export const tripMetadataSchema = Joi.object().keys({
     actual_cost: numberSchema.required(),
     components: Joi.object().required(),
     currency: stringSchema.required(),
-    paymentMethods: Joi.object().required() // loose validation for now
+    payment_methods: Joi.object().required() // loose validation for now
   }),
   reservation_method: stringSchema.valid(...RESERVATION_METHODS).required(),
   reservation_type: stringSchema.valid(...RESERVATION_TYPES).required()
