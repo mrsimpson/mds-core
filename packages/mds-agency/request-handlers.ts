@@ -1,13 +1,5 @@
 import logger from '@mds-core/mds-logger'
-import {
-  isUUID,
-  now,
-  ValidationError,
-  normalizeToArray,
-  NotFoundError,
-  ServerError,
-  BadParamsError
-} from '@mds-core/mds-utils'
+import { isUUID, now, ValidationError, normalizeToArray, NotFoundError, ServerError } from '@mds-core/mds-utils'
 import {
   isValidStop,
   isValidDevice,
