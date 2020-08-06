@@ -101,6 +101,7 @@ export const WebSocketServer = async <T extends readonly string[]>(entityTypes?:
 
   const processor = async (err: Nullable<NatsError>, msg: Msg) => {
     const entity = msg.subject.split('.')?.[1]
+    console.log(msg.data) // FIXME remove temporary debug line
     await pushToClients(entity, msg.data)
   }
 

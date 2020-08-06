@@ -7,7 +7,8 @@ import {
   Recorded,
   VEHICLE_STATE,
   Stop,
-  VEHICLE_EVENT
+  VEHICLE_EVENT,
+  TripMetadata
 } from '@mds-core/mds-types'
 import { MultiPolygon } from 'geojson'
 import {
@@ -33,7 +34,7 @@ export type AgencyApiSubmitVehicleEventRequest = AgencyApiRequest<VehicleEvent> 
 export type AgencyApiSubmitVehicleTelemetryRequest = AgencyApiRequest<{ data: Telemetry[] }>
 export type AgencyApiRegisterStopRequest = AgencyApiRequest<Stop>
 export type AgencyApiReadStopRequest = AgencyApiRequest & ApiRequestParams<'stop_id'>
-
+export type AgencyApiPostTripMetadataRequest = AgencyApiRequest<TripMetadata>
 export type AgencyApiAccessTokenScopes = 'admin:all' | 'vehicles:read'
 
 export type AgencyApiResponse<B = {}> = ApiResponse<B> &
@@ -71,6 +72,7 @@ export type AgencyApiReadStopsResponse = AgencyApiResponse<{
     >
   >[]
 }>
+export type AgencyApiPostTripMetadataResponse = AgencyApiResponse<TripMetadata>
 
 export interface ServiceArea {
   service_area_id: UUID

@@ -19,7 +19,8 @@ import {
   submitVehicleTelemetry,
   registerStop,
   readStop,
-  readStops
+  readStops,
+  writeTripMetadata
 } from './request-handlers'
 import { readAllVehicleIds } from './agency-candidate-request-handlers'
 import { getCacheInfo, wipeDevice, refreshCache } from './sandbox-admin-request-handlers'
@@ -148,6 +149,9 @@ function api(app: express.Express): express.Express {
   app.get(pathPrefix('/stops/:stop_id'), readStop)
 
   app.get(pathPrefix('/stops'), readStops)
+
+  /* Experimental Endpoint */
+  app.post(pathPrefix('/trips'), writeTripMetadata)
 
   return app
 }
