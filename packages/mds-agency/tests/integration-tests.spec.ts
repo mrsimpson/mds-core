@@ -1654,7 +1654,6 @@ describe('Tests TripMetadata', async () => {
         .send(subsetMetadata)
         .expect(400)
 
-      console.log(result.body)
       test.string(result.body.error.reason).is('invalid_value')
       test.string(result.body.error.info.details).contains(`value.${key} is required`)
     })
