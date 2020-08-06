@@ -1,12 +1,7 @@
 import test from 'unit.js'
 import { uuid, now } from '@mds-core/mds-utils'
-import { Timestamp, VEHICLE_EVENT } from '../../index'
-import {
-  VehicleEvent_v0_4_1,
-  VehicleEvent_v1_0_0,
-  v0_4_1_to_v1_0_0,
-  v1_0_0_to_v0_4_0
-} from '../transformers/vehicle_event_transformers'
+import { Timestamp, VEHICLE_EVENT, VehicleEvent_v0_4_1 } from '../../index'
+import { v0_4_1_to_v1_0_0 } from '../../transformers'
 
 const TIME = now()
 const DEVICE_ID = uuid()
@@ -28,13 +23,14 @@ describe('Test transformers', () => {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
       timestamp: TIME,
-      vehicle_state: 'provider_pick_up',
-      event_types: ['low_battery'],
+      vehicle_state: 'non_operational',
+      event_types: ['battery_low'],
       recorded: TIME
     })
     done()
   })
 
+  /*
   it('validates the transformation between v1.0.0 VehicleEvent and v0.4.0 VehicleEvent when there are multiple event types', done => {
     const event: VehicleEvent_v1_0_0 = {
       device_id: DEVICE_ID,
@@ -87,4 +83,5 @@ describe('Test transformers', () => {
     })
     done()
   })
+  */
 })

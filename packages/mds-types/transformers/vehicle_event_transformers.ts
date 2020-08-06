@@ -111,10 +111,46 @@ function convert_event_type_and_event_type_reason_to_event_type(
  "trip_leave",
  "trip_start"
 */
-export function convert_event_type_to_vehicle_state(event_type: VEHICLE_REASON_0_4_1): VEHICLE_STATE {
-  switch(event_type): {
+export function convert_event_type_to_vehicle_state(event_type: VEHICLE_EVENT_0_4_1): VEHICLE_STATE {
+  switch (event_type) {
     case 'agency_drop_off': {
-
+      return 'available'
+    }
+    case 'agency_pick_up': {
+      return 'removed'
+    }
+    case 'cancel_reservation': {
+      return 'available'
+    }
+    case 'deregister': {
+      return 'removed'
+    }
+    case 'provider_drop_off': {
+      return 'available'
+    }
+    case 'provider_pick_up': {
+      return 'removed'
+    }
+    case 'register': {
+      return 'removed'
+    }
+    case 'reserve': {
+      return 'reserved'
+    }
+    case 'service_end': {
+      return 'non_operational'
+    }
+    case 'service_start': {
+      return 'available'
+    }
+    case 'trip_end': {
+      return 'available'
+    }
+    case 'trip_leave': {
+      return 'elsewhere'
+    }
+    case 'trip_start': {
+      return 'on_trip'
     }
     default: {
       return 'unknown'
@@ -143,7 +179,7 @@ export function v0_4_1_to_v1_0_0(event: VehicleEvent_v0_4_1): VehicleEvent {
     timestamp,
     timestamp_long,
     delta,
-    vehicle_state: event_type,
+    vehicle_state: convert_event_type_to_vehicle_state(event_type),
     event_types: [convert_event_type_and_event_type_reason_to_event_type(event_type, event_type_reason)],
     telemetry_timestamp,
     telemetry,

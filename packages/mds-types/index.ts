@@ -239,7 +239,7 @@ export interface VehicleEvent_v0_4_1 {
   timestamp: Timestamp
   timestamp_long?: string | null
   delta?: Timestamp | null
-  event_type: VEHICLE_EVENTS_0_4_1
+  event_type: VEHICLE_EVENT_0_4_1
   event_type_reason?: VEHICLE_REASON_0_4_1 | null
   telemetry_timestamp?: Timestamp | null
   telemetry?: Telemetry | null
