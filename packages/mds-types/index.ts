@@ -51,22 +51,25 @@ export type VEHICLE_STATE = typeof VEHICLE_STATES[number]
 // export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
 export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip'] as const
 
-// export const VEHICLE_EVENTS = Enum(
-//   'register',
-//   'service_start',
-//   'service_end',
-//   'provider_drop_off',
-//   'provider_pick_up',
-//   'agency_pick_up',
-//   'agency_drop_off',
-//   'reserve',
-//   'cancel_reservation',
-//   'trip_start',
-//   'trip_enter',
-//   'trip_leave',
-//   'trip_end',
-//   'deregister'
-// )
+export const VEHICLE_EVENTS_0_4_1 = [
+  'register',
+  'service_start',
+  'service_end',
+  'provider_drop_off',
+  'provider_pick_up',
+  'agency_pick_up',
+  'agency_drop_off',
+  'reserve',
+  'cancel_reservation',
+  'trip_start',
+  'trip_enter',
+  'trip_leave',
+  'trip_end',
+  'deregister'
+] as const
+
+export type VEHICLE_EVENT_0_4_1 = typeof VEHICLE_EVENTS_0_4_1[number]
+
 export const VEHICLE_EVENTS = [
   'agency_drop_off',
   'agency_pick_up',
@@ -229,6 +232,21 @@ export interface Device {
 }
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
+
+export interface VehicleEvent_v0_4_1 {
+  device_id: UUID
+  provider_id: UUID
+  timestamp: Timestamp
+  timestamp_long?: string | null
+  delta?: Timestamp | null
+  event_type: VEHICLE_EVENTS_0_4_1
+  event_type_reason?: VEHICLE_REASON_0_4_1 | null
+  telemetry_timestamp?: Timestamp | null
+  telemetry?: Telemetry | null
+  trip_id?: UUID | null
+  service_area_id?: UUID | null
+  recorded: Timestamp
+}
 
 // Represents a row in the "events" table
 // Named "VehicleEvent" to avoid confusion with the DOM's Event interface

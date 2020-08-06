@@ -1,7 +1,12 @@
 import test from 'unit.js'
 import { uuid, now } from '@mds-core/mds-utils'
 import { Timestamp, VEHICLE_EVENT } from '../../index'
-import { VehicleEvent_v0_4_1, VehicleEvent_v1_0_0, v0_4_1_to_v1_0_0, v1_0_0_to_v0_4_0 } from '../transformers'
+import {
+  VehicleEvent_v0_4_1,
+  VehicleEvent_v1_0_0,
+  v0_4_1_to_v1_0_0,
+  v1_0_0_to_v0_4_0
+} from '../transformers/vehicle_event_transformers'
 
 const TIME = now()
 const DEVICE_ID = uuid()
