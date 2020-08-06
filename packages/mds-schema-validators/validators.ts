@@ -162,7 +162,7 @@ const propulsionTypeSchema = stringSchema.valid(...Object.keys(PROPULSION_TYPES)
 
 const vehicleStatusSchema = stringSchema.valid(...VEHICLE_STATES)
 
-const accessibilityOptionsSchema = stringSchema.valid(...ACCESSIBILITY_OPTIONS)
+export const accessibilityOptionsSchema = stringSchema.valid(...ACCESSIBILITY_OPTIONS)
 
 const modalitySchema = stringSchema.valid(...MODALITIES)
 
