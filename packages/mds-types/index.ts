@@ -65,7 +65,8 @@ export const VEHICLE_EVENTS_0_4_1 = [
   'trip_enter',
   'trip_leave',
   'trip_end',
-  'deregister'
+  'deregister',
+  'no_backconversion_available'
 ] as const
 
 export type VEHICLE_EVENT_0_4_1 = typeof VEHICLE_EVENTS_0_4_1[number]
