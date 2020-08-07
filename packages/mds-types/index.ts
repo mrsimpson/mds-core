@@ -51,26 +51,6 @@ export type VEHICLE_STATE = typeof VEHICLE_STATES[number]
 // export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
 export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip'] as const
 
-export const VEHICLE_EVENTS_0_4_1 = [
-  'register',
-  'service_start',
-  'service_end',
-  'provider_drop_off',
-  'provider_pick_up',
-  'agency_pick_up',
-  'agency_drop_off',
-  'reserve',
-  'cancel_reservation',
-  'trip_start',
-  'trip_enter',
-  'trip_leave',
-  'trip_end',
-  'deregister',
-  'no_backconversion_available'
-] as const
-
-export type VEHICLE_EVENT_0_4_1 = typeof VEHICLE_EVENTS_0_4_1[number]
-
 export const VEHICLE_EVENTS = [
   'agency_drop_off',
   'agency_pick_up',
@@ -100,19 +80,6 @@ export const VEHICLE_EVENTS = [
 ] as const
 
 export type VEHICLE_EVENT = typeof VEHICLE_EVENTS[number]
-
-export const VEHICLE_REASONS_0_4_1 = Enum(
-  'battery_charged',
-  'charge',
-  'compliance',
-  'decommissioned',
-  'low_battery',
-  'maintenance',
-  'missing',
-  'off_hours',
-  'rebalance'
-)
-export type VEHICLE_REASON_0_4_1 = keyof typeof VEHICLE_REASONS_0_4_1
 
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
@@ -233,21 +200,6 @@ export interface Device {
 }
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
-
-export interface VehicleEvent_v0_4_1 {
-  device_id: UUID
-  provider_id: UUID
-  timestamp: Timestamp
-  timestamp_long?: string | null
-  delta?: Timestamp | null
-  event_type: VEHICLE_EVENT_0_4_1
-  event_type_reason?: VEHICLE_REASON_0_4_1 | null
-  telemetry_timestamp?: Timestamp | null
-  telemetry?: Telemetry | null
-  trip_id?: UUID | null
-  service_area_id?: UUID | null
-  recorded: Timestamp
-}
 
 // Represents a row in the "events" table
 // Named "VehicleEvent" to avoid confusion with the DOM's Event interface

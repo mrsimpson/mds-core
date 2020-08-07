@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { uuid, now } from '@mds-core/mds-utils'
-import { Timestamp, VEHICLE_EVENT, VehicleEvent_v0_4_1, VehicleEvent } from '../../index'
+import { VehicleEvent_v0_4_1 } from '../../transformers/@types'
+import { VehicleEvent } from '../../index'
 import { convert_v0_4_1_to_v1_0_0, convert_v1_0_0_to_v0_4_1 } from '../../transformers'
 
 const TIME = now()
@@ -8,7 +9,7 @@ const DEVICE_ID = uuid()
 const PROVIDER_ID = uuid()
 
 describe('Test transformers', () => {
-  it('validates the transformation between v0.4.1 and v1.0.0 VehicleEvent types', done => {
+  it('spot checks the transformation between v0.4.1 and v1.0.0 VehicleEvent types', done => {
     const event: VehicleEvent_v0_4_1 = {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
@@ -59,7 +60,7 @@ describe('Test transformers', () => {
     done()
   })
 
-  it('validates some of the transformations between v1.0.0 VehicleEvent and v0.4.0 VehicleEvent when there are multiple event types', done => {
+  it('spot checks the transformations between v1.0.0 VehicleEvent and v0.4.0 VehicleEvent when there are multiple event types', done => {
     const eventA: VehicleEvent = {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
