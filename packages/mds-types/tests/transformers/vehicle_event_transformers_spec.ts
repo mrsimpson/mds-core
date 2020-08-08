@@ -57,6 +57,30 @@ describe('Test transformers', () => {
       timestamp_long: null,
       trip_id: null
     })
+
+    const event3: VehicleEvent_v0_4_1 = {
+      device_id: DEVICE_ID,
+      provider_id: PROVIDER_ID,
+      timestamp: TIME,
+      event_type: 'trip_enter',
+      recorded: TIME
+    }
+
+    const transformedEvent3 = convert_v0_4_1_to_v1_0_0(event3)
+
+    assert.deepEqual(transformedEvent3, {
+      delta: null,
+      device_id: DEVICE_ID,
+      provider_id: PROVIDER_ID,
+      timestamp: TIME,
+      vehicle_state: 'on_trip',
+      event_types: ['trip_enter_jurisdiction'],
+      recorded: TIME,
+      telemetry: null,
+      telemetry_timestamp: null,
+      timestamp_long: null,
+      trip_id: null
+    })
     done()
   })
 
