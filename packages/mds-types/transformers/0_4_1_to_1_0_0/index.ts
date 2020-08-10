@@ -1,11 +1,15 @@
-import { VEHICLE_REASON_0_4_1, VehicleEvent_v0_4_1, VEHICLE_EVENT_0_4_1 } from '../@types'
+import {
+  VEHICLE_REASON_0_4_1,
+  VehicleEvent_v0_4_1,
+  VEHICLE_EVENT_0_4_1,
+  TRANSFORMER_VEHICLE_EVENT,
+  TRANSFORMER_EVENT_TYPE_REASON
+} from '../@types'
 import { VEHICLE_EVENT, VehicleEvent, VEHICLE_STATE } from '../../index'
 
-type EVENT_TYPE_REASONS = VEHICLE_REASON_0_4_1 | 'no_event_type_reason'
-
 export const FULL_STATE_MAPPING_0_4_1_to_1_0_0: {
-  [P in VEHICLE_EVENT_0_4_1]: {
-    [Q in EVENT_TYPE_REASONS]: {
+  [P in VEHICLE_EVENT_0_4_1 | TRANSFORMER_VEHICLE_EVENT]: {
+    [Q in VEHICLE_REASON_0_4_1 | TRANSFORMER_EVENT_TYPE_REASON]: {
       event_type: VEHICLE_EVENT
       vehicle_state: VEHICLE_STATE
     }
@@ -64,15 +68,14 @@ export const FULL_STATE_MAPPING_0_4_1_to_1_0_0: {
   /* This event_type exists only to ensure backconversions and should not be present in any
    * real events submitted via 0.4.1.
    */
-
   no_backconversion_available: {
     no_event_type_reason: { event_type: 'unspecified', vehicle_state: 'unknown' }
   }
 }
 
 function map_v_0_4_1_fields_to_v_1_0_0_fields(
-  event_type: VEHICLE_EVENT_0_4_1,
-  event_type_reason: VEHICLE_REASON_0_4_1 | null | undefined
+  event_type: VEHICLE_EVENT_0_4_1 | TRANSFORMER_VEHICLE_EVENT,
+  event_type_reason: VEHICLE_REASON_0_4_1 | TRANSFORMER_EVENT_TYPE_REASON | null | undefined
 ): { event_type: VEHICLE_EVENT; vehicle_state: VEHICLE_STATE } {
   if (event_type_reason) {
     return FULL_STATE_MAPPING_0_4_1_to_1_0_0[event_type][event_type_reason]

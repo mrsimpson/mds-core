@@ -35,9 +35,9 @@ export type RULE_TYPE = keyof typeof RULE_TYPES
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
-// export const VEHICLE_STATUSES = Enum('available', 'reserved', 'unavailable', 'removed', 'inactive', 'trip', 'elsewhere')
-// export type VEHICLE_STATUS = keyof typeof VEHICLE_STATUSES
-export const VEHICLE_STATES = [
+export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip'] as const
+
+export const VEHICLE_STATES_1_0_0 = [
   'available',
   'elsewhere',
   'non_operational',
@@ -46,12 +46,9 @@ export const VEHICLE_STATES = [
   'reserved',
   'unknown'
 ] as const
-export type VEHICLE_STATE = typeof VEHICLE_STATES[number]
+export type VEHICLE_STATE = typeof VEHICLE_STATES_1_0_0[number]
 
-// export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
-export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip'] as const
-
-export const VEHICLE_EVENTS = [
+export const VEHICLE_EVENTS_1_0_0 = [
   'agency_drop_off',
   'agency_pick_up',
   'battery_charged',
@@ -79,27 +76,10 @@ export const VEHICLE_EVENTS = [
   'unspecified'
 ] as const
 
-export type VEHICLE_EVENT = typeof VEHICLE_EVENTS[number]
+export type VEHICLE_EVENT = typeof VEHICLE_EVENTS_1_0_0[number]
 
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
-
-// export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE } = {
-//   register: VEHICLE_STATES.removed,
-//   service_start: VEHICLE_STATES.available,
-//   service_end: VEHICLE_STATES.unavailable,
-//   provider_drop_off: VEHICLE_STATES.available,
-//   provider_pick_up: VEHICLE_STATES.removed,
-//   agency_pick_up: VEHICLE_STATES.removed,
-//   agency_drop_off: VEHICLE_STATES.available,
-//   reserve: VEHICLE_STATES.reserved,
-//   cancel_reservation: VEHICLE_STATES.available,
-//   trip_start: VEHICLE_STATES.trip,
-//   trip_enter: VEHICLE_STATES.trip,
-//   trip_leave: VEHICLE_STATES.elsewhere,
-//   trip_end: VEHICLE_STATES.available,
-//   deregister: VEHICLE_STATES.inactive
-// }
 
 // States you transition into based on event_type
 export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE[] } = {

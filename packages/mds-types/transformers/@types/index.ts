@@ -36,8 +36,7 @@ export const VEHICLE_EVENTS_0_4_1 = [
   'trip_enter',
   'trip_leave',
   'trip_end',
-  'deregister',
-  'no_backconversion_available'
+  'deregister'
 ] as const
 
 export type VEHICLE_EVENT_0_4_1 = typeof VEHICLE_EVENTS_0_4_1[number]
@@ -48,11 +47,43 @@ export interface VehicleEvent_v0_4_1 {
   timestamp: Timestamp
   timestamp_long?: string | null
   delta?: Timestamp | null
-  event_type: VEHICLE_EVENT_0_4_1
-  event_type_reason?: VEHICLE_REASON_0_4_1 | null
+  event_type: VEHICLE_EVENT_0_4_1 | TRANSFORMER_VEHICLE_EVENT
+  event_type_reason?: VEHICLE_REASON_0_4_1 | null | TRANSFORMER_EVENT_TYPE_REASON
   telemetry_timestamp?: Timestamp | null
   telemetry?: Telemetry | null
   trip_id?: UUID | null
   service_area_id?: UUID | null
   recorded: Timestamp
 }
+
+export const VEHICLE_STATES_0_4_1 = [
+  'available',
+  'elsewhere',
+  'inactive',
+  'trip',
+  'removed',
+  'reserved',
+  'unavailable'
+] as const
+export type VEHICLE_STATE_0_4_1 = typeof VEHICLE_STATES_0_4_1[number]
+
+// Old event-states transitions.
+export const EVENT_STATES_MAP_0_4_1: { [P in VEHICLE_EVENT_0_4_1]: VEHICLE_STATE_0_4_1 } = {
+  register: 'removed',
+  service_start: 'available',
+  service_end: 'unavailable',
+  provider_drop_off: 'available',
+  provider_pick_up: 'removed',
+  agency_pick_up: 'removed',
+  agency_drop_off: 'available',
+  reserve: 'reserved',
+  cancel_reservation: 'available',
+  trip_start: 'trip',
+  trip_enter: 'trip',
+  trip_leave: 'elsewhere',
+  trip_end: 'available',
+  deregister: 'inactive'
+}
+
+export type TRANSFORMER_VEHICLE_EVENT = 'no_backconversion_available'
+export type TRANSFORMER_EVENT_TYPE_REASON = 'no_event_type_reason'

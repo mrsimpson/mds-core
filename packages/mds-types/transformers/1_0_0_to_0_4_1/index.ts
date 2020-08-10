@@ -1,9 +1,9 @@
-import { VEHICLE_REASON_0_4_1, VehicleEvent_v0_4_1, VEHICLE_EVENT_0_4_1 } from '../@types'
+import { VEHICLE_REASON_0_4_1, VehicleEvent_v0_4_1, VEHICLE_EVENT_0_4_1, TRANSFORMER_VEHICLE_EVENT } from '../@types'
 import { VEHICLE_EVENT, VehicleEvent } from '../../index'
 
 export const FULL_STATE_MAPPING_1_0_0_to_0_4_1: {
   [P in VEHICLE_EVENT]: {
-    event_type: VEHICLE_EVENT_0_4_1
+    event_type: VEHICLE_EVENT_0_4_1 | TRANSFORMER_VEHICLE_EVENT
     event_type_reason?: VEHICLE_REASON_0_4_1
   }
 } = {
