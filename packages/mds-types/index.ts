@@ -37,7 +37,7 @@ export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
 export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip'] as const
 
-export const VEHICLE_STATES_1_0_0 = [
+const VEHICLE_STATES_1_0_0 = [
   'available',
   'elsewhere',
   'non_operational',
@@ -47,8 +47,9 @@ export const VEHICLE_STATES_1_0_0 = [
   'unknown'
 ] as const
 export type VEHICLE_STATE = typeof VEHICLE_STATES_1_0_0[number]
+export const VEHICLE_STATES = VEHICLE_STATES_1_0_0
 
-export const VEHICLE_EVENTS_1_0_0 = [
+const VEHICLE_EVENTS_1_0_0 = [
   'agency_drop_off',
   'agency_pick_up',
   'battery_charged',
@@ -76,6 +77,7 @@ export const VEHICLE_EVENTS_1_0_0 = [
   'unspecified'
 ] as const
 
+export const VEHICLE_EVENTS = VEHICLE_EVENTS_1_0_0
 export type VEHICLE_EVENT = typeof VEHICLE_EVENTS_1_0_0[number]
 
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
