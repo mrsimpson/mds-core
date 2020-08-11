@@ -84,7 +84,7 @@ describe('Test transformers', () => {
     done()
   })
 
-  it('spot checks the transformations between v1.0.0 VehicleEvent and v0.4.0 VehicleEvent when there are multiple event types', done => {
+  it('spot checks the transformations between v1.0.0 VehicleEvent and v0.4.1 VehicleEvent when there are multiple event types', done => {
     const eventA: VehicleEvent = {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
