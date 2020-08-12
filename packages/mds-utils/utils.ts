@@ -51,21 +51,19 @@ const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
 
 /* Is `as` a subset of `bs`? */
 const isSubset = <T extends Array<string>, U extends Readonly<Array<string>>>(as: T, bs: U) => {
-  return !as.some(a => !bs.includes(a))
+  return as.every(a => bs.includes(a))
 }
 
 const isMicroMobilityEvent = (
-  device: Pick<Device, 'modality'>,
+  { modality }: Pick<Device, 'modality'>,
   event: VehicleEvent
 ): event is MicroMobilityVehicleEvent => {
   const { event_types } = event
-  const { modality } = device
   return modality === 'micro-mobility' && isSubset(event_types, MICRO_MOBILITY_VEHICLE_EVENTS)
 }
 
-const isTaxiEvent = (device: Pick<Device, 'modality'>, event: VehicleEvent): event is TaxiVehicleEvent => {
+const isTaxiEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TaxiVehicleEvent => {
   const { event_types } = event
-  const { modality } = device
   return modality === 'taxi' && isSubset(event_types, TAXI_VEHICLE_EVENTS)
 }
 

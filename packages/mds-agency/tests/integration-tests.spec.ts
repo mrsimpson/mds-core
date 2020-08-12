@@ -1588,7 +1588,7 @@ describe('Tests for taxi modality', async () => {
    * are not included in the valid Taxi events.
    */
   const MICRO_MOBILITY_EVENTS_NOT_IN_TAXI_EVENTS = MICRO_MOBILITY_VEHICLE_EVENTS.filter(
-    item => TAXI_VEHICLE_EVENTS.indexOf(item as TAXI_VEHICLE_EVENT) < 0
+    item => !TAXI_VEHICLE_EVENTS.includes(item as TAXI_VEHICLE_EVENT)
   )
 
   for (const microEvent of MICRO_MOBILITY_EVENTS_NOT_IN_TAXI_EVENTS) {

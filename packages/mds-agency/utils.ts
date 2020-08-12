@@ -293,7 +293,7 @@ export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObje
 }
 
 // TODO Joi
-export async function badEvent(device: Pick<Device, 'modality'>, event: VehicleEvent) {
+export async function badEvent({ modality }: Pick<Device, 'modality'>, event: VehicleEvent) {
   if (event.timestamp === undefined) {
     return {
       error: 'missing_param',
@@ -329,7 +329,6 @@ export async function badEvent(device: Pick<Device, 'modality'>, event: VehicleE
     return { error: 'missing_param', error_description: 'missing enum field "vehicle_state"' }
   }
 
-  const { modality } = device
   if (modality === 'micro-mobility') {
     for (const event_type of event.event_types) {
       if (!MICRO_MOBILITY_VEHICLE_EVENTS.includes(event_type as MICRO_MOBILITY_VEHICLE_EVENT))
