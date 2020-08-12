@@ -23,13 +23,15 @@ export const FULL_STATE_MAPPING_0_4_1_to_1_0_0: {
   cancel_reservation: { no_event_type_reason: { event_type: 'reservation_cancel', vehicle_state: 'available' } },
   deregister: {
     decommissioned: { event_type: 'decommissioned', vehicle_state: 'removed' },
-    missing: { event_type: 'missing', vehicle_state: 'removed' }
+    missing: { event_type: 'missing', vehicle_state: 'removed' },
+    no_event_type_reason: { event_type: 'decommissioned', vehicle_state: 'removed' }
   },
   provider_pick_up: {
     rebalance: { event_type: 'rebalance_pick_up', vehicle_state: 'removed' },
     maintenance: { event_type: 'maintenance_pick_up', vehicle_state: 'removed' },
     charge: { event_type: 'maintenance_pick_up', vehicle_state: 'removed' },
-    compliance: { event_type: 'compliance_pick_up', vehicle_state: 'removed' }
+    compliance: { event_type: 'compliance_pick_up', vehicle_state: 'removed' },
+    no_event_type_reason: { event_type: 'maintenance_pick_up', vehicle_state: 'removed' }
   },
   provider_drop_off: {
     no_event_type_reason: { event_type: 'provider_drop_off', vehicle_state: 'available' }
@@ -44,7 +46,8 @@ export const FULL_STATE_MAPPING_0_4_1_to_1_0_0: {
     low_battery: { event_type: 'battery_low', vehicle_state: 'non_operational' },
     maintenance: { event_type: 'maintenance', vehicle_state: 'non_operational' },
     compliance: { event_type: 'compliance_pick_up', vehicle_state: 'non_operational' },
-    off_hours: { event_type: 'off_hours', vehicle_state: 'non_operational' }
+    off_hours: { event_type: 'off_hours', vehicle_state: 'non_operational' },
+    no_event_type_reason: { event_type: 'maintenance', vehicle_state: 'non_operational' }
   },
   trip_end: {
     no_event_type_reason: { event_type: 'trip_end', vehicle_state: 'available' }
