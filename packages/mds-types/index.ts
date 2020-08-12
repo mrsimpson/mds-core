@@ -137,7 +137,7 @@ export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE[] } = {
   battery_charged: ['available'],
   battery_low: ['non_operational'],
   comms_lost: ['unknown'],
-  comms_restored: ['available', 'non_operational', 'reserved', 'on_trip', 'elsewhere'],
+  comms_restored: ['available', 'elsewhere', 'non_operational', 'removed', 'reserved', 'on_trip'],
   compliance_pick_up: ['removed'],
   decommissioned: ['removed'],
   maintenance: ['available', 'non_operational'],
@@ -156,7 +156,7 @@ export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE[] } = {
   trip_enter_jurisdiction: ['on_trip'],
   trip_leave_jurisdiction: ['elsewhere'],
   trip_start: ['on_trip'],
-  unspecified: ['available', 'non_operational', 'removed']
+  unspecified: ['available', 'elsewhere', 'non_operational', 'on_trip', 'removed', 'reserved', 'unknown']
 }
 
 const StatusEventMap = <T extends { [S in VEHICLE_STATE]: Partial<VEHICLE_EVENT[]> }>(map: T) => map
