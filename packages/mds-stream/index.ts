@@ -188,14 +188,10 @@ async function writeTelemetry(telemetry: Telemetry[]) {
 }
 
 const writeTripMetadata = async (metadata: TripMetadata) => {
-  const streamWrites = []
-  if (env.NATS) {
-    streamWrites.push(AgencyStreamNats.writeTripMetadata(metadata))
-  }
-  if (env.KAFKA_HOST) {
-    streamWrites.push(AgencyStreamKafka.writeTripMetadata(metadata))
-  }
-  return Promise.all(streamWrites)
+  return Promise.all([
+    ...(env.NATS ? [AgencyStreamNats.writeTripMetadata(metadata)] : []),
+    ...(env.KAFKA_HOST ? [AgencyStreamKafka.writeTripMetadata(metadata)] : [])
+  ])
 }
 
 async function readStream(
