@@ -1,12 +1,13 @@
 import assert from 'assert'
 import { uuid, now } from '@mds-core/mds-utils'
 import { VehicleEvent_v0_4_1 } from '../../transformers/@types'
-import { VehicleEvent } from '../../index'
+import { VehicleEvent, VehicleEvent_1_0_0 } from '../../index'
 import { convert_v1_0_0_vehicle_event_to_v0_4_1, convert_v0_4_1_vehicle_event_to_v1_0_0 } from '../../transformers'
 
 const TIME = now()
 const DEVICE_ID = uuid()
 const PROVIDER_ID = uuid()
+const STOP_ID = uuid()
 
 describe('Test transformers', () => {
   it('spot checks the transformation between v0.4.1 and v1.0.0 VehicleEvent types', done => {
@@ -98,18 +99,43 @@ describe('Test transformers', () => {
     assert.deepEqual(converted_eventA_1.event_type, 'provider_drop_off')
     assert.deepEqual(converted_eventA_2.event_type, 'trip_start')
 
-    const eventB: VehicleEvent = {
+    const eventB: VehicleEvent_1_0_0 = {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
       timestamp: TIME,
       vehicle_state: 'available',
       event_types: ['comms_lost', 'comms_restored'],
+      telemetry: {
+        provider_id: PROVIDER_ID,
+        device_id: DEVICE_ID,
+        timestamp: TIME,
+        gps: {
+          lat: 1000,
+          lng: 1000,
+          speed: 1,
+          hdop: 5,
+          heading: 5
+        },
+        stop_id: STOP_ID
+      },
       recorded: TIME
     }
 
     const { 0: converted_eventB_1, 1: converted_eventB_2 } = convert_v1_0_0_vehicle_event_to_v0_4_1(eventB)
     assert.deepEqual(converted_eventB_1.event_type, 'no_backconversion_available')
     assert.deepEqual(converted_eventB_2.event_type, 'no_backconversion_available')
+    assert.deepEqual(converted_eventB_2.telemetry, {
+      provider_id: PROVIDER_ID,
+      device_id: DEVICE_ID,
+      timestamp: TIME,
+      gps: {
+        lat: 1000,
+        lng: 1000,
+        speed: 1,
+        hdop: 5,
+        heading: 5
+      }
+    })
     done()
   })
 })

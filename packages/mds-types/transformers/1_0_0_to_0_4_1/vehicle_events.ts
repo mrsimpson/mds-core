@@ -1,3 +1,4 @@
+import { clone } from '@mds-core/mds-utils'
 import { VEHICLE_REASON_0_4_1, VehicleEvent_v0_4_1, VEHICLE_EVENT_0_4_1, TRANSFORMER_VEHICLE_EVENT } from '../@types'
 import { VehicleEvent_1_0_0, VEHICLE_EVENT_1_0_0 } from '../../index'
 
@@ -90,6 +91,11 @@ function convert_v1_0_0_to_v0_4_1_helper(
   current_event_type: VEHICLE_EVENT_1_0_0
 ): VehicleEvent_v0_4_1 {
   const { event_type, event_type_reason } = FULL_STATE_MAPPING_1_0_0_to_0_4_1[current_event_type]
+
+  const telemetry = event.telemetry ? clone(event.telemetry) : null
+  if (telemetry && telemetry.stop_id) {
+    delete telemetry.stop_id
+  }
   return {
     device_id: event.device_id,
     provider_id: event.provider_id,
@@ -99,6 +105,7 @@ function convert_v1_0_0_to_v0_4_1_helper(
     event_type,
     event_type_reason,
     telemetry_timestamp: event.telemetry_timestamp,
+    telemetry,
     trip_id: event.trip_id,
     service_area_id: null,
     recorded: event.recorded

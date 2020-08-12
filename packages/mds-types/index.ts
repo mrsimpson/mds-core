@@ -182,13 +182,18 @@ export interface Device_v1_0_0 {
   recorded: Timestamp
   state?: VEHICLE_STATE | null
 }
+/**
+ * This is an alias that must be updated in the event of future changes to the type.
+ */
 export type Device = Device_v1_0_0
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
 
-/* Represents a row in the "events" table
+/**
+ *  Represents a row in the "events" table
  * Named "VehicleEvent" to avoid confusion with the DOM's Event interface
  * Keeping 1_0_0 types in here and not in transformers/@types to avoid circular imports.
+ * This alias must be updated if this type is updated.
  */
 export interface VehicleEvent_1_0_0 {
   device_id: UUID
@@ -233,6 +238,7 @@ export interface Telemetry extends WithGpsProperty<TelemetryData> {
   device_id: UUID
   timestamp: Timestamp
   recorded?: Timestamp
+  stop_id?: UUID | null
 }
 
 // Represents a row in the "attachments" table

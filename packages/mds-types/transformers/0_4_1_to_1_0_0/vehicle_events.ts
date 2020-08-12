@@ -97,6 +97,7 @@ export function convert_v0_4_1_vehicle_event_to_v1_0_0(event: VehicleEvent_v0_4_
     trip_id = null,
     recorded
   } = event
+
   const { event_type: new_event_type, vehicle_state } = map_v_0_4_1_vehicle_event_fields_to_v_1_0_0_fields(
     event_type,
     event_type_reason
