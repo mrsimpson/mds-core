@@ -1,7 +1,7 @@
 import express from 'express'
 import { Query } from 'express-serve-static-core'
 
-import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox, areThereCommonElements } from '@mds-core/mds-utils'
+import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox, areThereCommonElements, clone } from '@mds-core/mds-utils'
 import stream from '@mds-core/mds-stream'
 import {
   UUID,
@@ -417,7 +417,16 @@ export async function validateDeviceId(req: express.Request, res: express.Respon
   next()
 }
 
-export function computeCompositeVehicleData(payload: VehiclePayload) {
+export function downConvertCompositeVehicleData(composite) {
+  const newComposite = clone(composite)
+  const [prev_event] = newComposite.prev_events
+  delete newComposite.prev_events
+  newComposite.prev_event = prev_event
+  newComposite.status = composite.state
+  return newComposite
+}
+
+export function computeCompositeVehicleData(version: AGENCY_API_SUPPORTED_VERSION, payload: VehiclePayload) {
   const { device, event, telemetry } = payload
 
   const composite: CompositeVehicle = {
@@ -436,6 +445,9 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
     if (telemetry.gps) {
       composite.gps = telemetry.gps
     }
+  }
+  if (version === '0.4.1') {
+    return downConvertCompositeVehicleData(composite)
   }
   return composite
 }

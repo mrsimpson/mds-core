@@ -1268,7 +1268,7 @@ describe('Tests API', () => {
         done(err)
       })
   })
-  it('verifies get device readback w/telemetry success (database)', done => {
+  it.only('verifies get device readback with telemetry success (database)', done => {
     request
       .get(pathPrefix(`/vehicles/${DEVICE_UUID}`))
       .set('Authorization', AUTH)
@@ -1279,8 +1279,8 @@ describe('Tests API', () => {
         test.value(deviceA.device_id).is(DEVICE_UUID)
         test.value(deviceA.provider_id).is(TEST1_PROVIDER_ID)
         test.value(deviceA.gps.lat).is(TEST_TELEMETRY.gps.lat)
-        test.value(deviceA.state).is('available')
-        test.value(JSON.stringify(deviceA.prev_events)).is(JSON.stringify(['reservation_cancel']))
+        test.value(deviceA.status).is('available')
+        test.value(deviceA.prev_event).is('reservation_cancel')
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })

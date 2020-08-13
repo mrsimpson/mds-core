@@ -111,6 +111,7 @@ export const getVehicleById = async (req: AgencyApiGetVehicleByIdRequest, res: A
   const { provider_id } = res.locals.scopes.includes('vehicles:read')
     ? parseRequest(req).single().query('provider_id')
     : res.locals
+  const {  version } = res.locals
 
   const payload = await readPayload(device_id)
 
@@ -118,7 +119,7 @@ export const getVehicleById = async (req: AgencyApiGetVehicleByIdRequest, res: A
     res.status(404).send({})
     return
   }
-  const compositeData = computeCompositeVehicleData(payload)
+  const compositeData = computeCompositeVehicleData(version, payload)
   res.status(200).send({ ...compositeData })
 }
 
