@@ -38,7 +38,7 @@ import { makeDevices, makeEvents, GEOGRAPHY_UUID, LA_CITY_BOUNDARY, JUMP_TEST_DE
 import { ApiServer } from '@mds-core/mds-api-server'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
 import { pathPrefix } from '@mds-core/mds-utils'
-import { api } from '../api'
+import { api } from '../../api'
 
 /* eslint-disable-next-line no-console */
 const log = console.log.bind(console)
@@ -219,7 +219,7 @@ describe('Tests API', () => {
       })
   })
 
-  it.only('verifies post device bad propulsion', done => {
+  it('verifies post device bad propulsion', done => {
     const badVehicle = deepCopy(TEST_VEHICLE)
     // @ts-ignore: Spoofing garbage data
     badVehicle.propulsion_types = ['hamster']

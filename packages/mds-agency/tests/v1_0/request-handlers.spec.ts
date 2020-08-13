@@ -13,15 +13,15 @@ import {
   AgencyApiUpdateVehicleRequest,
   AgencyApiRegisterVehicleRequest,
   AgencyApiGetVehiclesByProviderRequest
-} from '../types'
+} from '../../types'
 import {
   registerVehicle,
   getVehicleById,
   getVehiclesByProvider,
   updateVehicleFail,
   updateVehicle
-} from '../request-handlers'
-import * as utils from '../utils'
+} from '../../request-handlers'
+import * as utils from '../../utils'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -29,7 +29,7 @@ function getLocals(provider_id: string) {
   return { provider_id, scopes: [] }
 }
 
-describe('Agency API request handlers', () => {
+describe.only('Agency API request handlers', () => {
   describe('Register vehicle', () => {
     const getFakeBody = () => {
       const device_id = uuid()
@@ -75,6 +75,7 @@ describe('Agency API request handlers', () => {
       } as any)
       res.status = statusHandler
       res.locals = getLocals(provider_id) as any
+      res.locals.version = '1.0.0'
       Sinon.replace(db, 'writeDevice', Sinon.fake.rejects('fake-rejects-db'))
       await registerVehicle({ body } as AgencyApiRegisterVehicleRequest, res)
       assert.equal(statusHandler.calledWith(500), true)
@@ -92,6 +93,7 @@ describe('Agency API request handlers', () => {
       } as any)
       res.status = statusHandler
       res.locals = getLocals(provider_id) as any
+      res.locals.version = '1.0.0'
       Sinon.replace(db, 'writeDevice', Sinon.fake.rejects('fake-rejects-other'))
       await registerVehicle({ body } as AgencyApiRegisterVehicleRequest, res)
       assert.equal(statusHandler.calledWith(500), true)

@@ -18,6 +18,7 @@ import {
   ApiRequestParams,
   ApiVersion
 } from '@mds-core/mds-api-server'
+import { Device_v0_4_1 } from '@mds-core/mds-types/transformers/@types'
 
 export const AGENCY_API_SUPPORTED_VERSIONS = ['0.4.1', '1.0.0'] as const
 export type AGENCY_API_SUPPORTED_VERSION = typeof AGENCY_API_SUPPORTED_VERSIONS[number]
@@ -25,7 +26,7 @@ export const [AGENCY_API_DEFAULT_VERSION] = AGENCY_API_SUPPORTED_VERSIONS // def
 
 export type AgencyApiRequest<B = {}> = ApiRequest<B>
 
-export type AgencyApiRegisterVehicleRequest = AgencyApiRequest<Device>
+export type AgencyApiRegisterVehicleRequest = AgencyApiRequest<Device | Device_v0_4_1>
 export type AgencyApiGetVehicleByIdRequest = AgencyApiRequest & ApiRequestParams<'device_id'>
 export type AgencyApiGetVehiclesByProviderRequest = AgencyApiRequest
 export type AgencyApiUpdateVehicleRequest = AgencyApiRequest<Device> & ApiRequestParams<'device_id'>

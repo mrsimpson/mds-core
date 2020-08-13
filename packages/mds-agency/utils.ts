@@ -22,6 +22,7 @@ import logger from '@mds-core/mds-logger'
 import cache from '@mds-core/mds-agency-cache'
 import { convert_v0_4_1_device_to_v1_0_0 } from '@mds-core/mds-types/transformers'
 import { isArray } from 'util'
+import { MinorVersion } from '@mds-core/mds-api-server/middleware/api-version'
 import {
   VehiclePayload,
   TelemetryResult,
@@ -470,10 +471,12 @@ export function upconvert_device_to_latest(
   version: AGENCY_API_SUPPORTED_VERSION | null | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body_params: any
-): Device {
+): Partial<Device> {
   const { provider_id, recorded, device_id, vehicle_id, year, mfgr, model } = body_params
-  switch (version) {
-    case '0.4.1': {
+  console.log('body_params: ', body_params)
+  console.log('version: ', version)
+  switch (version ? MinorVersion(version) : null) {
+    case '0.4': {
       return convert_v0_4_1_device_to_v1_0_0({
         provider_id,
         device_id,
@@ -487,7 +490,7 @@ export function upconvert_device_to_latest(
         recorded
       })
     }
-    default:
+    case '1.0':
       return {
         provider_id,
         device_id,
@@ -500,5 +503,19 @@ export function upconvert_device_to_latest(
         state: body_params.state,
         recorded
       }
+    default: {
+      return convert_v0_4_1_device_to_v1_0_0({
+        provider_id,
+        device_id,
+        vehicle_id,
+        type: body_params.type,
+        propulsion: body_params.propulsion,
+        year,
+        mfgr,
+        model,
+        status: body_params.status,
+        recorded
+      })
+    }
   }
 }
