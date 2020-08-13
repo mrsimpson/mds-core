@@ -2,7 +2,7 @@ import assert from 'assert'
 import { uuid, now } from '@mds-core/mds-utils'
 import { Device_v0_4_1 } from '../../transformers/@types'
 import { Device_v1_0_0 } from '../../index'
-import { convert_v0_4_1_device_to_1_0_0, convert_v1_0_0_device_to_0_4_1 } from '../../transformers'
+import { convert_v0_4_1_device_to_v1_0_0, convert_v1_0_0_device_to_v0_4_1 } from '../../transformers'
 
 const TIME = now()
 const DEVICE_ID = uuid()
@@ -21,7 +21,7 @@ describe('Test transformers', () => {
       recorded: TIME
     }
 
-    assert.deepEqual(convert_v0_4_1_device_to_1_0_0(device), {
+    assert.deepEqual(convert_v0_4_1_device_to_v1_0_0(device), {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
       vehicle_id: VEHICLE_ID,
@@ -51,7 +51,7 @@ describe('Test transformers', () => {
       model: 'fancy'
     }
 
-    assert.deepEqual(convert_v1_0_0_device_to_0_4_1(device), {
+    assert.deepEqual(convert_v1_0_0_device_to_v0_4_1(device), {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
       vehicle_id: VEHICLE_ID,

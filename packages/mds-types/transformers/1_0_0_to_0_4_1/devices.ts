@@ -1,7 +1,7 @@
 import { Device_v1_0_0 } from '../../index'
 import { Device_v0_4_1 } from '../@types'
 
-export function convert_v1_0_0_device_to_0_4_1(device: Device_v1_0_0): Device_v0_4_1 {
+export function convert_v1_0_0_device_to_v0_4_1(device: Device_v1_0_0): Device_v0_4_1 {
   const {
     provider_id,
     device_id,

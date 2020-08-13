@@ -219,7 +219,7 @@ describe('Tests API', () => {
       })
   })
 
-  it('verifies post device bad propulsion', done => {
+  it.only('verifies post device bad propulsion', done => {
     const badVehicle = deepCopy(TEST_VEHICLE)
     // @ts-ignore: Spoofing garbage data
     badVehicle.propulsion_types = ['hamster']

@@ -20,8 +20,15 @@ import {
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
 import cache from '@mds-core/mds-agency-cache'
+import { convert_v0_4_1_device_to_v1_0_0 } from '@mds-core/mds-types/transformers'
 import { isArray } from 'util'
-import { VehiclePayload, TelemetryResult, CompositeVehicle, PaginatedVehiclesList } from './types'
+import {
+  VehiclePayload,
+  TelemetryResult,
+  CompositeVehicle,
+  PaginatedVehiclesList,
+  AGENCY_API_SUPPORTED_VERSION
+} from './types'
 
 export function badDevice(device: Device): { error: string; error_description: string } | null {
   if (!device.device_id) {
@@ -457,4 +464,41 @@ export async function readPayload(device_id: UUID): Promise<VehiclePayload> {
     logger.error(err)
   }
   return payload
+}
+
+export function upconvert_device_to_latest(
+  version: AGENCY_API_SUPPORTED_VERSION | null | undefined,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body_params: any
+): Device {
+  const { provider_id, recorded, device_id, vehicle_id, year, mfgr, model } = body_params
+  switch (version) {
+    case '0.4.1': {
+      return convert_v0_4_1_device_to_v1_0_0({
+        provider_id,
+        device_id,
+        vehicle_id,
+        type: body_params.type,
+        propulsion: body_params.propulsion,
+        year,
+        mfgr,
+        model,
+        status: body_params.status,
+        recorded
+      })
+    }
+    default:
+      return {
+        provider_id,
+        device_id,
+        vehicle_id,
+        vehicle_type: body_params.vehicle_type,
+        propulsion_types: body_params.propulsion_types,
+        year,
+        mfgr,
+        model,
+        state: body_params.state,
+        recorded
+      }
+  }
 }

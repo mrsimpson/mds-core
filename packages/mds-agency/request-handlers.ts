@@ -45,7 +45,8 @@ import {
   badEvent,
   badTelemetry,
   readPayload,
-  computeCompositeVehicleData
+  computeCompositeVehicleData,
+  upconvert_device_to_latest
 } from './utils'
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -57,26 +58,20 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   const recorded = now()
 
   const { provider_id, version } = res.locals
-  if (!version || version === '0.4.1') {
-    // convert old body into new body
-  }
-  // const { device_id, vehicle_id, type, propulsion, year, mfgr, model } = body
-  const { device_id, vehicle_id, vehicle_type, propulsion_types, year, mfgr, model } = body
+
+  console.log('body body')
+  console.log(body)
+  console.log('version: ', version)
+  body.provider_id = provider_id
+  body.recorded = now()
+  // Including `provider_id` because the transformers expect it there.
+  const { device_id, vehicle_id, vehicle_type, propulsion_types, year, mfgr, model } = upconvert_device_to_latest(
+    version,
+    body
+  )
 
   const status: VEHICLE_STATE = 'removed'
 
-  // const device = {
-  //   provider_id,
-  //   device_id,
-  //   vehicle_id,
-  //   type,
-  //   propulsion,
-  //   year,
-  //   mfgr,
-  //   model,
-  //   recorded,
-  //   status
-  // }
   const device = {
     provider_id,
     device_id,
@@ -90,6 +85,8 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     status
   }
 
+  console.log('device: ', device)
+
   try {
     isValidDevice(device)
   } catch (err) {
@@ -97,6 +94,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   }
 
   const failure = badDevice(device)
+  console.log('failure: ', failure)
   if (failure) {
     return res.status(400).send(failure)
   }

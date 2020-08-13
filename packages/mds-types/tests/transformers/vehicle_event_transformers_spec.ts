@@ -1,8 +1,9 @@
 import assert from 'assert'
 import { uuid, now } from '@mds-core/mds-utils'
+import { convert_v1_0_0_vehicle_event_to_v0_4_1 } from '../../transformers/1_0_0_to_0_4_1/vehicle_events'
 import { VehicleEvent_v0_4_1 } from '../../transformers/@types'
 import { VehicleEvent, VehicleEvent_1_0_0 } from '../../index'
-import { convert_v1_0_0_vehicle_event_to_v0_4_1, convert_v0_4_1_vehicle_event_to_v1_0_0 } from '../../transformers'
+import { convert_v0_4_1_vehicle_event_to_v1_0_0 } from '../../transformers'
 
 const TIME = now()
 const DEVICE_ID = uuid()
