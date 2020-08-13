@@ -34,10 +34,11 @@ import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
 import { shutdown as socketShutdown } from '@mds-core/mds-web-sockets'
-import { makeDevices, makeEvents, GEOGRAPHY_UUID, LA_CITY_BOUNDARY, JUMP_TEST_DEVICE_1 } from '@mds-core/mds-test-data'
+import { makeDevices, makeEvents, GEOGRAPHY_UUID, LA_CITY_BOUNDARY } from '@mds-core/mds-test-data'
 import { ApiServer } from '@mds-core/mds-api-server'
-import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
+import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID, JUMP_PROVIDER_ID } from '@mds-core/mds-providers'
 import { pathPrefix } from '@mds-core/mds-utils'
+import { Device_v0_4_1 } from '@mds-core/mds-types/transformers/@types'
 import { api } from '../../api'
 
 /* eslint-disable-next-line no-console */
@@ -81,12 +82,12 @@ const TEST_TELEMETRY2 = {
   timestamp: now() + 1000
 }
 
-const TEST_VEHICLE: Omit<Device, 'recorded'> = {
+const TEST_VEHICLE: Omit<Device_v0_4_1, 'recorded'> = {
   device_id: DEVICE_UUID,
   provider_id: TEST1_PROVIDER_ID,
   vehicle_id: 'test-id-1',
-  vehicle_type: VEHICLE_TYPES.bicycle,
-  propulsion_types: [PROPULSION_TYPES.human],
+  type: VEHICLE_TYPES.bicycle,
+  propulsion: PROPULSION_TYPES.human,
   year: 2018,
   mfgr: 'Schwinn',
   model: 'Mantaray'
@@ -109,7 +110,19 @@ const LAGeography: Geography = {
   geography_json: LA_CITY_BOUNDARY
 }
 
-const JUMP_TEST_DEVICE_1_ID = JUMP_TEST_DEVICE_1.device_id
+const JUMP_TEST_DEVICE_1_v0_4: Device_v0_4_1 = {
+  provider_id: JUMP_PROVIDER_ID,
+  device_id: 'e9edbe74-f7be-48e0-a63a-92f4bc1af5ed',
+  vehicle_id: '1230987',
+  type: VEHICLE_TYPES.scooter,
+  propulsion: PROPULSION_TYPES.electric,
+  year: 2018,
+  mfgr: 'Schwinn',
+  model: 'whoknows',
+  recorded: now()
+}
+
+const JUMP_TEST_DEVICE_1_ID = JUMP_TEST_DEVICE_1_v0_4.device_id
 
 function deepCopy<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj))
@@ -205,14 +218,13 @@ describe('Tests API', () => {
   // })
   it('verifies post device missing propulsion', done => {
     const badVehicle = deepCopy(TEST_VEHICLE)
-    delete badVehicle.propulsion_types
+    delete badVehicle.propulsion
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)
       .send(badVehicle)
       .expect(400)
       .end((err, result) => {
-        // log('err', err, 'body', result.body)
         test.string(result.body.error_description).contains('missing')
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
@@ -222,7 +234,7 @@ describe('Tests API', () => {
   it('verifies post device bad propulsion', done => {
     const badVehicle = deepCopy(TEST_VEHICLE)
     // @ts-ignore: Spoofing garbage data
-    badVehicle.propulsion_types = ['hamster']
+    badVehicle.propulsion = 'hamster'
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)
@@ -284,7 +296,7 @@ describe('Tests API', () => {
   })
   it('verifies post device missing vehicle_type', done => {
     const badVehicle = deepCopy(TEST_VEHICLE)
-    delete badVehicle.vehicle_type
+    delete badVehicle.type
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)
@@ -300,7 +312,7 @@ describe('Tests API', () => {
   it('verifies post device bad vehicle_type', done => {
     const badVehicle = deepCopy(TEST_VEHICLE)
     // @ts-ignore: Spoofing garbage data
-    badVehicle.vehicle_type = 'hamster'
+    badVehicle.type = 'hamster'
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)
@@ -1293,15 +1305,15 @@ describe('Tests API', () => {
   })
 
   it('verifies get device defaults to `deregister` if cache misses reads for associated events', async () => {
-    await request.post(pathPrefix('/vehicles')).set('Authorization', AUTH).send(JUMP_TEST_DEVICE_1).expect(201)
+    await request.post(pathPrefix('/vehicles')).set('Authorization', AUTH).send(JUMP_TEST_DEVICE_1_v0_4).expect(201)
 
     await request
       .post(pathPrefix(`/vehicles/${JUMP_TEST_DEVICE_1_ID}/event`))
       .set('Authorization', AUTH)
       .send({
-        device_id: JUMP_TEST_DEVICE_1,
+        device_id: JUMP_TEST_DEVICE_1_ID,
         timestamp: now(),
-        event_types: ['decommissioned'],
+        event_type: 'decommissioned',
         vehicle_state: 'removed'
       })
       .expect(201)

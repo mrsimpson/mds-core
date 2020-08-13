@@ -473,8 +473,6 @@ export function upconvert_device_to_latest(
   body_params: any
 ): Partial<Device> {
   const { provider_id, recorded, device_id, vehicle_id, year, mfgr, model } = body_params
-  console.log('body_params: ', body_params)
-  console.log('version: ', version)
   switch (version ? MinorVersion(version) : null) {
     case '0.4': {
       return convert_v0_4_1_device_to_v1_0_0({

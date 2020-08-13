@@ -61,16 +61,11 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   const conversionParams = clone(body)
   conversionParams.provider_id = provider_id
   conversionParams.recorded = now()
-  console.log('body body')
-  console.log(conversionParams)
-  console.log('version: ', version)
   const device = upconvert_device_to_latest(version, conversionParams) as Device
 
   const status: VEHICLE_STATE = 'removed'
 
   device.state = status
-
-  console.log('device: ', device)
 
   try {
     isValidDevice(device)
@@ -79,7 +74,6 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   }
 
   const failure = badDevice(device)
-  console.log('failure: ', failure)
   if (failure) {
     return res.status(400).send(failure)
   }
