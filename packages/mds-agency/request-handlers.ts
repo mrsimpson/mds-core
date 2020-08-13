@@ -1,5 +1,5 @@
 import logger from '@mds-core/mds-logger'
-import { isUUID, now, ValidationError, normalizeToArray, NotFoundError, ServerError } from '@mds-core/mds-utils'
+import { isUUID, now, ValidationError, normalizeToArray, NotFoundError, ServerError, clone } from '@mds-core/mds-utils'
 import { isValidStop, isValidDevice, validateEvent, isValidTelemetry } from '@mds-core/mds-schema-validators'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
@@ -55,35 +55,20 @@ const agencyServerError = { error: 'server_error', error_description: 'Unknown s
 
 export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res: AgencyApiRegisterVehicleResponse) => {
   const { body } = req
-  const recorded = now()
 
   const { provider_id, version } = res.locals
 
+  const conversionParams = clone(body)
+  conversionParams.provider_id = provider_id
+  conversionParams.recorded = now()
   console.log('body body')
-  console.log(body)
+  console.log(conversionParams)
   console.log('version: ', version)
-  body.provider_id = provider_id
-  body.recorded = now()
-  // Including `provider_id` because the transformers expect it there.
-  const { device_id, vehicle_id, vehicle_type, propulsion_types, year, mfgr, model } = upconvert_device_to_latest(
-    version,
-    body
-  )
+  const device = upconvert_device_to_latest(version, conversionParams) as Device
 
   const status: VEHICLE_STATE = 'removed'
 
-  const device = {
-    provider_id,
-    device_id,
-    vehicle_id,
-    vehicle_type,
-    propulsion_types,
-    year,
-    mfgr,
-    model,
-    recorded,
-    status
-  }
+  device.state = status
 
   console.log('device: ', device)
 

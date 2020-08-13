@@ -100,3 +100,10 @@ export interface Device_v0_4_1 {
   recorded: Timestamp
   status?: VEHICLE_STATE | null
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* export type DeviceFields_v0_4_1 = { [P in keyof Device_v0_4_1]: any }
+export type DeviceFields_v1_0_0 = { [P in keyof Device]: any }
+
+export type FieldNamesOnly<T> = Partial<{ [P in keyof T]: T[P] }>
+*/
