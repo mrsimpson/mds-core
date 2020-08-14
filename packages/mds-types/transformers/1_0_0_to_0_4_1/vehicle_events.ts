@@ -1,11 +1,11 @@
 import { clone } from '@mds-core/mds-utils'
-import { VEHICLE_REASON_0_4_1, VehicleEvent_v0_4_1, VEHICLE_EVENT_0_4_1, TRANSFORMER_VEHICLE_EVENT } from '../@types'
-import { VehicleEvent_1_0_0, VEHICLE_EVENT_1_0_0 } from '../../index'
+import { VEHICLE_REASON_v0_4_1, VehicleEvent_v0_4_1, VEHICLE_EVENT_v0_4_1, TRANSFORMER_VEHICLE_EVENT } from '../@types'
+import { VehicleEvent_v1_0_0, VEHICLE_EVENT_v1_0_0 } from '../../index'
 
-export const FULL_STATE_MAPPING_1_0_0_to_0_4_1: {
-  [P in VEHICLE_EVENT_1_0_0]: {
-    event_type: VEHICLE_EVENT_0_4_1 | TRANSFORMER_VEHICLE_EVENT
-    event_type_reason?: VEHICLE_REASON_0_4_1
+export const FULL_STATE_MAPPING_v1_0_0_to_v0_4_1: {
+  [P in VEHICLE_EVENT_v1_0_0]: {
+    event_type: VEHICLE_EVENT_v0_4_1 | TRANSFORMER_VEHICLE_EVENT
+    event_type_reason?: VEHICLE_REASON_v0_4_1
   }
 } = {
   agency_drop_off: { event_type: 'agency_drop_off' },
@@ -87,10 +87,10 @@ export const FULL_STATE_MAPPING_1_0_0_to_0_4_1: {
 }
 
 function convert_v1_0_0_to_v0_4_1_helper(
-  event: VehicleEvent_1_0_0,
-  current_event_type: VEHICLE_EVENT_1_0_0
+  event: VehicleEvent_v1_0_0,
+  current_event_type: VEHICLE_EVENT_v1_0_0
 ): VehicleEvent_v0_4_1 {
-  const { event_type, event_type_reason } = FULL_STATE_MAPPING_1_0_0_to_0_4_1[current_event_type]
+  const { event_type, event_type_reason } = FULL_STATE_MAPPING_v1_0_0_to_v0_4_1[current_event_type]
 
   const telemetry = event.telemetry ? clone(event.telemetry) : null
   if (telemetry && telemetry.stop_id) {
@@ -112,7 +112,7 @@ function convert_v1_0_0_to_v0_4_1_helper(
   }
 }
 
-export function convert_v1_0_0_vehicle_event_to_v0_4_1(event: VehicleEvent_1_0_0): VehicleEvent_v0_4_1[] {
+export function convert_v1_0_0_vehicle_event_to_v0_4_1(event: VehicleEvent_v1_0_0): VehicleEvent_v0_4_1[] {
   return event.event_types.map(event_type => {
     return convert_v1_0_0_to_v0_4_1_helper(event, event_type)
   })

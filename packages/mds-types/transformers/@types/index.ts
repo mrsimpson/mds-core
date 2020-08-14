@@ -9,7 +9,7 @@
 
 import { UUID, Timestamp, Telemetry, VEHICLE_TYPE, PROPULSION_TYPE } from '../../index'
 
-export const VEHICLE_REASONS_0_4_1 = [
+export const VEHICLE_REASONS_v0_4_1 = [
   'battery_charged',
   'charge',
   'compliance',
@@ -20,9 +20,9 @@ export const VEHICLE_REASONS_0_4_1 = [
   'off_hours',
   'rebalance'
 ]
-export type VEHICLE_REASON_0_4_1 = typeof VEHICLE_REASONS_0_4_1[number]
+export type VEHICLE_REASON_v0_4_1 = typeof VEHICLE_REASONS_v0_4_1[number]
 
-export const VEHICLE_EVENTS_0_4_1 = [
+export const VEHICLE_EVENTS_v0_4_1 = [
   'register',
   'service_start',
   'service_end',
@@ -39,7 +39,7 @@ export const VEHICLE_EVENTS_0_4_1 = [
   'deregister'
 ] as const
 
-export type VEHICLE_EVENT_0_4_1 = typeof VEHICLE_EVENTS_0_4_1[number]
+export type VEHICLE_EVENT_v0_4_1 = typeof VEHICLE_EVENTS_v0_4_1[number]
 
 export interface VehicleEvent_v0_4_1 {
   device_id: UUID
@@ -47,8 +47,8 @@ export interface VehicleEvent_v0_4_1 {
   timestamp: Timestamp
   timestamp_long?: string | null
   delta?: Timestamp | null
-  event_type: VEHICLE_EVENT_0_4_1 | TRANSFORMER_VEHICLE_EVENT
-  event_type_reason?: VEHICLE_REASON_0_4_1 | null | TRANSFORMER_EVENT_TYPE_REASON
+  event_type: VEHICLE_EVENT_v0_4_1 | TRANSFORMER_VEHICLE_EVENT
+  event_type_reason?: VEHICLE_REASON_v0_4_1 | null | TRANSFORMER_EVENT_TYPE_REASON
   telemetry_timestamp?: Timestamp | null
   telemetry?: Telemetry | null
   trip_id?: UUID | null
@@ -68,7 +68,7 @@ export const VEHICLE_STATES_v0_4_1 = [
 export type VEHICLE_STATE_v0_4_1 = typeof VEHICLE_STATES_v0_4_1[number]
 
 // Old event-states transitions.
-export const EVENT_STATES_MAP_0_4_1: { [P in VEHICLE_EVENT_0_4_1]: VEHICLE_STATE_v0_4_1 } = {
+export const EVENT_STATES_MAP_v0_4_1: { [P in VEHICLE_EVENT_v0_4_1]: VEHICLE_STATE_v0_4_1 } = {
   register: 'removed',
   service_start: 'available',
   service_end: 'unavailable',
