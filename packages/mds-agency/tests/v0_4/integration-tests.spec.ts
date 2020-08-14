@@ -30,8 +30,6 @@
 import supertest from 'supertest'
 import test from 'unit.js'
 import {
-  VEHICLE_STATUSES_v0_4_1,
-  Device_v0_4_1,
   VEHICLE_TYPES,
   PROPULSION_TYPES,
   Timestamp,
@@ -40,6 +38,7 @@ import {
   Stop,
   VEHICLE_EVENTS
 } from '@mds-core/mds-types'
+import { VEHICLE_EVENTS_v0_4_1, Device_v0_4_1 } from '@mds-core/mds-types/transformers'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
@@ -54,7 +53,6 @@ import {
 import { ApiServer } from '@mds-core/mds-api-server'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
 import { pathPrefix } from '@mds-core/mds-utils'
-import { VEHICLE_EVENTS_v0_4_1 } from '@mds-core/mds-types/transformers/@types'
 import { api } from '../../api'
 
 /* eslint-disable-next-line no-console */
@@ -580,7 +578,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS_v0_4_1.service_end,
+        event_type: 'service_end',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp
       })
@@ -605,7 +603,7 @@ describe('Tests API', () => {
   })
   it('verifies read-back of post device status deregister success (db)', async () => {
     const event = await db.readEvent(DEVICE_UUID, test_event.timestamp)
-    test.assert(event.event_type === VEHICLE_EVENTS.deregister)
+    test.assert(event.event_types[0] === 'decommissioned')
     test.assert(event.device_id === DEVICE_UUID)
   })
 
@@ -629,7 +627,7 @@ describe('Tests API', () => {
       .post(pathPrefix('/vehicles/' + 'bogus' + '/event'))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: 'provider_pick_up',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
       })
@@ -645,7 +643,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH2)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: 'provider_pick_up',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
       })
@@ -661,7 +659,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: 'provider_pick_up',
         telemetry: TEST_TELEMETRY
       })
       .expect(400)
@@ -694,7 +692,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: 'provider_pick_up',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
       })
@@ -708,7 +706,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: 'provider_pick_up',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp - 1
       })
@@ -726,7 +724,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${TRIP_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: 'provider_pick_up',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp
       })
@@ -742,7 +740,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.provider_pick_up,
+        event_type: 'provider_pick_up',
         event_type_reason: 'not_an_event_type',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp
@@ -844,7 +842,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.reserve,
+        event_type: 'reserve',
         trip_id: TRIP_UUID,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
@@ -859,7 +857,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.cancel_reservation,
+        event_type: 'reservation_cancel',
         trip_id: TRIP_UUID,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
@@ -1066,7 +1064,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.service_end,
+        event_type: 'provider_pick_up',
         event_type_reason: 'rebalance',
         telemetry: TEST_TELEMETRY,
         timestamp: lateTimestamp
@@ -1077,19 +1075,6 @@ describe('Tests API', () => {
       })
   })
 
-  // read back posted event (cache should not work; it should only have latest)
-  it('verifies late-event read-back of service_end (rebalance) success (db)', async () => {
-    const timestamp = lateTimestamp
-
-    const event = await db.readEvent(DEVICE_UUID, timestamp)
-    test.object(event).match((obj: VehicleEvent) => obj.event_type_reason === 'rebalance')
-  })
-
-  // make sure we read back the latest event, not the past event
-  it('verifies out-of-order event reads back latest (cache)', async () => {
-    const event = await db.readEvent(DEVICE_UUID, 0)
-    test.assert(event.event_type === 'cancel_reservation')
-  })
 
   const WEIRD_UUID = '034e1c90-9f84-4292-a750-e8f395e4869d'
   // tests this particular uuid
@@ -1294,7 +1279,7 @@ describe('Tests API', () => {
         test.value(deviceA.provider_id).is(TEST1_PROVIDER_ID)
         test.value(deviceA.gps.lat).is(TEST_TELEMETRY.gps.lat)
         test.value(deviceA.status).is(VEHICLE_STATUSES.available)
-        test.value(deviceA.prev_event).is(VEHICLE_EVENTS.cancel_reservation)
+        test.value(deviceA.prev_event).is('reservation_cancel')
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -1312,7 +1297,7 @@ describe('Tests API', () => {
         test.value(deviceB.provider_id).is(TEST1_PROVIDER_ID)
         test.value(deviceB.gps.lat).is(TEST_TELEMETRY.gps.lat)
         test.value(deviceB.status).is(VEHICLE_STATUSES.available)
-        test.value(deviceB.prev_event).is(VEHICLE_EVENTS.cancel_reservation)
+        test.value(deviceB.prev_event).is('reservation_cancel')
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
