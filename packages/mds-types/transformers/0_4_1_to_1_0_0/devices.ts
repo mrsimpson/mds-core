@@ -13,7 +13,7 @@ export function convert_v0_4_1_device_to_v1_0_0(device: Partial<Device_v0_4_1>):
     device_id,
     vehicle_id,
     vehicle_type: type,
-    propulsion_types: propulsion ? [propulsion] : undefined,
+    propulsion_types: propulsion,
     year,
     mfgr,
     model,

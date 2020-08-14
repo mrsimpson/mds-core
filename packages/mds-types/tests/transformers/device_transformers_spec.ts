@@ -16,7 +16,7 @@ describe('Test transformers', () => {
       provider_id: PROVIDER_ID,
       vehicle_id: VEHICLE_ID,
       type: 'scooter',
-      propulsion: 'electric',
+      propulsion: ['electric'],
       status: 'removed',
       recorded: TIME
     }
@@ -56,7 +56,7 @@ describe('Test transformers', () => {
       provider_id: PROVIDER_ID,
       vehicle_id: VEHICLE_ID,
       type: 'scooter',
-      propulsion: 'electric',
+      propulsion: ['electric', 'hybrid'],
       status: 'removed',
       recorded: TIME,
       year: 2000,

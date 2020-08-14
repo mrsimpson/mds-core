@@ -19,7 +19,7 @@ export function convert_v1_0_0_device_to_v0_4_1(device: Device_v1_0_0): Device_v
     device_id,
     vehicle_id,
     type: vehicle_type,
-    propulsion: propulsion_types[0], // Not ideal, but backconversion can be lossy
+    propulsion: propulsion_types,
     year,
     mfgr,
     model,
