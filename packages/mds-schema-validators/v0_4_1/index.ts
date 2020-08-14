@@ -3,7 +3,7 @@
 // **************************
 import Joi from '@hapi/joi'
 
-import { VehicleEvent_v0_4_1, VEHICLE_EVENTS_0_4_1 } from '@mds-core/mds-types/transformers/@types'
+import { VehicleEvent_v0_4_1, VEHICLE_EVENTS_v0_4_1 } from '@mds-core/mds-types/transformers/@types'
 import {
   ValidatorOptions,
   ValidateSchema,
@@ -13,7 +13,7 @@ import {
   stringSchema
 } from '../validators'
 
-const vehicleEventTypeSchema_v0_4_1 = stringSchema.valid(...VEHICLE_EVENTS_0_4_1)
+const vehicleEventTypeSchema_v0_4_1 = stringSchema.valid(...VEHICLE_EVENTS_v0_4_1)
 
 const eventSchema_v0_4_1 = Joi.object().keys({
   device_id: uuidSchema.required(),
