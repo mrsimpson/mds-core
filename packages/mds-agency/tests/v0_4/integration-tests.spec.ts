@@ -30,25 +30,31 @@
 import supertest from 'supertest'
 import test from 'unit.js'
 import {
-  VEHICLE_STATUSES_0_4_1,
+  VEHICLE_STATUSES_v0_4_1,
   VEHICLE_TYPES,
   PROPULSION_TYPES,
   Timestamp,
-  Device,
   VehicleEvent,
   Geography,
   Stop
 } from '@mds-core/mds-types'
+import { Device_v0_4_1 } from '@mds-core/mds-types/transformers'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
 import { shutdown as socketShutdown } from '@mds-core/mds-web-sockets'
-import { makeDevices, makeEvents, GEOGRAPHY_UUID, LA_CITY_BOUNDARY, JUMP_TEST_DEVICE_1 } from '@mds-core/mds-test-data'
+import {
+  makeDevices,
+  makeEvents,
+  GEOGRAPHY_UUID,
+  LA_CITY_BOUNDARY,
+  JUMP_TEST_DEVICE_1
+} from '@mds-core/mds-test-data'
 import { ApiServer } from '@mds-core/mds-api-server'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
 import { pathPrefix } from '@mds-core/mds-utils'
+import { VEHICLE_EVENTS_v0_4_1 } from '@mds-core/mds-types/transformers/@types'
 import { api } from '../../api'
-import { VEHICLE_EVENTS_0_4_1 } from '@mds-core/mds-types/transformers/@types'
 
 /* eslint-disable-next-line no-console */
 const log = console.log.bind(console)
@@ -291,7 +297,7 @@ describe('Tests API', () => {
         done(err)
       })
   })
-  it.only('verifies post device missing type', done => {
+  it('verifies post device missing type', done => {
     const badVehicle = deepCopy(TEST_VEHICLE)
     delete badVehicle.type
     request
@@ -358,9 +364,9 @@ describe('Tests API', () => {
       .expect(200)
       .end((err, result) => {
         // log('----------', result.body)
-        test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
-        test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
-        test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATUSES.removed)
+        test.object(result.body).match((obj: Device_v0_4_1) => obj.device_id === DEVICE_UUID)
+        test.object(result.body).match((obj: Device_v0_4_1) => obj.provider_id === TEST1_PROVIDER_ID)
+        test.object(result.body).match((obj: Device_v0_4_1) => obj.status === 'removed')
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -372,9 +378,9 @@ describe('Tests API', () => {
       .expect(200)
       .end((err, result) => {
         // log('----------', result.body)
-        test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
-        test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
-        test.object(result.body).match((obj: Device) => obj.status === VEHICLE_STATUSES.removed)
+        test.object(result.body).match((obj: Device_v0_4_1) => obj.device_id === DEVICE_UUID)
+        test.object(result.body).match((obj: Device_v0_4_1) => obj.provider_id === TEST1_PROVIDER_ID)
+        test.object(result.body).match((obj: Device_v0_4_1) => obj.status === 'removed')
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -450,7 +456,7 @@ describe('Tests API', () => {
       .set('Authorization', AUTH)
       .expect(200)
       .end((err, result) => {
-        test.object(result.body).match((obj: Device) => obj.vehicle_id === NEW_VEHICLE_ID)
+        test.object(result.body).match((obj: Device_v0_4_1) => obj.vehicle_id === NEW_VEHICLE_ID)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -461,7 +467,7 @@ describe('Tests API', () => {
       .set('Authorization', AUTH)
       .expect(200)
       .end((err, result) => {
-        test.object(result.body).match((obj: Device) => obj.vehicle_id === NEW_VEHICLE_ID)
+        test.object(result.body).match((obj: Device_v0_4_1) => obj.vehicle_id === NEW_VEHICLE_ID)
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -1523,4 +1529,3 @@ describe('Tests Stops', async () => {
       })
   })
 })
-
