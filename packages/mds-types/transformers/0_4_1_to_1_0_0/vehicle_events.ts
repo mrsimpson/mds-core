@@ -1,17 +1,17 @@
 import {
-  VEHICLE_REASON_0_4_1,
-  VehicleEvent_v0_4_1,
-  VEHICLE_EVENT_0_4_1,
+  VEHICLE_REASON_v0_4_1,
+  VEHICLE_EVENT_v0_4_1,
   TRANSFORMER_VEHICLE_EVENT,
-  TRANSFORMER_EVENT_TYPE_REASON
+  TRANSFORMER_EVENT_TYPE_REASON,
+  VehicleEvent_v0_4_1
 } from '../@types'
-import { VEHICLE_EVENT_1_0_0, VEHICLE_STATE_1_0_0, VehicleEvent_1_0_0 } from '../../index'
+import { VEHICLE_EVENT_v1_0_0, VEHICLE_STATE_v1_0_0, VehicleEvent_v1_0_0 } from '../../index'
 
-export const FULL_STATE_MAPPING_0_4_1_to_1_0_0: {
-  [P in VEHICLE_EVENT_0_4_1 | TRANSFORMER_VEHICLE_EVENT]: {
-    [Q in VEHICLE_REASON_0_4_1 | TRANSFORMER_EVENT_TYPE_REASON]: {
-      event_type: VEHICLE_EVENT_1_0_0
-      vehicle_state: VEHICLE_STATE_1_0_0
+export const FULL_STATE_MAPPING_v0_4_1_to_v1_0_0: {
+  [P in VEHICLE_EVENT_v0_4_1 | TRANSFORMER_VEHICLE_EVENT]: {
+    [Q in VEHICLE_REASON_v0_4_1 | TRANSFORMER_EVENT_TYPE_REASON]: {
+      event_type: VEHICLE_EVENT_v1_0_0
+      vehicle_state: VEHICLE_STATE_v1_0_0
     }
   }
 } = {
@@ -62,7 +62,7 @@ export const FULL_STATE_MAPPING_0_4_1_to_1_0_0: {
     no_event_type_reason: { event_type: 'trip_start', vehicle_state: 'on_trip' }
   },
   /* We don't actually accept events with this event_type in Agency, but it's part of
-   * the VEHICLE_EVENT_0_4_1 type, and Omit doesn't seem to work on types that
+   * the VEHICLE_EVENT_0_4_v1 type, and Omit doesn't seem to work on types that
    * are string arrays, so it has to be here.
    */
   register: {
@@ -76,17 +76,17 @@ export const FULL_STATE_MAPPING_0_4_1_to_1_0_0: {
   }
 }
 
-function map_v_0_4_1_vehicle_event_fields_to_v_1_0_0_fields(
-  event_type: VEHICLE_EVENT_0_4_1 | TRANSFORMER_VEHICLE_EVENT,
-  event_type_reason: VEHICLE_REASON_0_4_1 | TRANSFORMER_EVENT_TYPE_REASON | null | undefined
-): { event_type: VEHICLE_EVENT_1_0_0; vehicle_state: VEHICLE_STATE_1_0_0 } {
+function map_v0_4_1_vehicle_event_fields_to_v1_0_0_fields(
+  event_type: VEHICLE_EVENT_v0_4_1 | TRANSFORMER_VEHICLE_EVENT,
+  event_type_reason: VEHICLE_REASON_v0_4_1 | TRANSFORMER_EVENT_TYPE_REASON | null | undefined
+): { event_type: VEHICLE_EVENT_v1_0_0; vehicle_state: VEHICLE_STATE_v1_0_0 } {
   if (event_type_reason) {
-    return FULL_STATE_MAPPING_0_4_1_to_1_0_0[event_type][event_type_reason]
+    return FULL_STATE_MAPPING_v0_4_1_to_v1_0_0[event_type][event_type_reason]
   }
-  return FULL_STATE_MAPPING_0_4_1_to_1_0_0[event_type].no_event_type_reason
+  return FULL_STATE_MAPPING_v0_4_1_to_v1_0_0[event_type].no_event_type_reason
 }
 
-export function convert_v0_4_1_vehicle_event_to_v1_0_0(event: VehicleEvent_v0_4_1): VehicleEvent_1_0_0 {
+export function convert_v0_4_1_vehicle_event_to_v1_0_0(event: VehicleEvent_v0_4_1): VehicleEvent_v1_0_0 {
   const {
     device_id,
     provider_id,
@@ -101,7 +101,7 @@ export function convert_v0_4_1_vehicle_event_to_v1_0_0(event: VehicleEvent_v0_4_
     recorded
   } = event
 
-  const { event_type: new_event_type, vehicle_state } = map_v_0_4_1_vehicle_event_fields_to_v_1_0_0_fields(
+  const { event_type: new_event_type, vehicle_state } = map_v0_4_1_vehicle_event_fields_to_v1_0_0_fields(
     event_type,
     event_type_reason
   )
