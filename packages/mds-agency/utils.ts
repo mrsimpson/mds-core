@@ -1,7 +1,15 @@
 import express from 'express'
 import { Query } from 'express-serve-static-core'
 
-import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox, areThereCommonElements, clone } from '@mds-core/mds-utils'
+import {
+  isUUID,
+  isPct,
+  isTimestamp,
+  isFloat,
+  isInsideBoundingBox,
+  areThereCommonElements,
+  clone
+} from '@mds-core/mds-utils'
 import stream from '@mds-core/mds-stream'
 import {
   UUID,
@@ -107,6 +115,7 @@ export function badDevice(device: Device): { error: string; error_description: s
 }
 
 export async function getVehicles(
+  version: AGENCY_API_SUPPORTED_VERSION,
   skip: number,
   take: number,
   url: string,
@@ -426,7 +435,7 @@ export function downConvertCompositeVehicleData(composite) {
   return newComposite
 }
 
-export function computeCompositeVehicleData(version: AGENCY_API_SUPPORTED_VERSION, payload: VehiclePayload) {
+export function computeCompositeVehicleData(version: string, payload: VehiclePayload) {
   const { device, event, telemetry } = payload
 
   const composite: CompositeVehicle = {
@@ -446,7 +455,7 @@ export function computeCompositeVehicleData(version: AGENCY_API_SUPPORTED_VERSIO
       composite.gps = telemetry.gps
     }
   }
-  if (version === '0.4.1') {
+  if (version === '0.4') {
     return downConvertCompositeVehicleData(composite)
   }
   return composite
@@ -480,12 +489,12 @@ export async function readPayload(device_id: UUID): Promise<VehiclePayload> {
 }
 
 export function upconvert_device_to_latest(
-  version: AGENCY_API_SUPPORTED_VERSION | null | undefined,
+  version: string | null | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body_params: any
 ): Partial<Device> {
   const { provider_id, recorded, device_id, vehicle_id, year, mfgr, model } = body_params
-  switch (version ? MinorVersion(version) : null) {
+  switch (version) {
     case '0.4': {
       return convert_v0_4_1_device_to_v1_0_0({
         provider_id,

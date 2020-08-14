@@ -111,7 +111,7 @@ export const getVehicleById = async (req: AgencyApiGetVehicleByIdRequest, res: A
   const { provider_id } = res.locals.scopes.includes('vehicles:read')
     ? parseRequest(req).single().query('provider_id')
     : res.locals
-  const {  version } = res.locals
+  const { version } = res.locals
 
   const payload = await readPayload(device_id)
 
@@ -143,7 +143,8 @@ export const getVehiclesByProvider = async (
     : res.locals
 
   try {
-    const response = await getVehicles(skip, take, url, req.query, provider_id)
+    const { version } = res.locals
+    const response = await getVehicles(version, skip, take, url, req.query, provider_id)
     return res.status(200).send({ ...response })
   } catch (err) {
     logger.error('getVehicles fail', err)

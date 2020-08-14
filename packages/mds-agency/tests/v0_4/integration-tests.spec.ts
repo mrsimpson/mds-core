@@ -31,14 +31,15 @@ import supertest from 'supertest'
 import test from 'unit.js'
 import {
   VEHICLE_STATUSES_v0_4_1,
+  Device_v0_4_1,
   VEHICLE_TYPES,
   PROPULSION_TYPES,
   Timestamp,
   VehicleEvent,
   Geography,
-  Stop
+  Stop,
+  VEHICLE_EVENTS
 } from '@mds-core/mds-types'
-import { Device_v0_4_1 } from '@mds-core/mds-types/transformers'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
@@ -579,7 +580,7 @@ describe('Tests API', () => {
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
       .set('Authorization', AUTH)
       .send({
-        event_type: VEHICLE_EVENTS.service_end,
+        event_type: VEHICLE_EVENTS_v0_4_1.service_end,
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp
       })

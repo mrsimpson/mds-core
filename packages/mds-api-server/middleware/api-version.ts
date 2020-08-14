@@ -1,7 +1,7 @@
 import express from 'express'
 import { ApiRequest, ApiVersionedResponse } from '../@types'
 
-export const MinorVersion = (version: string) => {
+const MinorVersion = (version: string) => {
   const [major, minor] = version.split('.')
   return `${major}.${minor}`
 }
