@@ -7,7 +7,7 @@
  *  former `event_type_reasons`.
  */
 
-import { UUID, Timestamp, Telemetry, VEHICLE_TYPE, PROPULSION_TYPE, VEHICLE_STATE } from '../../index'
+import { UUID, Timestamp, Telemetry, VEHICLE_TYPE, PROPULSION_TYPE } from '../../index'
 
 export const VEHICLE_REASONS_0_4_1 = [
   'battery_charged',
@@ -56,7 +56,7 @@ export interface VehicleEvent_v0_4_1 {
   recorded: Timestamp
 }
 
-export const VEHICLE_STATES_0_4_1 = [
+export const VEHICLE_STATES_v0_4_1 = [
   'available',
   'elsewhere',
   'inactive',
@@ -65,10 +65,10 @@ export const VEHICLE_STATES_0_4_1 = [
   'reserved',
   'unavailable'
 ] as const
-export type VEHICLE_STATE_0_4_1 = typeof VEHICLE_STATES_0_4_1[number]
+export type VEHICLE_STATE_v0_4_1 = typeof VEHICLE_STATES_v0_4_1[number]
 
 // Old event-states transitions.
-export const EVENT_STATES_MAP_0_4_1: { [P in VEHICLE_EVENT_0_4_1]: VEHICLE_STATE_0_4_1 } = {
+export const EVENT_STATES_MAP_0_4_1: { [P in VEHICLE_EVENT_0_4_1]: VEHICLE_STATE_v0_4_1 } = {
   register: 'removed',
   service_start: 'available',
   service_end: 'unavailable',
@@ -98,7 +98,7 @@ export interface Device_v0_4_1 {
   mfgr?: string | null
   model?: string | null
   recorded: Timestamp
-  status?: VEHICLE_STATE | null
+  status?: VEHICLE_STATE_v0_4_1 | null
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

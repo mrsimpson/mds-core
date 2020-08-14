@@ -1,9 +1,8 @@
 import assert from 'assert'
 import { uuid, now } from '@mds-core/mds-utils'
-import { convert_v1_0_0_vehicle_event_to_v0_4_1 } from '../../transformers/1_0_0_to_0_4_1/vehicle_events'
 import { VehicleEvent_v0_4_1 } from '../../transformers/@types'
-import { VehicleEvent, VehicleEvent_1_0_0 } from '../../index'
-import { convert_v0_4_1_vehicle_event_to_v1_0_0 } from '../../transformers'
+import { VehicleEvent_v1_0_0 } from '../../index'
+import { convert_v1_0_0_vehicle_event_to_v0_4_1, convert_v0_4_1_vehicle_event_to_v1_0_0 } from '../../transformers'
 
 const TIME = now()
 const DEVICE_ID = uuid()
@@ -87,7 +86,7 @@ describe('Test transformers', () => {
   })
 
   it('spot checks the transformations between v1.0.0 VehicleEvent and v0.4.1 VehicleEvent when there are multiple event types', done => {
-    const eventA: VehicleEvent = {
+    const eventA: VehicleEvent_v1_0_0 = {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
       timestamp: TIME,
@@ -100,7 +99,7 @@ describe('Test transformers', () => {
     assert.deepEqual(converted_eventA_1.event_type, 'provider_drop_off')
     assert.deepEqual(converted_eventA_2.event_type, 'trip_start')
 
-    const eventB: VehicleEvent_1_0_0 = {
+    const eventB: VehicleEvent_v1_0_0 = {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
       timestamp: TIME,

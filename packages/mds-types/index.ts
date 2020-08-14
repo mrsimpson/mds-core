@@ -37,7 +37,7 @@ export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
 export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip'] as const
 
-export const VEHICLE_STATES_1_0_0 = [
+export const VEHICLE_STATES_v1_0_0 = [
   'available',
   'elsewhere',
   'non_operational',
@@ -46,11 +46,11 @@ export const VEHICLE_STATES_1_0_0 = [
   'reserved',
   'unknown'
 ] as const
-export type VEHICLE_STATE_1_0_0 = typeof VEHICLE_STATES_1_0_0[number]
-export type VEHICLE_STATE = VEHICLE_STATE_1_0_0
-export const VEHICLE_STATES = VEHICLE_STATES_1_0_0
+export type VEHICLE_STATE_v1_0_0 = typeof VEHICLE_STATES_v1_0_0[number]
+export type VEHICLE_STATE = VEHICLE_STATE_v1_0_0
+export const VEHICLE_STATES = VEHICLE_STATES_v1_0_0
 
-export const VEHICLE_EVENTS_1_0_0 = [
+export const VEHICLE_EVENTS_v1_0_0 = [
   'agency_drop_off',
   'agency_pick_up',
   'battery_charged',
@@ -78,9 +78,9 @@ export const VEHICLE_EVENTS_1_0_0 = [
   'unspecified'
 ] as const
 
-export const VEHICLE_EVENTS = VEHICLE_EVENTS_1_0_0
-export type VEHICLE_EVENT_1_0_0 = typeof VEHICLE_EVENTS_1_0_0[number]
-export type VEHICLE_EVENT = VEHICLE_EVENT_1_0_0
+export const VEHICLE_EVENTS = VEHICLE_EVENTS_v1_0_0
+export type VEHICLE_EVENT_v1_0_0 = typeof VEHICLE_EVENTS_v1_0_0[number]
+export type VEHICLE_EVENT = VEHICLE_EVENT_v1_0_0
 
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
@@ -195,7 +195,7 @@ export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
  * Keeping 1_0_0 types in here and not in transformers/@types to avoid circular imports.
  * This alias must be updated if this type is updated.
  */
-export interface VehicleEvent_1_0_0 {
+export interface VehicleEvent_v1_0_0 {
   device_id: UUID
   provider_id: UUID
   timestamp: Timestamp
@@ -208,7 +208,7 @@ export interface VehicleEvent_1_0_0 {
   vehicle_state: VEHICLE_STATE
   recorded: Timestamp
 }
-export type VehicleEvent = VehicleEvent_1_0_0
+export type VehicleEvent = VehicleEvent_v1_0_0
 
 // Standard telemetry columns (used in more than one table)
 export interface TelemetryData {
