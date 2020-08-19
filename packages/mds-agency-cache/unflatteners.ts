@@ -7,7 +7,8 @@ import {
   VehicleEvent,
   PROPULSION_TYPE,
   ACCESSIBILITY_OPTION,
-  MODALITY
+  MODALITY,
+  TRIP_STATE
 } from '@mds-core/mds-types'
 
 import { ParseError } from '@mds-core/mds-utils'
@@ -60,7 +61,8 @@ function parseEvent(
       telemetry: event.telemetry ? parseTelemetry(event.telemetry) : null,
       trip_id: event.trip_id ? event.trip_id : null,
       recorded: Number(event.recorded),
-      vehicle_state: event.vehicle_state as VEHICLE_STATE
+      vehicle_state: event.vehicle_state as VEHICLE_STATE,
+      trip_state: event.trip_state ? (event.trip_state as TRIP_STATE) : null
     }
   }
   return event

@@ -19,7 +19,8 @@ import {
   DeviceID,
   VEHICLE_EVENT,
   UUID,
-  VEHICLE_STATE
+  VEHICLE_STATE,
+  TRIP_STATE
 } from '@mds-core/mds-types'
 import urls from 'url'
 import { parseRequest } from '@mds-core/mds-api-helpers'
@@ -264,6 +265,7 @@ export const submitVehicleEvent = async (
         ? (req.body.event_types.map(lower) as VEHICLE_EVENT[])
         : req.body.event_types, // FIXME: this is super not the best way of doing things. Need to use better validation.
     vehicle_state: req.body.vehicle_state as VEHICLE_STATE,
+    trip_state: req.body.trip_state ? (req.body.trip_state as TRIP_STATE) : null,
     telemetry: req.body.telemetry ? { ...req.body.telemetry, provider_id: res.locals.provider_id } : null,
     timestamp: req.body.timestamp,
     trip_id: req.body.trip_id,

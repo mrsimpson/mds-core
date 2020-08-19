@@ -83,6 +83,7 @@ describe('Testing API', () => {
       device_id: provider_device_id,
       event_types: ['agency_drop_off'],
       vehicle_state: 'available',
+      trip_state: null,
       telemetry_timestamp: AUDIT_START,
       trip_id: uuid(),
       timestamp: AUDIT_START,

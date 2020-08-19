@@ -42,7 +42,8 @@ import {
   MICRO_MOBILITY_VEHICLE_EVENTS,
   TAXI_EVENT_STATES_MAP,
   MICRO_MOBILITY_EVENT_STATES_MAP,
-  TripMetadata
+  TripMetadata,
+  TRIP_STATE
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
@@ -126,6 +127,7 @@ const test_event: Omit<VehicleEvent, 'recorded' | 'provider_id'> = {
   device_id: DEVICE_UUID,
   event_types: ['decommissioned'],
   vehicle_state: 'removed',
+  trip_state: null,
   timestamp: testTimestamp
 }
 
@@ -1560,16 +1562,14 @@ describe('Tests for taxi modality', async () => {
     for (const vehicle_state of validStates) {
       it(`verifies ${taxiEvent} success`, done => {
         const { device_id } = TEST_TAXI
-        let trip_id
-        if (taxiEvent.startsWith('trip_')) {
-          trip_id = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc6b'
-        }
         const body = {
           event_types: [taxiEvent],
           vehicle_state,
           telemetry: TEST_TELEMETRY,
           timestamp: now(),
-          trip_id
+          ...(taxiEvent.startsWith('trip_')
+            ? { trip_id: '1f943d59-ccc9-4d91-b6e2-0c5e771cbc6b', trip_state: vehicle_state as TRIP_STATE }
+            : {})
         }
         request
           .post(pathPrefix(`/vehicles/${device_id}/event`))

@@ -514,6 +514,7 @@ function makeEvents(
       provider_id: device.provider_id,
       event_types,
       vehicle_state,
+      trip_state: null,
       timestamp,
       recorded: now()
     }
@@ -538,6 +539,7 @@ function makeEventsWithTelemetry(
       provider_id: device.provider_id,
       event_types,
       vehicle_state,
+      trip_state: null,
       telemetry: makeTelemetryInArea(device, timestamp, area, speed),
       timestamp,
       recorded: timestamp

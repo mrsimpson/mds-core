@@ -64,6 +64,9 @@ export type VEHICLE_STATE = typeof VEHICLE_STATES[number]
 // export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
 export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip'] as const
 
+export const TRIP_STATES = ['on_trip', 'reserved', 'stopped'] as const
+export type TRIP_STATE = typeof TRIP_STATES[number]
+
 // export const VEHICLE_EVENTS = Enum(
 //   'register',
 //   'service_start',
@@ -347,6 +350,7 @@ export interface VehicleEvent {
   telemetry?: Telemetry | null
   trip_id?: UUID | null
   vehicle_state: VEHICLE_STATE
+  trip_state: Nullable<TRIP_STATE>
   recorded: Timestamp
 }
 

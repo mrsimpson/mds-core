@@ -94,6 +94,7 @@ const COLUMN = Enum(
   'timestamp',
   'timezone',
   'trip_id',
+  'trip_state', // new for Taxi
   'type', // deprecated 1.0 for vehicle_type
   'vehicle_state', // new in 1.0
   'vehicle_type', // new in 1.0
@@ -175,6 +176,7 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
     COLUMN.vehicle_state, // added 1.0
     COLUMN.telemetry_timestamp,
     COLUMN.trip_id,
+    COLUMN.trip_state,
     COLUMN.service_area_id,
     COLUMN.recorded
   ],
@@ -320,6 +322,7 @@ const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {
   [COLUMN.timestamp]: 'bigint NOT NULL',
   [COLUMN.timezone]: 'varchar(255)',
   [COLUMN.trip_id]: 'uuid',
+  [COLUMN.trip_state]: 'varchar(31)',
   [COLUMN.type]: 'varchar(31) NOT NULL',
   [COLUMN.vehicle_id]: 'varchar(255) NOT NULL',
   [COLUMN.vehicle_state]: 'varchar(31) NOT NULL',
