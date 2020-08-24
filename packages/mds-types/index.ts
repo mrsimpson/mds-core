@@ -382,7 +382,7 @@ export interface Telemetry extends WithGpsProperty<TelemetryData> {
   recorded?: Timestamp
 }
 
-export const PAYMENT_METHODS = ['cash', 'debit', 'credit', 'equity_program'] as const
+export const PAYMENT_METHODS = ['cash', 'card', 'equity_program'] as const
 export type PAYMENT_METHOD = typeof PAYMENT_METHODS[number]
 
 export const RESERVATION_METHODS = ['app', 'street_hail', 'phone_dispatch'] as const
@@ -395,20 +395,20 @@ export interface TripMetadata {
   trip_id: UUID
   provider_id: UUID
   reservation_time: Timestamp
-  dispatch_time: Timestamp
-  trip_start_time: Timestamp
-  trip_end_time: Timestamp
-  distance: number // Distance in meters
-  accessibility_options_used: ACCESSIBILITY_OPTION[]
-  fare: {
-    quoted_cost: number
-    actual_cost: number
-    components: { [entity: string]: number } // e.g. entity = 'LAX_AIRPORT_FEE'
-    currency: string
-    payment_methods: Partial<{ [S in PAYMENT_METHOD]: number }>
-  }
   reservation_method: RESERVATION_METHOD
   reservation_type: RESERVATION_TYPE
+  dispatch_time?: Timestamp
+  trip_start_time?: Timestamp
+  trip_end_time?: Timestamp
+  distance?: number // Distance in meters
+  accessibility_options_used?: ACCESSIBILITY_OPTION[]
+  fare?: {
+    quoted_cost?: number
+    actual_cost?: number
+    components?: { [entity: string]: number } // e.g. entity = 'LAX_AIRPORT_FEE'
+    currency?: string
+    payment_methods?: Partial<{ [S in PAYMENT_METHOD]: number }>
+  }
 }
 
 // Represents a row in the "attachments" table

@@ -14,23 +14,26 @@ export const tripMetadataSchema = Joi.object().keys({
   trip_id: uuidSchema.required(),
   provider_id: uuidSchema.required(),
   reservation_time: timestampSchema.required(),
-  dispatch_time: timestampSchema.required(),
-  trip_start_time: timestampSchema.required(),
-  trip_end_time: timestampSchema.required(),
-  distance: numberSchema.required(),
-  accessibility_options_used: Joi.array().items(accessibilityOptionsSchema).required(),
-  fare: Joi.object().keys({
-    quoted_cost: numberSchema.required(),
-    actual_cost: numberSchema.required(),
-    components: Joi.object().required(),
-    currency: stringSchema.required(),
-    payment_methods: Joi.object().required() // loose validation for now
-  }),
   reservation_method: stringSchema.valid(...RESERVATION_METHODS).required(),
-  reservation_type: stringSchema.valid(...RESERVATION_TYPES).required()
+  reservation_type: stringSchema.valid(...RESERVATION_TYPES).required(),
+  dispatch_time: timestampSchema.optional(),
+  trip_start_time: timestampSchema.optional(),
+  trip_end_time: timestampSchema.optional(),
+  cancellation_reason: Joi.array().items(stringSchema).optional(),
+  accessibility_options_used: Joi.array().items(accessibilityOptionsSchema).optional(),
+  distance: numberSchema.optional(),
+  fare: Joi.object()
+    .keys({
+      quoted_cost: numberSchema.optional(),
+      actual_cost: numberSchema.optional(),
+      components: Joi.object().optional(),
+      currency: stringSchema.optional(),
+      payment_methods: Joi.object().optional() // loose validation for now
+    })
+    .optional()
 })
 
 export const validateTripMetadata = (metadata: unknown) => {
-  if (ValidateSchema<TripMetadata>(metadata, tripMetadataSchema, { assert: true, allowUnknown: true })) return metadata
+  if (ValidateSchema<TripMetadata>(metadata, tripMetadataSchema, { assert: true, allowUnknown: false })) return metadata
   throw new RuntimeError('This should never happen')
 }

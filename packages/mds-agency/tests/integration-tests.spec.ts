@@ -1632,7 +1632,7 @@ describe('Tests TripMetadata', async () => {
       currency: 'USD',
       payment_methods: {
         cash: 1250,
-        credit: 1250
+        card: 1250
       }
     },
     reservation_type: 'on_demand',
@@ -1643,7 +1643,10 @@ describe('Tests TripMetadata', async () => {
     await request.post(pathPrefix('/trips')).set('Authorization', AUTH).send(metadata).expect(201)
   })
 
-  for (const key of Object.keys(metadata) as (keyof Omit<TripMetadata, 'provider_id'>)[]) {
+  for (const key of ['trip_id', 'reservation_time', 'reservation_type', 'reservation_method'] as (keyof Omit<
+    TripMetadata,
+    'provider_id'
+  >)[]) {
     it(`Tests invalid TripMetadata payload without ${key}`, async () => {
       const { [key]: foo, ...subsetMetadata } = metadata
 
