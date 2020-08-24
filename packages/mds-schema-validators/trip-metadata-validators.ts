@@ -13,7 +13,7 @@ import {
 export const tripMetadataSchema = Joi.object().keys({
   trip_id: uuidSchema.required(),
   provider_id: uuidSchema.required(),
-  reserve_time: timestampSchema.required(),
+  reservation_time: timestampSchema.required(),
   dispatch_time: timestampSchema.required(),
   trip_start_time: timestampSchema.required(),
   trip_end_time: timestampSchema.required(),

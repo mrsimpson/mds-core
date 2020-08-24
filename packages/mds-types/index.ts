@@ -394,7 +394,7 @@ export type RESERVATION_TYPE = typeof RESERVATION_TYPES[number]
 export interface TripMetadata {
   trip_id: UUID
   provider_id: UUID
-  reserve_time: Timestamp
+  reservation_time: Timestamp
   dispatch_time: Timestamp
   trip_start_time: Timestamp
   trip_end_time: Timestamp

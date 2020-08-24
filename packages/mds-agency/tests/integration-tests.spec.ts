@@ -1619,7 +1619,7 @@ describe('Tests for taxi modality', async () => {
 describe('Tests TripMetadata', async () => {
   const metadata: Omit<TripMetadata, 'provider_id'> = {
     trip_id: uuid(),
-    reserve_time: now(),
+    reservation_time: now(),
     dispatch_time: now(),
     trip_start_time: now(),
     trip_end_time: now(),
