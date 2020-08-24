@@ -1,0 +1,38 @@
+{
+  "name": "@mds-core/mds-compliance-service",
+  "version": "0.1.0",
+  "description": "Compliance Service",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "keywords": [
+    "mds",
+    "compliance"
+  ],
+  "scripts": {
+    "build": "tsc --build tsconfig.build.json",
+    "start": "yarn watch server",
+    "test": "yarn test:eslint && yarn test:unit",
+    "test:eslint": "eslint --ignore-path ../../.gitignore '**/*.ts'",
+    "test:unit": "yarn typeorm schema:drop && DOTENV_CONFIG_PATH=../../.env nyc ts-mocha --project ../../tsconfig.json && yarn typeorm schema:drop",
+    "ts-node": "yarn build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "typeorm": "yarn ts-node ./node_modules/.bin/typeorm",
+    "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec yarn ts-node --"
+  },
+  "author": "Lacuna Technologies",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@hapi/joi": "17.1.1",
+    "@mds-core/mds-rpc-common": "0.1.0",
+    "@mds-core/mds-logger": "0.1.24",
+    "@mds-core/mds-repository": "0.1.0",
+    "@mds-core/mds-service-helpers": "0.1.0",
+    "@mds-core/mds-types": "0.1.23",
+    "@mds-core/mds-utils": "0.1.26",
+    "@types/hapi__joi": "17.1.2",
+    "typeorm": "0.2.25"
+  },
+  "devDependencies": {}
+}
