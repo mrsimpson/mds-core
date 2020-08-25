@@ -1,2 +1,2 @@
-export { processPolicy, getSupersedingPolicies, getRecentEvents } from './mds-compliance-engine'
-export { getComplianceInputs } from './helpers'
+export { processPolicy, getSupersedingPolicies, getRecentEvents } from './engine/mds-compliance-engine'
+export { getComplianceInputs } from './engine/helpers'
