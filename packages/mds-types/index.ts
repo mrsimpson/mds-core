@@ -408,7 +408,7 @@ export interface TripMetadata {
     actual_cost?: number
     components?: { [entity: string]: number } // e.g. entity = 'LAX_AIRPORT_FEE'
     currency?: string
-    payment_methods?: Partial<{ [S in PAYMENT_METHOD]: number }>
+    payment_methods?: PAYMENT_METHOD[]
   }
 }
 

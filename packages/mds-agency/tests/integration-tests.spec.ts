@@ -1631,10 +1631,7 @@ describe('Tests TripMetadata', async () => {
       actual_cost: 2500,
       components: {},
       currency: 'USD',
-      payment_methods: {
-        cash: 1250,
-        card: 1250
-      }
+      payment_methods: ['cash', 'card', 'equity_program']
     },
     reservation_type: 'on_demand',
     reservation_method: 'app'

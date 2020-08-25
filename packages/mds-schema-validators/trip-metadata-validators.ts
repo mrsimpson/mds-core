@@ -1,5 +1,5 @@
 import Joi from '@hapi/joi'
-import { TripMetadata, RESERVATION_METHODS, RESERVATION_TYPES } from '@mds-core/mds-types'
+import { TripMetadata, RESERVATION_METHODS, RESERVATION_TYPES, PAYMENT_METHODS } from '@mds-core/mds-types'
 import { RuntimeError } from '@mds-core/mds-utils'
 import {
   uuidSchema,
@@ -28,7 +28,9 @@ export const tripMetadataSchema = Joi.object().keys({
       actual_cost: numberSchema.optional(),
       components: Joi.object().optional(),
       currency: stringSchema.optional(),
-      payment_methods: Joi.object().optional() // loose validation for now
+      payment_methods: Joi.array()
+        .items(stringSchema.valid(...PAYMENT_METHODS))
+        .optional()
     })
     .optional()
 })
