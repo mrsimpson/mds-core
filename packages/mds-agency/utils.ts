@@ -354,7 +354,7 @@ export async function badEvent({ modality }: Pick<Device, 'modality'>, event: Ve
     if (
       event.trip_id &&
       TRIP_STATES.includes(event.vehicle_state as TRIP_STATE) &&
-      !areThereCommonElements([TAXI_TRIP_EXIT_EVENTS], event.event_types)
+      !areThereCommonElements(TAXI_TRIP_EXIT_EVENTS, event.event_types)
     ) {
       if (!event.trip_state) {
         return { error: 'missing_param', error_description: `missing enum field "trip_state" required on trip events` }
