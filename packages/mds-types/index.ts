@@ -135,6 +135,13 @@ export const TAXI_VEHICLE_EVENTS = [
 ] as const
 export type TAXI_VEHICLE_EVENT = typeof TAXI_VEHICLE_EVENTS[number]
 
+export const TAXI_TRIP_EXIT_EVENTS: TAXI_VEHICLE_EVENT[] = [
+  'trip_end',
+  'leave_jurisdiction',
+  'passenger_cancellation',
+  'driver_cancellation'
+]
+
 export const VEHICLE_EVENTS = [...MICRO_MOBILITY_VEHICLE_EVENTS, ...TAXI_VEHICLE_EVENTS] as const
 export type VEHICLE_EVENT = typeof VEHICLE_EVENTS[number]
 

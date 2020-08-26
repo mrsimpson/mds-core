@@ -25,7 +25,8 @@ import {
   TAXI_VEHICLE_EVENT,
   TAXI_VEHICLE_STATE,
   TRIP_STATES,
-  TRIP_STATE
+  TRIP_STATE,
+  TAXI_TRIP_EXIT_EVENTS
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -350,7 +351,11 @@ export async function badEvent({ modality }: Pick<Device, 'modality'>, event: Ve
       return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
     }
 
-    if (event.trip_id && TRIP_STATES.includes(event.vehicle_state as TRIP_STATE)) {
+    if (
+      event.trip_id &&
+      TRIP_STATES.includes(event.vehicle_state as TRIP_STATE) &&
+      !areThereCommonElements([TAXI_TRIP_EXIT_EVENTS], event.event_types)
+    ) {
       if (!event.trip_state) {
         return { error: 'missing_param', error_description: `missing enum field "trip_state" required on trip events` }
       }
