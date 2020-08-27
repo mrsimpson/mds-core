@@ -94,11 +94,12 @@ export interface ComplianceResponse {
 
 export interface ComplianceDomainModel {
   compliance_id: UUID
-  timestamp: Timestamp
   provider_id: UUID
   policy_id: UUID
   compliance_json: ComplianceResponse // in typeorm this will be a json or jsonb column
   total_violations: number
+  recorded: Timestamp
+  timestamp: Timestamp
 }
 
 export type ComplianceDomainCreateModel = ComplianceDomainModel
