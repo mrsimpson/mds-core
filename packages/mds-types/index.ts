@@ -116,7 +116,7 @@ export const TAXI_VEHICLE_EVENTS = [
   'comms_lost',
   'comms_restored',
   'decommissioned',
-  'depot_enter',
+  'maintenance_start',
   'depot_leave',
   'driver_cancellation',
   'enter_jurisdiction',
@@ -215,7 +215,7 @@ export const TAXI_EVENT_STATES_MAP: {
   comms_lost: ['unknown'],
   comms_restored: ['available', 'non_operational', 'reserved', 'on_trip', 'elsewhere'],
   decommissioned: ['removed'],
-  depot_enter: ['removed'],
+  maintenance_start: ['removed'],
   depot_leave: ['non_operational'],
   driver_cancellation: ['available', 'on_trip', 'reserved', 'stopped'],
   enter_jurisdiction: ['available', 'reserved', 'on_trip', 'non_operational'],
@@ -278,7 +278,7 @@ export const TAXI_STATE_EVENT_MAP = TaxiStatusEventMap({
   non_operational: ['depot_leave', 'service_end', 'enter_jurisdiction', 'maintenance'],
   on_trip: ['trip_start', 'enter_jurisdiction', 'comms_restored', 'trip_resume'],
   elsewhere: ['leave_jurisdiction', 'comms_restored'],
-  removed: ['depot_enter', 'maintenance'],
+  removed: ['maintenance_start', 'maintenance'],
   unknown: ['comms_lost'],
   stopped: ['trip_stop', 'reservation_stop']
 })
