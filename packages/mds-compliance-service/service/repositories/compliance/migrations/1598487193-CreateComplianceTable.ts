@@ -6,7 +6,7 @@ export class CreateInitialTablesEvents1598487193 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `CREATE TABLE "compliance"
-        ("recorded" bigint NOT NULL DEFAULT (extract(epoch from now()) * 1000)::bigint,
+        ("recorded" bigint NOT NULL,
         "id" bigint GENERATED ALWAYS AS IDENTITY,
         "compliance_id" uuid NOT NULL,
         "provider_id" uuid NOT NULL,
