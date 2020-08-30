@@ -28,7 +28,7 @@ import {
 import {
   MatchedVehiclePlusRule,
   CountMatch,
-  Compliance,
+  RuleCompliance,
   MatchedVehicle,
   SpeedMatch,
   TimeMatch,
@@ -86,7 +86,7 @@ function processCountRule(
   events: VehicleEvent[],
   geographies: Geography[],
   devices: { [d: string]: Device }
-): Compliance & { matches: CountMatch[] | null } {
+): RuleCompliance & { matches: CountMatch[] | null } {
   const maximum = rule.maximum || Number.POSITIVE_INFINITY
   if (isRuleActive(rule)) {
     const matches: CountMatch[] = rule.geographies.reduce(
@@ -126,7 +126,7 @@ function processTimeRule(
   events: VehicleEvent[],
   geographies: Geography[],
   devices: { [d: string]: Device }
-): Compliance & { matches: TimeMatch[] | null } {
+): RuleCompliance & { matches: TimeMatch[] | null } {
   if (isRuleActive(rule)) {
     const matches: TimeMatch[] = rule.geographies.reduce((matches_acc: TimeMatch[], geography: string): TimeMatch[] => {
       events.forEach((event: VehicleEvent) => {
@@ -162,7 +162,7 @@ function processSpeedRule(
   events: VehicleEvent[],
   geographies: Geography[],
   devices: { [d: string]: Device }
-): Compliance & { matches: SpeedMatch[] | null } {
+): RuleCompliance & { matches: SpeedMatch[] | null } {
   if (isRuleActive(rule)) {
     const matches_result: SpeedMatch[] = rule.geographies.reduce((matches: any[], geography: string) => {
       events.forEach((event: VehicleEvent) => {
@@ -206,151 +206,157 @@ function processPolicy(
     let countViolations = 0
     const timeVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
     const speedingVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
-    const compliance: Compliance[] = policy.rules.reduce((compliance_acc: Compliance[], rule: Rule): Compliance[] => {
-      // Even if a vehicle breaks two rules, it will be counted in violation of only the first rule.
-      // So we must filter it out so it's not included in the processing of any other policy rules.
-      vehiclesToFilter.forEach((vehicle: MatchedVehicle) => {
-        /* eslint-reason need to remove matched vehicles */
-        /* eslint-disable-next-line no-param-reassign */
-        delete devices[vehicle.device.device_id]
-      })
+    const rule_compliances: RuleCompliance[] = policy.rules.reduce(
+      (compliance_acc: RuleCompliance[], rule: Rule): RuleCompliance[] => {
+        // Even if a vehicle breaks two rules, it will be counted in violation of only the first rule.
+        // So we must filter it out so it's not included in the processing of any other policy rules.
+        vehiclesToFilter.forEach((vehicle: MatchedVehicle) => {
+          /* eslint-reason need to remove matched vehicles */
+          /* eslint-disable-next-line no-param-reassign */
+          delete devices[vehicle.device.device_id]
+        })
 
-      switch (rule.rule_type) {
-        case 'count': {
-          const comp: Compliance & { matches: CountMatch[] } = processCountRule(
-            rule,
-            sortedEvents,
-            geographies,
-            devices
-          )
-
-          const compressedComp = {
-            rule,
-            matches: comp.matches
-              ? comp.matches.reduce((acc: { measured: number; geography_id: UUID }[], inst: CountMatch) => {
-                  const { measured, geography_id } = inst
-                  return [...acc, { measured, geography_id }]
-                }, [])
-              : []
-          }
-
-          const bucketMap = comp.matches.reduce(
-            (acc2: { matched: MatchedVehicle[]; overflowed: MatchedVehiclePlusRule[] }[], match) => {
-              return [
-                ...acc2,
-                match.matched_vehicles.reduce(
-                  (
-                    acc: { matched: MatchedVehicle[]; overflowed: MatchedVehiclePlusRule[] },
-                    match_instance: MatchedVehicle,
-                    i: number
-                  ) => {
-                    // If the rule has a defined maximum, use it, even if 0
-                    const maximum = rule.maximum == null ? Number.POSITIVE_INFINITY : rule.maximum
-                    if (maximum && i < maximum) {
-                      if (overflowVehiclesMap[match_instance.device.device_id]) {
-                        delete overflowVehiclesMap[match_instance.device.device_id]
-                      }
-                      if (countVehiclesMap[match_instance.device.device_id]) {
-                        delete countVehiclesMap[match_instance.device.device_id]
-                      }
-                      acc.matched.push(match_instance)
-                    } else {
-                      acc.overflowed.push({ ...match_instance, rule_id: rule.rule_id })
-                    }
-                    return acc
-                  },
-                  { matched: [], overflowed: [] }
-                )
-              ]
-            },
-            [{ matched: [], overflowed: [] }]
-          )
-
-          const vehiclesMatched = bucketMap.reduce((acc: MatchedVehicle[], map) => {
-            return [...acc, ...map.matched]
-          }, [])
-          vehiclesToFilter.push(...vehiclesMatched)
-
-          const overflowVehicles = bucketMap.reduce((acc: MatchedVehiclePlusRule[], map) => {
-            return [...acc, ...map.overflowed]
-          }, [])
-
-          // Add overflowed vehicles to the overall overflowVehiclesMap.
-          overflowVehiclesMap = {
-            ...overflowVehiclesMap,
-            ...overflowVehicles.reduce(
-              (acc: { [key: string]: MatchedVehiclePlusRule }, match: MatchedVehiclePlusRule) => {
-                acc[match.device.device_id] = match
-                return acc
-              },
-              {}
+        switch (rule.rule_type) {
+          case 'count': {
+            const comp: RuleCompliance & { matches: CountMatch[] } = processCountRule(
+              rule,
+              sortedEvents,
+              geographies,
+              devices
             )
+
+            const compressedComp = {
+              rule,
+              matches: comp.matches
+                ? comp.matches.reduce((acc: { measured: number; geography_id: UUID }[], inst: CountMatch) => {
+                    const { measured, geography_id } = inst
+                    return [...acc, { measured, geography_id }]
+                  }, [])
+                : []
+            }
+
+            const bucketMap = comp.matches.reduce(
+              (acc2: { matched: MatchedVehicle[]; overflowed: MatchedVehiclePlusRule[] }[], match) => {
+                return [
+                  ...acc2,
+                  match.matched_vehicles.reduce(
+                    (
+                      acc: { matched: MatchedVehicle[]; overflowed: MatchedVehiclePlusRule[] },
+                      match_instance: MatchedVehicle,
+                      i: number
+                    ) => {
+                      // If the rule has a defined maximum, use it, even if 0
+                      const maximum = rule.maximum == null ? Number.POSITIVE_INFINITY : rule.maximum
+                      if (maximum && i < maximum) {
+                        if (overflowVehiclesMap[match_instance.device.device_id]) {
+                          delete overflowVehiclesMap[match_instance.device.device_id]
+                        }
+                        if (countVehiclesMap[match_instance.device.device_id]) {
+                          delete countVehiclesMap[match_instance.device.device_id]
+                        }
+                        acc.matched.push(match_instance)
+                      } else {
+                        acc.overflowed.push({ ...match_instance, rule_id: rule.rule_id })
+                      }
+                      return acc
+                    },
+                    { matched: [], overflowed: [] }
+                  )
+                ]
+              },
+              [{ matched: [], overflowed: [] }]
+            )
+
+            const vehiclesMatched = bucketMap.reduce((acc: MatchedVehicle[], map) => {
+              return [...acc, ...map.matched]
+            }, [])
+            vehiclesToFilter.push(...vehiclesMatched)
+
+            const overflowVehicles = bucketMap.reduce((acc: MatchedVehiclePlusRule[], map) => {
+              return [...acc, ...map.overflowed]
+            }, [])
+
+            // Add overflowed vehicles to the overall overflowVehiclesMap.
+            overflowVehiclesMap = {
+              ...overflowVehiclesMap,
+              ...overflowVehicles.reduce(
+                (acc: { [key: string]: MatchedVehiclePlusRule }, match: MatchedVehiclePlusRule) => {
+                  acc[match.device.device_id] = match
+                  return acc
+                },
+                {}
+              )
+            }
+
+            // only vehicles in count maximum violation are in overflow
+            // no vehicles are in violation if it's a mininimum violation,
+            // but # of violations goes up
+            const minimum = rule.minimum == null ? Number.NEGATIVE_INFINITY : rule.minimum
+
+            if (overflowVehicles.length > 0) {
+              countVehiclesMap = { ...countVehiclesMap, ...overflowVehiclesMap }
+              countViolations += overflowVehicles.length
+            } else if (vehiclesMatched.length < minimum) {
+              countViolations += minimum - vehiclesMatched.length
+            }
+
+            compliance_acc.push(compressedComp)
+
+            break
           }
-
-          // only vehicles in count maximum violation are in overflow
-          // no vehicles are in violation if it's a mininimum violation,
-          // but # of violations goes up
-          const minimum = rule.minimum == null ? Number.NEGATIVE_INFINITY : rule.minimum
-
-          if (overflowVehicles.length > 0) {
-            countVehiclesMap = { ...countVehiclesMap, ...overflowVehiclesMap }
-            countViolations += overflowVehicles.length
-          } else if (vehiclesMatched.length < minimum) {
-            countViolations += minimum - vehiclesMatched.length
-          }
-
-          compliance_acc.push(compressedComp)
-
-          break
-        }
-        case 'time': {
-          const comp: Compliance & { matches: TimeMatch[] | null } = processTimeRule(
-            rule,
-            sortedEvents,
-            geographies,
-            devices
-          )
-          compliance_acc.push(comp)
-
-          const timeVehicles = comp.matches
-            ? comp.matches.reduce((acc: MatchedVehicle[], match: TimeMatch) => {
-                const { matched_vehicle } = match
-                timeVehiclesMap[matched_vehicle.device.device_id] = { ...matched_vehicle, ...{ rule_id: rule.rule_id } }
-                acc.push(matched_vehicle)
-                return acc
-              }, [])
-            : []
-
-          vehiclesToFilter.push(...timeVehicles)
-          break
-        }
-        case 'speed':
-          {
-            const comp: Compliance & { matches: SpeedMatch[] | null } = processSpeedRule(
+          case 'time': {
+            const comp: RuleCompliance & { matches: TimeMatch[] | null } = processTimeRule(
               rule,
               sortedEvents,
               geographies,
               devices
             )
             compliance_acc.push(comp)
-            const speedingVehicles = comp.matches
-              ? comp.matches.reduce((acc: MatchedVehicle[], match: SpeedMatch) => {
-                  acc.push(match.matched_vehicle)
+
+            const timeVehicles = comp.matches
+              ? comp.matches.reduce((acc: MatchedVehicle[], match: TimeMatch) => {
+                  const { matched_vehicle } = match
+                  timeVehiclesMap[matched_vehicle.device.device_id] = {
+                    ...matched_vehicle,
+                    ...{ rule_id: rule.rule_id }
+                  }
+                  acc.push(matched_vehicle)
                   return acc
                 }, [])
               : []
-            vehiclesToFilter.push(...speedingVehicles)
 
-            speedingVehicles.forEach(vehicle => {
-              speedingVehiclesMap[vehicle.device.device_id] = { ...vehicle, ...{ rule_id: rule.rule_id } }
-            })
+            vehiclesToFilter.push(...timeVehicles)
+            break
           }
-          break
-        default:
-          compliance_acc.push({ rule, matches: [] })
-      }
-      return compliance_acc
-    }, [])
+          case 'speed':
+            {
+              const comp: RuleCompliance & { matches: SpeedMatch[] | null } = processSpeedRule(
+                rule,
+                sortedEvents,
+                geographies,
+                devices
+              )
+              compliance_acc.push(comp)
+              const speedingVehicles = comp.matches
+                ? comp.matches.reduce((acc: MatchedVehicle[], match: SpeedMatch) => {
+                    acc.push(match.matched_vehicle)
+                    return acc
+                  }, [])
+                : []
+              vehiclesToFilter.push(...speedingVehicles)
+
+              speedingVehicles.forEach(vehicle => {
+                speedingVehiclesMap[vehicle.device.device_id] = { ...vehicle, ...{ rule_id: rule.rule_id } }
+              })
+            }
+            break
+          default:
+            compliance_acc.push({ rule, matches: [] })
+        }
+        return compliance_acc
+      },
+      []
+    )
 
     const countVehicles = getViolationsArray(countVehiclesMap)
     const timeVehicles = getViolationsArray(timeVehiclesMap)
@@ -358,7 +364,7 @@ function processPolicy(
 
     return {
       policy,
-      compliance,
+      rule_compliances,
       total_violations: countViolations + timeVehicles.length + speedingVehicles.length,
       vehicles_in_violation: { ...countVehicles, ...timeVehiclesMap, ...speedingVehiclesMap }
     }

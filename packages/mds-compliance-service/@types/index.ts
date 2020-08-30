@@ -81,28 +81,27 @@ export interface ReducedMatch {
   geography_id: UUID
 }
 
-export interface Compliance {
+export interface RuleCompliance {
   rule: Rule
   matches: ReducedMatch[] | CountMatch[] | TimeMatch[] | SpeedMatch[]
 }
 export interface ComplianceResponse {
   policy: Policy
-  compliance: Compliance[]
+  rule_compliances: RuleCompliance[]
   total_violations: number
   vehicles_in_violation: MatchedVehiclePlusRule[]
 }
 
-export interface ComplianceDomainModel {
+export interface ComplianceResponseDomainModel {
   compliance_id: UUID
   provider_id: UUID
-  policy_id: UUID
   compliance_json: ComplianceResponse // in typeorm this will be a json or jsonb column
   total_violations: number
   recorded: Timestamp
   timestamp: Timestamp
 }
 
-export type ComplianceDomainCreateModel = ComplianceDomainModel
+export type ComplianceDomainCreateModel = ComplianceResponseDomainModel
 /*
 
 

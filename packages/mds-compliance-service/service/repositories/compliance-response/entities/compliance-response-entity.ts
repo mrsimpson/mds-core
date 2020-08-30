@@ -1,24 +1,12 @@
 import { Entity, Column } from 'typeorm'
 import { UUID, Timestamp } from '@mds-core/mds-types'
 import { BigintTransformer } from '@mds-core/mds-repository'
-import { Compliance } from 'packages/mds-compliance/types'
-import { ComplianceDomainModel } from '../../../@types'
+import { ComplianceResponseDomainModel, ComplianceResponse } from '../../../../@types'
 
-export type ComplianceEntityModel = ComplianceDomainModel
-/*
-
-        ("recorded" bigint NOT NULL DEFAULT (extract(epoch from now()) * 1000)::bigint,
-        "id" bigint GENERATED ALWAYS AS IDENTITY,
-        "compliance_id" uuid NOT NULL,
-        "provider_id" uuid NOT NULL,
-        "policy_id" uuid NOT NULL,
-        "compliance_json" jsonb NOT NULL,
-        "timestamp" bigint NOT NULL,
-        "total_violations" int NOT NULL,
-        */
+export type ComplianceResponseEntityModel = ComplianceResponseDomainModel
 
 @Entity('compliance')
-export class ComplianceEntity implements ComplianceEntityModel {
+export class ComplianceResponseEntity implements ComplianceResponseEntityModel {
   @Column('bigint', { primary: true, generated: 'increment', transformer: BigintTransformer })
   id: number
 
@@ -42,7 +30,7 @@ export class ComplianceEntity implements ComplianceEntityModel {
 
   // TODO write transformer or find it
   @Column('jsonb', { transformer: BigintTransformer })
-  compliance_json: Compliance
+  compliance_json: ComplianceResponse
 
   @Column('int')
   total_violations: number

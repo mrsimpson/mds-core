@@ -1,3 +1,3 @@
-import { ComplianceRepository } from './service/repositories/compliance/entities'
+import { ComplianceResponseRepository } from './service/repositories/compliance-response'
 
-module.exports = ComplianceRepository.cli({ migrationsDir: 'service/repository/migrations' })
+module.exports = ComplianceResponseRepository.cli({ migrationsDir: 'service/repository/migrations' })
