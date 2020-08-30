@@ -5,7 +5,7 @@ import { ComplianceResponseDomainModel, ComplianceResponse } from '../../../../@
 
 export type ComplianceResponseEntityModel = ComplianceResponseDomainModel
 
-@Entity('compliance')
+@Entity('compliance_response')
 export class ComplianceResponseEntity implements ComplianceResponseEntityModel {
   @Column('bigint', { primary: true, generated: 'increment', transformer: BigintTransformer })
   id: number
@@ -15,9 +15,6 @@ export class ComplianceResponseEntity implements ComplianceResponseEntityModel {
 
   @Column('uuid')
   provider_id: UUID
-
-  @Column('uuid')
-  policy_id: UUID
 
   @Column('bigint', {
     transformer: BigintTransformer,
