@@ -1,6 +1,7 @@
 import { InsertReturning, RepositoryError, ReadWriteRepository, UpdateReturning } from '@mds-core/mds-repository'
 import { NotFoundError } from '@mds-core/mds-utils'
 import { Nullable } from '@mds-core/mds-types'
+import { ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
 import { ComplianceResponseEntity } from './entities'
 import * as migrations from './migrations'
 /*
@@ -15,6 +16,27 @@ class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
       entities: [ComplianceResponseEntity],
       migrations: Object.values(migrations)
     })
+  }
+
+  public createComplianceResponse = async (
+    compliance_response: ComplianceResponseDomainModel
+  ): Promise<ComplianceResponseDomainModel> => {
+    const { connect } = this
+    try {
+      const connection = await connect('rw')
+      const {
+        raw: [entity]
+      }: InsertReturning<ComplianceResponseEntity> = await connection
+        .getRepository(ComplianceResponseEntity)
+        .createQueryBuilder()
+        .insert()
+        .values([ComplianceResponseDomainToEntityCreate.map(compliance_response)])
+        .returning('*')
+        .execute()
+      return ComplianceResponseEntityToDomainModel.map(entity)
+    } catch (error) {
+      throw RepositoryError(error)
+    }
   }
 }
 
