@@ -1620,6 +1620,7 @@ describe('Tests TripMetadata', async () => {
   const metadata: Required<Omit<TripMetadata, 'provider_id'>> = {
     trip_id: uuid(),
     reservation_time: now(),
+    scheduled_trip_start_time: now(),
     dispatch_time: now(),
     trip_start_time: now(),
     trip_end_time: now(),
