@@ -7,7 +7,7 @@ import ormconfig = require('../ormconfig')
 
 describe('Test Migrations', () => {
   const options = ormconfig as ConnectionOptions
-  it.only(`Run Migrations for compliance`, async () => {
+  it(`Run Migrations for compliance`, async () => {
     const connection = await createConnection(options)
     await connection.runMigrations()
     await connection.close()
