@@ -21,7 +21,7 @@ export const tripMetadataSchema = Joi.object().keys({
   trip_start_time: timestampSchema.optional(),
   trip_end_time: timestampSchema.optional(),
   cancellation_reason: stringSchema.optional(),
-  accessibility_options_used: Joi.array().items(accessibilityOptionsSchema).optional(),
+  accessibility_options: Joi.array().items(accessibilityOptionsSchema).optional(),
   distance: numberSchema.optional(),
   fare: Joi.object()
     .keys({

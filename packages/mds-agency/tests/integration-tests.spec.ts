@@ -1626,7 +1626,7 @@ describe('Tests TripMetadata', async () => {
     trip_end_time: now(),
     cancellation_reason: 'test',
     distance: 100,
-    accessibility_options_used: [],
+    accessibility_options: [],
     fare: {
       quoted_cost: 2000,
       actual_cost: 2500,

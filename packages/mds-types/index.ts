@@ -412,7 +412,7 @@ export interface TripMetadata {
   trip_start_time?: Timestamp
   trip_end_time?: Timestamp
   distance?: number // Distance in meters
-  accessibility_options_used?: ACCESSIBILITY_OPTION[]
+  accessibility_options?: ACCESSIBILITY_OPTION[]
   fare?: {
     quoted_cost?: number
     actual_cost?: number
