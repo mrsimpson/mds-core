@@ -13,6 +13,7 @@ import {
   DAY_OF_WEEK,
   PolicyMessage
 } from '@mds-core/mds-types'
+import { DomainModelCreate } from '@mds-core/mds-repository'
 // import { RpcServiceDefinition, RpcRoute } from '@mds-core/mds-rpc-common'
 
 export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
@@ -93,14 +94,13 @@ export interface ComplianceResponse {
 }
 
 export interface ComplianceResponseDomainModel {
-  compliance_id: UUID
+  compliance_response_id: UUID
   provider_id: UUID
   compliance_json: ComplianceResponse // in typeorm this will be a json or jsonb column
-  total_violations: number
   timestamp: Timestamp
 }
 
-export type ComplianceDomainCreateModel = ComplianceResponseDomainModel
+export type ComplianceResponseDomainCreateModel = DomainModelCreate<ComplianceResponseDomainModel>
 /*
 
 

@@ -1,9 +1,8 @@
 import { InsertReturning, RepositoryError, ReadWriteRepository, UpdateReturning } from '@mds-core/mds-repository'
-import { NotFoundError } from '@mds-core/mds-utils'
-import { Nullable } from '@mds-core/mds-types'
-import { ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
+import { ComplianceResponseDomainModel } from '../../../@types'
 import { ComplianceResponseEntity } from './entities'
 import * as migrations from './migrations'
+import { ComplianceResponseEntityToDomain } from './mappers'
 /*
 import { EventDomainModel, GetEventQuery, DeviceSessions } from '../../../@types'
 import { EventEntityToDomainModel, EventDomainToEntityCreate } from './mappers'
@@ -18,7 +17,7 @@ class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
     })
   }
 
-  public createComplianceResponse = async (
+  public writeComplianceResponse = async (
     compliance_response: ComplianceResponseDomainModel
   ): Promise<ComplianceResponseDomainModel> => {
     const { connect } = this
@@ -30,10 +29,10 @@ class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
         .getRepository(ComplianceResponseEntity)
         .createQueryBuilder()
         .insert()
-        .values([ComplianceResponseDomainToEntityCreate.map(compliance_response)])
+        .values([compliance_response])
         .returning('*')
         .execute()
-      return ComplianceResponseEntityToDomainModel.map(entity)
+      return ComplianceResponseEntityToDomain.map(entity)
     } catch (error) {
       throw RepositoryError(error)
     }
