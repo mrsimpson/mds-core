@@ -11,6 +11,7 @@ export class CreateInitialTablesEvents1598487193 implements MigrationInterface {
         "compliance_response_id" uuid NOT NULL,
         "provider_id" uuid NOT NULL,
         "compliance_json" jsonb NOT NULL,
+        "timestamp" bigint NOT NULL,
         CONSTRAINT "compliance_pkey" PRIMARY KEY ("compliance_response_id"))`,
       undefined
     )
