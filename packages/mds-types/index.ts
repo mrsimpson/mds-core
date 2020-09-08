@@ -310,7 +310,7 @@ export type NullableKeys<T> = {
 export type Optional<T, P extends keyof T> = Omit<T, P> & Partial<Pick<T, P>>
 export type NonEmptyArray<T> = [T, ...T[]]
 
-export const ACCESSIBILITY_OPTIONS = ['wheelchair_boarding'] as const
+export const ACCESSIBILITY_OPTIONS = ['wheelchair_accessible'] as const
 export type ACCESSIBILITY_OPTION = typeof ACCESSIBILITY_OPTIONS[number]
 
 export const MODALITIES = ['micro-mobility', 'taxi'] as const

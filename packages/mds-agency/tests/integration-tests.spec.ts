@@ -109,7 +109,7 @@ const TEST_BICYCLE: Omit<Device, 'recorded' | 'accessibility_options'> = {
 }
 
 const TEST_TAXI: Omit<Device, 'recorded'> = {
-  accessibility_options: ['wheelchair_boarding'],
+  accessibility_options: ['wheelchair_accessible'],
   device_id: uuid(),
   provider_id: TEST1_PROVIDER_ID,
   vehicle_id: 'test-id-1',
