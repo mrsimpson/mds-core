@@ -1619,6 +1619,7 @@ describe('Tests for taxi modality', async () => {
 describe('Tests TripMetadata', async () => {
   const metadata: Required<Omit<TripMetadata, 'provider_id'>> = {
     trip_id: uuid(),
+    requested_trip_start_location: { lat: 34.0522, lng: -118.2437 },
     reservation_time: now(),
     scheduled_trip_start_time: now(),
     dispatch_time: now(),

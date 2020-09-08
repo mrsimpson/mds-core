@@ -403,6 +403,7 @@ export type RESERVATION_TYPE = typeof RESERVATION_TYPES[number]
 export interface TripMetadata {
   trip_id: UUID
   provider_id: UUID
+  requested_trip_start_location: Pick<GpsData, 'lat' | 'lng'>
   reservation_time: Timestamp
   reservation_method: RESERVATION_METHOD
   reservation_type: RESERVATION_TYPE
