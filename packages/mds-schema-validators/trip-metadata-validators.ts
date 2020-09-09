@@ -18,7 +18,7 @@ export const tripMetadataSchema = Joi.object().keys({
       lng: numberSchema.required(),
       lat: numberSchema.required()
     })
-    .required(),
+    .optional(),
   reservation_time: timestampSchema.required(),
   reservation_method: stringSchema.valid(...RESERVATION_METHODS).required(),
   reservation_type: stringSchema.valid(...RESERVATION_TYPES).required(),
