@@ -5,6 +5,8 @@ import { COMPLIANCE_RESPONSE_1 } from './compliance_response_fixtures'
 
 import ormconfig = require('../ormconfig')
 
+const COMPLIANCE_RESPONSE_ID = uuid()
+
 describe('Test Migrations', () => {
   const options = ormconfig as ConnectionOptions
   it(`Run Migrations for compliance`, async () => {
@@ -15,11 +17,18 @@ describe('Test Migrations', () => {
 
   it(`writes a compliance response`, async () => {
     await ComplianceResponseRepository.writeComplianceResponse({
-      compliance_response_id: uuid(),
+      compliance_response_id: COMPLIANCE_RESPONSE_ID,
       provider_id: uuid(),
       compliance_json: COMPLIANCE_RESPONSE_1,
       timestamp: now()
     })
+  })
+
+  it(`reads a compliance response`, async () => {
+    const result = await ComplianceResponseRepository.getComplianceResponse({
+      compliance_response_id: COMPLIANCE_RESPONSE_ID
+    })
+    console.log(result)
   })
 
   it(`Revert Migrations ${options.name}`, async () => {
