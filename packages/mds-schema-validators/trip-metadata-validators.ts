@@ -22,7 +22,7 @@ export const tripMetadataSchema = Joi.object().keys({
   reservation_time: timestampSchema.required(),
   reservation_method: stringSchema.valid(...RESERVATION_METHODS).required(),
   reservation_type: stringSchema.valid(...RESERVATION_TYPES).required(),
-  scheduled_trip_start_time: timestampSchema.optional(), // FIXME: Can we (in a clean way) make this conditionally required if reservation_type === 'scheduled'?
+  quoted_trip_start_time: timestampSchema.required(),
   dispatch_time: timestampSchema.optional(),
   trip_start_time: timestampSchema.optional(),
   trip_end_time: timestampSchema.optional(),

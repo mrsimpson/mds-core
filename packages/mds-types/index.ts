@@ -406,8 +406,8 @@ export interface TripMetadata {
   reservation_time: Timestamp
   reservation_method: RESERVATION_METHOD
   reservation_type: RESERVATION_TYPE
+  quoted_trip_start_time: Timestamp
   requested_trip_start_location?: Pick<GpsData, 'lat' | 'lng'>
-  scheduled_trip_start_time?: Timestamp
   cancellation_reason?: string
   dispatch_time?: Timestamp
   trip_start_time?: Timestamp

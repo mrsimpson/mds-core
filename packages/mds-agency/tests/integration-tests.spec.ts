@@ -1621,7 +1621,7 @@ describe('Tests TripMetadata', async () => {
     trip_id: uuid(),
     requested_trip_start_location: { lat: 34.0522, lng: -118.2437 },
     reservation_time: now(),
-    scheduled_trip_start_time: now(),
+    quoted_trip_start_time: now(),
     dispatch_time: now(),
     trip_start_time: now(),
     trip_end_time: now(),
