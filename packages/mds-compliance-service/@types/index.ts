@@ -100,7 +100,24 @@ export interface ComplianceResponseDomainModel {
   timestamp: Timestamp
 }
 
-export type ComplianceResponseDomainCreateModel = DomainModelCreate<ComplianceResponseDomainModel>
+// export type ComplianceResponseDomainCreateModel = DomainModelCreate<ComplianceResponseDomainModel>
+export interface BlogService {
+  createBlogs: (blogs: BlogDomainModel[]) => BlogDomainModel[]
+  createBlog: (blog: BlogDomainModel) => BlogDomainModel
+  getBlogs: () => BlogDomainModel[]
+  getBlog: (name: string) => BlogDomainModel
+  updateBlog: (payload: BlogDomainModel) => BlogDomainModel
+  deleteBlog: (name: string) => BlogDomainModel['name']
+}
+
+export const BlogServiceDefinition: RpcServiceDefinition<BlogService> = {
+  createBlogs: RpcRoute<BlogService['createBlogs']>(),
+  createBlog: RpcRoute<BlogService['createBlog']>(),
+  getBlogs: RpcRoute<BlogService['getBlogs']>(),
+  getBlog: RpcRoute<BlogService['getBlog']>(),
+  updateBlog: RpcRoute<BlogService['updateBlog']>(),
+  deleteBlog: RpcRoute<BlogService['deleteBlog']>()
+}
 /*
 
 

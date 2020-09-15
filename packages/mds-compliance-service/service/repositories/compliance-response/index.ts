@@ -1,8 +1,8 @@
 import { InsertReturning, RepositoryError, ReadWriteRepository, UpdateReturning } from '@mds-core/mds-repository'
 import { ComplianceResponseDomainModel } from '../../../@types'
-import { ComplianceResponseEntity } from './entities'
+import { ComplianceResponsePersistence } from './entities'
 import * as migrations from './migrations'
-import { ComplianceResponseEntityToDomain } from './mappers'
+import { ComplianceResponsePersistenceToDomain } from './mappers'
 import { UUID } from '@mds-core/mds-types'
 /*
 import { EventDomainModel, GetEventQuery, DeviceSessions } from '../../../@types'
@@ -17,7 +17,7 @@ export interface GetComplianceResponseOptions {
 class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
   constructor() {
     super('compliance_response', {
-      entities: [ComplianceResponseEntity],
+      entities: [ComplianceResponsePersistence],
       migrations: Object.values(migrations)
     })
   }
@@ -30,14 +30,14 @@ class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
       const connection = await connect('rw')
       const {
         raw: [entity]
-      }: InsertReturning<ComplianceResponseEntity> = await connection
-        .getRepository(ComplianceResponseEntity)
+      }: InsertReturning<ComplianceResponsePersistence> = await connection
+        .getRepository(ComplianceResponsePersistence)
         .createQueryBuilder()
         .insert()
         .values([compliance_response])
         .returning('*')
         .execute()
-      return ComplianceResponseEntityToDomain.map(entity)
+      return ComplianceResponsePersistenceToDomain.map(entity)
     } catch (error) {
       throw RepositoryError(error)
     }
@@ -49,7 +49,7 @@ class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
     const { connect } = this
     try {
       const connection = await connect('ro')
-      const query = connection.createQueryBuilder(ComplianceResponseEntity, 'compliance_response')
+      const query = connection.createQueryBuilder(ComplianceResponsePersistence, 'compliance_response')
       const result = await query
         .select('*')
         .where('compliance_response_id = :compliance_response_id', { compliance_response_id })

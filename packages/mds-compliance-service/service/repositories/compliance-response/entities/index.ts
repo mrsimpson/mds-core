@@ -1,1 +1,1 @@
-export { ComplianceResponseEntity } from './compliance-response-entity'
+export { ComplianceResponsePersistence } from './compliance-response-entity'

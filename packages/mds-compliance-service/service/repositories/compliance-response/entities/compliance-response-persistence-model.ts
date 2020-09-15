@@ -3,7 +3,7 @@ import { UUID, Timestamp } from '@mds-core/mds-types'
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import { ComplianceResponseDomainModel, ComplianceResponse } from '../../../../@types'
 
-export interface ComplianceResponseEntityModel extends IdentityColumn, RecordedColumn {
+export interface ComplianceResponsePersistenceModel extends IdentityColumn, RecordedColumn {
   compliance_response_id: ComplianceResponseDomainModel['compliance_response_id']
   provider_id: ComplianceResponseDomainModel['provider_id']
   compliance_json: ComplianceResponseDomainModel['compliance_json']
@@ -11,8 +11,8 @@ export interface ComplianceResponseEntityModel extends IdentityColumn, RecordedC
 }
 
 @Entity('compliance_response')
-export class ComplianceResponseEntity extends IdentityColumn(RecordedColumn(class {}))
-  implements ComplianceResponseEntityModel {
+export class ComplianceResponsePersistence extends IdentityColumn(RecordedColumn(class {}))
+  implements ComplianceResponsePersistenceModel {
   @Column('uuid', { primary: true })
   compliance_response_id: UUID
 
