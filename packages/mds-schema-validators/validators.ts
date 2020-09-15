@@ -41,7 +41,7 @@ import { ValidationError, areThereCommonElements } from '@mds-core/mds-utils'
 
 export { ValidationError }
 
-interface ValidatorOptions {
+export interface ValidatorOptions {
   property: string
   assert: boolean
   required: boolean
@@ -60,9 +60,9 @@ export const timestampSchema = numberSchema.min(1420099200000)
 
 export const providerIdSchema = uuidSchema.valid(...Object.keys(providers))
 
-const vehicleIdSchema = stringSchema.max(255)
+export const vehicleIdSchema = stringSchema.max(255)
 
-const telemetrySchema = Joi.object().keys({
+export const telemetrySchema = Joi.object().keys({
   gps: Joi.object()
     .keys({
       lat: numberSchema.min(-90).max(90).required(),
@@ -385,7 +385,7 @@ export function rawValidatePolicy(policy: Policy): Joi.ValidationResult {
 
 const validateTripEvent = (event: VehicleEvent) => ValidateSchema(event, tripEventSchema, {})
 
-export const validateEvent = (event: unknown) => {
+const validate_v1_0_0_Event = (event: unknown) => {
   if (isValidEvent(event, { allowUnknown: true })) {
     const { event_types } = event
 
@@ -403,6 +403,8 @@ export const validateEvent = (event: unknown) => {
     return ValidateSchema(event, eventSchema, {})
   }
 }
+
+export const validateEvent = validate_v1_0_0_Event
 
 export const policySchemaJson = joiToJson(policySchema)
 

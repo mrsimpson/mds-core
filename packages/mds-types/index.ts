@@ -35,9 +35,9 @@ export type RULE_TYPE = keyof typeof RULE_TYPES
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
-// export const VEHICLE_STATUSES = Enum('available', 'reserved', 'unavailable', 'removed', 'inactive', 'trip', 'elsewhere')
-// export type VEHICLE_STATUS = keyof typeof VEHICLE_STATUSES
-export const VEHICLE_STATES = [
+export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip'] as const
+
+export const VEHICLE_STATES_v1_0_0 = [
   'available',
   'elsewhere',
   'non_operational',
@@ -46,28 +46,11 @@ export const VEHICLE_STATES = [
   'reserved',
   'unknown'
 ] as const
-export type VEHICLE_STATE = typeof VEHICLE_STATES[number]
+export type VEHICLE_STATE_v1_0_0 = typeof VEHICLE_STATES_v1_0_0[number]
+export type VEHICLE_STATE = VEHICLE_STATE_v1_0_0
+export const VEHICLE_STATES = VEHICLE_STATES_v1_0_0
 
-// export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
-export const RIGHT_OF_WAY_STATES = ['available', 'reserved', 'non_operational', 'trip'] as const
-
-// export const VEHICLE_EVENTS = Enum(
-//   'register',
-//   'service_start',
-//   'service_end',
-//   'provider_drop_off',
-//   'provider_pick_up',
-//   'agency_pick_up',
-//   'agency_drop_off',
-//   'reserve',
-//   'cancel_reservation',
-//   'trip_start',
-//   'trip_enter',
-//   'trip_leave',
-//   'trip_end',
-//   'deregister'
-// )
-export const VEHICLE_EVENTS = [
+export const VEHICLE_EVENTS_v1_0_0 = [
   'agency_drop_off',
   'agency_pick_up',
   'battery_charged',
@@ -76,6 +59,7 @@ export const VEHICLE_EVENTS = [
   'comms_restored',
   'compliance_pick_up',
   'decommissioned',
+  'located',
   'maintenance',
   'maintenance_pick_up',
   'missing',
@@ -95,40 +79,12 @@ export const VEHICLE_EVENTS = [
   'unspecified'
 ] as const
 
-export type VEHICLE_EVENT = typeof VEHICLE_EVENTS[number]
-
-// export const VEHICLE_REASONS = Enum(
-//   'battery_charged',
-//   'charge',
-//   'compliance',
-//   'decommissioned',
-//   'low_battery',
-//   'maintenance',
-//   'missing',
-//   'off_hours',
-//   'rebalance'
-// )
-// export type VEHICLE_REASON = keyof typeof VEHICLE_REASONS
+export const VEHICLE_EVENTS = VEHICLE_EVENTS_v1_0_0
+export type VEHICLE_EVENT_v1_0_0 = typeof VEHICLE_EVENTS_v1_0_0[number]
+export type VEHICLE_EVENT = VEHICLE_EVENT_v1_0_0
 
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
-
-// export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE } = {
-//   register: VEHICLE_STATES.removed,
-//   service_start: VEHICLE_STATES.available,
-//   service_end: VEHICLE_STATES.unavailable,
-//   provider_drop_off: VEHICLE_STATES.available,
-//   provider_pick_up: VEHICLE_STATES.removed,
-//   agency_pick_up: VEHICLE_STATES.removed,
-//   agency_drop_off: VEHICLE_STATES.available,
-//   reserve: VEHICLE_STATES.reserved,
-//   cancel_reservation: VEHICLE_STATES.available,
-//   trip_start: VEHICLE_STATES.trip,
-//   trip_enter: VEHICLE_STATES.trip,
-//   trip_leave: VEHICLE_STATES.elsewhere,
-//   trip_end: VEHICLE_STATES.available,
-//   deregister: VEHICLE_STATES.inactive
-// }
 
 // States you transition into based on event_type
 export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE[] } = {
@@ -140,6 +96,7 @@ export const EVENT_STATES_MAP: { [P in VEHICLE_EVENT]: VEHICLE_STATE[] } = {
   comms_restored: ['available', 'elsewhere', 'non_operational', 'removed', 'reserved', 'on_trip'],
   compliance_pick_up: ['removed'],
   decommissioned: ['removed'],
+  located: ['available', 'non_operational', 'reserved', 'on_trip', 'elsewhere'],
   maintenance: ['available', 'non_operational'],
   maintenance_pick_up: ['removed'],
   missing: ['unknown'],
@@ -189,7 +146,7 @@ export const STATE_EVENT_MAP = StatusEventMap({
     'decommissioned',
     'unspecified'
   ],
-  unknown: ['comms_lost', 'missing']
+  unknown: ['comms_lost', 'missing', 'located']
 })
 
 export const DAYS_OF_WEEK = Enum('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
@@ -218,7 +175,7 @@ export type Optional<T, P extends keyof T> = Omit<T, P> & Partial<Pick<T, P>>
 export type NonEmptyArray<T> = [T, ...T[]]
 
 // Represents a row in the "devices" table
-export interface Device {
+export interface Device_v1_0_0 {
   device_id: UUID
   provider_id: UUID
   vehicle_id: string
@@ -230,12 +187,20 @@ export interface Device {
   recorded: Timestamp
   state?: VEHICLE_STATE | null
 }
+/**
+ * This is an alias that must be updated in the event of future changes to the type.
+ */
+export type Device = Device_v1_0_0
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
 
-// Represents a row in the "events" table
-// Named "VehicleEvent" to avoid confusion with the DOM's Event interface
-export interface VehicleEvent {
+/**
+ *  Represents a row in the "events" table
+ * Named "VehicleEvent" to avoid confusion with the DOM's Event interface
+ * Keeping 1_0_0 types in here and not in transformers/@types to avoid circular imports.
+ * This alias must be updated if this type is updated.
+ */
+export interface VehicleEvent_v1_0_0 {
   device_id: UUID
   provider_id: UUID
   timestamp: Timestamp
@@ -248,6 +213,7 @@ export interface VehicleEvent {
   vehicle_state: VEHICLE_STATE
   recorded: Timestamp
 }
+export type VehicleEvent = VehicleEvent_v1_0_0
 
 // Standard telemetry columns (used in more than one table)
 export interface TelemetryData {
@@ -277,6 +243,7 @@ export interface Telemetry extends WithGpsProperty<TelemetryData> {
   device_id: UUID
   timestamp: Timestamp
   recorded?: Timestamp
+  stop_id?: UUID | null
 }
 
 // Represents a row in the "attachments" table
