@@ -1,9 +1,9 @@
 import { InsertReturning, RepositoryError, ReadWriteRepository, UpdateReturning } from '@mds-core/mds-repository'
-import { ComplianceResponseDomainModel } from '../../../@types'
+import { UUID } from '@mds-core/mds-types'
+import { ComplianceResponseDomainModel } from '../../@types'
 import { ComplianceResponsePersistence } from './entities'
 import * as migrations from './migrations'
 import { ComplianceResponsePersistenceToDomain } from './mappers'
-import { UUID } from '@mds-core/mds-types'
 /*
 import { EventDomainModel, GetEventQuery, DeviceSessions } from '../../../@types'
 import { EventEntityToDomainModel, EventDomainToEntityCreate } from './mappers'

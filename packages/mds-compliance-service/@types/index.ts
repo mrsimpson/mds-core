@@ -11,7 +11,8 @@ import {
   VEHICLE_STATUS,
   STATUS_EVENT_MAP,
   DAY_OF_WEEK,
-  PolicyMessage
+  PolicyMessage,
+  VEHICLE_EVENT
 } from '@mds-core/mds-types'
 import { DomainModelCreate } from '@mds-core/mds-repository'
 // import { RpcServiceDefinition, RpcRoute } from '@mds-core/mds-rpc-common'
@@ -51,73 +52,39 @@ export type UserRule = BaseRule<'user'>
 
 export type Rule = CountRule | TimeRule | SpeedRule | UserRule
 
-export type MatchedVehiclePlusRule = MatchedVehicle & { rule_id: UUID }
-
 export type VehicleEventWithTelemetry = VehicleEvent & { telemetry: { gps: { lat: number; lng: number } } }
-export interface MatchedVehicle {
-  device: Device
-  event: VehicleEvent
-}
-
-export interface CountMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicles: MatchedVehicle[]
-}
-
-export interface TimeMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-export interface SpeedMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-export interface ReducedMatch {
-  measured: number
-  geography_id: UUID
-}
-
-export interface RuleCompliance {
-  rule: Rule
-  matches: ReducedMatch[] | CountMatch[] | TimeMatch[] | SpeedMatch[]
-}
-export interface ComplianceResponse {
-  policy: Policy
-  rule_compliances: RuleCompliance[]
-  total_violations: number
-  vehicles_in_violation: MatchedVehiclePlusRule[]
-}
-
-export interface ComplianceResponseDomainModel {
-  compliance_response_id: UUID
-  provider_id: UUID
-  compliance_json: ComplianceResponse // in typeorm this will be a json or jsonb column
+export interface MatchedVehicleInformation {
+  device_id: UUID
+  state: VEHICLE_STATUS
+  event_types: VEHICLE_EVENT[]
   timestamp: Timestamp
+  /* Sometimes a device can match more than one rule, and it's helpful to know all of them,
+     for instance, with a count policy.
+  */
+  rules_matched: UUID[]
+  rule_applied: UUID // a device can only ever match one rule for the purpose of computing compliance, however
+  speed?: number | null
+  speed_unit?: number | null
+  speed_measurement?: number | null
+  gps: {
+    lat: number
+    lng: number
+  }
+}
+
+export interface ComplianceResponse {
+  compliance_response_id: UUID
+  compliance_as_of: Timestamp
+  excess_vehicles_count: number
+  policy: {
+    policy_id: UUID
+    policy_name: string
+  }
+  total_violations: number
+  vehicles_found: MatchedVehicleInformation[]
 }
 
 // export type ComplianceResponseDomainCreateModel = DomainModelCreate<ComplianceResponseDomainModel>
-export interface BlogService {
-  createBlogs: (blogs: BlogDomainModel[]) => BlogDomainModel[]
-  createBlog: (blog: BlogDomainModel) => BlogDomainModel
-  getBlogs: () => BlogDomainModel[]
-  getBlog: (name: string) => BlogDomainModel
-  updateBlog: (payload: BlogDomainModel) => BlogDomainModel
-  deleteBlog: (name: string) => BlogDomainModel['name']
-}
-
-export const BlogServiceDefinition: RpcServiceDefinition<BlogService> = {
-  createBlogs: RpcRoute<BlogService['createBlogs']>(),
-  createBlog: RpcRoute<BlogService['createBlog']>(),
-  getBlogs: RpcRoute<BlogService['getBlogs']>(),
-  getBlog: RpcRoute<BlogService['getBlog']>(),
-  updateBlog: RpcRoute<BlogService['updateBlog']>(),
-  deleteBlog: RpcRoute<BlogService['deleteBlog']>()
-}
 /*
 
 

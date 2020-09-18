@@ -1,12 +1,15 @@
 import Joi from '@hapi/joi'
 import { ValidationError } from '@mds-core/mds-utils'
-import { ComplianceResponseDomainModel } from '../@types'
+import { ComplianceResponseDomainModel } from './@types'
+import { uuidSchema } from '@mds-core/mds-types'
 
-export const complianceResponseDomainModelSchema = Joi.object().keys({
-  // todo
-})
+const complianceResponseSchema = {
+  compliance_response_id: uuidSchema
+}
 
-export const ValidateBlogDomainModel = (
+export const complianceResponseDomainModelSchema = Joi.object().keys({})
+
+export const ValidateComplianceResponseDomainModel = (
   complianceResponse: ComplianceResponseDomainModel
 ): ComplianceResponseDomainModel => {
   const { error } = complianceResponseDomainModelSchema.validate(complianceResponse)
