@@ -5,16 +5,13 @@ import {
   // Nullable,
   // NonEmptyArray,
   VehicleEvent,
-  Device,
   Enum,
-  Policy,
   VEHICLE_STATUS,
   STATUS_EVENT_MAP,
   DAY_OF_WEEK,
   PolicyMessage,
   VEHICLE_EVENT
 } from '@mds-core/mds-types'
-import { DomainModelCreate } from '@mds-core/mds-repository'
 // import { RpcServiceDefinition, RpcRoute } from '@mds-core/mds-rpc-common'
 
 export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
