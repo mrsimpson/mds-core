@@ -7,8 +7,8 @@ import {
   ServiceResponse
 } from '@mds-core/mds-service-helpers'
 import { ComplianceResponseRepository } from './repositories/compliance-response'
-import { ComplianceResponse } from '..'
-import { ComplianceResponseDomainModel, ComplianceResponseService } from './@types'
+import { ComplianceResponseDomainModel, ComplianceResponseService } from '../@types'
+import { ValidateComplianceResponseDomainModel } from './validators'
 // import { ValidateComplianceResponseDomainModel } from './validators'
 
 export const ComplianceResponseServiceProvider: ServiceProvider<ComplianceResponseService> & ProcessController = {
@@ -19,10 +19,9 @@ export const ComplianceResponseServiceProvider: ServiceProvider<ComplianceRespon
   ): Promise<ServiceResponse<ComplianceResponseDomainModel>> => {
     try {
       return ServiceResult(
-        await ComplianceResponseRepository
-          .writeComplianceResponse
-          //          ValidateComplianceResponseDomainModel(complianceResponse)
-          ()
+        await ComplianceResponseRepository.writeComplianceResponse(
+          ValidateComplianceResponseDomainModel(complianceResponse)
+        )
       )
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating ComplianceResponse', error)

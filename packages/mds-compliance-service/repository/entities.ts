@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm'
 import { UUID, Timestamp } from '@mds-core/mds-types'
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
-import { ComplianceResponseDomainModel, ComplianceResponse } from '../../../../@types'
+import { ComplianceResponse, ComplianceResponseDomainModel } from '../@types'
 
 export interface ComplianceResponsePersistenceModel extends IdentityColumn, RecordedColumn {
   compliance_response_id: ComplianceResponseDomainModel['compliance_response_id']
@@ -11,7 +11,8 @@ export interface ComplianceResponsePersistenceModel extends IdentityColumn, Reco
 }
 
 @Entity('compliance_response')
-export class ComplianceResponsePersistence extends IdentityColumn(RecordedColumn(class {}))
+export class ComplianceResponsePersistenceEntity
+  extends IdentityColumn(RecordedColumn(class {}))
   implements ComplianceResponsePersistenceModel {
   @Column('uuid', { primary: true })
   compliance_response_id: UUID

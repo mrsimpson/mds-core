@@ -12,6 +12,8 @@ import {
   PolicyMessage,
   VEHICLE_EVENT
 } from '@mds-core/mds-types'
+import { RpcServiceDefinition, RpcRoute } from '@mds-core/mds-rpc-common'
+
 // import { RpcServiceDefinition, RpcRoute } from '@mds-core/mds-rpc-common'
 
 export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
@@ -82,54 +84,28 @@ export interface ComplianceResponse {
 }
 
 // export type ComplianceResponseDomainCreateModel = DomainModelCreate<ComplianceResponseDomainModel>
-/*
 
-
-export interface ReadMetricsTimeOptions {
-  time_bin_duration: string
-  time_bin_start: Timestamp
-  time_bin_end?: Timestamp
+export interface ComplianceResponseDomainModel {
+  compliance_response_id: UUID
+  provider_id: UUID
+  compliance_json: ComplianceResponse // in typeorm this will be a json or jsonb column
+  timestamp: Timestamp
 }
 
-export interface ReadMetricsFilterOptions {
-  provider_id: Nullable<UUID>[]
-  geography_id: Nullable<UUID>[]
-  stop_id: Nullable<UUID>[]
-  spot_id: Nullable<UUID>[]
-  vehicle_type: Nullable<VEHICLE_TYPE>[]
-  service_type: Nullable<SERVICE_TYPE>[]
+export interface ComplianceResponseService {
+  createComplianceResponses: (blogs: ComplianceResponseDomainModel[]) => ComplianceResponseDomainModel[]
+  createComplianceResponse: (blog: ComplianceResponseDomainModel) => ComplianceResponseDomainModel
+  getComplianceResponses: () => ComplianceResponseDomainModel[]
+  getComplianceResponse: (name: string) => ComplianceResponseDomainModel
+  updateComplianceResponse: (blog: ComplianceResponseDomainModel) => ComplianceResponseDomainModel
+  deleteComplianceResponse: (name: string) => ComplianceResponseDomainModel['compliance_response_id']
 }
 
-export interface MetricSelector {
-  name: string
-  aggregate: MetricAggregate
+export const ComplianceResponseServiceDefinition: RpcServiceDefinition<ComplianceResponseService> = {
+  createComplianceResponses: RpcRoute<ComplianceResponseService['createComplianceResponses']>(),
+  createComplianceResponse: RpcRoute<ComplianceResponseService['createComplianceResponse']>(),
+  getComplianceResponses: RpcRoute<ComplianceResponseService['getComplianceResponses']>(),
+  getComplianceResponse: RpcRoute<ComplianceResponseService['getComplianceResponse']>(),
+  updateComplianceResponse: RpcRoute<ComplianceResponseService['updateComplianceResponse']>(),
+  deleteComplianceResponse: RpcRoute<ComplianceResponseService['deleteComplianceResponse']>()
 }
-
-export interface ReadMetricsOptions extends ReadMetricsTimeOptions, Partial<ReadMetricsFilterOptions> {
-  metrics: NonEmptyArray<MetricSelector>
-}
-
-export type AggregateMetricDomainModel<D extends MetricDimension, M extends string> = Pick<
-  MetricDomainModel,
-  'time_bin_start' | 'time_bin_duration' | D
-> &
-  { [P in M]: number }
-
-export type AggregateMetricsOptions = ReadMetricsOptions & {
-  dimensions?: Array<MetricDimension>
-}
-
-export interface MetricsService {
-  writeMetrics: (metrics: MetricDomainCreateModel[]) => MetricDomainModel[]
-  readMetrics: (options: ReadMetricsOptions) => MetricDomainModel[]
-  aggregateMetrics: <D extends MetricDimension, T extends string>(
-    options: AggregateMetricsOptions
-  ) => AggregateMetricDomainModel<D, T>[]
-}
-
-export const MetricsServiceDefinition: RpcServiceDefinition<MetricsService> = {
-  readMetrics: RpcRoute<MetricsService['readMetrics']>(),
-  writeMetrics: RpcRoute<MetricsService['writeMetrics']>(),
-  aggregateMetrics: RpcRoute<MetricsService['aggregateMetrics']>()
-}
-*/

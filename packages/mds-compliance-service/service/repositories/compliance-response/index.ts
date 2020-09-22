@@ -1,7 +1,7 @@
-import { InsertReturning, RepositoryError, ReadWriteRepository, UpdateReturning } from '@mds-core/mds-repository'
+import { InsertReturning, RepositoryError, ReadWriteRepository } from '@mds-core/mds-repository'
 import { UUID } from '@mds-core/mds-types'
-import { ComplianceResponseDomainModel } from '../../@types'
-import { ComplianceResponsePersistence } from './entities'
+import { ComplianceResponseDomainModel } from '../../../@types'
+import { ComplianceResponsePersistenceEntity } from '../../../repository/entities'
 import * as migrations from './migrations'
 import { ComplianceResponsePersistenceToDomain } from './mappers'
 /*
@@ -17,7 +17,7 @@ export interface GetComplianceResponseOptions {
 class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
   constructor() {
     super('compliance_response', {
-      entities: [ComplianceResponsePersistence],
+      entities: [ComplianceResponsePersistenceEntity],
       migrations: Object.values(migrations)
     })
   }
@@ -30,8 +30,8 @@ class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
       const connection = await connect('rw')
       const {
         raw: [entity]
-      }: InsertReturning<ComplianceResponsePersistence> = await connection
-        .getRepository(ComplianceResponsePersistence)
+      }: InsertReturning<ComplianceResponsePersistenceEntity> = await connection
+        .getRepository(ComplianceResponsePersistenceEntity)
         .createQueryBuilder()
         .insert()
         .values([compliance_response])
@@ -49,7 +49,7 @@ class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
     const { connect } = this
     try {
       const connection = await connect('ro')
-      const query = connection.createQueryBuilder(ComplianceResponsePersistence, 'compliance_response')
+      const query = connection.createQueryBuilder(ComplianceResponsePersistenceEntity, 'compliance_response')
       const result = await query
         .select('*')
         .where('compliance_response_id = :compliance_response_id', { compliance_response_id })
