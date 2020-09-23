@@ -467,24 +467,6 @@ export interface PolicyMessage {
   [key: string]: string
 }
 
-// interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
-//   name: string
-//   rule_id: UUID
-//   geographies: UUID[]
-//   statuses: Partial<{ [S in VEHICLE_STATE]: (keyof typeof STATUS_EVENT_MAP[S])[] | [] }> | null
-//   rule_type: RuleType
-//   vehicle_types?: VEHICLE_TYPE[] | null
-//   maximum?: number | null
-//   minimum?: number | null
-//   start_time?: string | null
-//   end_time?: string | null
-//   days?: DAY_OF_WEEK[] | null
-//   /* eslint-reason TODO: message types haven't been defined well yet */
-//   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-//   messages?: PolicyMessage
-//   value_url?: URL | null
-// }
-
 // This gets you a type where the keys must be VEHICLE_STATES, such as 'available',
 // and the values are an array of events.
 export type MicroMobilityStatesToEvents = {
@@ -502,6 +484,7 @@ interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   geographies: UUID[]
   rule_type: RuleType
   vehicle_types?: VEHICLE_TYPE[] | null
+  accessibility_options?: ACCESSIBILITY_OPTION[] | null
   modality?: MODALITY
   maximum?: number | null
   minimum?: number | null

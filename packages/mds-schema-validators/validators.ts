@@ -100,6 +100,9 @@ const ruleSchema = Joi.object().keys({
       )
     )
     .allow(null),
+  accessibility_options: Joi.array()
+    .items(Joi.string().valid(...ACCESSIBILITY_OPTIONS))
+    .optional(),
   vehicle_types: Joi.array().items(Joi.string().valid(...Object.values(VEHICLE_TYPES))),
   modality: Joi.string()
     .valid(...MODALITIES)
