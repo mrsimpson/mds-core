@@ -1,7 +1,7 @@
-import { InsertReturning, RepositoryError, ReadWriteRepository } from '@mds-core/mds-repository'
+import { InsertReturning, RepositoryError, ReadWriteRepository, UpdateReturning } from '@mds-core/mds-repository'
 import { UUID } from '@mds-core/mds-types'
-import { ComplianceResponseDomainModel } from '../../../@types'
-import { ComplianceResponsePersistenceEntity } from '../../../repository/entities'
+import { ComplianceResponseDomainModel } from '../@types'
+import { ComplianceResponsePersistenceEntity } from './entities'
 import * as migrations from './migrations'
 import { ComplianceResponsePersistenceToDomain } from './mappers'
 /*

@@ -83,8 +83,6 @@ export interface ComplianceResponse {
   vehicles_found: MatchedVehicleInformation[]
 }
 
-// export type ComplianceResponseDomainCreateModel = DomainModelCreate<ComplianceResponseDomainModel>
-
 export interface ComplianceResponseDomainModel {
   compliance_response_id: UUID
   provider_id: UUID
@@ -93,12 +91,12 @@ export interface ComplianceResponseDomainModel {
 }
 
 export interface ComplianceResponseService {
-  createComplianceResponses: (blogs: ComplianceResponseDomainModel[]) => ComplianceResponseDomainModel[]
+  //  createComplianceResponses: (blogs: ComplianceResponseDomainModel[]) => ComplianceResponseDomainModel[]
   createComplianceResponse: (blog: ComplianceResponseDomainModel) => ComplianceResponseDomainModel
-  getComplianceResponses: () => ComplianceResponseDomainModel[]
+  //  getComplianceResponses: () => ComplianceResponseDomainModel[]
   getComplianceResponse: (name: string) => ComplianceResponseDomainModel
-  updateComplianceResponse: (blog: ComplianceResponseDomainModel) => ComplianceResponseDomainModel
-  deleteComplianceResponse: (name: string) => ComplianceResponseDomainModel['compliance_response_id']
+  // updateComplianceResponse: (blog: ComplianceResponseDomainModel) => ComplianceResponseDomainModel
+  // deleteComplianceResponse: (name: string) => ComplianceResponseDomainModel['compliance_response_id']
 }
 
 export const ComplianceResponseServiceDefinition: RpcServiceDefinition<ComplianceResponseService> = {
