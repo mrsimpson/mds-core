@@ -59,7 +59,7 @@ const isMicroMobilityEvent = (
   event: VehicleEvent
 ): event is MicroMobilityVehicleEvent => {
   const { event_types } = event
-  return modality === 'micro-mobility' && isSubset(event_types, MICRO_MOBILITY_VEHICLE_EVENTS)
+  return modality === 'micromobility' && isSubset(event_types, MICRO_MOBILITY_VEHICLE_EVENTS)
 }
 
 const isTaxiEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TaxiVehicleEvent => {

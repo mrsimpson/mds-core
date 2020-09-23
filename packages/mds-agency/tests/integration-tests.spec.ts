@@ -104,7 +104,7 @@ const TEST_BICYCLE: Omit<Device, 'recorded' | 'accessibility_options'> = {
   propulsion_types: [PROPULSION_TYPES.human],
   year: 2018,
   mfgr: 'Schwinn',
-  modality: 'micro-mobility',
+  modality: 'micromobility',
   model: 'Mantaray'
 }
 
@@ -1594,7 +1594,7 @@ describe('Tests for taxi modality', async () => {
   for (const microEvent of MICRO_MOBILITY_EVENTS_NOT_IN_TAXI_EVENTS) {
     const validStates = MICRO_MOBILITY_EVENT_STATES_MAP[microEvent]
     for (const vehicle_state of validStates) {
-      it('verifies cannot send micro-mobility type event for a taxi', done => {
+      it('verifies cannot send micromobility type event for a taxi', done => {
         const { device_id } = TEST_TAXI
         request
           .post(pathPrefix(`/vehicles/${device_id}/event`))

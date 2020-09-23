@@ -80,7 +80,7 @@ const JUMP_TEST_DEVICE_1: Device = {
   propulsion_types: [PROPULSION_TYPES.electric],
   year: 2018,
   mfgr: 'Schwinn',
-  modality: 'micro-mobility',
+  modality: 'micromobility',
   model: 'whoknows',
   recorded: now()
 }
@@ -625,7 +625,7 @@ function makeDevices(count: number, timestamp: Timestamp, provider_id = TEST1_PR
       propulsion_types,
       year,
       mfgr,
-      modality: 'micro-mobility' as MODALITY,
+      modality: 'micromobility' as MODALITY,
       model,
       timestamp,
       recorded: now()

@@ -332,7 +332,7 @@ export async function badEvent({ modality }: Pick<Device, 'modality'>, event: Ve
     return { error: 'missing_param', error_description: 'missing enum field "vehicle_state"' }
   }
 
-  if (modality === 'micro-mobility') {
+  if (modality === 'micromobility') {
     for (const event_type of event.event_types) {
       if (!MICRO_MOBILITY_VEHICLE_EVENTS.includes(event_type as MICRO_MOBILITY_VEHICLE_EVENT))
         return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }

@@ -190,7 +190,7 @@ function api(app: express.Express): express.Express {
       // https://stackoverflow.com/a/51577579 to remove nulls in typesafe way
       const filteredVehicleEvents = events.filter(
         (event): event is VehicleEvent =>
-          event !== null && isInStatesOrEvents(rule, { modality: 'micro-mobility' } as Device, event) // FIXME: Shouldn't be doing casting like this
+          event !== null && isInStatesOrEvents(rule, { modality: 'micromobility' } as Device, event) // FIXME: Shouldn't be doing casting like this
       )
       const filteredEvents = compliance_engine.getRecentEvents(filteredVehicleEvents)
 

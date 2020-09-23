@@ -280,7 +280,7 @@ export type NonEmptyArray<T> = [T, ...T[]]
 export const ACCESSIBILITY_OPTIONS = ['wheelchair_accessible'] as const
 export type ACCESSIBILITY_OPTION = typeof ACCESSIBILITY_OPTIONS[number]
 
-export const MODALITIES = ['micro-mobility', 'taxi'] as const
+export const MODALITIES = ['micromobility', 'taxi'] as const
 export type MODALITY = typeof MODALITIES[number]
 
 // Represents a row in the "devices" table
@@ -515,7 +515,7 @@ interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
 }
 
 interface MicroMobilityRule<RuleType = 'count' | 'speed' | 'time'> extends BaseRule<RuleType> {
-  modality?: 'micro-mobility'
+  modality?: 'micromobility'
   states: Partial<MicroMobilityStatesToEvents> | null
 }
 

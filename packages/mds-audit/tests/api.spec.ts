@@ -106,7 +106,7 @@ describe('Testing API', () => {
     db.writeDevice({
       accessibility_options: [],
       device_id: provider_device_id,
-      modality: 'micro-mobility',
+      modality: 'micromobility',
       provider_id,
       vehicle_id: provider_vehicle_id,
       propulsion_types: [PROPULSION_TYPES.electric],
@@ -700,7 +700,7 @@ describe('Testing API', () => {
         await db.writeDevice({
           accessibility_options: [],
           device_id: provider_device_id,
-          modality: 'micro-mobility',
+          modality: 'micromobility',
           provider_id,
           vehicle_id: provider_vehicle_id,
           propulsion_types: [PROPULSION_TYPES.electric],

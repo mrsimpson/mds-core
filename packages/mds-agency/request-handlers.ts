@@ -78,7 +78,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     propulsion_types,
     year,
     mfgr,
-    modality = 'micro-mobility',
+    modality = 'micromobility',
     model
   } = body
 
