@@ -40,7 +40,8 @@ import {
   GEOGRAPHY_UUID,
   LA_CITY_BOUNDARY,
   SCOPED_AUTH,
-  PUBLISHED_POLICY
+  PUBLISHED_POLICY,
+  TAXI_POLICY
 } from '@mds-core/mds-test-data'
 import { api } from '../api'
 import { POLICY_AUTHOR_API_DEFAULT_VERSION } from '../types'
@@ -161,6 +162,20 @@ describe('Tests app', () => {
 
     it('creates one current policy', done => {
       const policy = POLICY_JSON_WITHOUT_PUBLISH_DATE
+      request
+        .post(pathPrefix(`/policies`))
+        .set('Authorization', POLICIES_WRITE_SCOPE)
+        .send(policy)
+        .expect(201)
+        .end((err, result) => {
+          test.value(result).hasHeader('content-type', APP_JSON)
+          test.value(result.body.version).is(POLICY_AUTHOR_API_DEFAULT_VERSION)
+          done(err)
+        })
+    })
+
+    it('creates one Taxi policy', done => {
+      const { publish_date, ...policy } = TAXI_POLICY
       request
         .post(pathPrefix(`/policies`))
         .set('Authorization', POLICIES_WRITE_SCOPE)

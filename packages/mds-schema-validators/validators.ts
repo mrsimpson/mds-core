@@ -101,6 +101,9 @@ const ruleSchema = Joi.object().keys({
     )
     .allow(null),
   vehicle_types: Joi.array().items(Joi.string().valid(...Object.values(VEHICLE_TYPES))),
+  modality: Joi.string()
+    .valid(...MODALITIES)
+    .optional(),
   maximum: Joi.number(),
   minimum: Joi.number(),
   start_time: Joi.string(),

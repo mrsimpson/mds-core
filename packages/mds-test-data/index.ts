@@ -113,6 +113,30 @@ const POLICY_JSON: Policy = {
   ]
 }
 
+const TAXI_POLICY: Policy = {
+  name: 'Policy 1',
+  description: 'Mobility caps as described in the One-Year Permit',
+  policy_id: uuid(),
+  start_date: START_TOMORROW,
+  end_date: null,
+  publish_date: START_NOW,
+  prev_policies: null,
+  provider_ids: [],
+  rules: [
+    {
+      rule_type: 'count',
+      rule_id: uuid(),
+      name: 'Greater LA',
+      geographies: [GEOGRAPHY_UUID],
+      modality: 'taxi',
+      states: { available: [], removed: [], reserved: [], on_trip: [] },
+      vehicle_types: [VEHICLE_TYPES.car],
+      maximum: 3000,
+      minimum: 500
+    }
+  ]
+}
+
 const SUPERSEDING_POLICY_JSON: Policy = {
   // TODO guts
   name: 'Supersedes Policy 1',
@@ -653,5 +677,6 @@ export {
   SCOPED_AUTH,
   serviceAreaMap,
   restrictedAreas,
-  veniceSpecOps
+  veniceSpecOps,
+  TAXI_POLICY
 }
