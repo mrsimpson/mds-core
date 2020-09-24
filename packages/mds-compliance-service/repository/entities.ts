@@ -1,13 +1,15 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm'
+import { Column, Entity } from 'typeorm'
 import { UUID, Timestamp } from '@mds-core/mds-types'
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
-import { ComplianceResponse, ComplianceResponseDomainModel } from '../@types'
+import { ComplianceResponseDomainModel } from '../@types'
 
 export interface ComplianceResponsePersistenceModel extends IdentityColumn, RecordedColumn {
   compliance_response_id: ComplianceResponseDomainModel['compliance_response_id']
-  provider_id: ComplianceResponseDomainModel['provider_id']
-  compliance_json: ComplianceResponseDomainModel['compliance_json']
-  timestamp: ComplianceResponseDomainModel['timestamp']
+  compliance_as_of: ComplianceResponseDomainModel['compliance_as_of']
+  excess_vehicles_count: ComplianceResponseDomainModel['excess_vehicles_count']
+  policy: ComplianceResponseDomainModel['policy']
+  total_violations: ComplianceResponseDomainModel['total_violations']
+  vehicles_found: ComplianceResponseDomainModel['vehicles_found']
 }
 
 @Entity('compliance_response')
@@ -17,12 +19,18 @@ export class ComplianceResponsePersistenceEntity
   @Column('uuid', { primary: true })
   compliance_response_id: UUID
 
-  @Column('uuid')
-  provider_id: UUID
-
   @Column('bigint', { transformer: BigintTransformer })
-  timestamp: Timestamp
+  compliance_as_of: Timestamp
 
-  @Column('jsonb', { transformer: BigintTransformer })
-  compliance_json: ComplianceResponse
+  @Column('int')
+  excess_vehicles_count: number
+
+  @Column('jsonb')
+  policy: ComplianceResponsePersistenceModel['policy']
+
+  @Column('int')
+  total_violations: number
+
+  @Column('jsonb')
+  vehicles_found: ComplianceResponsePersistenceModel['vehicles_found']
 }

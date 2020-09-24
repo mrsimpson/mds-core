@@ -3,7 +3,7 @@ import { RecordedColumn, IdentityColumn, ModelMapper } from '@mds-core/mds-repos
 import { ComplianceResponsePersistenceModel } from './entities'
 import { ComplianceResponseDomainModel } from '../@types'
 
-export const ComplianceResponsePersistenceToDomain = ModelMapper<
+export const ComplianceResponsePersistenceModelToDomainModel = ModelMapper<
   ComplianceResponsePersistenceModel,
   ComplianceResponseDomainModel
 >((entity, options) => {

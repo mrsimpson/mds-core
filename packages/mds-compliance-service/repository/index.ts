@@ -1,9 +1,9 @@
-import { InsertReturning, RepositoryError, ReadWriteRepository, UpdateReturning } from '@mds-core/mds-repository'
+import { InsertReturning, RepositoryError, ReadWriteRepository } from '@mds-core/mds-repository'
 import { UUID } from '@mds-core/mds-types'
 import { ComplianceResponseDomainModel } from '../@types'
 import { ComplianceResponsePersistenceEntity } from './entities'
+import { ComplianceResponsePersistenceModelToDomainModel } from './mappers'
 import * as migrations from './migrations'
-import { ComplianceResponsePersistenceToDomain } from './mappers'
 /*
 import { EventDomainModel, GetEventQuery, DeviceSessions } from '../../../@types'
 import { EventEntityToDomainModel, EventDomainToEntityCreate } from './mappers'
@@ -37,7 +37,7 @@ class ComplianceResponseReadWriteRepository extends ReadWriteRepository {
         .values([compliance_response])
         .returning('*')
         .execute()
-      return ComplianceResponsePersistenceToDomain.map(entity)
+      return ComplianceResponsePersistenceModelToDomainModel.map(entity)
     } catch (error) {
       throw RepositoryError(error)
     }

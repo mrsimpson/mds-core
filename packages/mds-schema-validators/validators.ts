@@ -152,13 +152,13 @@ const geographiesSchema = Joi.array().items(geographySchema)
 
 const eventsSchema = Joi.array().items()
 
-const vehicleEventTypeSchema = stringSchema.valid(...Object.keys(VEHICLE_EVENTS))
+export const vehicleEventTypeSchema = stringSchema.valid(...Object.keys(VEHICLE_EVENTS))
 
 const vehicleTypeSchema = stringSchema.valid(...Object.keys(VEHICLE_TYPES))
 
 const propulsionTypeSchema = stringSchema.valid(...Object.keys(PROPULSION_TYPES))
 
-const vehicleStatusSchema = stringSchema.valid(...Object.keys(VEHICLE_STATUSES))
+export const vehicleStatusSchema = stringSchema.valid(...Object.keys(VEHICLE_STATUSES))
 
 const eventSchema = Joi.object().keys({
   device_id: uuidSchema.required(),

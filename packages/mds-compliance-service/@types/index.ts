@@ -71,7 +71,7 @@ export interface MatchedVehicleInformation {
   }
 }
 
-export interface ComplianceResponse {
+export interface ComplianceResponseDomainModel {
   compliance_response_id: UUID
   compliance_as_of: Timestamp
   excess_vehicles_count: number
@@ -81,13 +81,6 @@ export interface ComplianceResponse {
   }
   total_violations: number
   vehicles_found: MatchedVehicleInformation[]
-}
-
-export interface ComplianceResponseDomainModel {
-  compliance_response_id: UUID
-  provider_id: UUID
-  compliance_json: ComplianceResponse // in typeorm this will be a json or jsonb column
-  timestamp: Timestamp
 }
 
 export interface ComplianceResponseService {
@@ -100,10 +93,10 @@ export interface ComplianceResponseService {
 }
 
 export const ComplianceResponseServiceDefinition: RpcServiceDefinition<ComplianceResponseService> = {
-  createComplianceResponses: RpcRoute<ComplianceResponseService['createComplianceResponses']>(),
+  //  createComplianceResponses: RpcRoute<ComplianceResponseService['createComplianceResponses']>(),
   createComplianceResponse: RpcRoute<ComplianceResponseService['createComplianceResponse']>(),
-  getComplianceResponses: RpcRoute<ComplianceResponseService['getComplianceResponses']>(),
-  getComplianceResponse: RpcRoute<ComplianceResponseService['getComplianceResponse']>(),
-  updateComplianceResponse: RpcRoute<ComplianceResponseService['updateComplianceResponse']>(),
-  deleteComplianceResponse: RpcRoute<ComplianceResponseService['deleteComplianceResponse']>()
+  // getComplianceResponses: RpcRoute<ComplianceResponseService['getComplianceResponses']>(),
+  getComplianceResponse: RpcRoute<ComplianceResponseService['getComplianceResponse']>()
+  // updateComplianceResponse: RpcRoute<ComplianceResponseService['updateComplianceResponse']>(),
+  // deleteComplianceResponse: RpcRoute<ComplianceResponseService['deleteComplianceResponse']>()
 }

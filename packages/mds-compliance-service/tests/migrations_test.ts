@@ -1,11 +1,8 @@
-import { uuid, now } from '@mds-core/mds-utils'
-import { createConnection, ConnectionOptions, Connection } from 'typeorm'
-import { ComplianceResponseRepository } from '../service/repositories/compliance-response'
-import { COMPLIANCE_RESPONSE_1 } from './compliance_response_fixtures'
+import { createConnection, ConnectionOptions } from 'typeorm'
+import { ComplianceResponseRepository } from '../repository'
+import { COMPLIANCE_RESPONSE_1, COMPLIANCE_RESPONSE_ID } from './compliance_response_fixtures'
 
 import ormconfig = require('../ormconfig')
-
-const COMPLIANCE_RESPONSE_ID = uuid()
 
 describe('Test Migrations', () => {
   const options = ormconfig as ConnectionOptions
@@ -15,16 +12,11 @@ describe('Test Migrations', () => {
     await connection.close()
   })
 
-  it(`writes a compliance response`, async () => {
-    await ComplianceResponseRepository.writeComplianceResponse({
-      compliance_response_id: COMPLIANCE_RESPONSE_ID,
-      provider_id: uuid(),
-      compliance_json: COMPLIANCE_RESPONSE_1,
-      timestamp: now()
-    })
+  it(`has the repository write a compliance response`, async () => {
+    await ComplianceResponseRepository.writeComplianceResponse(COMPLIANCE_RESPONSE_1)
   })
 
-  it(`reads a compliance response`, async () => {
+  it(`has the repository read a compliance response`, async () => {
     const result = await ComplianceResponseRepository.getComplianceResponse({
       compliance_response_id: COMPLIANCE_RESPONSE_ID
     })
