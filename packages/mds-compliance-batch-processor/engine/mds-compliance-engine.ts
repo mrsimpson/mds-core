@@ -26,13 +26,8 @@ import {
 } from '@mds-core/mds-types'
 
 import {
-  MatchedVehiclePlusRule,
-  CountMatch,
-  RuleCompliance,
-  MatchedVehicle,
-  SpeedMatch,
-  TimeMatch,
-  ComplianceResponse,
+  MatchedVehicleInformation,
+  ComplianceResponseDomainModel,
   CountRule,
   Rule,
   SpeedRule,
