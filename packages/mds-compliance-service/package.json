@@ -24,7 +24,7 @@
   "author": "Lacuna Technologies",
   "license": "UNLICENSED",
   "dependencies": {
-    "@hapi/joi": "17.1.1",
+    "joi": "17.2.1",
     "@mds-core/mds-rpc-common": "0.1.0",
     "@mds-core/mds-logger": "0.1.24",
     "@mds-core/mds-repository": "0.1.0",
@@ -32,7 +32,6 @@
     "@mds-core/mds-schema-validators": "0.1.2",
     "@mds-core/mds-types": "0.1.23",
     "@mds-core/mds-utils": "0.1.26",
-    "@types/hapi__joi": "17.1.2",
     "typeorm": "0.2.25"
   },
   "devDependencies": {}

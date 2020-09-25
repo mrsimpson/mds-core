@@ -47,7 +47,7 @@ export const COMPLIANCE_RESPONSE_1: any = {
       rule_applied: RULE_ID_1, // a device can only ever match one rule for the purpose of computing compliance, however
       speed: null,
       speed_unit: null,
-      speed_measurement: null,
+      speed_measurement_type: null,
       gps: {
         lat: 1,
         lng: 1

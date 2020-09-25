@@ -1,5 +1,5 @@
-import Joi from '@hapi/joi'
-import { UUID_REGEX, ValidationError } from '@mds-core/mds-utils'
+import * as Joi from 'joi'
+import { ValidationError } from '@mds-core/mds-utils'
 import {
   uuidSchema,
   timestampSchema,
@@ -33,8 +33,8 @@ export interface MatchedVehicleInformation {
 */
 
 const gpsSchema = Joi.object().keys({
-  lat: numberSchema.required(),
-  lng: numberSchema.required()
+  lat: numberSchema.min(-90).max(90).required(),
+  lng: numberSchema.min(-180).max(180).required()
 })
 
 export const matchedVehicleInformationSchema = Joi.object().keys({
@@ -46,6 +46,7 @@ export const matchedVehicleInformationSchema = Joi.object().keys({
   rule_applied: uuidSchema,
   speed: numberSchema.allow(null).optional(),
   speed_unit: numberSchema.allow(null).optional(),
+  speed_measurement_type: stringSchema.valid('instantaneous', 'average').allow(null).optional(),
   gps: gpsSchema.required()
 })
 
