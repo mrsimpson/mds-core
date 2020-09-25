@@ -1,6 +1,4 @@
 import { createConnection, ConnectionOptions } from 'typeorm'
-import { ComplianceResponseRepository } from '../repository'
-import { COMPLIANCE_RESPONSE_1, COMPLIANCE_RESPONSE_ID } from './compliance_response_fixtures'
 
 import ormconfig = require('../ormconfig')
 
@@ -10,17 +8,6 @@ describe('Test Migrations', () => {
     const connection = await createConnection(options)
     await connection.runMigrations()
     await connection.close()
-  })
-
-  it(`has the repository write a compliance response`, async () => {
-    await ComplianceResponseRepository.writeComplianceResponse(COMPLIANCE_RESPONSE_1)
-  })
-
-  it(`has the repository read a compliance response`, async () => {
-    const result = await ComplianceResponseRepository.getComplianceResponse({
-      compliance_response_id: COMPLIANCE_RESPONSE_ID
-    })
-    console.log(result)
   })
 
   it(`Revert Migrations ${options.name}`, async () => {
