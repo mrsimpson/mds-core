@@ -31,17 +31,17 @@ import {
   Telemetry,
   Stop,
   PROPULSION_TYPES,
-  VEHICLE_STATUSES,
-  Device
+  Device,
+  VEHICLE_STATES
 } from '@mds-core/mds-types'
 import * as Joi from 'joi'
 import joiToJson from 'joi-to-json'
 
-import { ValidationError } from '@mds-core/mds-utils'
+import { ValidationError, areThereCommonElements } from '@mds-core/mds-utils'
 
 export { ValidationError }
 
-interface ValidatorOptions {
+export interface ValidatorOptions {
   property: string
   assert: boolean
   required: boolean
@@ -60,9 +60,9 @@ export const timestampSchema = numberSchema.min(1420099200000)
 
 export const providerIdSchema = uuidSchema.valid(...Object.keys(providers))
 
-const vehicleIdSchema = stringSchema.max(255)
+export const vehicleIdSchema = stringSchema.max(255)
 
-const telemetrySchema = Joi.object().keys({
+export const telemetrySchema = Joi.object().keys({
   gps: Joi.object()
     .keys({
       lat: numberSchema.min(-90).max(90).required(),
@@ -152,13 +152,13 @@ const geographiesSchema = Joi.array().items(geographySchema)
 
 const eventsSchema = Joi.array().items()
 
-export const vehicleEventTypeSchema = stringSchema.valid(...Object.keys(VEHICLE_EVENTS))
+export const vehicleEventTypeSchema = stringSchema.valid(...VEHICLE_EVENTS)
 
 const vehicleTypeSchema = stringSchema.valid(...Object.keys(VEHICLE_TYPES))
 
 const propulsionTypeSchema = stringSchema.valid(...Object.keys(PROPULSION_TYPES))
 
-export const vehicleStatusSchema = stringSchema.valid(...Object.keys(VEHICLE_STATUSES))
+export const vehicleStatusSchema = stringSchema.valid(...VEHICLE_STATES)
 
 const eventSchema = Joi.object().keys({
   device_id: uuidSchema.required(),
@@ -173,18 +173,6 @@ const eventSchema = Joi.object().keys({
 
 const tripEventSchema = eventSchema.keys({
   trip_id: uuidSchema.required()
-})
-
-const serviceEndEventSchema = eventSchema.keys({
-  event_type_reason: stringSchema.valid('low_battery', 'maintenance', 'compliance', 'off_hours').required()
-})
-
-const providerPickUpEventSchema = eventSchema.keys({
-  event_type_reason: stringSchema.valid('rebalance', 'maintenance', 'charge', 'compliance').required()
-})
-
-const deregisterEventSchema = eventSchema.keys({
-  event_type_reason: stringSchema.valid('missing', 'decomissioned').required()
 })
 
 const auditEventTypeSchema = (accept?: AUDIT_EVENT_TYPE[]): Joi.StringSchema =>
@@ -397,39 +385,26 @@ export function rawValidatePolicy(policy: Policy): Joi.ValidationResult {
 
 const validateTripEvent = (event: VehicleEvent) => ValidateSchema(event, tripEventSchema, {})
 
-const validateProviderPickUpEvent = (event: VehicleEvent) => ValidateSchema(event, providerPickUpEventSchema, {})
-
-const validateServiceEndEvent = (event: VehicleEvent) => ValidateSchema(event, serviceEndEventSchema, {})
-
-const validateDeregisterEvent = (event: VehicleEvent) => ValidateSchema(event, deregisterEventSchema, {})
-
-export const validateEvent = (event: unknown) => {
+const validate_v1_0_0_Event = (event: unknown) => {
   if (isValidEvent(event, { allowUnknown: true })) {
-    const { event_type } = event
+    const { event_types } = event
 
-    const TRIP_EVENTS: string[] = [
-      VEHICLE_EVENTS.trip_start,
-      VEHICLE_EVENTS.trip_end,
-      VEHICLE_EVENTS.trip_enter,
-      VEHICLE_EVENTS.trip_leave
+    const TRIP_EVENTS: VEHICLE_EVENT[] = [
+      'trip_start',
+      'trip_end',
+      'trip_enter_jurisdiction',
+      'trip_leave_jurisdiction'
     ]
 
-    if (TRIP_EVENTS.includes(event_type)) {
+    if (areThereCommonElements(TRIP_EVENTS, event_types)) {
       return validateTripEvent(event)
-    }
-    if (event_type === VEHICLE_EVENTS.provider_pick_up) {
-      return validateProviderPickUpEvent(event)
-    }
-    if (event_type === VEHICLE_EVENTS.service_end) {
-      return validateServiceEndEvent(event)
-    }
-    if (event_type === VEHICLE_EVENTS.deregister) {
-      return validateDeregisterEvent(event)
     }
 
     return ValidateSchema(event, eventSchema, {})
   }
 }
+
+export const validateEvent = validate_v1_0_0_Event
 
 export const policySchemaJson = joiToJson(policySchema)
 

@@ -127,7 +127,7 @@ function api(app: express.Express): express.Express {
               .map(p => p.policy_id)
               .includes(policy.policy_id)
           ) {
-            const { filteredEvents, geographies, deviceMap } = await getComplianceInputs(target_provider_id, timestamp)
+            const { filteredEvents, geographies, deviceMap } = await getComplianceInputs(target_provider_id)
             const result = compliance_engine.processPolicy(policy, filteredEvents, geographies, deviceMap)
             if (result === undefined) {
               return res.status(400).send({ error: new BadParamsError('Unable to process compliance results') })
@@ -147,6 +147,9 @@ function api(app: express.Express): express.Express {
   app.get(pathPrefix('/count/:rule_id'), async (req: ComplianceApiCountRequest, res: ComplianceApiCountResponse) => {
     const { timestamp } = {
       ...parseRequest(req).single({ parser: Number }).query('timestamp')
+    }
+    if (timestamp) {
+      return res.status(400).send({ error: new BadParamsError('timestamp deprecated') })
     }
     const query_date = timestamp || now()
     if (!AllowedProviderIDs.includes(res.locals.provider_id)) {
@@ -182,7 +185,7 @@ function api(app: express.Express): express.Express {
         return [...acc, getPolygon(geographies, geography.geography_id)]
       }, [])
 
-      const events = timestamp ? await db.readHistoricalEvents({ end_date: timestamp }) : await cache.readAllEvents()
+      const events = await cache.readAllEvents()
 
       // https://stackoverflow.com/a/51577579 to remove nulls in typesafe way
       const filteredVehicleEvents = events.filter(

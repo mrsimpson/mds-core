@@ -2,15 +2,7 @@ import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers'
 import { now, inc, ServerError, filterDefined } from '@mds-core/mds-utils'
-import {
-  UUID,
-  VehicleEvent,
-  VEHICLE_STATUSES,
-  EVENT_STATUS_MAP,
-  VEHICLE_EVENT,
-  TripsStats,
-  Device
-} from '@mds-core/mds-types'
+import { UUID, VehicleEvent, VEHICLE_EVENT, TripsStats, Device } from '@mds-core/mds-types'
 import { DailyApiRequest, DailyApiResponse, ProviderInfo, DailyApiGetRawTripDataRequest } from './types'
 import {
   getTimeSinceLastEvent,
@@ -109,9 +101,11 @@ export async function getVehicleCounts(req: DailyApiRequest, res: DailyApiRespon
         )
         items.filter(filterDefined({ warnOnEmpty: true })).map(async item => {
           const event = eventMap[item.device_id]
-          inc(stat.event_type, event ? event.event_type : 'default')
-          const status = event ? EVENT_STATUS_MAP[event.event_type] : VEHICLE_STATUSES.removed
-          inc(stat.status, status)
+          if (event.event_types) {
+            event.event_types.forEach(event_type => inc(stat.event_type, event_type))
+          }
+          const state = event ? event.vehicle_state : 'removed'
+          inc(stat.status, state)
         })
       })
     )

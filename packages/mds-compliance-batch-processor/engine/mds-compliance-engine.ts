@@ -426,18 +426,38 @@ function getRecentEvents(events: VehicleEvent[], end_time = now()): VehicleEvent
   })
 }
 
+function createMatchedVehicleInformation(device: Device, event: VehicleEvent) {
+  /*
+  return {
+    device_id: device.device_id,
+    state: event.ve
+    event_types: VEHICLE_EVENT[]
+    timestamp: Timestamp
+    rules_matched: UUID[]
+    rule_applied: UUID // a device can only ever match one rule for the purpose of computing compliance, however
+    speed?: number | null
+    speed_unit?: number | null
+    speed_measurement_type?: 'instantaneous' | 'average' | null
+    gps: {
+      lat: number
+      lng: number
+    }
+  }
+  */
+}
+
 function processCountRuleNewTypes(
   rule: CountRule,
   events: VehicleEvent[],
   geographies: Geography[],
   devices: { [d: string]: Device }
-): RuleCompliance & { matches: CountMatch[] | null } {
+): MatchedVehicleInformation[] | null {
   const maximum = rule.maximum || Number.POSITIVE_INFINITY
   if (isRuleActive(rule)) {
-    const matches: CountMatch[] = rule.geographies.reduce(
-      (matches_acc: CountMatch[], geography: string): CountMatch[] => {
-        const matched_vehicles: MatchedVehicle[] = events.reduce(
-          (matched_vehicles_acc: MatchedVehicle[], event: VehicleEvent): MatchedVehicle[] => {
+    const matches: MatchedVehicleInformation[] = rule.geographies.reduce(
+      (matches_acc: MatchedVehicleInformation[], geography: string): MatchedVehicleInformation[] => {
+        const matched_vehicles: MatchedVehicleInformation[] = events.reduce(
+          (matched_vehicles_acc: MatchedVehicleInformation[], event: VehicleEvent): MatchedVehicleInformation[] => {
             const device: Device | undefined = devices[event.device_id]
             if (event.telemetry && device) {
               if (isInStatesOrEvents(rule, event) && isInVehicleTypes(rule, device)) {

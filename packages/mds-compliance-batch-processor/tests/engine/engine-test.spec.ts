@@ -9,6 +9,7 @@ import { FeatureCollection } from 'geojson'
 import { processPolicy, getSupersedingPolicies, getRecentEvents } from '@mds-core/mds-compliance/mds-compliance-engine'
 import { RuntimeError, minutes } from '@mds-core/mds-utils'
 import { ValidationError, validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
+import { processCountRuleNewTypes } from 'packages/mds-compliance-batch-processor/engine/mds-compliance-engine'
 
 let policies: Policy[] = []
 let low_count_policies: Policy[] = []
@@ -390,6 +391,31 @@ describe('Verifies compliance engine processes by vehicle most recent event', as
 
 describe('new rule processors', () => {
   it('processCountRuleNewTypes', done => {
+    /*
+    rule: CountRule,
+    events: VehicleEvent[],
+    geographies: Geography[],
+    devices: { [d: string]: Device }
+    */
+
+    const countRule: CountRule = {
+      name: 'Greater LA',
+      rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
+      rule_type: 'count',
+      geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
+      statuses: {
+        available: [],
+        trip: []
+      },
+      vehicle_types: ['bicycle', 'scooter'],
+      maximum: 3000,
+      minimum: 500
+    }
+
+    const devices = makeDevices(800, now())
+    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_start')
+
+    const result = processCountRuleNewTypes(countRule, events, geographies, devices)
     done()
   })
 })

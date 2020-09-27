@@ -20,7 +20,7 @@ import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
 import stream from '@mds-core/mds-stream'
 import supertest from 'supertest'
-import { now, uuid, minutes, pathPrefix } from '@mds-core/mds-utils'
+import { now, uuid, minutes, pathPrefix, rangeRandomInt } from '@mds-core/mds-utils'
 import {
   Telemetry,
   Device,
@@ -100,7 +100,7 @@ const COUNT_POLICY_JSON: Policy = {
       rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
       rule_type: RULE_TYPES.count,
       geographies: [GEOGRAPHY_UUID],
-      statuses: { available: [], unavailable: [], reserved: [], trip: [] },
+      states: { available: [], non_operational: [], reserved: [], on_trip: [] },
       vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
       maximum: 10,
       minimum: 5
@@ -123,7 +123,7 @@ const SCOPED_COUNT_POLICY_JSON = {
       rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
       rule_type: RULE_TYPES.count,
       geographies: [GEOGRAPHY_UUID],
-      statuses: { available: [], unavailable: [], reserved: [], trip: [] },
+      states: { available: [], non_operational: [], reserved: [], on_trip: [] },
       vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
       maximum: 10,
       minimum: 5
@@ -145,7 +145,7 @@ const COUNT_POLICY_JSON_2: Policy = {
       rule_id: '405b959e-4377-4a31-8b34-a9a4771125fc',
       rule_type: RULE_TYPES.count,
       geographies: ['ff822e26-a70c-4721-ac32-2f6734beff9b'],
-      statuses: { available: [], unavailable: [], reserved: [], trip: [] },
+      states: { available: [], non_operational: [], reserved: [], on_trip: [] },
       days: ['sat', 'sun'],
       maximum: 0,
       minimum: 0
@@ -168,7 +168,7 @@ const COUNT_POLICY_JSON_3: Policy = {
       rule_id: '04dc545b-41d8-401d-89bd-bfac9247b555',
       rule_type: RULE_TYPES.count,
       geographies: [GEOGRAPHY_UUID],
-      statuses: { available: ['service_start'], unavailable: [], reserved: [], trip: [] },
+      states: { available: ['on_hours'], non_operational: [], reserved: [], on_trip: [] },
       vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
       maximum: 10
     }
@@ -190,7 +190,7 @@ const COUNT_POLICY_JSON_4: Policy = {
       rule_id: '04dc545b-41d8-401d-89bd-bfac9247b555',
       rule_type: RULE_TYPES.count,
       geographies: [GEOGRAPHY_UUID],
-      statuses: { trip: [] },
+      states: { on_trip: [] },
       vehicle_types: ['bicycle', 'scooter'],
       maximum: 10
     }
@@ -204,8 +204,8 @@ const COUNT_POLICY_JSON_5: Policy = {
       name: 'Prohibited Dockless Zones',
       maximum: 0,
       rule_id: '8ad39dc3-005b-4348-9d61-c830c54c161b',
-      statuses: {
-        trip: [],
+      states: {
+        on_trip: [],
         reserved: [],
         available: []
       },
@@ -241,7 +241,7 @@ const TIME_POLICY_JSON: Policy = {
       rule_type: RULE_TYPES.time,
       rule_units: 'minutes',
       geographies: [GEOGRAPHY_UUID],
-      statuses: { available: [] },
+      states: { available: [] },
       vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
       maximum: 20
     }
@@ -325,7 +325,11 @@ describe('Tests Compliance API:', () => {
   describe('Count Compliant Test: ', () => {
     before(done => {
       const devices: Device[] = makeDevices(7, now())
-      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, 'trip_end')
+      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: rangeRandomInt(10)
+      })
       const telemetry: Telemetry[] = []
       devices.forEach(device => {
         telemetry.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
@@ -432,7 +436,11 @@ console.dir(result.body, { depth: null })
       const devicesOfProvider1: Device[] = makeDevices(15, now())
       const devicesOfProvider2: Device[] = makeDevices(15, now(), JUMP_PROVIDER_ID)
       const devices = [...devicesOfProvider1, ...devicesOfProvider2]
-      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, 'trip_end')
+      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: rangeRandomInt(10)
+      })
       const telemetry: Telemetry[] = []
       devices.forEach(device => {
         telemetry.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
@@ -490,7 +498,11 @@ console.dir(result.body, { depth: null })
   describe('Time Compliant Test: ', () => {
     before(done => {
       const devices: Device[] = makeDevices(15, now())
-      const events = makeEventsWithTelemetry(devices, now() - 10, CITY_OF_LA, 'trip_end')
+      const events = makeEventsWithTelemetry(devices, now() - 10, CITY_OF_LA, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: rangeRandomInt(10)
+      })
       const telemetry: Telemetry[] = []
       devices.forEach(device => {
         telemetry.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
@@ -527,7 +539,11 @@ console.dir(result.body, { depth: null })
   describe('Time Violation Test: ', () => {
     before(done => {
       const devices: Device[] = makeDevices(15, now())
-      const events = makeEventsWithTelemetry(devices, now() - minutes(21), CITY_OF_LA, 'trip_end')
+      const events = makeEventsWithTelemetry(devices, now() - minutes(21), CITY_OF_LA, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: rangeRandomInt(10)
+      })
       const telemetry: Telemetry[] = []
       devices.forEach(device => {
         telemetry.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
@@ -578,7 +594,11 @@ console.dir(result.body, { depth: null })
   describe('Verifies day-based bans work properly', () => {
     before(done => {
       const devices: Device[] = makeDevices(15, now())
-      const events = makeEventsWithTelemetry(devices, now() - 10, LA_BEACH, 'trip_end')
+      const events = makeEventsWithTelemetry(devices, now() - 10, LA_BEACH, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: rangeRandomInt(10)
+      })
       const telemetry: Telemetry[] = []
       devices.forEach(device => {
         telemetry.push(makeTelemetryInArea(device, now(), LA_BEACH, 10))
@@ -630,7 +650,11 @@ console.dir(result.body, { depth: null })
   describe('Particular Event Violation: ', () => {
     before(done => {
       const devices: Device[] = makeDevices(15, now())
-      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, 'service_start')
+      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
+        event_types: ['on_hours'],
+        vehicle_state: 'available',
+        speed: 0
+      })
       const telemetry: Telemetry[] = []
       devices.forEach(device => {
         telemetry.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
@@ -668,7 +692,11 @@ console.dir(result.body, { depth: null })
   describe('Particular Event Compliance: ', () => {
     before(done => {
       const devices: Device[] = makeDevices(15, now())
-      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, 'trip_end')
+      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: rangeRandomInt(10)
+      })
       const telemetry: Telemetry[] = []
       devices.forEach(device => {
         telemetry.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
@@ -735,7 +763,7 @@ console.dir(result.body, { depth: null })
             rule_id: '7a043ac8-03cd-4b0d-9588-d0af24f82832',
             rule_type: RULE_TYPES.count,
             geographies: veniceSpecOpsPointIds,
-            statuses: { available: ['provider_drop_off'] },
+            states: { available: ['provider_drop_off'] },
             vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter]
           },
           {
@@ -743,7 +771,7 @@ console.dir(result.body, { depth: null })
             rule_id: '596d7fe1-53fd-4ea4-8ba7-33f5ea8d98a6',
             rule_type: RULE_TYPES.count,
             geographies: ['e0e4a085-7a50-43e0-afa4-6792ca897c5a'],
-            statuses: { available: ['provider_drop_off'] },
+            states: { available: ['provider_drop_off'] },
             vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
             maximum: 0
           }
@@ -767,7 +795,13 @@ console.dir(result.body, { depth: null })
       let iter = 0
       const events_a: VehicleEvent[] = veniceSpecOps.features.reduce((acc: VehicleEvent[], feature: Feature) => {
         if (feature.geometry.type === 'Point') {
-          acc.push(...makeEventsWithTelemetry([devices_a[iter++]], now() - 10, feature.geometry, 'provider_drop_off'))
+          acc.push(
+            ...makeEventsWithTelemetry([devices_a[iter++]], now() - 10, feature.geometry, {
+              event_types: ['provider_drop_off'],
+              vehicle_state: 'available',
+              speed: 0
+            })
+          )
         }
         return acc
       }, [])
@@ -777,7 +811,11 @@ console.dir(result.body, { depth: null })
         devices_b,
         now() - 10,
         TEST_ZONE_NO_VALID_DROP_OFF_POINTS,
-        'provider_drop_off'
+        {
+          event_types: ['provider_drop_off'],
+          vehicle_state: 'available',
+          speed: 0
+        }
       )
       Promise.all([db.initialize(), cache.initialize()]).then(async () => {
         const seedData: { devices: Device[]; events: VehicleEvent[]; telemetry: Telemetry[] } = {
@@ -815,14 +853,22 @@ console.dir(result.body, { depth: null })
     before(done => {
       // Generate old events
       const devices: Device[] = makeDevices(15, yesterday)
-      const events_a = makeEventsWithTelemetry(devices, yesterday, CITY_OF_LA, 'trip_start')
+      const events_a = makeEventsWithTelemetry(devices, yesterday, CITY_OF_LA, {
+        event_types: ['trip_start'],
+        vehicle_state: 'on_trip',
+        speed: rangeRandomInt(0, 10)
+      })
       const telemetry_a: Telemetry[] = []
       devices.forEach(device => {
         telemetry_a.push(makeTelemetryInArea(device, yesterday, CITY_OF_LA, 10))
       })
 
       // Generate new events
-      const events_b = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'provider_drop_off')
+      const events_b = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+        event_types: ['provider_drop_off'],
+        vehicle_state: 'available',
+        speed: 0
+      })
       const telemetry_b: Telemetry[] = []
       devices.forEach(device => {
         telemetry_a.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
@@ -872,13 +918,21 @@ console.dir(result.body, { depth: null })
   describe('Tests count endpoint', () => {
     before(async () => {
       const devices_a: Device[] = makeDevices(15, now())
-      const events_a = makeEventsWithTelemetry(devices_a, now(), CITY_OF_LA, 'trip_start')
+      const events_a = makeEventsWithTelemetry(devices_a, now(), CITY_OF_LA, {
+        event_types: ['trip_start'],
+        vehicle_state: 'on_trip',
+        speed: 0
+      })
       const telemetry_a: Telemetry[] = devices_a.reduce((acc: Telemetry[], device) => {
         return [...acc, makeTelemetryInArea(device, now(), CITY_OF_LA, 10)]
       }, [])
 
       const devices_b: Device[] = makeDevices(15, now())
-      const events_b = makeEventsWithTelemetry(devices_b, now(), CITY_OF_LA, 'provider_drop_off')
+      const events_b = makeEventsWithTelemetry(devices_b, now(), CITY_OF_LA, {
+        event_types: ['provider_drop_off'],
+        vehicle_state: 'available',
+        speed: 0
+      })
       const telemetry_b: Telemetry[] = devices_b.reduce((acc: Telemetry[], device) => {
         return [...acc, makeTelemetryInArea(device, now(), CITY_OF_LA, 10)]
       }, [])
@@ -937,7 +991,11 @@ console.dir(result.body, { depth: null })
   describe('Count Compliant Test: ', () => {
     before(async () => {
       const devices: Device[] = makeDevices(7, now(), MOCHA_PROVIDER_ID)
-      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, 'trip_end')
+      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: 0
+      })
       const telemetry: Telemetry[] = []
       devices.forEach(device => {
         telemetry.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
@@ -990,7 +1048,11 @@ console.dir(result.body, { depth: null })
       }
 
       const devices: Device[] = makeDevices(15, now())
-      const events = makeEventsWithTelemetry(devices, now() - 10, LA_BEACH, 'trip_start')
+      const events = makeEventsWithTelemetry(devices, now() - 10, LA_BEACH, {
+        event_types: ['trip_start'],
+        vehicle_state: 'on_trip',
+        speed: 0
+      })
 
       const seedData = { devices, events, telemetry: [] }
 

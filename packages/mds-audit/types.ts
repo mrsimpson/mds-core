@@ -25,9 +25,7 @@ import {
   AuditEvent,
   WithGpsProperty,
   VEHICLE_EVENT,
-  VEHICLE_REASON,
-  VEHICLE_STATUS,
-  Nullable
+  VEHICLE_STATE
 } from '@mds-core/mds-types'
 import {
   ApiRequest,
@@ -148,9 +146,8 @@ export type GetAuditTripDetailsResponse = AuditApiResponse<
   Audit & {
     events: WithGpsProperty<ReadOnlyAuditEvent>[]
     attachments: AttachmentSummary[]
-    provider_event_type?: VEHICLE_EVENT
-    provider_event_type_reason?: VEHICLE_REASON | null
-    provider_status?: VEHICLE_STATUS // any //  EVENT_STATUS_MAP[providerEvent[0]?.event_type as VEHICLE_EVENT],
+    provider_event_types?: VEHICLE_EVENT[]
+    provider_vehicle_state?: VEHICLE_STATE // any
     provider_telemetry?: Telemetry | null //  providerEvent[0]?.telemetry,
     provider_event_time?: Timestamp // providerEvent[0]?.timestamp,
     provider: {

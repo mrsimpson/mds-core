@@ -45,15 +45,7 @@ import {
 } from '@mds-core/mds-schema-validators'
 
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
-import {
-  AUDIT_EVENT_TYPES,
-  AuditEvent,
-  EVENT_STATUS_MAP,
-  Timestamp,
-  Telemetry,
-  TelemetryData,
-  VEHICLE_EVENT
-} from '@mds-core/mds-types'
+import { AUDIT_EVENT_TYPES, AuditEvent, Timestamp, Telemetry, TelemetryData } from '@mds-core/mds-types'
 import { parsePagingQueryParams, asJsonApiLinks, parseRequest } from '@mds-core/mds-api-helpers'
 import { checkAccess, AccessTokenScopeValidator } from '@mds-core/mds-api-server'
 import {
@@ -549,9 +541,8 @@ function api(app: express.Express): express.Express {
                 version: res.locals.version,
                 ...audit,
                 provider_vehicle_id: device.vehicle_id,
-                provider_event_type: providerEvent[0]?.event_type,
-                provider_event_type_reason: providerEvent[0]?.event_type_reason,
-                provider_status: EVENT_STATUS_MAP[providerEvent[0]?.event_type as VEHICLE_EVENT],
+                provider_event_types: providerEvent[0]?.event_types,
+                provider_vehicle_state: providerEvent[0]?.vehicle_state,
                 provider_telemetry: providerEvent[0]?.telemetry,
                 provider_event_time: providerEvent[0]?.timestamp,
                 events: auditEvents.map(withGpsProperty),

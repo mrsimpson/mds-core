@@ -17,17 +17,8 @@
 import logger from '@mds-core/mds-logger'
 
 import flatten from 'flat'
-import { NotFoundError, nullKeys, stripNulls, now, isInsideBoundingBox, routeDistance } from '@mds-core/mds-utils'
-import {
-  UUID,
-  Timestamp,
-  Device,
-  VehicleEvent,
-  Telemetry,
-  BoundingBox,
-  EVENT_STATUS_MAP,
-  VEHICLE_STATUSES
-} from '@mds-core/mds-types'
+import { NotFoundError, nullKeys, stripNulls, now, isInsideBoundingBox, routeDistance, tail } from '@mds-core/mds-utils'
+import { UUID, Timestamp, Device, VehicleEvent, Telemetry, BoundingBox } from '@mds-core/mds-types'
 import redis from 'redis'
 import bluebird from 'bluebird'
 
@@ -265,7 +256,7 @@ async function writeEvent(event: VehicleEvent) {
   // FIXME cope with out-of-order -- check timestamp
   // logger.info('redis write event', event.device_id)
   try {
-    if (event.event_type === 'deregister') {
+    if (tail(event.event_types) === 'decommissioned') {
       return await wipeDevice(event.device_id)
     }
     const prev_event = parseEvent((await hread('event', event.device_id)) as StringifiedEventWithTelemetry)
@@ -417,7 +408,7 @@ async function readDevicesStatus(query: {
       try {
         const parsedItem = parseEvent(item)
         if (
-          EVENT_STATUS_MAP[parsedItem.event_type] === VEHICLE_STATUSES.removed ||
+          parsedItem.vehicle_state === 'removed' ||
           !parsedItem.telemetry ||
           (strictChecking && !isInsideBoundingBox(parsedItem.telemetry, query.bbox))
         )
