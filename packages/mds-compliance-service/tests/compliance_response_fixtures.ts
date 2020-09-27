@@ -32,7 +32,7 @@ export const COMPLIANCE_RESPONSE_1: any = {
   compliance_response_id: COMPLIANCE_RESPONSE_ID,
   compliance_as_of: yesterday(),
   policy: {
-    policy_name: 'LADOT Mobility Caps',
+    name: 'LADOT Mobility Caps',
     policy_id: '72971a3d-876c-41ea-8e48-c9bb965bbbcc'
   },
   excess_vehicles_count: 1,

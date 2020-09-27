@@ -52,7 +52,7 @@ export const matchedVehicleInformationSchema = Joi.object().keys({
 
 export const complianceResponsePolicyInfoSchema = Joi.object().keys({
   policy_id: uuidSchema.required(),
-  policy_name: stringSchema.required()
+  name: stringSchema.required()
 })
 
 export const complianceResponseDomainModelSchema = Joi.object().keys({

@@ -36,6 +36,40 @@ import {
 import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
 
+interface MatchedVehicle {
+  device: Device
+  event: VehicleEvent
+}
+
+interface CountMatch {
+  measured: number
+  geography_id: UUID
+  matched_vehicles: MatchedVehicle[]
+}
+
+interface TimeMatch {
+  measured: number
+  geography_id: UUID
+  matched_vehicle: MatchedVehicle
+}
+
+interface SpeedMatch {
+  measured: number
+  geography_id: UUID
+  matched_vehicle: MatchedVehicle
+}
+
+interface ReducedMatch {
+  measured: number
+  geography_id: UUID
+}
+
+interface RuleCompliance {
+  rule: Rule
+  matches: ReducedMatch[] | CountMatch[] | TimeMatch[] | SpeedMatch[]
+}
+type MatchedVehiclePlusRule = MatchedVehicle & { rule_id: UUID }
+
 const { env } = process
 
 const TWO_DAYS_IN_MS = 172800000
@@ -190,11 +224,13 @@ function processPolicy(
   events: VehicleEvent[],
   geographies: Geography[],
   devices: { [d: string]: Device }
-): ComplianceResponse | undefined {
+): any | undefined {
+  // ComplianceResponseDomainModel | undefined {
   if (isPolicyActive(policy)) {
     const sortedEvents = events.sort((e_1, e_2) => {
       return e_1.timestamp - e_2.timestamp
     })
+    // This variable will hold vehicles th
     const vehiclesToFilter: MatchedVehicle[] = []
     let overflowVehiclesMap: { [key: string]: MatchedVehiclePlusRule } = {}
     let countVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
@@ -358,7 +394,10 @@ function processPolicy(
     const speedingVehicles = getViolationsArray(speedingVehiclesMap)
 
     return {
-      policy,
+      policy: {
+        policy_id: policy.policy_id,
+        name: policy.name
+      },
       rule_compliances,
       total_violations: countViolations + timeVehicles.length + speedingVehicles.length,
       vehicles_in_violation: { ...countVehicles, ...timeVehiclesMap, ...speedingVehiclesMap }
@@ -387,4 +426,44 @@ function getRecentEvents(events: VehicleEvent[], end_time = now()): VehicleEvent
   })
 }
 
-export { processPolicy, getSupersedingPolicies, getRecentEvents }
+function processCountRuleNewTypes(
+  rule: CountRule,
+  events: VehicleEvent[],
+  geographies: Geography[],
+  devices: { [d: string]: Device }
+): RuleCompliance & { matches: CountMatch[] | null } {
+  const maximum = rule.maximum || Number.POSITIVE_INFINITY
+  if (isRuleActive(rule)) {
+    const matches: CountMatch[] = rule.geographies.reduce(
+      (matches_acc: CountMatch[], geography: string): CountMatch[] => {
+        const matched_vehicles: MatchedVehicle[] = events.reduce(
+          (matched_vehicles_acc: MatchedVehicle[], event: VehicleEvent): MatchedVehicle[] => {
+            const device: Device | undefined = devices[event.device_id]
+            if (event.telemetry && device) {
+              if (isInStatesOrEvents(rule, event) && isInVehicleTypes(rule, device)) {
+                const poly = getPolygon(geographies, geography)
+                if (poly && pointInShape(event.telemetry.gps, poly)) {
+                  // push devices that are in violation
+                  matched_vehicles_acc.push({ device, event })
+                }
+              }
+            }
+            return matched_vehicles_acc
+          },
+          []
+        )
+        matches_acc.push({
+          geography_id: geography,
+          measured: maximum && matched_vehicles.length > maximum ? maximum : matched_vehicles.length,
+          matched_vehicles
+        })
+        return matches_acc
+      },
+      []
+    )
+    return { rule, matches }
+  }
+  return { rule, matches: [] }
+}
+
+export { processPolicy, getSupersedingPolicies, getRecentEvents, processCountRuleNewTypes }

@@ -77,7 +77,7 @@ export interface ComplianceResponseDomainModel {
   excess_vehicles_count: number
   policy: {
     policy_id: UUID
-    policy_name: string
+    name: string
   }
   total_violations: number
   vehicles_found: MatchedVehicleInformation[]

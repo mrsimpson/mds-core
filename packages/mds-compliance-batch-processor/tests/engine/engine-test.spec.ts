@@ -387,3 +387,9 @@ describe('Verifies compliance engine processes by vehicle most recent event', as
     done()
   })
 })
+
+describe('new rule processors', () => {
+  it('processCountRuleNewTypes', done => {
+    done()
+  })
+})
