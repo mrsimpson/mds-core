@@ -1,17 +1,20 @@
 import assert from 'assert'
-import { uuid, now } from '@mds-core/mds-utils'
 import { VehicleEvent_v0_4_1 } from '../../transformers/@types'
 import { VehicleEvent_v1_0_0 } from '../../index'
-import { convert_v1_0_0_vehicle_event_to_v0_4_1, convert_v0_4_1_vehicle_event_to_v1_0_0 } from '../../transformers'
+import {
+  convert_v1_0_0_vehicle_event_to_v0_4_1,
+  convert_v0_4_1_vehicle_event_to_v1_0_0,
+  UnsupportedEventTypeError
+} from '../../transformers'
 
-const TIME = now()
-const DEVICE_ID = uuid()
-const PROVIDER_ID = uuid()
-const STOP_ID = uuid()
+const TIME = Date.now()
+const DEVICE_ID = 'd0d9c274-773f-46c4-8c3a-f3cd35e4f99c'
+const PROVIDER_ID = 'baf215d4-8b4b-4be4-8189-980171a964ba'
+const STOP_ID = '3f411cb1-a5a4-4b29-9e72-2714fdd24bc8'
 
 describe('Test transformers', () => {
-  it('spot checks the transformation between v0.4.1 and v1.0.0 VehicleEvent types', done => {
-    it('checks the provider_pick_up and charge combo translate correctly', finished => {
+  describe('spot checks the transformation between v0.4.1 and v1.0.0 VehicleEvent types', () => {
+    it('checks the provider_pick_up and charge combo translate correctly', () => {
       const event: VehicleEvent_v0_4_1 = {
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
@@ -35,10 +38,9 @@ describe('Test transformers', () => {
         timestamp_long: null,
         trip_id: null
       })
-      finished()
     })
 
-    it('checks that the service_end and low_battery combo translate correctly', finished => {
+    it('checks that the service_end and low_battery combo translate correctly', () => {
       const event: VehicleEvent_v0_4_1 = {
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
@@ -62,10 +64,9 @@ describe('Test transformers', () => {
         timestamp_long: null,
         trip_id: null
       })
-      finished()
     })
 
-    it('verifies the translation of trip_enter to on_trip', finished => {
+    it('verifies the translation of trip_enter to on_trip', () => {
       const event: VehicleEvent_v0_4_1 = {
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
@@ -89,13 +90,22 @@ describe('Test transformers', () => {
         timestamp_long: null,
         trip_id: null
       })
-      finished()
     })
 
-    done()
+    it('throws an error with the event_type `register`', () => {
+      const event: VehicleEvent_v0_4_1 = {
+        device_id: DEVICE_ID,
+        provider_id: PROVIDER_ID,
+        timestamp: TIME,
+        event_type: 'register',
+        recorded: TIME
+      }
+
+      assert.throws(() => convert_v0_4_1_vehicle_event_to_v1_0_0(event), UnsupportedEventTypeError)
+    })
   })
 
-  it('spot checks the transformations between v1.0.0 VehicleEvent and v0.4.1 VehicleEvent when there are multiple event types', done => {
+  it('spot checks the transformations between v1.0.0 VehicleEvent and v0.4.1 VehicleEvent when there are multiple event types', () => {
     const eventA: VehicleEvent_v1_0_0 = {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
@@ -146,6 +156,5 @@ describe('Test transformers', () => {
         heading: 5
       }
     })
-    done()
   })
 })
