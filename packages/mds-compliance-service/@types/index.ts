@@ -6,8 +6,8 @@ import {
   // NonEmptyArray,
   VehicleEvent,
   Enum,
-  VEHICLE_STATUS,
-  STATUS_EVENT_MAP,
+  VEHICLE_STATE,
+  STATE_EVENT_MAP,
   DAY_OF_WEEK,
   PolicyMessage,
   VEHICLE_EVENT
@@ -23,7 +23,7 @@ interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   name: string
   rule_id: UUID
   geographies: UUID[]
-  statuses: Partial<{ [S in VEHICLE_STATUS]: (keyof typeof STATUS_EVENT_MAP[S])[] | [] }> | null
+  statuses: Partial<{ [S in VEHICLE_STATE]: (keyof typeof STATE_EVENT_MAP[S])[] | [] }> | null
   rule_type: RuleType
   vehicle_types?: VEHICLE_TYPE[] | null
   maximum?: number | null
@@ -54,7 +54,7 @@ export type Rule = CountRule | TimeRule | SpeedRule | UserRule
 export type VehicleEventWithTelemetry = VehicleEvent & { telemetry: { gps: { lat: number; lng: number } } }
 export interface MatchedVehicleInformation {
   device_id: UUID
-  state: VEHICLE_STATUS
+  state: VEHICLE_STATE
   event_types: VEHICLE_EVENT[]
   timestamp: Timestamp
   /* Sometimes a device can match more than one rule, and it's helpful to know all of them,
