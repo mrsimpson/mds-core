@@ -9,7 +9,8 @@ import { FeatureCollection } from 'geojson'
 import { processPolicy, getSupersedingPolicies, getRecentEvents } from '@mds-core/mds-compliance/mds-compliance-engine'
 import { RuntimeError, minutes } from '@mds-core/mds-utils'
 import { ValidationError, validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
-import { processCountRuleNewTypes } from 'packages/mds-compliance-batch-processor/engine/mds-compliance-engine'
+import mdsLogger from '@mds-core/mds-logger'
+import { processCountRuleNewTypes } from '../../engine/mds-compliance-engine'
 
 let policies: Policy[] = []
 let low_count_policies: Policy[] = []
@@ -35,7 +36,6 @@ function getDeviceMap(devices: Device[]): { [d: string]: Device } {
     return Object.assign(deviceMapAcc, { [device.device_id]: device })
   }, {})
 }
-
 describe('Tests Compliance Engine', () => {
   before(async () => {
     policies = await readJson('test_data/policies.json')
@@ -57,7 +57,11 @@ describe('Tests Compliance Engine', () => {
 
   it('Verifies count compliance', done => {
     const devices = makeDevices(800, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_start')
+    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+      event_types: ['trip_start'],
+      vehicle_state: 'on_trip',
+      speed: 0
+    })
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
@@ -85,7 +89,11 @@ describe('Tests Compliance Engine', () => {
 
   it('Verifies count compliance maximum violation', done => {
     const devices = makeDevices(3001, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_start')
+    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+      event_types: ['trip_start'],
+      vehicle_state: 'on_trip',
+      speed: 0
+    })
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
@@ -119,7 +127,11 @@ describe('Tests Compliance Engine', () => {
 
   it('Verifies count compliance minimum violation', done => {
     const devices = makeDevices(10, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_start')
+    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+      event_types: ['trip_start'],
+      vehicle_state: 'on_trip',
+      speed: 0
+    })
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
@@ -153,7 +165,11 @@ describe('Tests Compliance Engine', () => {
 
   it('Verifies speed compliance', done => {
     const devices = makeDevices(5, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_start', 5)
+    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+      event_types: ['trip_start'],
+      vehicle_state: 'on_trip',
+      speed: 5
+    })
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
@@ -185,7 +201,11 @@ describe('Tests Compliance Engine', () => {
 
   it('Verifies speed compliance violation', done => {
     const devices = makeDevices(5, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_start', 500)
+    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+      event_types: ['trip_start'],
+      vehicle_state: 'on_trip',
+      speed: 500
+    })
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
@@ -218,7 +238,11 @@ describe('Tests Compliance Engine', () => {
 
   it('Verifies time compliance', done => {
     const devices = makeDevices(400, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_end')
+    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+      event_types: ['trip_end'],
+      vehicle_state: 'available',
+      speed: 0
+    })
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
@@ -250,7 +274,11 @@ describe('Tests Compliance Engine', () => {
 
   it('Verifies time compliance violation', done => {
     const devices = makeDevices(400, now())
-    const events = makeEventsWithTelemetry(devices, now() - minutes(21), CITY_OF_LA, 'trip_end')
+    const events = makeEventsWithTelemetry(devices, now() - minutes(21), CITY_OF_LA, {
+      event_types: ['trip_end'],
+      vehicle_state: 'available',
+      speed: 0
+    })
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
@@ -284,7 +312,11 @@ describe('Tests Compliance Engine', () => {
   it('Verifies not considering events older than 48 hours', done => {
     const TWO_DAYS_IN_MS = 172800000
     const devices = makeDevices(400, now())
-    const events = makeEventsWithTelemetry(devices, now() - TWO_DAYS_IN_MS, CITY_OF_LA, 'trip_end')
+    const events = makeEventsWithTelemetry(devices, now() - TWO_DAYS_IN_MS, CITY_OF_LA, {
+      event_types: ['trip_end'],
+      vehicle_state: 'available',
+      speed: 0
+    })
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
@@ -329,7 +361,11 @@ describe('Verifies errors are being properly thrown', () => {
     const oldTimezone = process.env.TIMEZONE
     process.env.TIMEZONE = 'Pluto/Potato_Land'
     const devices = makeDevices(1, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_end')
+    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+      event_types: ['trip_end'],
+      vehicle_state: 'available',
+      speed: 0
+    })
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
@@ -363,12 +399,18 @@ describe('Verifies compliance engine processes by vehicle most recent event', as
     const start_time = now() - 10000000
     const latest_device: Device = devices[0]
     const events: VehicleEvent[] = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
-      const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, 'trip_start')
+      const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
+        event_types: ['trip_start'],
+        vehicle_state: 'on_trip',
+        speed: 0
+      })
       events_acc.push(...device_events)
       return events_acc
     }, [])
     const deviceMap = getDeviceMap(devices)
     const results = low_count_policies.map(policy => processPolicy(policy, events, geographies, deviceMap))
+    console.log('foofoo')
+    console.dir(results, { depth: null })
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {
@@ -403,9 +445,9 @@ describe('new rule processors', () => {
       rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
       rule_type: 'count',
       geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
-      statuses: {
+      states: {
         available: [],
-        trip: []
+        on_trip: []
       },
       vehicle_types: ['bicycle', 'scooter'],
       maximum: 3000,

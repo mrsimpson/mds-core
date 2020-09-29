@@ -346,14 +346,14 @@ describe('Tests Compliance API:', () => {
       })
     })
 
-    it.only('Verifies count in compliance', done => {
+    it('Verifies count in compliance', done => {
       request
         .get(pathPrefix(`/snapshot/${COUNT_POLICY_UUID}`))
         .set('Authorization', ADMIN_AUTH)
         .expect(200)
         .end((err, result) => {
           test.assert.deepEqual(result.body.total_violations, 0)
-console.dir(result.body, { depth: null })
+          console.dir(result.body, { depth: null })
           test.object(result.body).hasProperty('timestamp')
           test.value(result.body.policy, COUNT_POLICY_UUID)
           test.value(result).hasHeader('content-type', APP_JSON)

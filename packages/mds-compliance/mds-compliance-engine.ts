@@ -14,6 +14,11 @@
     limitations under the License.
  */
 
+/*
+ notes:
+   CountMatch has an array of matched vehicles. The other types of matches have only one vehicle each.
+ */
+
 import {
   CountRule,
   Device,

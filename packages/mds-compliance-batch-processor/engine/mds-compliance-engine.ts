@@ -256,6 +256,21 @@ function processPolicy(
             devices
           )
 
+          // comp here looks like this:
+          /*
+            {
+              rule: Rule
+              matches:
+                {
+                  measured: number
+                  geography_id: UUID
+                  matched_vehicles: MatchedVehicle[]
+                }[]
+
+            }
+          */
+
+          // not sure what's going on but basically the `CountMatches` get turned into `ReducedMatches`
           const compressedComp = {
             rule,
             matches: comp.matches

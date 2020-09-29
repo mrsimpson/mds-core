@@ -408,6 +408,8 @@ describe('Verifies compliance engine processes by vehicle most recent event', as
     }, [])
     const deviceMap = getDeviceMap(devices)
     const results = low_count_policies.map(policy => processPolicy(policy, events, geographies, deviceMap))
+    console.log('foofoo')
+    console.dir(results, { depth: null })
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {
