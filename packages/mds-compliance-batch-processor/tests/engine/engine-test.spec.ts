@@ -2,7 +2,7 @@ import test from 'unit.js'
 import fs from 'fs'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { RULE_TYPES, Geography, Policy, Device, VehicleEvent, CountRule } from '@mds-core/mds-types'
+import { RULE_TYPES, Geography, Policy, Device, VehicleEvent } from '@mds-core/mds-types'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
@@ -455,9 +455,9 @@ describe('new rule processors', () => {
     }
 
     const devices = makeDevices(800, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_start')
+    //    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, 'trip_start')
 
-    const result = processCountRuleNewTypes(countRule, events, geographies, devices)
+    //    const result = processCountRuleNewTypes(countRule, events, geographies, devices)
     done()
   })
 })
