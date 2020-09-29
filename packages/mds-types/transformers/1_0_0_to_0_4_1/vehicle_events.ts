@@ -9,7 +9,7 @@ import {
 
 export const FULL_STATE_MAPPING_v1_0_0_to_v0_4_1: {
   [P in VEHICLE_EVENT_v1_0_0]: {
-    event_type: Exclude<VEHICLE_EVENT_v0_4_1, 'register'> | TRANSFORMER_VEHICLE_EVENT
+    event_type: VEHICLE_EVENT_v0_4_1 | TRANSFORMER_VEHICLE_EVENT
     event_type_reason?: VEHICLE_REASON_v0_4_1
   }
 } = {

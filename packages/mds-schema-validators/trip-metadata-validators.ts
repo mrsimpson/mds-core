@@ -1,4 +1,4 @@
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 import { TripMetadata, RESERVATION_METHODS, RESERVATION_TYPES, PAYMENT_METHODS } from '@mds-core/mds-types'
 import { RuntimeError } from '@mds-core/mds-utils'
 import {

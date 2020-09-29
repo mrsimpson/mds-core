@@ -14,7 +14,8 @@ const MIGRATIONS = [
   'dropAuditEventsColumns',
   'alterReportsTripsMigration',
   'alterDeviceColumnsAddModalityAndAccessibilityOptions',
-  'alterEventsColumnsExtendEventTypes'
+  'alterEventsColumnsExtendEventTypes',
+  'addIndexToGeographiesPublishDate'
 ] as const
 type MIGRATION = typeof MIGRATIONS[number]
 
@@ -200,6 +201,10 @@ async function alterEventsColumnsExtendEventTypes(exec: SqlExecuterFunction) {
   await exec(`ALTER TABLE ${schema.TABLE.devices} SET COLUMN ${schema.COLUMN.accessibility_options} varchar(255)[]`)
 }
 
+async function addIndexToGeographiesPublishDate(exec: SqlExecuterFunction) {
+  await exec(`CREATE INDEX geographies_publish_date_idx on geographies(publish_date)`)
+}
+
 async function doMigrations(client: MDSPostgresClient) {
   const exec = SqlExecuter(client)
   await doMigration(exec, 'alterGeographiesColumns', alterGeographiesColumnsMigration)
@@ -214,6 +219,7 @@ async function doMigrations(client: MDSPostgresClient) {
     alterDeviceColumnsAddModalityAndAccessibilityOptions
   )
   await doMigration(exec, 'alterEventsColumnsExtendEventTypes', alterEventsColumnsExtendEventTypes)
+  await doMigration(exec, 'addIndexToGeographiesPublishDate', addIndexToGeographiesPublishDate)
 }
 
 async function updateSchema(client: MDSPostgresClient) {

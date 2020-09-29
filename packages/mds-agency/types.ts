@@ -14,10 +14,10 @@ import { MultiPolygon } from 'geojson'
 import {
   ApiRequest,
   ApiResponse,
-  ApiClaims,
   ApiResponseLocals,
   ApiRequestParams,
-  ApiVersion
+  ApiResponseLocalsClaims,
+  ApiResponseLocalsVersion
 } from '@mds-core/mds-api-server'
 
 export const AGENCY_API_SUPPORTED_VERSIONS = ['0.4.1', '1.0.0'] as const
@@ -38,11 +38,9 @@ export type AgencyApiPostTripMetadataRequest = AgencyApiRequest<TripMetadata>
 export type AgencyApiAccessTokenScopes = 'admin:all' | 'vehicles:read'
 
 export type AgencyApiResponse<B = {}> = ApiResponse<B> &
-  ApiResponseLocals<
-    ApiClaims<AgencyApiAccessTokenScopes> & {
-      provider_id: UUID
-    } & ApiVersion<AGENCY_API_SUPPORTED_VERSION>
-  >
+  ApiResponseLocalsClaims<AgencyApiAccessTokenScopes> &
+  ApiResponseLocals<'provider_id', UUID> &
+  ApiResponseLocalsVersion<AGENCY_API_SUPPORTED_VERSION>
 
 export type AgencyApiRegisterVehicleResponse = AgencyApiResponse
 
