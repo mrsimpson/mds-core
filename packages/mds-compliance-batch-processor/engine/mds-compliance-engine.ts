@@ -77,6 +77,7 @@ export interface ComplianceResponse {
 const { env } = process
 
 const TWO_DAYS_IN_MS = 172800000
+
 function isPolicyActive(policy: Policy, end_time: number = now()): boolean {
   if (policy.end_date === null) {
     return end_time >= policy.start_date
@@ -433,6 +434,8 @@ function createMatchedVehicleInformation(device: Device, event: VehicleEvent) {
     }
   }
 }
+
+/*
 function processCountRuleNewTypes(
   rule: CountRule,
   events: VehicleEvent[],
@@ -473,4 +476,6 @@ function processCountRuleNewTypes(
   return { rule, matches: [] }
 }
 
-export { processPolicy, getSupersedingPolicies, getRecentEvents, processCountRuleNewTypes }
+*/
+// export { processPolicy, getSupersedingPolicies, getRecentEvents, processCountRuleNewTypes }
+export { processPolicy, getSupersedingPolicies, getRecentEvents }

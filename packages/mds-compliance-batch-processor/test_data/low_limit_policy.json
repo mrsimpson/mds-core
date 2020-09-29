@@ -11,16 +11,11 @@
         "name": "Greater LA",
         "rule_id": "2aa6953d-fa8f-4018-9b54-84c8b4b83c6d",
         "rule_type": "count",
-        "geographies": [
-          "1f943d59-ccc9-4d91-b6e2-0c5e771cbc49"
-        ],
-        "statuses": {
-          "trip": []
+        "geographies": ["1f943d59-ccc9-4d91-b6e2-0c5e771cbc49"],
+        "states": {
+          "on_trip": []
         },
-        "vehicle_types": [
-          "bicycle",
-          "scooter"
-        ],
+        "vehicle_types": ["bicycle", "scooter"],
         "maximum": 5
       }
     ]
