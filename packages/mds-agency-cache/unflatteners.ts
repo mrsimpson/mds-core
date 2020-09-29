@@ -71,7 +71,7 @@ function parseDevice(device: StringifiedCacheReadDeviceResult): Device {
       provider_id: device.provider_id,
       vehicle_id: device.vehicle_id,
       vehicle_type: device.vehicle_type as VEHICLE_TYPE,
-      propulsion_types: JSON.parse(device.propulsion_types) as PROPULSION_TYPE[],
+      propulsion_types: device.propulsion_types as PROPULSION_TYPE[],
       year: device.year ? Number(device.year) : null,
       mfgr: device.mfgr ? device.mfgr : null,
       model: device.model ? device.model : null,
@@ -94,7 +94,7 @@ const isStringifiedCacheReadDeviceResult = (device: unknown): device is Stringif
     'device_id',
     'provider_id',
     'vehicle_type',
-    'propulsion'
+    'propulsion_types'
   )
 
 function parseCachedItem(item: CachedItem): Device | Telemetry | VehicleEvent {
