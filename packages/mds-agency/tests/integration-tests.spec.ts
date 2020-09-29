@@ -203,9 +203,9 @@ describe('Tests API', () => {
   //             done(err)
   //         })
   // })
-  it('verifies post device missing propulsion', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
-    delete badVehicle.propulsion_types
+  it('verifies post device missing propulsion_types', done => {
+    const { propulsion_types, ...badVehicle } = deepCopy(TEST_VEHICLE)
+
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)
@@ -283,8 +283,8 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device missing vehicle_type', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
-    delete badVehicle.vehicle_type
+    const { vehicle_type, ...badVehicle } = deepCopy(TEST_VEHICLE)
+
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)
@@ -836,9 +836,6 @@ describe('Tests API', () => {
       })
   })
 
-  const telemetry_without_device_id = deepCopy(TEST_TELEMETRY)
-  delete telemetry_without_device_id.device_id
-
   it('verifies post start trip missing event', done => {
     request
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
@@ -857,9 +854,7 @@ describe('Tests API', () => {
       })
   })
 
-  const telemetry_without_location = deepCopy(TEST_TELEMETRY)
-  delete telemetry_without_location.gps.lat
-  delete telemetry_without_location.gps.lng
+  const { gps, ...telemetry_without_location } = deepCopy(TEST_TELEMETRY)
 
   it('verifies post trip start missing location', done => {
     request

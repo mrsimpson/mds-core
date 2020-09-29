@@ -34,7 +34,7 @@ import {
   VEHICLE_STATES,
   Device
 } from '@mds-core/mds-types'
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 import joiToJson from 'joi-to-json'
 
 import { ValidationError, areThereCommonElements } from '@mds-core/mds-utils'
