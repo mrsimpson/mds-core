@@ -6,11 +6,15 @@ import { RULE_TYPES, Geography, Policy, Device, VehicleEvent } from '@mds-core/m
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
-import { processPolicy, getSupersedingPolicies, getRecentEvents } from '@mds-core/mds-compliance/mds-compliance-engine'
 import { RuntimeError, minutes } from '@mds-core/mds-utils'
 import { ValidationError, validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
 import mdsLogger from '@mds-core/mds-logger'
-import { processCountRuleNewTypes } from '../../engine/mds-compliance-engine'
+import {
+  processPolicy,
+  getSupersedingPolicies,
+  getRecentEvents,
+  processCountRuleNewTypes
+} from '../../engine/mds-compliance-engine'
 
 let policies: Policy[] = []
 let low_count_policies: Policy[] = []
@@ -409,8 +413,6 @@ describe('Verifies compliance engine processes by vehicle most recent event', as
     }, [])
     const deviceMap = getDeviceMap(devices)
     const results = low_count_policies.map(policy => processPolicy(policy, events, geographies, deviceMap))
-    console.log('foofoo')
-    console.dir(results, { depth: null })
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {

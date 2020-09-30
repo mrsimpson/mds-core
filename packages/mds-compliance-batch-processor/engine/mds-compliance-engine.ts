@@ -234,6 +234,12 @@ function processPolicy(
       return e_1.timestamp - e_2.timestamp
     })
     const vehiclesToFilter: MatchedVehicle[] = []
+    /*
+     * For a count rule, the vehicles that exceed the maximum go into this
+     * overflowVehiclesMap variable. E.g. if a count rule has a maximum of 10,
+     * and 15 vehicles match, 10 vehicles go into vehiclesMatched, and 5 go into
+     * overflowVehiclesMap.
+     */
     let overflowVehiclesMap: { [key: string]: MatchedVehiclePlusRule } = {}
     let countVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
     let countViolations = 0
@@ -282,6 +288,9 @@ function processPolicy(
               : []
           }
 
+          // need a pair of nested reduces because processCountRule basically returns an array of arrays of
+          // matched vehicles
+          // vehicles that are over the count maximum go into the overflowVehiclesMap
           const bucketMap = comp.matches.reduce(
             (acc2: { matched: MatchedVehicle[]; overflowed: MatchedVehiclePlusRule[] }[], match) => {
               return [
