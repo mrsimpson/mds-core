@@ -45,7 +45,7 @@ const createStreamConsumer = async (
     await consumer.run({ eachMessage })
     return consumer
   } catch (err) {
-    logger.error(err)
+    logger.error(err, topic)
   }
   return null
 }

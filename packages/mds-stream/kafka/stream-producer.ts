@@ -39,7 +39,7 @@ const createStreamProducer = async ({ clientId = 'writer' }: Partial<KafkaStream
     await producer.connect()
     return producer
   } catch (err) {
-    logger.error(err)
+    logger.error(err, topic)
   }
   return null
 }
