@@ -15,6 +15,67 @@ import { processPolicy } from '../../engine/mds-compliance-engine'
 process.env.TIMEZONE = 'America/Los_Angeles'
 const VENICE_POLICY_UUID = 'dd9ace3e-14c8-461b-b5e7-1326505ff176'
 
+const INNER_GEO: Geography = {
+  name: 'inner venice geo',
+  geography_id: 'b4c75556-3842-47a9-b8f6-d721b98c8ca5',
+  geography_json: {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-118.46941709518433, 33.9807517760146],
+              [-118.46564054489136, 33.9807517760146],
+              [-118.46564054489136, 33.98356306245639],
+              [-118.46941709518433, 33.98356306245639],
+              [-118.46941709518433, 33.9807517760146]
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}
+
+const OUTER_GEO: Geography = {
+  geography_id: 'e0e4a085-7a50-43e0-afa4-6792ca897c5a',
+  name: 'outer venice geo',
+  geography_json: {
+    type: 'FeatureCollection',
+    features: [{ properties: {}, type: 'Feature', geometry: veniceSpecOps.features[0].geometry }]
+  }
+}
+
+const INNER_POLYGON: Polygon = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [-118.46853733062744, 33.98187274314647],
+      [-118.46694946289064, 33.98187274314647],
+      [-118.46694946289064, 33.982797974722246],
+      [-118.46853733062744, 33.982797974722246],
+      [-118.46853733062744, 33.98187274314647]
+    ]
+  ]
+}
+
+const OUTER_POLYGON: Polygon = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [-118.47261428833006, 33.98888290068113],
+      [-118.4684944152832, 33.98888290068113],
+      [-118.4684944152832, 33.99044854215088],
+      [-118.47261428833006, 33.99044854215088],
+      [-118.47261428833006, 33.98888290068113]
+    ]
+  ]
+}
+
 describe('Tests Compliance API:', () => {
   describe('Verifies venice beach spec ops', () => {
     it('has the correct number of matches per rule', done => {
@@ -126,41 +187,6 @@ describe('Tests Compliance API:', () => {
     })
 
     it.only('does overflow correctly', done => {
-      const innerGeo: Geography = {
-        name: 'inner venice geo',
-        geography_id: 'b4c75556-3842-47a9-b8f6-d721b98c8ca5',
-        geography_json: {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Polygon',
-                coordinates: [
-                  [
-                    [-118.46941709518433, 33.9807517760146],
-                    [-118.46564054489136, 33.9807517760146],
-                    [-118.46564054489136, 33.98356306245639],
-                    [-118.46941709518433, 33.98356306245639],
-                    [-118.46941709518433, 33.9807517760146]
-                  ]
-                ]
-              }
-            }
-          ]
-        }
-      }
-
-      const outerGeo: Geography = {
-        geography_id: 'e0e4a085-7a50-43e0-afa4-6792ca897c5a',
-        name: 'outer venice geo',
-        geography_json: {
-          type: 'FeatureCollection',
-          features: [{ properties: {}, type: 'Feature', geometry: veniceSpecOps.features[0].geometry }]
-        }
-      }
-
       const VENICE_OVERFLOW_POLICY: Policy = {
         name: 'Venice Overflow Test',
         description: 'what it says on the can',
@@ -175,16 +201,16 @@ describe('Tests Compliance API:', () => {
             name: 'Inner geo',
             rule_id: '7a043ac8-03cd-4b0d-9588-d0af24f82832',
             rule_type: RULE_TYPES.count,
-            geographies: [innerGeo.geography_id],
+            geographies: [INNER_GEO.geography_id],
             states: { available: ['provider_drop_off'] },
             maximum: 5,
             vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter]
           },
           {
-            name: 'Drop-off No-Fly Zones',
+            name: 'Outer Zone',
             rule_id: '596d7fe1-53fd-4ea4-8ba7-33f5ea8d98a6',
             rule_type: RULE_TYPES.count,
-            geographies: [outerGeo.geography_id],
+            geographies: [OUTER_GEO.geography_id],
             states: { available: ['provider_drop_off'] },
             vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
             maximum: 0
@@ -192,36 +218,33 @@ describe('Tests Compliance API:', () => {
         ]
       }
 
+      // The polygons within which these events are being created do not overlap
+      // with each other at all.
       const devices_a: Device[] = makeDevices(8, now())
-      const events_a: VehicleEvent[] = makeEventsWithTelemetry(
-        devices_a,
-        now() - 10,
-        innerGeo.geography_json.features[0].geometry as Polygon,
-        {
-          event_types: ['provider_drop_off'],
-          vehicle_state: 'available',
-          speed: 0
-        }
-      )
+      const events_a: VehicleEvent[] = makeEventsWithTelemetry(devices_a, now() - 10, INNER_POLYGON, {
+        event_types: ['provider_drop_off'],
+        vehicle_state: 'available',
+        speed: 0
+      })
 
       const devices_b: Device[] = makeDevices(8, now())
-      const events_b: VehicleEvent[] = makeEventsWithTelemetry(
-        devices_b,
-        now() - 10,
-        outerGeo.geography_json.features[0].geometry as Polygon,
-        {
-          event_types: ['provider_drop_off'],
-          vehicle_state: 'available',
-          speed: 0
-        }
-      )
+      const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now() - 10, OUTER_POLYGON, {
+        event_types: ['provider_drop_off'],
+        vehicle_state: 'available',
+        speed: 0
+      })
       const deviceMap: { [d: string]: Device } = [...devices_a, ...devices_b].reduce(
         (deviceMapAcc: { [d: string]: Device }, device: Device) => {
           return Object.assign(deviceMapAcc, { [device.device_id]: device })
         },
         {}
       )
-      const result = processPolicy(VENICE_OVERFLOW_POLICY, [...events_a, ...events_b], [innerGeo, outerGeo], deviceMap)
+      const result = processPolicy(
+        VENICE_OVERFLOW_POLICY,
+        [...events_a, ...events_b],
+        [INNER_GEO, OUTER_GEO],
+        deviceMap
+      )
       console.log('rezz')
       console.dir(result, { depth: null })
       console.log(result?.total_violations)

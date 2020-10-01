@@ -2,7 +2,7 @@ import test from 'unit.js'
 import fs from 'fs'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { RULE_TYPES, Geography, Policy, Device, VehicleEvent } from '@mds-core/mds-types'
+import { RULE_TYPES, Geography, Policy, Device, VehicleEvent, CountRule } from '@mds-core/mds-types'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
@@ -12,8 +12,8 @@ import mdsLogger from '@mds-core/mds-logger'
 import {
   processPolicy,
   getSupersedingPolicies,
-  getRecentEvents,
-  processCountRuleNewTypes
+  getRecentEvents // ,
+  // processCountRuleNewTypes
 } from '../../engine/mds-compliance-engine'
 
 let policies: Policy[] = []

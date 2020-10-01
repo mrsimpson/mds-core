@@ -320,7 +320,7 @@ function processPolicy(
                 )
               ]
             },
-            [{ matched: [], overflowed: [] }]
+            []
           )
 
           const vehiclesMatched = bucketMap.reduce((acc: MatchedVehicle[], map) => {
