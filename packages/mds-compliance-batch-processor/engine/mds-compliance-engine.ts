@@ -351,7 +351,7 @@ function processPolicy(
 
           if (overflowVehicles.length > 0) {
             countVehiclesMap = { ...countVehiclesMap, ...overflowVehiclesMap }
-            countViolations += overflowVehicles.length
+            countViolations += overflowVehicles.length // it's this line that double counts things
           } else if (vehiclesMatched.length < minimum) {
             countViolations += minimum - vehiclesMatched.length
           }
