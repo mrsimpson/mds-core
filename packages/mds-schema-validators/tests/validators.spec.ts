@@ -15,9 +15,10 @@
  */
 
 import test from 'unit.js'
-import { uuid } from '@mds-core/mds-utils'
+import { now, uuid } from '@mds-core/mds-utils'
 import { AUDIT_EVENT_TYPES } from '@mds-core/mds-types'
 import { providers } from '@mds-core/mds-providers' // map of uuids -> obj
+import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import {
   isValidAuditTripId,
   isValidVehicleEventType,
@@ -32,7 +33,9 @@ import {
   isValidAuditIssueCode,
   isValidAuditNote,
   isValidNumber,
-  ValidationError
+  ValidationError,
+  validateEvents,
+  isValidEvent
 } from '../validators'
 
 describe('Tests validators', () => {
@@ -194,6 +197,76 @@ describe('Tests validators', () => {
     test.value(isValidAuditNote('V'.repeat(256), { assert: false })).is(false)
     test.value(isValidAuditNote('provider-vehicle-id')).is(true)
     test.value(isValidAuditNote(undefined, { assert: false, required: false })).is(true)
+    done()
+  })
+
+  it('verifies vehicle event validation (single)', done => {
+    test.assert.doesNotThrow(() =>
+      isValidEvent({
+        device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+        provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+        event_types: ['trip_start', 'unspecified'],
+        vehicle_state: 'unknown',
+        telemetry: {
+          device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+          provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+          gps: {
+            lat: 33.91503182420198,
+            lng: -118.28634258945067,
+            speed: 6,
+            hdop: 3,
+            heading: 220
+          },
+          charge: 0.778778830284381,
+          timestamp: 1601964963032,
+          recorded: 1601964963032
+        },
+        timestamp: 1601964963032,
+        recorded: 1601964963032
+      })
+    )
+    test.assert.doesNotThrow(() =>
+      isValidEvent({
+        device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+        provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+        event_types: ['trip_start', 'unspecified'],
+        vehicle_state: 'unknown',
+        timestamp: 1601964963032
+      })
+    )
+    test.assert.throws(
+      () =>
+        isValidEvent({
+          device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+          provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+          event_types: ['notreal', 'unspecified'],
+          vehicle_state: 'unknown',
+          timestamp: 1601964963032
+        }),
+      ValidationError
+    )
+    test.assert.throws(
+      () =>
+        isValidEvent({
+          device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+          provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+          event_types: ['on_trip', 'unspecified'],
+          vehicle_state: 'fakestate',
+          timestamp: 1601964963032
+        }),
+      ValidationError
+    )
+    done()
+  })
+
+  it('verifies vehicle events validator (array)', done => {
+    const devices = makeDevices(3, now())
+    const events = makeEventsWithTelemetry(devices, now(), '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49')
+    test.assert.doesNotThrow(() => validateEvents(events))
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: make a bad event for the sake of exercising the validator
+    events[0].event_types = ['notreal']
+    test.assert.throws(() => validateEvents(events), ValidationError)
     done()
   })
 })

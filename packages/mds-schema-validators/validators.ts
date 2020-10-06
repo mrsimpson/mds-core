@@ -147,8 +147,6 @@ export const geographySchema = Joi.object().keys({
 
 const geographiesSchema = Joi.array().items(geographySchema)
 
-const eventsSchema = Joi.array().items()
-
 const vehicleEventTypeSchema = stringSchema.valid(...VEHICLE_EVENTS)
 
 const vehicleTypeSchema = stringSchema.valid(...Object.keys(VEHICLE_TYPES))
@@ -161,12 +159,17 @@ const eventSchema = Joi.object().keys({
   device_id: uuidSchema.required(),
   provider_id: uuidSchema.required(),
   timestamp: timestampSchema.required(),
-  event_type: vehicleEventTypeSchema.required(),
+  timestamp_long: stringSchema.optional(),
+  delta: timestampSchema.optional(),
+  event_types: Joi.array().items(vehicleEventTypeSchema.required()),
   telemetry_timestamp: timestampSchema.optional(),
-  telemetry: telemetrySchema.required(),
-  service_area_id: uuidSchema.allow(null).optional(),
+  telemetry: telemetrySchema.allow(null).optional(),
+  trip_id: uuidSchema.allow(null).optional(),
+  vehicle_state: vehicleStatusSchema.allow(null).optional(),
   recorded: timestampSchema.optional()
 })
+
+const eventsSchema = Joi.array().items(eventSchema)
 
 const tripEventSchema = eventSchema.keys({
   trip_id: uuidSchema.required()
