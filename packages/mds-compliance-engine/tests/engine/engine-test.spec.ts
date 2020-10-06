@@ -1,5 +1,4 @@
 import test from 'unit.js'
-import fs from 'fs'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import { RULE_TYPES, Geography, Policy, Device, VehicleEvent, CountRule } from '@mds-core/mds-types'
@@ -8,13 +7,13 @@ import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
 import { RuntimeError, minutes } from '@mds-core/mds-utils'
 import { ValidationError, validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
-import mdsLogger from '@mds-core/mds-logger'
 import {
   processPolicy,
   getSupersedingPolicies,
   getRecentEvents // ,
   // processCountRuleNewTypes
 } from '../../engine/mds-compliance-engine'
+import { readJson } from './helpers'
 
 let policies: Policy[] = []
 let low_count_policies: Policy[] = []
@@ -31,15 +30,6 @@ function now(): number {
   return Date.now()
 }
 
-async function readJson(path: string): Promise<Policy[]> {
-  return Promise.resolve(JSON.parse(fs.readFileSync(path).toString()))
-}
-
-function getDeviceMap(devices: Device[]): { [d: string]: Device } {
-  return devices.reduce((deviceMapAcc: { [d: string]: Device }, device: Device) => {
-    return Object.assign(deviceMapAcc, { [device.device_id]: device })
-  }, {})
-}
 describe('Tests Compliance Engine', () => {
   before(async () => {
     policies = await readJson('test_data/policies.json')
@@ -51,121 +41,6 @@ describe('Tests Compliance Engine', () => {
   //   test.assert.equal(validateSchemaCompliance(devices, devices_schema), devices.devices)
   //   done()
   // })
-
-  it('Verify Events Schema Compliance', done => {
-    const devices = makeDevices(5, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA)
-    test.assert.doesNotThrow(() => validateEvents(events))
-    done()
-  })
-
-  it('Verifies count compliance', done => {
-    const devices = makeDevices(800, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
-      event_types: ['trip_start'],
-      vehicle_state: 'on_trip',
-      speed: 0
-    })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
-    test.assert.doesNotThrow(() => validateGeographies(geographies))
-    test.assert.doesNotThrow(() => validateEvents(events))
-
-    const recentEvents = getRecentEvents(events)
-    const supersedingPolicies = getSupersedingPolicies(policies)
-    const deviceMap: { [d: string]: Device } = devices.reduce(
-      (deviceMapAcc: { [d: string]: Device }, device: Device) => {
-        return Object.assign(deviceMapAcc, { [device.device_id]: device })
-      },
-      {}
-    )
-    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
-    results.forEach(result => {
-      if (result) {
-        result.compliance.forEach(compliance => {
-          if (compliance.matches && compliance.rule.rule_type === RULE_TYPES.count) {
-            test.assert.deepEqual(compliance.matches.length, 1)
-          }
-        })
-      }
-    })
-    done()
-  })
-
-  it('Verifies count compliance maximum violation', done => {
-    const devices = makeDevices(3001, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
-      event_types: ['trip_start'],
-      vehicle_state: 'on_trip',
-      speed: 0
-    })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
-    test.assert.doesNotThrow(() => validateGeographies(geographies))
-    test.assert.doesNotThrow(() => validateEvents(events))
-
-    const recentEvents = getRecentEvents(events)
-    const supersedingPolicies = getSupersedingPolicies(policies)
-    const deviceMap: { [d: string]: Device } = devices.reduce(
-      (deviceMapAcc: { [d: string]: Device }, device: Device) => {
-        return Object.assign(deviceMapAcc, { [device.device_id]: device })
-      },
-      {}
-    )
-    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
-
-    results.forEach(result => {
-      if (result) {
-        result.compliance.forEach(compliance => {
-          if (
-            compliance.matches &&
-            compliance.rule.rule_type === RULE_TYPES.count &&
-            compliance.rule.geographies.includes(CITY_OF_LA)
-          ) {
-            test.assert.notEqual(compliance.matches.length, 0)
-            test.assert.deepEqual(result.total_violations, 1)
-          }
-        })
-      }
-    })
-    done()
-  })
-
-  it('Verifies count compliance minimum violation', done => {
-    const devices = makeDevices(10, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
-      event_types: ['trip_start'],
-      vehicle_state: 'on_trip',
-      speed: 0
-    })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
-    test.assert.doesNotThrow(() => validateGeographies(geographies))
-    test.assert.doesNotThrow(() => validateEvents(events))
-
-    const recentEvents = getRecentEvents(events)
-    const supersedingPolicies = getSupersedingPolicies(policies)
-    const deviceMap: { [d: string]: Device } = devices.reduce(
-      (deviceMapAcc: { [d: string]: Device }, device: Device) => {
-        return Object.assign(deviceMapAcc, { [device.device_id]: device })
-      },
-      {}
-    )
-    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
-
-    results.forEach(result => {
-      if (result) {
-        result.compliance.forEach(compliance => {
-          if (
-            compliance.matches &&
-            compliance.rule.rule_type === RULE_TYPES.count &&
-            compliance.rule.geographies.includes(CITY_OF_LA)
-          ) {
-            test.assert.notEqual(compliance.matches.length, 0)
-            test.assert.deepEqual(result.total_violations, 490)
-          }
-        })
-      }
-    })
-    done()
-  })
 
   it('Verifies speed compliance', done => {
     const devices = makeDevices(5, now())

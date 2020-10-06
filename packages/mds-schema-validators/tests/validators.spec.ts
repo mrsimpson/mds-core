@@ -15,9 +15,10 @@
  */
 
 import test from 'unit.js'
-import { uuid } from '@mds-core/mds-utils'
+import { now, uuid } from '@mds-core/mds-utils'
 import { AUDIT_EVENT_TYPES } from '@mds-core/mds-types'
 import { providers } from '@mds-core/mds-providers' // map of uuids -> obj
+import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import {
   isValidAuditTripId,
   isValidVehicleEventType,
@@ -32,7 +33,9 @@ import {
   isValidAuditIssueCode,
   isValidAuditNote,
   isValidNumber,
-  ValidationError
+  ValidationError,
+  validateEvents,
+  validatePolicies
 } from '../validators'
 
 describe('Tests validators', () => {
@@ -196,4 +199,102 @@ describe('Tests validators', () => {
     test.value(isValidAuditNote(undefined, { assert: false, required: false })).is(true)
     done()
   })
+
+  it('verifies vehicle event validator', done => {
+    const devices = makeDevices(5, now())
+    const events = makeEventsWithTelemetry(devices, now(), '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49')
+    test.assert.doesNotThrow(() => validateEvents(events))
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: Making a bad event so the validator can have some bad inputs
+    events[0].event_types = ['nonexistent']
+    test.assert.throws(() => validateEvents(events), ValidationError)
+  })
+
+  it('verifies policy validator', done => {
+    test.assert.doesNotThrow(() =>
+      validatePolicies([
+        {
+          name: 'LADOT Mobility Caps',
+          description: 'Mobility caps as described in the One-Year Permit',
+          policy_id: uuid(),
+          start_date: 1558389669540,
+          publish_date: 1558389669540,
+          end_date: null,
+          prev_policies: null,
+          provider_ids: [],
+          rules: [
+            {
+              name: 'Greater LA',
+              rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
+              rule_type: 'count',
+              geographies: uuid(),
+              states: { available: [], non_operational: [], reserved: [], on_trip: [] },
+              vehicle_types: ['scooter'],
+              maximum: 10,
+              minimum: 5
+            }
+          ]
+        }
+      ])
+    )
+
+    test.assert.throws(
+      () =>
+        validatePolicies([
+          {
+            name: 'LADOT Mobility Caps',
+            description: 'Mobility caps as described in the One-Year Permit',
+            policy_id: uuid(),
+            start_date: 1558389669540,
+            publish_date: 1558389669540,
+            end_date: null,
+            prev_policies: null,
+            provider_ids: [],
+            rules: [
+              {
+                name: 'Greater LA',
+                rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
+                rule_type: 'count',
+                geographies: uuid(),
+                states: { available: [], non_operational: [], reserved: [], on_trip: [] },
+                vehicle_types: ['trololol'],
+                maximum: 10,
+                minimum: 5
+              }
+            ]
+          }
+        ]),
+      ValidationError
+    )
+
+    test.assert.throws(
+      () =>
+        validatePolicies([
+          {
+            name: 'LADOT Mobility Caps',
+            description: 'Mobility caps as described in the One-Year Permit',
+            policy_id: uuid(),
+            start_date: 1558389669540,
+            publish_date: 1558389669540,
+            end_date: null,
+            prev_policies: null,
+            provider_ids: [],
+            rules: [
+              {
+                name: 'Greater LA',
+                rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
+                rule_type: 'count',
+                geographies: uuid(),
+                states: { not_a_state: [] },
+                vehicle_types: ['scooter'],
+                maximum: 10,
+                minimum: 5
+              }
+            ]
+          }
+        ]),
+      ValidationError
+    )
+  })
+  //  test.assert.doesNotThrow(() => validateGeographies([LA_GEOGRAPHY]))
 })

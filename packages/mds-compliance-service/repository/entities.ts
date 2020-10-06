@@ -6,6 +6,7 @@ import { ComplianceResponseDomainModel } from '../@types'
 export interface ComplianceResponsePersistenceModel extends IdentityColumn, RecordedColumn {
   compliance_response_id: ComplianceResponseDomainModel['compliance_response_id']
   compliance_as_of: ComplianceResponseDomainModel['compliance_as_of']
+  provider_id: ComplianceResponseDomainModel['provider_id']
   excess_vehicles_count: ComplianceResponseDomainModel['excess_vehicles_count']
   policy: ComplianceResponseDomainModel['policy']
   total_violations: ComplianceResponseDomainModel['total_violations']
@@ -21,6 +22,9 @@ export class ComplianceResponsePersistenceEntity
 
   @Column('bigint', { transformer: BigintTransformer })
   compliance_as_of: Timestamp
+
+  @Column('provider_id')
+  provider_id: UUID
 
   @Column('int')
   excess_vehicles_count: number

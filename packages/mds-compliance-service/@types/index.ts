@@ -74,6 +74,7 @@ export interface MatchedVehicleInformation {
 export interface ComplianceResponseDomainModel {
   compliance_response_id: UUID
   compliance_as_of: Timestamp
+  provider_id: UUID
   excess_vehicles_count: number
   policy: {
     policy_id: UUID
