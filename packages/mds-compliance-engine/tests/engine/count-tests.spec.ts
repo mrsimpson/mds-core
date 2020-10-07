@@ -14,6 +14,7 @@ import {
   restrictedAreas
 } from '@mds-core/mds-test-data'
 import test from 'unit.js'
+import { FeatureCollection, Feature, Polygon } from 'geojson'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID, MOCHA_PROVIDER_ID, JUMP_PROVIDER_ID } from '@mds-core/mds-providers'
 import {
@@ -26,9 +27,10 @@ import {
   VEHICLE_TYPES,
   Telemetry
 } from '@mds-core/mds-types'
-import { Feature, Polygon } from 'geojson'
+
 import MockDate from 'mockdate'
 import { validatePolicies, validateGeographies, validateEvents } from '@mds-core/mds-schema-validators'
+import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import {
   ComplianceResponse,
   getRecentEvents,
@@ -40,6 +42,9 @@ import { CITY_OF_LA, COUNT_POLICY_JSON, INNER_POLYGON, LA_GEOGRAPHY, OUTER_POLYG
 
 process.env.TIMEZONE = 'America/Los_Angeles'
 let policies: Policy[] = []
+const geographies: Geography[] = [
+  { name: 'la', geography_id: CITY_OF_LA, geography_json: la_city_boundary as FeatureCollection }
+]
 
 describe('Tests Compliance Engine Count Functionality:', () => {
   before(async () => {
@@ -170,7 +175,6 @@ describe('Tests Compliance Engine Count Functionality:', () => {
   describe('Verifies compliance engine processes by vehicle most recent event', async () => {
     it('should process count violation vehicles with the most recent event last', async () => {
       const low_count_policies = await readJson('test_data/low_limit_policy.json')
-      const geographies = await readJson('test_data/geographies.json')
       const devices = makeDevices(6, now())
       const start_time = now() - 10000000
       const latest_device: Device = devices[0]

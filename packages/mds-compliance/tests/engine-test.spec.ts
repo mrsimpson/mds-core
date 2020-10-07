@@ -38,7 +38,6 @@ function getDeviceMap(devices: Device[]): { [d: string]: Device } {
 describe('Tests Compliance Engine', () => {
   before(async () => {
     policies = await readJson('test_data/policies.json')
-    // geographies = await readJson('test_data/geographies.json')
   })
 
   // it('Verify Devices Schema Compliance', done => {
