@@ -167,6 +167,43 @@ describe('Tests Compliance Engine Count Functionality:', () => {
     })
   })
 
+  describe('Verifies compliance engine processes by vehicle most recent event', async () => {
+    it('should process count violation vehicles with the most recent event last', async () => {
+      const low_count_policies = await readJson('test_data/low_limit_policy.json')
+      const geographies = await readJson('test_data/geographies.json')
+      const devices = makeDevices(6, now())
+      const start_time = now() - 10000000
+      const latest_device: Device = devices[0]
+      const events: VehicleEvent[] = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+        const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
+          event_types: ['trip_start'],
+          vehicle_state: 'on_trip',
+          speed: 0
+        })
+        events_acc.push(...device_events)
+        return events_acc
+      }, [])
+      const deviceMap = generateDeviceMap(devices)
+      const results = low_count_policies.map(policy => processPolicy(policy, events, geographies, deviceMap))
+      results.forEach(result => {
+        if (result) {
+          result.compliance.forEach(compliance => {
+            // It's not necessary to verify it works for the other rule types since the sorting happens before
+            // any policy processing happens.
+            if (
+              compliance.rule.geographies.includes(CITY_OF_LA) &&
+              compliance.matches &&
+              compliance.rule.rule_type === RULE_TYPES.count
+            ) {
+              test.assert.deepEqual(compliance.matches.length, 1)
+              test.assert.deepEqual(result.vehicles_in_violation[0].device.device_id, latest_device.device_id)
+            }
+          })
+        }
+      })
+    })
+  })
+
   describe('Verifies day-based bans work properly', () => {
     it('Reports violations accurately', done => {
       const devices: Device[] = makeDevices(15, now())
