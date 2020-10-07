@@ -35,7 +35,9 @@ import {
   isValidNumber,
   ValidationError,
   validateEvents,
-  validatePolicies
+  validatePolicies,
+  isValidEvent,
+  validateGeographies
 } from '../validators'
 
 describe('Tests validators', () => {
@@ -200,16 +202,6 @@ describe('Tests validators', () => {
     done()
   })
 
-  it('verifies vehicle event validator', done => {
-    const devices = makeDevices(5, now())
-    const events = makeEventsWithTelemetry(devices, now(), '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49')
-    test.assert.doesNotThrow(() => validateEvents(events))
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: Making a bad event so the validator can have some bad inputs
-    events[0].event_types = ['nonexistent']
-    test.assert.throws(() => validateEvents(events), ValidationError)
-  })
-
   it('verifies policy validator', done => {
     test.assert.doesNotThrow(() =>
       validatePolicies([
@@ -218,7 +210,6 @@ describe('Tests validators', () => {
           description: 'Mobility caps as described in the One-Year Permit',
           policy_id: uuid(),
           start_date: 1558389669540,
-          publish_date: 1558389669540,
           end_date: null,
           prev_policies: null,
           provider_ids: [],
@@ -227,7 +218,7 @@ describe('Tests validators', () => {
               name: 'Greater LA',
               rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
               rule_type: 'count',
-              geographies: uuid(),
+              geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
               states: { available: [], non_operational: [], reserved: [], on_trip: [] },
               vehicle_types: ['scooter'],
               maximum: 10,
@@ -246,7 +237,6 @@ describe('Tests validators', () => {
             description: 'Mobility caps as described in the One-Year Permit',
             policy_id: uuid(),
             start_date: 1558389669540,
-            publish_date: 1558389669540,
             end_date: null,
             prev_policies: null,
             provider_ids: [],
@@ -255,7 +245,7 @@ describe('Tests validators', () => {
                 name: 'Greater LA',
                 rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
                 rule_type: 'count',
-                geographies: uuid(),
+                geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
                 states: { available: [], non_operational: [], reserved: [], on_trip: [] },
                 vehicle_types: ['trololol'],
                 maximum: 10,
@@ -275,7 +265,6 @@ describe('Tests validators', () => {
             description: 'Mobility caps as described in the One-Year Permit',
             policy_id: uuid(),
             start_date: 1558389669540,
-            publish_date: 1558389669540,
             end_date: null,
             prev_policies: null,
             provider_ids: [],
@@ -284,7 +273,7 @@ describe('Tests validators', () => {
                 name: 'Greater LA',
                 rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
                 rule_type: 'count',
-                geographies: uuid(),
+                geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
                 states: { not_a_state: [] },
                 vehicle_types: ['scooter'],
                 maximum: 10,
@@ -295,6 +284,139 @@ describe('Tests validators', () => {
         ]),
       ValidationError
     )
+    done()
   })
-  //  test.assert.doesNotThrow(() => validateGeographies([LA_GEOGRAPHY]))
+
+  it('verifies vehicle event validation (single)', done => {
+    test.assert.doesNotThrow(() =>
+      isValidEvent({
+        device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+        provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+        event_types: ['trip_start', 'unspecified'],
+        vehicle_state: 'unknown',
+        telemetry: {
+          device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+          provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+          gps: {
+            lat: 33.91503182420198,
+            lng: -118.28634258945067,
+            speed: 6,
+            hdop: 3,
+            heading: 220
+          },
+          charge: 0.778778830284381,
+          timestamp: 1601964963032,
+          recorded: 1601964963032
+        },
+        timestamp: 1601964963032,
+        recorded: 1601964963032
+      })
+    )
+    test.assert.doesNotThrow(() =>
+      isValidEvent({
+        device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+        provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+        event_types: ['trip_start', 'unspecified'],
+        vehicle_state: 'unknown',
+        timestamp: 1601964963032
+      })
+    )
+    test.assert.throws(
+      () =>
+        isValidEvent({
+          device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+          provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+          event_types: ['notreal', 'unspecified'],
+          vehicle_state: 'unknown',
+          timestamp: 1601964963032
+        }),
+      ValidationError
+    )
+    test.assert.throws(
+      () =>
+        isValidEvent({
+          device_id: 'bae569e2-c011-4732-9796-c14402c2758e',
+          provider_id: '5f7114d1-4091-46ee-b492-e55875f7de00',
+          event_types: ['on_trip', 'unspecified'],
+          vehicle_state: 'fakestate',
+          timestamp: 1601964963032
+        }),
+      ValidationError
+    )
+    done()
+  })
+
+  it('verifies vehicle events validator (array)', done => {
+    const devices = makeDevices(3, now())
+    const events = makeEventsWithTelemetry(devices, now(), '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49')
+    test.assert.doesNotThrow(() => validateEvents(events))
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: make a bad event for the sake of exercising the validator
+    events[0].event_types = ['notreal']
+    test.assert.throws(() => validateEvents(events), ValidationError)
+    done()
+  })
+
+  it('verifies geographies validatory (array)', done => {
+    const geographies = [
+      {
+        name: 'inner venice geo',
+        geography_id: 'b4c75556-3842-47a9-b8f6-d721b98c8ca5',
+        geography_json: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-118.46941709518433, 33.9807517760146],
+                    [-118.46564054489136, 33.9807517760146],
+                    [-118.46564054489136, 33.98356306245639],
+                    [-118.46941709518433, 33.98356306245639],
+                    [-118.46941709518433, 33.9807517760146]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        name: 'a random utah geo',
+        geography_id: 'a345a55d-6b31-4c18-b082-3a37bba49982',
+        geography_json: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-112.587890625, 37.71859032558816],
+                    [-109.3798828125, 37.71859032558816],
+                    [-109.3798828125, 38.58252615935333],
+                    [-112.587890625, 38.58252615935333],
+                    [-112.587890625, 37.71859032558816]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+
+    test.assert.doesNotThrow(() => validateGeographies(geographies))
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: make a bad event for the sake of exercising the validator
+    geographies[0].geography_json = {}
+    test.assert.throws(() => validateGeographies(geographies), ValidationError)
+    done()
+  })
 })

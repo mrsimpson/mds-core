@@ -25,7 +25,8 @@ import {
   AuditEvent,
   WithGpsProperty,
   VEHICLE_EVENT,
-  VEHICLE_STATE
+  VEHICLE_STATE,
+  Nullable
 } from '@mds-core/mds-types'
 import {
   ApiRequest,

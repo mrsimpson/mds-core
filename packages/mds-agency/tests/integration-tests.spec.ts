@@ -203,10 +203,9 @@ describe('Tests API', () => {
   //             done(err)
   //         })
   // })
-  it('verifies post device missing propulsion', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
-    // @ts-ignore
-    delete badVehicle.propulsion_types
+  it('verifies post device missing propulsion_types', done => {
+    const { propulsion_types, ...badVehicle } = deepCopy(TEST_VEHICLE)
+
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)
@@ -284,9 +283,8 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device missing vehicle_type', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
-    // @ts-ignore
-    delete badVehicle.vehicle_type
+    const { vehicle_type, ...badVehicle } = deepCopy(TEST_VEHICLE)
+
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)

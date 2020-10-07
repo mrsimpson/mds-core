@@ -93,6 +93,11 @@ describe('Tests Compliance Engine', () => {
       vehicle_state: 'on_trip',
       speed: 0
     })
+    try {
+      validatePolicies(policies)
+    } catch (err) {
+      console.dir(err)
+    }
     test.assert.doesNotThrow(() => validatePolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))

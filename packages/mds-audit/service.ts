@@ -184,7 +184,12 @@ export async function getVehicle(provider_id: UUID, vehicle_id: string) {
       } else {
         const state = deviceStatus.vehicle_state
         const updated = deviceStatus.timestamp
-        deviceStatusMap.active.push({ ...device, ...deviceStatus, state, updated })
+        // FIXME: There are currently some scenarios in which in the latest device information
+        // isn't properly reflected in the device cache. As a result, we overwrite these values
+        // using the device information from the database. If these scenarios can be resolved then
+        // using just the cached values would be the preferred approach as the cache should always
+        // reflect the most up to date information.
+        deviceStatusMap.active.push({ ...deviceStatus, ...device, state, updated })
       }
     })
   )
