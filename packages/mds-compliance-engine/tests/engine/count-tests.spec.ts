@@ -458,12 +458,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         vehicle_state: 'available',
         speed: 0
       })
-      const deviceMap: { [d: string]: Device } = [...devices_a, ...devices_b].reduce(
-        (deviceMapAcc: { [d: string]: Device }, device: Device) => {
-          return Object.assign(deviceMapAcc, { [device.device_id]: device })
-        },
-        {}
-      )
+      const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
       const result = processPolicy(
         VENICE_OVERFLOW_POLICY,
         [...events_a, ...events_b],
@@ -471,15 +466,76 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         deviceMap
       ) as ComplianceResponse
 
-      // for these count results, matches are sorted by geography
-      // for the first compliance result, there's one or two vehicle matches for each of the 20 or so geographies
       test.assert.equal(result.compliance[0].matches[0].measured, 1)
-      // for the second compliance result, there's one geography
       test.assert.equal(result.compliance[1].matches[0].measured, 2)
-      // and therefore 10 vehicles that match for that geography
       test.assert.equal(result.total_violations, 2)
       test.assert.equal(result.vehicles_in_violation.length, 2)
       done()
     })
+  })
+
+  it('counts total_violations accurately when mixing count minumum and maximum violations', done => {
+    const VENICE_MIXED_VIOLATIONS_POLICY: Policy = {
+      name: 'Venice Overflow Test',
+      description: 'what it says on the can',
+      policy_id: VENICE_POLICY_UUID,
+      start_date: 1558389669540,
+      publish_date: 1558389669540,
+      end_date: null,
+      prev_policies: null,
+      provider_ids: [],
+      rules: [
+        {
+          name: 'Inner geo',
+          rule_id: '7a043ac8-03cd-4b0d-9588-d0af24f82832',
+          rule_type: RULE_TYPES.count,
+          geographies: [INNER_GEO.geography_id],
+          states: { available: ['provider_drop_off'] },
+          maximum: 1,
+          vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter]
+        },
+        {
+          name: 'Outer Zone',
+          rule_id: '596d7fe1-53fd-4ea4-8ba7-33f5ea8d98a6',
+          rule_type: RULE_TYPES.count,
+          geographies: [OUTER_GEO.geography_id],
+          states: { available: ['provider_drop_off'] },
+          vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+          maximum: 1000,
+          minimum: 10
+        }
+      ]
+    }
+
+    // The polygons within which these events are being created do not overlap
+    // with each other at all.
+    const devices_a: Device[] = makeDevices(3, now())
+    const events_a: VehicleEvent[] = makeEventsWithTelemetry(devices_a, now() - 10, INNER_POLYGON, {
+      event_types: ['provider_drop_off'],
+      vehicle_state: 'available',
+      speed: 0
+    })
+
+    const devices_b: Device[] = makeDevices(2, now())
+    const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now() - 10, OUTER_POLYGON, {
+      event_types: ['provider_drop_off'],
+      vehicle_state: 'available',
+      speed: 0
+    })
+    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
+    const result = processPolicy(
+      VENICE_MIXED_VIOLATIONS_POLICY,
+      [...events_a, ...events_b],
+      [INNER_GEO, OUTER_GEO],
+      deviceMap
+    ) as ComplianceResponse
+
+    test.assert.equal(result.compliance[0].matches[0].measured, 1)
+    // for the second compliance result, there's one geography
+    test.assert.equal(result.compliance[1].matches[0].measured, 4)
+    // and therefore 10 vehicles that match for that geography
+    test.assert.equal(result.total_violations, 6)
+    test.assert.equal(result.vehicles_in_violation.length, 0)
+    done()
   })
 })
