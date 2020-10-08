@@ -5,14 +5,9 @@ import { RULE_TYPES, Geography, Policy, Device } from '@mds-core/mds-types'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
-import { RuntimeError } from '@mds-core/mds-utils'
-import { ValidationError, validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
-import {
-  processPolicy,
-  getSupersedingPolicies,
-  getRecentEvents // ,
-  // processCountRuleNewTypes
-} from '../../engine/mds-compliance-engine'
+import { minutes } from '@mds-core/mds-utils'
+import { validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
+import { processPolicy, getSupersedingPolicies, getRecentEvents } from '../../engine/mds-compliance-engine'
 import { readJson, generateDeviceMap } from './helpers'
 
 let policies: Policy[] = []
@@ -29,26 +24,23 @@ function now(): number {
   return Date.now()
 }
 
-describe('Tests General Compliance Engine Functionality', () => {
+describe('Tests Compliance Engine Time Functionality', () => {
   before(async () => {
     policies = await readJson('test_data/policies.json')
   })
 
-  it('Verifies not considering events older than 48 hours', done => {
-    const TWO_DAYS_IN_MS = 172800000
+  it('Verifies time compliance', done => {
     const devices = makeDevices(400, now())
-    const events = makeEventsWithTelemetry(devices, now() - TWO_DAYS_IN_MS, CITY_OF_LA, {
+    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
       event_types: ['trip_end'],
       vehicle_state: 'available',
       speed: 0
     })
 
     const recentEvents = getRecentEvents(events)
-
-    test.assert.deepEqual(recentEvents.length, 0)
-
     const supersedingPolicies = getSupersedingPolicies(policies)
     const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
+
     const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
     results.forEach(result => {
       if (result) {
@@ -65,20 +57,10 @@ describe('Tests General Compliance Engine Functionality', () => {
     })
     done()
   })
-})
 
-describe('Verifies errors are being properly thrown', () => {
-  it('Verify garbage does not pass schema compliance', done => {
-    const devices = { foo: { potato: 'POTATO!' } }
-    test.assert.throws(() => validateEvents(devices), ValidationError)
-    done()
-  })
-
-  it('Verifies RuntimeErrors are being thrown with an invalid TIMEZONE env_var', done => {
-    const oldTimezone = process.env.TIMEZONE
-    process.env.TIMEZONE = 'Pluto/Potato_Land'
-    const devices = makeDevices(1, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+  it('Verifies time compliance violation', done => {
+    const devices = makeDevices(400, now())
+    const events = makeEventsWithTelemetry(devices, now() - minutes(21), CITY_OF_LA, {
       event_types: ['trip_end'],
       vehicle_state: 'available',
       speed: 0
@@ -90,11 +72,22 @@ describe('Verifies errors are being properly thrown', () => {
     const recentEvents = getRecentEvents(events)
     const supersedingPolicies = getSupersedingPolicies(policies)
     const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
-    test.assert.throws(
-      () => supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap)),
-      RuntimeError
-    )
-    process.env.TIMEZONE = oldTimezone
+
+    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
+    results.forEach(result => {
+      if (result) {
+        result.compliance.forEach(compliance => {
+          if (
+            compliance.rule.geographies.includes(CITY_OF_LA) &&
+            compliance.matches &&
+            compliance.rule.rule_type === RULE_TYPES.time
+          ) {
+            test.assert.notEqual(compliance.matches.length, 0)
+            test.assert.deepEqual(result.total_violations, 400)
+          }
+        })
+      }
+    })
     done()
   })
 })
