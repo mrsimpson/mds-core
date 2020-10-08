@@ -3,9 +3,8 @@ import { veniceSpecOps, LA_CITY_BOUNDARY, restrictedAreas } from '@mds-core/mds-
 
 import { Geography, Policy, RULE_TYPES, VEHICLE_TYPES } from '@mds-core/mds-types'
 
-export const GEOGRAPHY_UUID = '8917cf2d-a963-4ea2-a98b-7725050b3ec5'
 export const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
-export const LA_GEOGRAPHY = { name: 'la', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY }
+export const LA_GEOGRAPHY = { name: 'la', geography_id: CITY_OF_LA, geography_json: LA_CITY_BOUNDARY }
 export const LA_BEACH = 'ff822e26-a70c-4721-ac32-2f6734beff9b'
 export const LA_BEACH_GEOGRAPHY = { name: 'la beach', geography_id: LA_BEACH, geography_json: restrictedAreas }
 export const RESTRICTED_GEOGRAPHY = {
@@ -31,7 +30,7 @@ export const COUNT_POLICY_JSON: Policy = {
       name: 'Greater LA',
       rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
       rule_type: RULE_TYPES.count,
-      geographies: [GEOGRAPHY_UUID],
+      geographies: [CITY_OF_LA],
       states: { available: [], non_operational: [], reserved: [], on_trip: [] },
       vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
       maximum: 10,
@@ -77,7 +76,7 @@ export const COUNT_POLICY_JSON_3: Policy = {
       name: 'Greater LA',
       rule_id: '04dc545b-41d8-401d-89bd-bfac9247b555',
       rule_type: RULE_TYPES.count,
-      geographies: [GEOGRAPHY_UUID],
+      geographies: [CITY_OF_LA],
       states: { available: ['on_hours'], non_operational: [], reserved: [] },
       vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
       maximum: 10

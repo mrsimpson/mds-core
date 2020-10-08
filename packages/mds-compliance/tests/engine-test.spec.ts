@@ -85,7 +85,7 @@ describe('Tests Compliance Engine', () => {
     done()
   })
 
-  it('Verifies count compliance maximum violation', done => {
+  it.only('Verifies count compliance maximum violation', done => {
     const devices = makeDevices(3001, now())
     const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
       event_types: ['trip_start'],
@@ -113,6 +113,7 @@ describe('Tests Compliance Engine', () => {
 
     results.forEach(result => {
       if (result) {
+        console.dir(result, { depth: null })
         result.compliance.forEach(compliance => {
           if (
             compliance.matches &&

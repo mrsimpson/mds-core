@@ -38,13 +38,26 @@ import {
   processPolicy
 } from '../../engine/mds-compliance-engine'
 import { generateDeviceMap, readJson } from './helpers'
-import { CITY_OF_LA, COUNT_POLICY_JSON, INNER_POLYGON, LA_GEOGRAPHY, OUTER_POLYGON } from './fixtures'
+import {
+  CITY_OF_LA,
+  COUNT_POLICY_JSON,
+  INNER_POLYGON,
+  LA_GEOGRAPHY,
+  VENICE_POLICY_UUID,
+  OUTER_POLYGON,
+  COUNT_POLICY_JSON_3,
+  LA_BEACH,
+  LA_BEACH_GEOGRAPHY,
+  COUNT_POLICY_JSON_2,
+  COUNT_POLICY_JSON_5,
+  RESTRICTED_GEOGRAPHY,
+  INNER_GEO,
+  OUTER_GEO
+} from './fixtures'
 
 process.env.TIMEZONE = 'America/Los_Angeles'
 let policies: Policy[] = []
-const geographies: Geography[] = [
-  { name: 'la', geography_id: CITY_OF_LA, geography_json: la_city_boundary as FeatureCollection }
-]
+const GEOGRAPHIES = [{ name: 'la', geography_id: CITY_OF_LA, geography_json: la_city_boundary as FeatureCollection }]
 
 describe('Tests Compliance Engine Count Functionality:', () => {
   before(async () => {
@@ -76,9 +89,6 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         vehicle_state: 'on_trip',
         speed: 0
       })
-      test.assert.doesNotThrow(() => validatePolicies(policies))
-      test.assert.doesNotThrow(() => validateGeographies([LA_GEOGRAPHY]))
-      test.assert.doesNotThrow(() => validateEvents(events))
 
       const recentEvents = getRecentEvents(events)
       const supersedingPolicies = getSupersedingPolicies(policies)
@@ -152,7 +162,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         },
         {}
       )
-      const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
+      const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, GEOGRAPHIES, deviceMap))
 
       results.forEach(result => {
         if (result) {
@@ -188,7 +198,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         return events_acc
       }, [])
       const deviceMap = generateDeviceMap(devices)
-      const results = low_count_policies.map(policy => processPolicy(policy, events, geographies, deviceMap))
+      const results = low_count_policies.map(policy => processPolicy(policy, events, GEOGRAPHIES, deviceMap))
       results.forEach(result => {
         if (result) {
           result.compliance.forEach(compliance => {
@@ -418,7 +428,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
             rule_type: RULE_TYPES.count,
             geographies: [INNER_GEO.geography_id],
             states: { available: ['provider_drop_off'] },
-            maximum: 2,
+            maximum: 1,
             vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter]
           },
           {
@@ -428,7 +438,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
             geographies: [OUTER_GEO.geography_id],
             states: { available: ['provider_drop_off'] },
             vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
-            maximum: 1
+            maximum: 2
           }
         ]
       }
@@ -459,20 +469,16 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         [...events_a, ...events_b],
         [INNER_GEO, OUTER_GEO],
         deviceMap
-      )
-      console.log('rezz')
-      console.dir(result, { depth: null })
-      console.log(result?.total_violations)
-      console.log(result?.vehicles_in_violation.length)
-      /*
+      ) as ComplianceResponse
+
       // for these count results, matches are sorted by geography
       // for the first compliance result, there's one or two vehicle matches for each of the 20 or so geographies
-      test.assert(result?.compliance[0].matches.length === 22)
+      test.assert.equal(result.compliance[0].matches[0].measured, 1)
       // for the second compliance result, there's one geography
-      test.assert(result?.compliance[1].matches.length === 1)
+      test.assert.equal(result.compliance[1].matches[0].measured, 2)
       // and therefore 10 vehicles that match for that geography
-      test.assert(result?.compliance[1].matches[0].measured === 10)
-      */
+      test.assert.equal(result.total_violations, 2)
+      test.assert.equal(result.vehicles_in_violation.length, 2)
       done()
     })
   })

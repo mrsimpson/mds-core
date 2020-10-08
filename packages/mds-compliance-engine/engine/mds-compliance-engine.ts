@@ -142,6 +142,8 @@ function processCountRule(
         )
         matches_acc.push({
           geography_id: geography,
+          // We cap the # of measured vehicles at the maximum, because vehicles that are over
+          // the maximum will overflow into the next rule, for which they might be normal matches.
           measured: maximum && matched_vehicles.length > maximum ? maximum : matched_vehicles.length,
           matched_vehicles
         })
@@ -242,7 +244,7 @@ function processPolicy(
      */
     let overflowVehiclesMap: { [key: string]: MatchedVehiclePlusRule } = {}
     let countVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
-    let countViolations = 0
+    let countMinimumViolations = 0
     const timeVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
     const speedingVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
     const compliance: Compliance[] = policy.rules.reduce((compliance_acc: Compliance[], rule: Rule): Compliance[] => {
@@ -304,6 +306,10 @@ function processPolicy(
                     // If the rule has a defined maximum, use it, even if 0
                     const maximum = rule.maximum == null ? Number.POSITIVE_INFINITY : rule.maximum
                     if (maximum && i < maximum) {
+                      // A device could already be in overflowVehiclesMap if it was already overflowing
+                      // from the previous rule. If the current device had overflowed the previous rule,
+                      // but is under the count limit for the current rule, it is no longer overflowing.
+                      // So it must be removed.
                       if (overflowVehiclesMap[match_instance.device.device_id]) {
                         delete overflowVehiclesMap[match_instance.device.device_id]
                       }
@@ -351,9 +357,8 @@ function processPolicy(
 
           if (overflowVehicles.length > 0) {
             countVehiclesMap = { ...countVehiclesMap, ...overflowVehiclesMap }
-            countViolations += overflowVehicles.length // it's this line that double counts things
           } else if (vehiclesMatched.length < minimum) {
-            countViolations += minimum - vehiclesMatched.length
+            countMinimumViolations += minimum - vehiclesMatched.length
           }
 
           compliance_acc.push(compressedComp)
@@ -416,7 +421,11 @@ function processPolicy(
     return {
       policy,
       compliance,
-      total_violations: countViolations + timeVehicles.length + speedingVehicles.length,
+      total_violations:
+        countMinimumViolations +
+        Object.keys(overflowVehiclesMap).length +
+        timeVehicles.length +
+        speedingVehicles.length,
       vehicles_in_violation: [...countVehicles, ...timeVehicles, ...speedingVehicles]
     }
   }
