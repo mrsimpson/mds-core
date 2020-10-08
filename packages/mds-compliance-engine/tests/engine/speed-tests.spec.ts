@@ -5,8 +5,9 @@ import { RULE_TYPES, Geography, Policy, Device } from '@mds-core/mds-types'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
+import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
 import {
-  processPolicy,
+  processPolicyByProviderId,
   getSupersedingPolicies,
   getRecentEvents // ,
   // processCountRuleNewTypes
@@ -48,7 +49,9 @@ describe('Tests Compliance Engine Speed Violations', () => {
       },
       {}
     )
-    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
+    const results = supersedingPolicies.map(policy =>
+      processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, geographies, deviceMap)
+    )
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {
@@ -81,7 +84,9 @@ describe('Tests Compliance Engine Speed Violations', () => {
       },
       {}
     )
-    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
+    const results = supersedingPolicies.map(policy =>
+      processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, geographies, deviceMap)
+    )
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {

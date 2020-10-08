@@ -57,6 +57,7 @@ export const complianceResponsePolicyInfoSchema = Joi.object().keys({
 
 export const complianceResponseDomainModelSchema = Joi.object().keys({
   compliance_response_id: uuidSchema,
+  provider_id: uuidSchema,
   compliance_as_of: timestampSchema,
   excess_vehicles_count: numberSchema,
   policy: complianceResponsePolicyInfoSchema,

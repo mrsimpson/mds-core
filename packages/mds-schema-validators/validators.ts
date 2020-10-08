@@ -147,7 +147,7 @@ export const geographySchema = Joi.object().keys({
 
 const geographiesSchema = Joi.array().items(geographySchema)
 
-const vehicleEventTypeSchema = stringSchema.valid(...VEHICLE_EVENTS)
+export const vehicleEventTypeSchema = stringSchema.valid(...VEHICLE_EVENTS)
 
 const vehicleTypeSchema = stringSchema.valid(...Object.keys(VEHICLE_TYPES))
 

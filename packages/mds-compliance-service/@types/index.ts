@@ -63,8 +63,6 @@ export interface MatchedVehicleInformation {
   rules_matched: UUID[]
   rule_applied: UUID // a device can only ever match one rule for the purpose of computing compliance, however
   speed?: number | null
-  speed_unit?: number | null
-  speed_measurement_type?: 'instantaneous' | 'average' | null
   gps: {
     lat: number
     lng: number

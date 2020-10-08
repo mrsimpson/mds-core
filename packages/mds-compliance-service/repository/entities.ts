@@ -23,7 +23,7 @@ export class ComplianceResponsePersistenceEntity
   @Column('bigint', { transformer: BigintTransformer })
   compliance_as_of: Timestamp
 
-  @Column('provider_id')
+  @Column('uuid')
   provider_id: UUID
 
   @Column('int')

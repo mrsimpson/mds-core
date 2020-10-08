@@ -225,8 +225,9 @@ function processSpeedRule(
   return { rule, matches: [] }
 }
 
-function processPolicy(
+function processPolicyByProviderId(
   policy: Policy,
+  provider_id: UUID,
   events: VehicleEvent[],
   geographies: Geography[],
   devices: { [d: string]: Device }
@@ -447,7 +448,9 @@ function getSupersedingPolicies(policies: Policy[]): Policy[] {
 
 function getRecentEvents(events: VehicleEvent[], end_time = now()): VehicleEvent[] {
   return events.filter((event: VehicleEvent) => {
-    /* Keep events that are less than two days old */
+    /* Keep events that are less than two days old.
+     * This is a somewhat arbitrary window of time.
+     */
     return event.timestamp > end_time - TWO_DAYS_IN_MS
   })
 }
@@ -511,4 +514,4 @@ function processCountRuleNewTypes(
 
 */
 // export { processPolicy, getSupersedingPolicies, getRecentEvents, processCountRuleNewTypes }
-export { processPolicy, getSupersedingPolicies, getRecentEvents }
+export { processPolicyByProviderId, getSupersedingPolicies, getRecentEvents }

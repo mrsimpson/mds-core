@@ -16,7 +16,7 @@ import {
 import test from 'unit.js'
 import { FeatureCollection, Feature, Polygon } from 'geojson'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
-import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID, MOCHA_PROVIDER_ID, JUMP_PROVIDER_ID } from '@mds-core/mds-providers'
+import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
 import {
   Device,
   Policy,
@@ -35,7 +35,7 @@ import {
   ComplianceResponse,
   getRecentEvents,
   getSupersedingPolicies,
-  processPolicy
+  processPolicyByProviderId
 } from '../../engine/mds-compliance-engine'
 import { generateDeviceMap, readJson } from './helpers'
 import {
@@ -77,7 +77,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         telemetry.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
       })
       const deviceMap = generateDeviceMap(devices)
-      const result = processPolicy(COUNT_POLICY_JSON, events, [LA_GEOGRAPHY], deviceMap)
+      const result = processPolicyByProviderId(COUNT_POLICY_JSON, TEST1_PROVIDER_ID, events, [LA_GEOGRAPHY], deviceMap)
       test.assert.deepEqual(result?.total_violations, 0)
       done()
     })
@@ -94,7 +94,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       const supersedingPolicies = getSupersedingPolicies(policies)
       const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
 
-      const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, [LA_GEOGRAPHY], deviceMap))
+      const results = supersedingPolicies.map(policy =>
+        processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, [LA_GEOGRAPHY], deviceMap)
+      )
       results.forEach(result => {
         if (result) {
           result.compliance.forEach(compliance => {
@@ -126,7 +128,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         },
         {}
       )
-      const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, [LA_GEOGRAPHY], deviceMap))
+      const results = supersedingPolicies.map(policy =>
+        processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, [LA_GEOGRAPHY], deviceMap)
+      )
 
       results.forEach(result => {
         if (result) {
@@ -162,7 +166,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         },
         {}
       )
-      const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, GEOGRAPHIES, deviceMap))
+      const results = supersedingPolicies.map(policy =>
+        processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, GEOGRAPHIES, deviceMap)
+      )
 
       results.forEach(result => {
         if (result) {
@@ -198,7 +204,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         return events_acc
       }, [])
       const deviceMap = generateDeviceMap(devices)
-      const results = low_count_policies.map(policy => processPolicy(policy, events, GEOGRAPHIES, deviceMap))
+      const results = low_count_policies.map(policy =>
+        processPolicyByProviderId(policy, TEST1_PROVIDER_ID, events, GEOGRAPHIES, deviceMap)
+      )
       results.forEach(result => {
         if (result) {
           result.compliance.forEach(compliance => {
@@ -234,8 +242,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
 
       // Verifies on a Tuesday that vehicles are allowed
       MockDate.set('2019-05-21T20:00:00.000Z')
-      const tuesdayResult = processPolicy(
+      const tuesdayResult = processPolicyByProviderId(
         COUNT_POLICY_JSON_2,
+        TEST1_PROVIDER_ID,
         events,
         [LA_BEACH_GEOGRAPHY],
         deviceMap
@@ -243,8 +252,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       test.assert(tuesdayResult.compliance.length === 1)
       // Verifies on a Saturday that vehicles are banned
       MockDate.set('2019-05-25T20:00:00.000Z')
-      const saturdayResult = processPolicy(
+      const saturdayResult = processPolicyByProviderId(
         COUNT_POLICY_JSON_2,
+        TEST1_PROVIDER_ID,
         events,
         [LA_BEACH_GEOGRAPHY],
         deviceMap
@@ -264,7 +274,13 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         speed: 0
       })
       const deviceMap = generateDeviceMap(devices)
-      const result = processPolicy(COUNT_POLICY_JSON_3, events, [LA_GEOGRAPHY], deviceMap) as ComplianceResponse
+      const result = processPolicyByProviderId(
+        COUNT_POLICY_JSON_3,
+        TEST1_PROVIDER_ID,
+        events,
+        [LA_GEOGRAPHY],
+        deviceMap
+      ) as ComplianceResponse
 
       test.assert.deepEqual(result.compliance[0].matches[0].measured, 10)
       test.assert.deepEqual(result.total_violations, 5)
@@ -279,7 +295,13 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         speed: 0
       })
       const deviceMap = generateDeviceMap(devices)
-      const result = processPolicy(COUNT_POLICY_JSON_3, events, [LA_GEOGRAPHY], deviceMap) as ComplianceResponse
+      const result = processPolicyByProviderId(
+        COUNT_POLICY_JSON_3,
+        TEST1_PROVIDER_ID,
+        events,
+        [LA_GEOGRAPHY],
+        deviceMap
+      ) as ComplianceResponse
       test.assert.deepEqual(result.total_violations, 0)
       done()
     })
@@ -295,7 +317,13 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       })
 
       const deviceMap = generateDeviceMap(devices)
-      const result = processPolicy(COUNT_POLICY_JSON_5, events, [RESTRICTED_GEOGRAPHY], deviceMap) as ComplianceResponse
+      const result = processPolicyByProviderId(
+        COUNT_POLICY_JSON_5,
+        TEST1_PROVIDER_ID,
+        events,
+        [RESTRICTED_GEOGRAPHY],
+        deviceMap
+      ) as ComplianceResponse
 
       test.assert.deepEqual(result.total_violations, 15)
       done()
@@ -394,8 +422,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       )
 
       const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
-      const result = processPolicy(
+      const result = processPolicyByProviderId(
         VENICE_SPEC_OPS_POLICY,
+        TEST1_PROVIDER_ID,
         [...events_a, ...events_b],
         geographies,
         deviceMap
@@ -459,8 +488,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         speed: 0
       })
       const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
-      const result = processPolicy(
+      const result = processPolicyByProviderId(
         VENICE_OVERFLOW_POLICY,
+        TEST1_PROVIDER_ID,
         [...events_a, ...events_b],
         [INNER_GEO, OUTER_GEO],
         deviceMap
@@ -523,8 +553,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       speed: 0
     })
     const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
-    const result = processPolicy(
+    const result = processPolicyByProviderId(
       VENICE_MIXED_VIOLATIONS_POLICY,
+      TEST1_PROVIDER_ID,
       [...events_a, ...events_b],
       [INNER_GEO, OUTER_GEO],
       deviceMap

@@ -7,7 +7,8 @@ import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
 import { minutes } from '@mds-core/mds-utils'
 import { validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
-import { processPolicy, getSupersedingPolicies, getRecentEvents } from '../../engine/mds-compliance-engine'
+import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
+import { processPolicyByProviderId, getSupersedingPolicies, getRecentEvents } from '../../engine/mds-compliance-engine'
 import { readJson, generateDeviceMap } from './helpers'
 
 let policies: Policy[] = []
@@ -41,7 +42,9 @@ describe('Tests Compliance Engine Time Functionality', () => {
     const supersedingPolicies = getSupersedingPolicies(policies)
     const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
 
-    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
+    const results = supersedingPolicies.map(policy =>
+      processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, geographies, deviceMap)
+    )
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {
@@ -73,7 +76,9 @@ describe('Tests Compliance Engine Time Functionality', () => {
     const supersedingPolicies = getSupersedingPolicies(policies)
     const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
 
-    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
+    const results = supersedingPolicies.map(policy =>
+      processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, geographies, deviceMap)
+    )
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {

@@ -7,8 +7,9 @@ import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
 import { RuntimeError } from '@mds-core/mds-utils'
 import { ValidationError, validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
+import { TEST1_PROVIDER_ID } from 'packages/mds-providers'
 import {
-  processPolicy,
+  processPolicyByProviderId,
   getSupersedingPolicies,
   getRecentEvents // ,
   // processCountRuleNewTypes
@@ -49,7 +50,9 @@ describe('Tests General Compliance Engine Functionality', () => {
 
     const supersedingPolicies = getSupersedingPolicies(policies)
     const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
-    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
+    const results = supersedingPolicies.map(policy =>
+      processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, geographies, deviceMap)
+    )
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {
@@ -91,7 +94,10 @@ describe('Verifies errors are being properly thrown', () => {
     const supersedingPolicies = getSupersedingPolicies(policies)
     const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
     test.assert.throws(
-      () => supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap)),
+      () =>
+        supersedingPolicies.map(policy =>
+          processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, geographies, deviceMap)
+        ),
       RuntimeError
     )
     process.env.TIMEZONE = oldTimezone

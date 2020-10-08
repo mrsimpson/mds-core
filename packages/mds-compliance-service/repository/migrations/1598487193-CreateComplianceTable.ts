@@ -9,6 +9,7 @@ export class CreateInitialTablesEvents1598487193 implements MigrationInterface {
         ("recorded" bigint NOT NULL DEFAULT (extract(epoch from now()) * 1000)::bigint,
         "id" bigint GENERATED ALWAYS AS IDENTITY,
         "compliance_response_id" uuid NOT NULL,
+        "provider_id" uuid NOT NULL,
         "excess_vehicles_count" int NOT NULL,
         "total_violations" int NOT NULL,
         "compliance_as_of" bigint NOT NULL,
