@@ -12,6 +12,7 @@ import { processPolicy, getSupersedingPolicies, getRecentEvents } from './engine
 
 import { getComplianceInputs } from './engine/helpers'
 
+/*
 // Get all currently active policies that have not been superseded
 async function getPolicies() {
   const activePolicies = await db.readActivePolicies()
@@ -52,3 +53,4 @@ main()
   .then(result => logger.info('finito'))
   // eslint-disable-next-line promise/prefer-await-to-callbacks
   .catch(err => logger.error(err))
+ */

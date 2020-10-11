@@ -7,13 +7,13 @@ import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
 import { RuntimeError } from '@mds-core/mds-utils'
 import { ValidationError, validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
-import { TEST1_PROVIDER_ID } from 'packages/mds-providers'
+import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
+import { processPolicyByProviderId } from '../../engine/mds-compliance-engine'
 import {
-  processPolicyByProviderId,
   getSupersedingPolicies,
   getRecentEvents // ,
   // processCountRuleNewTypes
-} from '../../engine/mds-compliance-engine'
+} from '../../engine/helpers'
 import { readJson, generateDeviceMap } from './helpers'
 
 let policies: Policy[] = []
@@ -48,6 +48,7 @@ describe('Tests General Compliance Engine Functionality', () => {
 
     test.assert.deepEqual(recentEvents.length, 0)
 
+    // Mimic what we do in the real world to get inputs to feed into the compliance engine.
     const supersedingPolicies = getSupersedingPolicies(policies)
     const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
     const results = supersedingPolicies.map(policy =>

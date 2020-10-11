@@ -26,12 +26,14 @@ import {
   CountRule,
   Rule,
   SpeedRule,
-  TimeRule
+  TimeRule,
+  Telemetry
 } from '@mds-core/mds-types'
 
 import { MatchedVehicleInformation, ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
 import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
+import { isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 
 interface MatchedVehicle {
   device: Device
@@ -72,42 +74,6 @@ export interface ComplianceResponse {
   compliance: Compliance[]
   total_violations: number
   vehicles_in_violation: MatchedVehiclePlusRule[]
-}
-
-const { env } = process
-
-const TWO_DAYS_IN_MS = 172800000
-
-function isPolicyActive(policy: Policy, end_time: number = now()): boolean {
-  if (policy.end_date === null) {
-    return end_time >= policy.start_date
-  }
-  return end_time >= policy.start_date && end_time <= policy.end_date
-}
-
-function isRuleActive(rule: Rule): boolean {
-  if (!env.TIMEZONE) {
-    throw new RuntimeError('TIMEZONE environment variable must be declared!')
-  }
-
-  if (!moment.tz.names().includes(env.TIMEZONE)) {
-    throw new RuntimeError(`TIMEZONE environment variable ${env.TIMEZONE} is not a valid timezone!`)
-  }
-
-  const local_time = moment().tz(env.TIMEZONE)
-
-  if (!rule.days || rule.days.includes(Object.values(DAYS_OF_WEEK)[local_time.day()] as DAY_OF_WEEK)) {
-    if (!rule.start_time || local_time.isAfter(moment(rule.start_time, TIME_FORMAT))) {
-      if (!rule.end_time || local_time.isBefore(moment(rule.end_time, TIME_FORMAT))) {
-        return true
-      }
-    }
-  }
-  return false
-}
-
-function isInVehicleTypes(rule: Rule, device: Device): boolean {
-  return !rule.vehicle_types || (rule.vehicle_types && rule.vehicle_types.includes(device.vehicle_type))
 }
 
 function getViolationsArray(map: { [key: string]: MatchedVehiclePlusRule }) {
@@ -225,7 +191,7 @@ function processSpeedRule(
   return { rule, matches: [] }
 }
 
-function processPolicyByProviderId(
+export function processPolicyByProviderId(
   policy: Policy,
   provider_id: UUID,
   events: VehicleEvent[],
@@ -244,6 +210,7 @@ function processPolicyByProviderId(
      * overflowVehiclesMap.
      */
     let overflowVehiclesMap: { [key: string]: MatchedVehiclePlusRule } = {}
+
     let countVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
     let countMinimumViolations = 0
     const timeVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
@@ -432,30 +399,10 @@ function processPolicyByProviderId(
   }
 }
 
-// Take a list of policies, and eliminate all those that have been superseded. Returns
-// policies that have not been superseded.
-function getSupersedingPolicies(policies: Policy[]): Policy[] {
-  const prev_policies: string[] = policies.reduce((prev_policies_acc: string[], policy: Policy) => {
-    if (policy.prev_policies) {
-      prev_policies_acc.push(...policy.prev_policies)
-    }
-    return prev_policies_acc
-  }, [])
-  return policies.filter((policy: Policy) => {
-    return !prev_policies.includes(policy.policy_id)
-  })
-}
-
-function getRecentEvents(events: VehicleEvent[], end_time = now()): VehicleEvent[] {
-  return events.filter((event: VehicleEvent) => {
-    /* Keep events that are less than two days old.
-     * This is a somewhat arbitrary window of time.
-     */
-    return event.timestamp > end_time - TWO_DAYS_IN_MS
-  })
-}
-
-function createMatchedVehicleInformation(device: Device, event: VehicleEvent) {
+function createMatchedVehicleInformation(
+  device: Device,
+  event: VehicleEvent & { telemetry: Telemetry }
+): Partial<MatchedVehicleInformation> {
   return {
     device_id: device.device_id,
     state: event.vehicle_state,
@@ -514,4 +461,3 @@ function processCountRuleNewTypes(
 
 */
 // export { processPolicy, getSupersedingPolicies, getRecentEvents, processCountRuleNewTypes }
-export { processPolicyByProviderId, getSupersedingPolicies, getRecentEvents }

@@ -31,12 +31,9 @@ import {
 import MockDate from 'mockdate'
 import { validatePolicies, validateGeographies, validateEvents } from '@mds-core/mds-schema-validators'
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
-import {
-  ComplianceResponse,
-  getRecentEvents,
-  getSupersedingPolicies,
-  processPolicyByProviderId
-} from '../../engine/mds-compliance-engine'
+import { isSpeedRuleMatch } from 'packages/mds-compliance-engine/engine/speed_processors'
+import { ComplianceResponse, processPolicyByProviderId } from '../../engine/mds-compliance-engine'
+import { getRecentEvents, getSupersedingPolicies } from '../../engine/helpers'
 import { generateDeviceMap, readJson } from './helpers'
 import {
   CITY_OF_LA,
@@ -122,12 +119,8 @@ describe('Tests Compliance Engine Count Functionality:', () => {
 
       const recentEvents = getRecentEvents(events)
       const supersedingPolicies = getSupersedingPolicies(policies)
-      const deviceMap: { [d: string]: Device } = devices.reduce(
-        (deviceMapAcc: { [d: string]: Device }, device: Device) => {
-          return Object.assign(deviceMapAcc, { [device.device_id]: device })
-        },
-        {}
-      )
+      const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
+
       const results = supersedingPolicies.map(policy =>
         processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, [LA_GEOGRAPHY], deviceMap)
       )
@@ -140,7 +133,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
               compliance.rule.rule_type === RULE_TYPES.count &&
               compliance.rule.geographies.includes(CITY_OF_LA)
             ) {
-              test.assert.notEqual(compliance.matches.length, 0)
+              test.value(compliance.matches.length).is(1)
               test.assert.deepEqual(result.total_violations, 1)
             }
           })

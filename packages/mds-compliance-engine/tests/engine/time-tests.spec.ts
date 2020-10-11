@@ -8,7 +8,8 @@ import { FeatureCollection } from 'geojson'
 import { minutes } from '@mds-core/mds-utils'
 import { validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
 import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
-import { processPolicyByProviderId, getSupersedingPolicies, getRecentEvents } from '../../engine/mds-compliance-engine'
+import { processPolicyByProviderId } from '../../engine/mds-compliance-engine'
+import { getSupersedingPolicies, getRecentEvents } from '../../engine/helpers'
 import { readJson, generateDeviceMap } from './helpers'
 
 let policies: Policy[] = []
