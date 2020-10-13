@@ -536,46 +536,91 @@ function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
 
 const getPossibleStates = (device: Pick<Device, 'modality'>, event: VehicleEvent) => {
   if (isMicroMobilityEvent(device, event)) {
-    return event.event_types.reduce((acc: MICRO_MOBILITY_VEHICLE_STATE[], event_type) => {
-      return acc.concat(MICRO_MOBILITY_EVENT_STATES_MAP[event_type])
-    }, [])
+    const { event_types, vehicle_state } = event
+    // All event_types except the last (in most cases this will be an empty list)
+    const transientEventTypes = event_types.splice(0, -1)
+
+    return transientEventTypes.reduce(
+      (acc: MICRO_MOBILITY_VEHICLE_STATE[], event_type) => {
+        return acc.concat(MICRO_MOBILITY_EVENT_STATES_MAP[event_type])
+      },
+      [vehicle_state]
+    )
   }
   if (isTaxiEvent(device, event)) {
-    return event.event_types.reduce((acc: TAXI_VEHICLE_STATE[], event_type) => {
-      return acc.concat(TAXI_EVENT_STATES_MAP[event_type])
-    }, [])
+    const { event_types, vehicle_state } = event
+    // All event_types except the last (in most cases this will be an empty list)
+    const transientEventTypes = event_types.splice(0, -1)
+
+    return transientEventTypes.reduce(
+      (acc: TAXI_VEHICLE_STATE[], event_type) => {
+        return acc.concat(TAXI_EVENT_STATES_MAP[event_type])
+      },
+      [vehicle_state]
+    )
   }
 
-  return []
+  return [event.vehicle_state]
 }
 
-function isInStatesOrEvents(rule: Rule, device: Device, event: VehicleEvent): boolean {
+/**
+ * The rule matches this event if a transient event_type and possible resultant states,
+ * or the final event_type and explicitly encoded vehicle_state match with the rule's status definitions.
+ * e.g. if the rule states are { reserved: [] } and there's an event with event_types
+ *      [trip_end, reservation_start, trip_start], there's an implication
+ *      that the vehicle entered the reserved state after reservation_start,
+ *      even if the final state of the event is on_trip, and the rule will match.
+ *
+ * @example Matching transient `event_type`
+ * ```typescript
+ * isInStatesOrEvents({ states: { reserved: [] } }, { event_types: ['trip_end', 'reservation_start', 'trip_start'], vehicle_state: 'on_trip' }) => true
+ * ```
+ * @example State matching for transient `event_type` 'off_hours', but `event_type` not matched with explicit `event_type` in rule
+ * ```typescript
+ * isInStatesOrEvents({ states: { non_operational: ['maintenance'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' }) => false
+ * ```
+ * @example Match for last `event_type` and encoded `vehicle_state`, with explicit `event_type` in rule
+ * ```typescript
+ * isInStatesOrEvents({ states: { available: ['on_hours'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' }) => true
+ * ```
+ * @example Match for last `event_type` and encoded `vehicle_state`, with catch-all in rule
+ * ```typescript
+ * isInStatesOrEvents({ states: { available: [] } }, { event_types: ['on_hours'], vehicle_state: 'available' }) => true
+ * ```
+ */
+function isInStatesOrEvents(
+  rule: Pick<Rule, 'states'>,
+  device: Pick<Device, 'modality'>,
+  event: VehicleEvent
+): boolean {
   const { states } = rule
   // If no states are specified, then the rule applies to all VehicleStates.
   if (states === null || states === undefined) {
     return true
   }
 
-  // States that it is possible to transition into with event.event_type
+  /**
+   * State encoded in the event payload (default acc in the reducer) + states that it is
+   * possible to transition into with any transient event_types
+   */
   const possibleStates = getPossibleStates(device, event)
 
-  const result = possibleStates.reduce((acc, state) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const matchableEvents: any = states[state as MICRO_MOBILITY_VEHICLE_STATE] // FIXME
-    /* If there's a match between the event_type's transitionable events, and the
-     rule doesn't specify any events, or if there is a match between the rule and the specified
-     events, the rule matches this event. e.g. if the rule says { `available`: [`comms_lost`]} or
-     { `available`: [] }, it would match an event with event_type `comm_lost`.
-    */
+  return possibleStates.some(state => {
+    // Explicit events encoded in rule for that state (if any)
+    const matchableEvents: string[] | undefined = states[state as MICRO_MOBILITY_VEHICLE_STATE] // FIXME
+
+    /**
+     * If event_types not encoded in rule, assume state match.
+     * If event_types encoded in rule, see if event.event_types contains a match.
+     */
     if (
       matchableEvents !== undefined &&
       (matchableEvents.length === 0 || areThereCommonElements(matchableEvents, event.event_types))
     ) {
-      return acc + 1
+      return true
     }
-    return acc
-  }, 0)
-  return result > 0
+    return false
+  })
 }
 
 function routeDistance(coordinates: { lat: number; lng: number }[]): number {

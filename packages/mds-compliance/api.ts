@@ -139,6 +139,7 @@ function api(app: express.Express): express.Express {
           return res.status(401).send({ error: new AuthorizationError() })
         }
       } catch (err) {
+        logger.error(err)
         return res.status(500).send({ error: new ServerError() })
       }
     }

@@ -11,8 +11,7 @@ import {
   makeTelemetryInArea,
   restrictedAreas,
   veniceSpecOps,
-  LA_CITY_BOUNDARY,
-  START_ONE_MONTH_AGO
+  LA_CITY_BOUNDARY
 } from '@mds-core/mds-test-data'
 import test from 'unit.js'
 import { api as agency } from '@mds-core/mds-agency'
@@ -83,7 +82,6 @@ const VENICE_POLICY_UUID = 'dd9ace3e-14c8-461b-b5e7-1326505ff176'
 const COUNT_POLICY_UUID = '72971a3d-876c-41ea-8e48-c9bb965bbbcc'
 const COUNT_POLICY_UUID_2 = '37637f96-2580-475a-89e7-cfc5d2e70f84'
 const COUNT_POLICY_UUID_3 = 'e8f9a720-6c12-41c8-a31c-715e76d65ea1'
-const COUNT_POLICY_UUID_4 = 'b3b8529e-46e0-4d44-877b-2fb4e0ba3515'
 const GEOGRAPHY_UUID = '8917cf2d-a963-4ea2-a98b-7725050b3ec5'
 const COUNT_POLICY_JSON: Policy = {
   name: 'LADOT Mobility Caps',
@@ -170,28 +168,6 @@ const COUNT_POLICY_JSON_3: Policy = {
       geographies: [GEOGRAPHY_UUID],
       states: { available: ['on_hours'], non_operational: [], reserved: [], on_trip: [] },
       vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
-      maximum: 10
-    }
-  ]
-}
-
-const COUNT_POLICY_JSON_4: Policy = {
-  name: 'LADOT Mobility Caps',
-  description: 'Mobility caps as described in the One-Year Permit',
-  policy_id: COUNT_POLICY_UUID_4,
-  publish_date: 1558389669540,
-  start_date: 1558389669540,
-  end_date: null,
-  prev_policies: null,
-  provider_ids: [],
-  rules: [
-    {
-      name: 'Greater LA',
-      rule_id: '04dc545b-41d8-401d-89bd-bfac9247b555',
-      rule_type: RULE_TYPES.count,
-      geographies: [GEOGRAPHY_UUID],
-      states: { on_trip: [] },
-      vehicle_types: ['bicycle', 'scooter'],
       maximum: 10
     }
   ]
@@ -847,72 +823,76 @@ describe('Tests Compliance API:', () => {
     })
   })
 
-  describe('Tests reading historical compliance', () => {
-    const yesterday = now() - 86400000
-    before(done => {
-      // Generate old events
-      const devices: Device[] = makeDevices(15, yesterday)
-      const events_a = makeEventsWithTelemetry(devices, yesterday, CITY_OF_LA, {
-        event_types: ['trip_start'],
-        vehicle_state: 'on_trip',
-        speed: rangeRandomInt(0, 10)
-      })
-      const telemetry_a: Telemetry[] = []
-      devices.forEach(device => {
-        telemetry_a.push(makeTelemetryInArea(device, yesterday, CITY_OF_LA, 10))
-      })
+  /**
+   * @deprecated
+   * Historical checking deprecated as of 1.0.0
+   */
+  // describe('Tests reading historical compliance', () => {
+  //   const yesterday = now() - 86400000
+  //   before(done => {
+  //     // Generate old events
+  //     const devices: Device[] = makeDevices(15, yesterday)
+  //     const events_a = makeEventsWithTelemetry(devices, yesterday, CITY_OF_LA, {
+  //       event_types: ['trip_start'],
+  //       vehicle_state: 'on_trip',
+  //       speed: rangeRandomInt(0, 10)
+  //     })
+  //     const telemetry_a: Telemetry[] = []
+  //     devices.forEach(device => {
+  //       telemetry_a.push(makeTelemetryInArea(device, yesterday, CITY_OF_LA, 10))
+  //     })
 
-      // Generate new events
-      const events_b = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
-        event_types: ['provider_drop_off'],
-        vehicle_state: 'available',
-        speed: 0
-      })
-      const telemetry_b: Telemetry[] = []
-      devices.forEach(device => {
-        telemetry_a.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
-      })
+  //     // Generate new events
+  //     const events_b = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+  //       event_types: ['provider_drop_off'],
+  //       vehicle_state: 'available',
+  //       speed: 0
+  //     })
+  //     const telemetry_b: Telemetry[] = []
+  //     devices.forEach(device => {
+  //       telemetry_a.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
+  //     })
 
-      // Seed
-      const seedData = {
-        devices: [...devices],
-        events: [...events_a, ...events_b],
-        telemetry: [...telemetry_a, ...telemetry_b]
-      }
-      Promise.all([db.initialize(), cache.initialize()]).then(() => {
-        Promise.all([cache.seed(seedData), db.seed(seedData)]).then(async () => {
-          await db.writeGeography({ name: 'la', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY })
-          await db.publishGeography({ geography_id: GEOGRAPHY_UUID })
-          await db.writePolicy(COUNT_POLICY_JSON_4)
-          done()
-        })
-      })
-    })
+  //     // Seed
+  //     const seedData = {
+  //       devices: [...devices],
+  //       events: [...events_a, ...events_b],
+  //       telemetry: [...telemetry_a, ...telemetry_b]
+  //     }
+  //     Promise.all([db.initialize(), cache.initialize()]).then(() => {
+  //       Promise.all([cache.seed(seedData), db.seed(seedData)]).then(async () => {
+  //         await db.writeGeography({ name: 'la', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY })
+  //         await db.publishGeography({ geography_id: GEOGRAPHY_UUID })
+  //         await db.writePolicy(COUNT_POLICY_JSON_4)
+  //         done()
+  //       })
+  //     })
+  //   })
 
-    it('Historical check reports 5 violations', done => {
-      request
-        .get(pathPrefix(`/snapshot/${COUNT_POLICY_UUID_4}?timestamp=${yesterday + 200}`))
-        .set('Authorization', ADMIN_AUTH)
-        .expect(200)
-        .end((err, result) => {
-          test.assert.deepEqual(result.body.total_violations, 5)
-          test.value(result).hasHeader('content-type', APP_JSON)
-          done(err)
-        })
-    })
+  //   it('Historical check reports 5 violations', done => {
+  //     request
+  //       .get(pathPrefix(`/snapshot/${COUNT_POLICY_UUID_4}?timestamp=${yesterday + 200}`))
+  //       .set('Authorization', ADMIN_AUTH)
+  //       .expect(200)
+  //       .end((err, result) => {
+  //         test.assert.deepEqual(result.body.total_violations, 5)
+  //         test.value(result).hasHeader('content-type', APP_JSON)
+  //         done(err)
+  //       })
+  //   })
 
-    it('Current check reports 0 violations', done => {
-      request
-        .get(pathPrefix(`/snapshot/${COUNT_POLICY_UUID_4}`))
-        .set('Authorization', ADMIN_AUTH)
-        .expect(200)
-        .end((err, result) => {
-          test.assert(result.body.total_violations === 0)
-          test.value(result).hasHeader('content-type', APP_JSON)
-          done(err)
-        })
-    })
-  })
+  //   it('Current check reports 0 violations', done => {
+  //     request
+  //       .get(pathPrefix(`/snapshot/${COUNT_POLICY_UUID_4}`))
+  //       .set('Authorization', ADMIN_AUTH)
+  //       .expect(200)
+  //       .end((err, result) => {
+  //         test.assert(result.body.total_violations === 0)
+  //         test.value(result).hasHeader('content-type', APP_JSON)
+  //         done(err)
+  //       })
+  //   })
+  // })
 
   describe('Tests count endpoint', () => {
     before(async () => {
@@ -964,17 +944,21 @@ describe('Tests Compliance API:', () => {
         })
     })
 
-    it('Test count endpoint, expecting no events', done => {
-      request
-        .get(pathPrefix(`/count/47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6?timestamp=${START_ONE_MONTH_AGO}`))
-        .set('Authorization', ADMIN_AUTH)
-        .expect(200)
-        .end((err, result) => {
-          test.assert.deepEqual(result.body.count, 0)
-          test.value(result).hasHeader('content-type', APP_JSON)
-          done(err)
-        })
-    })
+    /**
+     * @deprecated
+     * Historical checking deprecated as of 1.0.0
+     */
+    // it('Test count endpoint, expecting no events', done => {
+    //   request
+    //     .get(pathPrefix(`/count/47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6?timestamp=${START_ONE_MONTH_AGO}`))
+    //     .set('Authorization', ADMIN_AUTH)
+    //     .expect(200)
+    //     .end((err, result) => {
+    //       test.assert.deepEqual(result.body.count, 0)
+    //       test.value(result).hasHeader('content-type', APP_JSON)
+    //       done(err)
+    //     })
+    // })
 
     it('Test count endpoint failure with bad rule_id', done => {
       request
