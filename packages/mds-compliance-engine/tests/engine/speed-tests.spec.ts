@@ -142,14 +142,14 @@ describe('Tests Compliance Engine Speed Violations', () => {
   })
 
   it('Verifies isSpeedRuleMatch', done => {
-    const speedingDevices = makeDevices(2, now())
+    const speedingDevices = makeDevices(1, now())
     const speedingEvents = makeEventsWithTelemetry(speedingDevices, now(), CITY_OF_LA, {
       event_types: ['trip_start'],
       vehicle_state: 'on_trip',
       speed: 500
     })
 
-    const nonSpeedingDevices = makeDevices(2, now())
+    const nonSpeedingDevices = makeDevices(1, now())
     const nonSpeedingEvents = makeEventsWithTelemetry(nonSpeedingDevices, now(), CITY_OF_LA, {
       event_types: ['trip_start'],
       vehicle_state: 'on_trip',
@@ -166,28 +166,13 @@ describe('Tests Compliance Engine Speed Violations', () => {
         speedingEvents[0] as VehicleEvent & { telemetry: Telemetry }
       )
     )
-    test.assert(
-      isSpeedRuleMatch(
-        rule,
-        geographies,
-        speedingDevices[1],
-        speedingEvents[1] as VehicleEvent & { telemetry: Telemetry }
-      )
-    )
+
     test.assert(
       !isSpeedRuleMatch(
         rule,
         geographies,
         nonSpeedingDevices[0],
         nonSpeedingEvents[0] as VehicleEvent & { telemetry: Telemetry }
-      )
-    )
-    test.assert(
-      !isSpeedRuleMatch(
-        rule,
-        geographies,
-        nonSpeedingDevices[1],
-        nonSpeedingEvents[1] as VehicleEvent & { telemetry: Telemetry }
       )
     )
     done()

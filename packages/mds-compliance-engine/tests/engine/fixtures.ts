@@ -171,3 +171,32 @@ export const INNER_POLYGON: Polygon = {
     ]
   ]
 }
+
+export const TANZANIA_POLYGON: Polygon = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [-322.80029296875, -7.406047717076258],
+      [-323.0859375, -8.363692651835823],
+      [-322.36083984375, -8.624472107633936],
+      [-320.77880859375, -8.276727101164033],
+      [-321.8115234375, -7.209900314368781],
+      [-322.80029296875, -7.406047717076258]
+    ]
+  ]
+}
+
+export const TANZANIA_GEO: Geography = {
+  geography_id: '122de6e9-a008-4602-a8b9-9ded3efa3580',
+  name: 'Tanzania geo',
+  geography_json: {
+    type: 'FeatureCollection',
+    features: [
+      {
+        properties: {},
+        type: 'Feature',
+        geometry: TANZANIA_POLYGON
+      }
+    ]
+  }
+}
