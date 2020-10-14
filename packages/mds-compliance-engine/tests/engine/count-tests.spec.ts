@@ -25,13 +25,13 @@ import {
   UUID,
   RULE_TYPES,
   VEHICLE_TYPES,
-  Telemetry
+  Telemetry,
+  CountRule
 } from '@mds-core/mds-types'
 
 import MockDate from 'mockdate'
 import { validatePolicies, validateGeographies, validateEvents } from '@mds-core/mds-schema-validators'
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
-import { isSpeedRuleMatch } from 'packages/mds-compliance-engine/engine/speed_processors'
 import { ComplianceResponse, processPolicyByProviderId } from '../../engine/mds-compliance-engine'
 import { getRecentEvents, getSupersedingPolicies } from '../../engine/helpers'
 import { generateDeviceMap, readJson } from './helpers'
@@ -49,11 +49,39 @@ import {
   COUNT_POLICY_JSON_5,
   RESTRICTED_GEOGRAPHY,
   INNER_GEO,
-  OUTER_GEO
+  OUTER_GEO,
+  TANZANIA_GEO,
+  TANZANIA_POLYGON
 } from './fixtures'
+import { isCountRuleMatch } from '../../engine/count_processors'
 
 process.env.TIMEZONE = 'America/Los_Angeles'
 let policies: Policy[] = []
+const COUNT_POLICY = {
+  policy_id: '221975ef-569c-40a1-a9b0-646e6155c764',
+  name: 'LADOT Pilot Caps',
+  description: 'LADOT Pilot Caps (add description)',
+  start_date: 1552678594428,
+  end_date: null,
+  prev_policies: null,
+  provider_ids: null,
+  rules: [
+    {
+      name: 'Greater LA',
+      rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
+      rule_type: 'count',
+      geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
+      states: {
+        available: [],
+        on_trip: []
+      },
+      vehicle_types: ['bicycle', 'scooter'],
+      maximum: 3000,
+      minimum: 500
+    }
+  ]
+}
+
 const GEOGRAPHIES = [{ name: 'la', geography_id: CITY_OF_LA, geography_json: la_city_boundary as FeatureCollection }]
 
 describe('Tests Compliance Engine Count Functionality:', () => {
@@ -62,6 +90,40 @@ describe('Tests Compliance Engine Count Functionality:', () => {
   })
 
   describe('basic count compliance cases', () => {
+    it('isCountRuleMatch is accurate', done => {
+      const LAdevices: Device[] = makeDevices(1, now())
+      const LAevents = makeEventsWithTelemetry(LAdevices, now(), CITY_OF_LA, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: rangeRandomInt(10)
+      })
+
+      const TZDevices: Device[] = makeDevices(1, now())
+      const TZEvents = makeEventsWithTelemetry(TZDevices, now(), TANZANIA_POLYGON, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: rangeRandomInt(10)
+      })
+
+      test.assert(
+        isCountRuleMatch(
+          COUNT_POLICY.rules[0] as CountRule,
+          GEOGRAPHIES,
+          LAdevices[0],
+          LAevents[0] as VehicleEvent & { telemetry: Telemetry }
+        )
+      )
+      test.assert(
+        !isCountRuleMatch(
+          COUNT_POLICY.rules[0] as CountRule,
+          GEOGRAPHIES,
+          TZDevices[0],
+          TZEvents[0] as VehicleEvent & { telemetry: Telemetry }
+        )
+      )
+      done()
+    })
+
     it('reports 0 violations if the number of vehicles is below the count limit', done => {
       const devices: Device[] = makeDevices(7, now())
       const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
@@ -133,8 +195,9 @@ describe('Tests Compliance Engine Count Functionality:', () => {
               compliance.rule.rule_type === RULE_TYPES.count &&
               compliance.rule.geographies.includes(CITY_OF_LA)
             ) {
-              test.value(compliance.matches.length).is(1)
+              test.assert.deepEqual(compliance.matches.length, 1)
               test.assert.deepEqual(result.total_violations, 1)
+              test.assert.deepEqual(result.vehicles_in_violation.length, 1)
             }
           })
         }
@@ -555,11 +618,77 @@ describe('Tests Compliance Engine Count Functionality:', () => {
     ) as ComplianceResponse
 
     test.assert.equal(result.compliance[0].matches[0].measured, 1)
-    // for the second compliance result, there's one geography
     test.assert.equal(result.compliance[1].matches[0].measured, 4)
-    // and therefore 10 vehicles that match for that geography
     test.assert.equal(result.total_violations, 6)
     test.assert.equal(result.vehicles_in_violation.length, 0)
+    done()
+  })
+
+  it('accurately tracks overflows per rule', done => {
+    const MANY_OVERFLOWS_POLICY: Policy = {
+      name: 'Many overflows',
+      description: 'what it says on the can',
+      policy_id: VENICE_POLICY_UUID,
+      start_date: 1558389669540,
+      publish_date: 1558389669540,
+      end_date: null,
+      prev_policies: null,
+      provider_ids: [],
+      rules: [
+        {
+          name: 'Somewhere in LA',
+          rule_id: '7a043ac8-03cd-4b0d-9588-d0af24f82832',
+          rule_type: RULE_TYPES.count,
+          geographies: [INNER_GEO.geography_id],
+          states: { available: ['provider_drop_off'] },
+          maximum: 1,
+          vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter]
+        },
+        {
+          name: 'Somewhere in Tanzania',
+          rule_id: '596d7fe1-53fd-4ea4-8ba7-33f5ea8d98a6',
+          rule_type: RULE_TYPES.count,
+          geographies: [TANZANIA_GEO.geography_id],
+          states: { available: ['provider_drop_off'] },
+          vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+          maximum: 5,
+          minimum: 1
+        }
+      ]
+    }
+
+    // The polygons within which these events are being created do not overlap
+    // with each other at all.
+    const devices_a: Device[] = makeDevices(2, now())
+    const events_a: VehicleEvent[] = makeEventsWithTelemetry(devices_a, now() - 10, INNER_POLYGON, {
+      event_types: ['provider_drop_off'],
+      vehicle_state: 'available',
+      speed: 0
+    })
+
+    const devices_b: Device[] = makeDevices(4, now())
+    const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now() - 10, TANZANIA_POLYGON, {
+      event_types: ['provider_drop_off'],
+      vehicle_state: 'available',
+      speed: 0
+    })
+    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
+    const result = processPolicyByProviderId(
+      MANY_OVERFLOWS_POLICY,
+      TEST1_PROVIDER_ID,
+      [...events_a, ...events_b],
+      [INNER_GEO, TANZANIA_GEO],
+      deviceMap
+    ) as ComplianceResponse
+
+    /* If there was a problem with the overflow logic, then the violation
+     * from the first rule would have overflowed into evaluation for the
+     * second rule, and there would be no violations at all.
+     */
+    test.assert.equal(result.compliance[0].matches[0].measured, 1)
+    test.assert.equal(result.compliance[1].matches[0].measured, 4)
+    test.assert.equal(result.total_violations, 1)
+    test.assert.equal(result.vehicles_in_violation.length, 1)
     done()
   })
 })
