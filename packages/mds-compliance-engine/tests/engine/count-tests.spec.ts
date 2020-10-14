@@ -234,8 +234,10 @@ describe('Tests Compliance Engine Count Functionality:', () => {
               compliance.rule.rule_type === RULE_TYPES.count &&
               compliance.rule.geographies.includes(CITY_OF_LA)
             ) {
-              test.assert.notEqual(compliance.matches.length, 0)
               test.assert.deepEqual(result.total_violations, 490)
+              test.assert.deepEqual(result.vehicles_in_violation.length, 0)
+              test.assert.deepEqual(compliance.matches.length, 1)
+              test.assert.deepEqual(compliance.matches[0].measured, 10)
             }
           })
         }
