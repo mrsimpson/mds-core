@@ -209,7 +209,6 @@ export function processPolicyByProviderId(
      * and 15 vehicles match, 10 vehicles go into vehiclesMatched, and 5 go into
      * overflowVehiclesMap.
      */
-    let overflowVehiclesMap: { [key: string]: MatchedVehiclePlusRule } = {}
 
     let countVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
     let countMinimumViolations = 0
@@ -226,6 +225,7 @@ export function processPolicyByProviderId(
 
       switch (rule.rule_type) {
         case 'count': {
+          let overflowVehiclesMap: { [key: string]: MatchedVehiclePlusRule } = {}
           const comp: Compliance & { matches: CountMatch[] } = processCountRule(
             rule,
             sortedEvents,
@@ -278,9 +278,9 @@ export function processPolicyByProviderId(
                       // from the previous rule. If the current device had overflowed the previous rule,
                       // but is under the count limit for the current rule, it is no longer overflowing.
                       // So it must be removed.
-                      if (overflowVehiclesMap[match_instance.device.device_id]) {
-                        delete overflowVehiclesMap[match_instance.device.device_id]
-                      }
+                      //                      if (overflowVehiclesMap[match_instance.device.device_id]) {
+                      //                        delete overflowVehiclesMap[match_instance.device.device_id]
+                      //                      }
                       if (countVehiclesMap[match_instance.device.device_id]) {
                         delete countVehiclesMap[match_instance.device.device_id]
                       }
@@ -389,11 +389,7 @@ export function processPolicyByProviderId(
     return {
       policy,
       compliance,
-      total_violations:
-        countMinimumViolations +
-        Object.keys(overflowVehiclesMap).length +
-        timeVehicles.length +
-        speedingVehicles.length,
+      total_violations: countMinimumViolations + countVehicles.length + timeVehicles.length + speedingVehicles.length,
       vehicles_in_violation: [...countVehicles, ...timeVehicles, ...speedingVehicles]
     }
   }
