@@ -43,47 +43,6 @@ import {
 import moment from 'moment-timezone'
 import { isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 
-interface MatchedVehicle {
-  device: Device
-  event: VehicleEvent
-}
-
-interface CountMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicles: MatchedVehicle[]
-}
-
-interface TimeMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-interface SpeedMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-interface ReducedMatch {
-  measured: number
-  geography_id: UUID
-}
-
-type MatchedVehiclePlusRule = MatchedVehicle & { rule_id: UUID }
-
-export interface Compliance {
-  rule: Rule
-  matches: ReducedMatch[] | CountMatch[] | TimeMatch[] | SpeedMatch[]
-}
-export interface ComplianceResponse {
-  policy: Policy
-  compliance: Compliance[]
-  total_violations: number
-  vehicles_in_violation: MatchedVehiclePlusRule[]
-}
-
 export function isCountRuleMatch(
   rule: CountRule,
   geographies: Geography[],
