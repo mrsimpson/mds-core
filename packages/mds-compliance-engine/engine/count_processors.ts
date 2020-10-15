@@ -31,7 +31,15 @@ import {
 } from '@mds-core/mds-types'
 
 import { MatchedVehicleInformation, ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
-import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
+import {
+  pointInShape,
+  getPolygon,
+  isInStatesOrEvents,
+  now,
+  RuntimeError,
+  RULE_UNIT_MAP,
+  isDefined
+} from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
 import { isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 
@@ -94,9 +102,10 @@ export function isCountRuleMatch(
       }
     }
   }
+  return false
 }
 
-function processCountPolicy(
+export function processCountPolicy(
   policy: Policy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
@@ -105,13 +114,17 @@ function processCountPolicy(
   const matchedVehicles: {
     [d: string]: { device: Device; event: VehicleEvent; rule_applied: UUID; rules_matched: UUID[] }
   } = {}
+  const overflowedVehicles: {
+    [d: string]: boolean
+  } = {}
+  let countMinimumViolations = 0
   if (isPolicyActive(policy)) {
     const sortedEvents = events.sort((e_1, e_2) => {
       return e_1.timestamp - e_2.timestamp
     })
     policy.rules.forEach(rule => {
-      const maximum = rule.maximum || Number.POSITIVE_INFINITY
-      const i = 0
+      const maximum = isDefined(rule.maximum) ? rule.maximum : Number.POSITIVE_INFINITY
+      let i = 0
       sortedEvents.forEach(event => {
         if (devicesToCheck[event.device_id]) {
           const device = devicesToCheck[event.device_id]
@@ -123,13 +136,29 @@ function processCountPolicy(
                 rule_applied: rule.rule_id,
                 rules_matched: [rule.rule_id]
               }
+              /* eslint-reason need to remove matched vehicles */
+              /* eslint-disable-next-line no-param-reassign */
+              delete devicesToCheck[device.device_id]
+              delete overflowedVehicles[device.device_id]
+            } else {
+              overflowedVehicles[device.device_id] = true
             }
-            /* eslint-reason need to remove matched vehicles */
-            /* eslint-disable-next-line no-param-reassign */
-            delete devicesToCheck[device.device_id]
           }
+          /* If there's a match, increase i.
+           */
+          i += 1
         }
       })
+      const minimum = rule.minimum == null ? Number.NEGATIVE_INFINITY : rule.minimum
+      if (i < minimum) {
+        countMinimumViolations += minimum - i
+      }
     })
+  }
+  return {
+    matchedVehicles,
+    measured: Object.keys(matchedVehicles).length,
+    overflowedVehicles,
+    total_violations: countMinimumViolations + Object.keys(overflowedVehicles).length
   }
 }

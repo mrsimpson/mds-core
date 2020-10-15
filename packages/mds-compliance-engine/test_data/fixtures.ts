@@ -200,3 +200,157 @@ export const TANZANIA_GEO: Geography = {
     ]
   }
 }
+
+export const HIGH_COUNT_POLICY: Policy = {
+  policy_id: '221975ef-569c-40a1-a9b0-646e6155c764',
+  name: 'LADOT Pilot Caps',
+  description: 'LADOT Pilot Caps (add description)',
+  start_date: 1552678594428,
+  end_date: null,
+  prev_policies: null,
+  rules: [
+    {
+      name: 'Greater LA',
+      rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
+      rule_type: 'count',
+      geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
+      states: {
+        available: [],
+        on_trip: []
+      },
+      vehicle_types: ['bicycle', 'scooter'],
+      maximum: 3000,
+      minimum: 500
+    }
+  ]
+}
+
+export const LOW_COUNT_POLICY: Policy = {
+  policy_id: '6d7a9c7e-853c-4ff7-a86f-e17c06d3bd80',
+  name: 'Very Low Count Limit',
+  description: 'Very low count limit',
+  start_date: 1552678594428,
+  end_date: null,
+  prev_policies: null,
+  rules: [
+    {
+      name: 'Greater LA',
+      rule_id: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      rule_type: 'count',
+      geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
+      states: {
+        on_trip: []
+      },
+      vehicle_types: ['bicycle', 'scooter'],
+      maximum: 5
+    }
+  ]
+}
+
+export const VENICE_OVERFLOW_POLICY: Policy = {
+  name: 'Venice Overflow Test',
+  description: 'what it says on the can',
+  policy_id: VENICE_POLICY_UUID,
+  start_date: 1558389669540,
+  publish_date: 1558389669540,
+  end_date: null,
+  prev_policies: null,
+  provider_ids: [],
+  rules: [
+    {
+      name: 'Inner geo',
+      rule_id: '7a043ac8-03cd-4b0d-9588-d0af24f82832',
+      rule_type: RULE_TYPES.count,
+      geographies: [INNER_GEO.geography_id],
+      states: { available: ['provider_drop_off'] },
+      maximum: 1,
+      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter]
+    },
+    {
+      name: 'Outer Zone',
+      rule_id: '596d7fe1-53fd-4ea4-8ba7-33f5ea8d98a6',
+      rule_type: RULE_TYPES.count,
+      geographies: [OUTER_GEO.geography_id],
+      states: { available: ['provider_drop_off'] },
+      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      maximum: 2
+    }
+  ]
+}
+
+export const VENICE_MIXED_VIOLATIONS_POLICY: Policy = {
+  name: 'Venice Overflow Test',
+  description: 'what it says on the can',
+  policy_id: VENICE_POLICY_UUID,
+  start_date: 1558389669540,
+  publish_date: 1558389669540,
+  end_date: null,
+  prev_policies: null,
+  provider_ids: [],
+  rules: [
+    {
+      name: 'Inner geo',
+      rule_id: '7a043ac8-03cd-4b0d-9588-d0af24f82832',
+      rule_type: RULE_TYPES.count,
+      geographies: [INNER_GEO.geography_id],
+      states: { available: ['provider_drop_off'] },
+      maximum: 1,
+      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter]
+    },
+    {
+      name: 'Outer Zone',
+      rule_id: '596d7fe1-53fd-4ea4-8ba7-33f5ea8d98a6',
+      rule_type: RULE_TYPES.count,
+      geographies: [OUTER_GEO.geography_id],
+      states: { available: ['provider_drop_off'] },
+      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      maximum: 1000,
+      minimum: 10
+    }
+  ]
+}
+
+export const MANY_OVERFLOWS_POLICY: Policy = {
+  name: 'Many overflows',
+  description: 'what it says on the can',
+  policy_id: VENICE_POLICY_UUID,
+  start_date: 1558389669540,
+  publish_date: 1558389669540,
+  end_date: null,
+  prev_policies: null,
+  provider_ids: [],
+  rules: [
+    {
+      name: 'Somewhere in LA',
+      rule_id: '7a043ac8-03cd-4b0d-9588-d0af24f82832',
+      rule_type: RULE_TYPES.count,
+      geographies: [INNER_GEO.geography_id],
+      states: { available: ['provider_drop_off'] },
+      maximum: 1,
+      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter]
+    },
+    {
+      name: 'Somewhere in Tanzania',
+      rule_id: '596d7fe1-53fd-4ea4-8ba7-33f5ea8d98a6',
+      rule_type: RULE_TYPES.count,
+      geographies: [TANZANIA_GEO.geography_id],
+      states: { available: ['provider_drop_off'] },
+      vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
+      maximum: 5,
+      minimum: 1
+    }
+  ]
+}
+
+export const TEST_ZONE_NO_VALID_DROP_OFF_POINTS: Polygon = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [-118.46941709518433, 33.9807517760146],
+      [-118.46564054489136, 33.9807517760146],
+      [-118.46564054489136, 33.98356306245639],
+      [-118.46941709518433, 33.98356306245639],
+      [-118.46941709518433, 33.9807517760146]
+    ]
+  ]
+}

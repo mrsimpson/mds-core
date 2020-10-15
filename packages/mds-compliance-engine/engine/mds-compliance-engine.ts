@@ -31,7 +31,7 @@ import {
 } from '@mds-core/mds-types'
 
 import { MatchedVehicleInformation, ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
-import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
+import { pointInShape, getPolygon, isInStatesOrEvents, now, isDefined, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
 import { isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 
@@ -86,7 +86,7 @@ function processCountRule(
   geographies: Geography[],
   devices: { [d: string]: Device }
 ): Compliance & { matches: CountMatch[] | null } {
-  const maximum = rule.maximum || Number.POSITIVE_INFINITY
+  const maximum = isDefined(rule.maximum) ? rule.maximum : Number.POSITIVE_INFINITY
   if (isRuleActive(rule)) {
     const matches: CountMatch[] = rule.geographies.reduce(
       (matches_acc: CountMatch[], geography: string): CountMatch[] => {

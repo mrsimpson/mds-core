@@ -598,6 +598,7 @@ describe('Tests Compliance API:', () => {
         .expect(200)
         .end((err, result) => {
           test.assert(result.body.compliance.length === 1)
+          test.assert(result.body.total_violations === 0)
           test.value(result).hasHeader('content-type', APP_JSON)
           done(err)
         })
@@ -611,6 +612,7 @@ describe('Tests Compliance API:', () => {
         .expect(200)
         .end((err, result) => {
           test.assert(result.body.compliance[0].matches[0].measured === 15)
+          test.assert(result.body.total_violations === 15)
           test.value(result).hasHeader('content-type', APP_JSON)
           done(err)
         })

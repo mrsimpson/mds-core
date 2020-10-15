@@ -78,6 +78,8 @@ describe('Tests Compliance Engine', () => {
         result.compliance.forEach(compliance => {
           if (compliance.matches && compliance.rule.rule_type === RULE_TYPES.count) {
             test.assert.deepEqual(compliance.matches.length, 1)
+            test.assert.deepEqual(compliance.matches[0].measured, 800)
+            test.assert.deepEqual(result.total_violations, 0)
           }
         })
       }
@@ -85,7 +87,7 @@ describe('Tests Compliance Engine', () => {
     done()
   })
 
-  it.only('Verifies count compliance maximum violation', done => {
+  it('Verifies count compliance maximum violation', done => {
     const devices = makeDevices(3001, now())
     const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
       event_types: ['trip_start'],

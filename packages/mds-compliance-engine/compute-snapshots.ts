@@ -1,3 +1,4 @@
+/*
 import * as fs from 'fs'
 import logger from '@mds-core/mds-logger'
 import * as yargs from 'yargs'
@@ -12,7 +13,6 @@ import { processPolicy, getSupersedingPolicies, getRecentEvents } from './engine
 
 import { getComplianceInputs } from './engine/helpers'
 
-/*
 // Get all currently active policies that have not been superseded
 async function getPolicies() {
   const activePolicies = await db.readActivePolicies()
