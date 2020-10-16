@@ -10,6 +10,7 @@ import { processPolicyByProviderId, ComplianceResponse } from '../../engine/mds-
 import { isSpeedRuleMatch, processSpeedPolicy } from '../../engine/speed_processors'
 import { getRecentEvents } from '../../engine/helpers'
 import { generateDeviceMap } from './helpers'
+import { ComplianceResult, MatchedVehicleInformation } from '../../@types'
 
 const SPEED_POLICY: Policy = {
   policy_id: '95645117-fd85-463e-a2c9-fc95ea47463e',
@@ -136,8 +137,26 @@ describe('Tests Compliance Engine Speed Violations', () => {
       recentEvents as (VehicleEvent & { telemetry: Telemetry })[],
       geographies,
       deviceMap
-    )
-    test.assert.deepEqual(Object.keys(result).length, 5)
+    ) as ComplianceResult
+    test.assert.deepEqual(result.vehicles_found.length, 5)
+    test.assert.deepEqual(result.total_violations, 5)
+    const { rule_id } = SPEED_POLICY.rules[0]
+    const speedingCount = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
+      if (vehicle.rule_applied === rule_id && vehicle.rules_matched.includes(rule_id)) {
+        // eslint-disable-next-line no-param-reassign
+        count += 1
+      }
+      return count
+    }, 0)
+    test.assert.deepEqual(speedingCount, 5)
+    const nonSpeedingCount = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
+      if (vehicle.rule_applied === null) {
+        // eslint-disable-next-line no-param-reassign
+        count += 1
+      }
+      return count
+    }, 0)
+    test.assert.deepEqual(nonSpeedingCount, 0)
     done()
   })
 

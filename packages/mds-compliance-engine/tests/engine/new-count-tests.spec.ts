@@ -5,18 +5,10 @@
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import {
-  makeDevices,
-  makeEventsWithTelemetry,
-  veniceSpecOps,
-  LA_CITY_BOUNDARY,
-  makeTelemetryInArea,
-  restrictedAreas
-} from '@mds-core/mds-test-data'
+import { makeDevices, makeEventsWithTelemetry, veniceSpecOps, makeTelemetryInArea } from '@mds-core/mds-test-data'
 import test from 'unit.js'
-import { FeatureCollection, Feature, Polygon } from 'geojson'
+import { FeatureCollection, Feature } from 'geojson'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
-import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
 import {
   Device,
   Policy,
@@ -30,17 +22,9 @@ import {
 } from '@mds-core/mds-types'
 
 import MockDate from 'mockdate'
-import {
-  validatePolicies,
-  validateGeographies,
-  validateEvents,
-  vehicleEventTypeSchema
-} from '@mds-core/mds-schema-validators'
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
-import { NewComplianceResponse, VehicleEventWithTelemetry } from '../../@types'
-import { ComplianceResponse, processPolicyByProviderId } from '../../engine/mds-compliance-engine'
-import { getRecentEvents, getSupersedingPolicies } from '../../engine/helpers'
-import { generateDeviceMap, readJson } from './helpers'
+import { ComplianceResult, VehicleEventWithTelemetry } from '../../@types'
+import { generateDeviceMap } from './helpers'
 import {
   CITY_OF_LA,
   COUNT_POLICY_JSON,
@@ -148,7 +132,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         events as (VehicleEvent & { telemetry: Telemetry })[],
         [LA_GEOGRAPHY],
         deviceMap
-      ) as NewComplianceResponse
+      ) as ComplianceResult
       test.assert.deepEqual(resultNew.total_violations, 0)
       done()
     })
@@ -163,7 +147,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
 
       const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
 
-      const result = processCountPolicy(HIGH_COUNT_POLICY, events, [LA_GEOGRAPHY], deviceMap) as NewComplianceResponse
+      const result = processCountPolicy(HIGH_COUNT_POLICY, events, [LA_GEOGRAPHY], deviceMap) as ComplianceResult
       test.assert.deepEqual(result.total_violations, 0)
       test.assert.deepEqual(result.vehicles_found.length, 800)
       done()
@@ -179,7 +163,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
 
       const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
 
-      const result = processCountPolicy(HIGH_COUNT_POLICY, events, [LA_GEOGRAPHY], deviceMap) as NewComplianceResponse
+      const result = processCountPolicy(HIGH_COUNT_POLICY, events, [LA_GEOGRAPHY], deviceMap) as ComplianceResult
       test.assert.deepEqual(result.total_violations, 1)
       test.assert.deepEqual(result.vehicles_found.length, 3001)
 
@@ -196,7 +180,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       }) as VehicleEventWithTelemetry[]
 
       const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
-      const result = processCountPolicy(HIGH_COUNT_POLICY, events, GEOGRAPHIES, deviceMap) as NewComplianceResponse
+      const result = processCountPolicy(HIGH_COUNT_POLICY, events, GEOGRAPHIES, deviceMap) as ComplianceResult
 
       test.assert.deepEqual(result.total_violations, 490)
       // test.assert.deepEqual(result.vehicles_in_violation.length, 0)
@@ -221,7 +205,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         return events_acc
       }, []) as VehicleEventWithTelemetry[]
       const deviceMap = generateDeviceMap(devices)
-      const result = processCountPolicy(LOW_COUNT_POLICY, events, GEOGRAPHIES, deviceMap) as NewComplianceResponse
+      const result = processCountPolicy(LOW_COUNT_POLICY, events, GEOGRAPHIES, deviceMap) as ComplianceResult
       test.assert.deepEqual(result.total_violations, 1)
       const { 0: device } = result.vehicles_found.filter(vehicle => {
         return !vehicle.rule_applied
@@ -253,7 +237,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         events,
         [LA_BEACH_GEOGRAPHY],
         TuesdayDeviceMap
-      ) as NewComplianceResponse
+      ) as ComplianceResult
       test.assert(tuesdayResult.total_violations === 0)
       // Verifies on a Saturday that vehicles are banned
       MockDate.set('2019-05-25T20:00:00.000Z')
@@ -262,7 +246,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         events,
         [LA_BEACH_GEOGRAPHY],
         SaturdayDeviceMap
-      ) as NewComplianceResponse
+      ) as ComplianceResult
       test.assert(saturdayResult.total_violations === 15)
       MockDate.reset()
       done()
@@ -278,7 +262,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         speed: 0
       }) as VehicleEventWithTelemetry[]
       const deviceMap = generateDeviceMap(devices)
-      const result = processCountPolicy(COUNT_POLICY_JSON_3, events, [LA_GEOGRAPHY], deviceMap) as NewComplianceResponse
+      const result = processCountPolicy(COUNT_POLICY_JSON_3, events, [LA_GEOGRAPHY], deviceMap) as ComplianceResult
 
       test.assert.deepEqual(result.vehicles_found.length, 15)
       test.assert.deepEqual(result.total_violations, 5)
@@ -293,7 +277,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       }) as VehicleEventWithTelemetry[]
 
       const deviceMap = generateDeviceMap(devices)
-      const result = processCountPolicy(COUNT_POLICY_JSON_3, events, [LA_GEOGRAPHY], deviceMap) as NewComplianceResponse
+      const result = processCountPolicy(COUNT_POLICY_JSON_3, events, [LA_GEOGRAPHY], deviceMap) as ComplianceResult
       test.assert.deepEqual(result.total_violations, 0)
       done()
     })
@@ -314,7 +298,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         events,
         [RESTRICTED_GEOGRAPHY],
         deviceMap
-      ) as NewComplianceResponse
+      ) as ComplianceResult
 
       test.assert.deepEqual(result.total_violations, 15)
       done()
@@ -405,7 +389,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         [...events_a, ...events_b] as VehicleEventWithTelemetry[],
         geographies,
         deviceMap
-      ) as NewComplianceResponse
+      ) as ComplianceResult
       test.assert(result.total_violations === 10)
       // for these count results, matches are sorted by geography
       // for the first compliance result, there's one or two vehicle matches for each of the 20 or so geographies
@@ -442,7 +426,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         [...events_a, ...events_b] as VehicleEventWithTelemetry[],
         [INNER_GEO, OUTER_GEO],
         deviceMap
-      ) as NewComplianceResponse
+      ) as ComplianceResult
 
       //      test.assert.equal(result.compliance[0].matches[0].measured, 1)
       //      test.assert.equal(result.compliance[1].matches[0].measured, 2)
@@ -476,7 +460,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       [...events_a, ...events_b] as VehicleEventWithTelemetry[],
       [INNER_GEO, OUTER_GEO],
       deviceMap
-    ) as NewComplianceResponse
+    ) as ComplianceResult
 
     //    test.assert.equal(result.compliance[0].matches[0].measured, 1)
     //    test.assert.equal(result.compliance[1].matches[0].measured, 4)
@@ -507,7 +491,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       [...events_a, ...events_b] as VehicleEventWithTelemetry[],
       [INNER_GEO, TANZANIA_GEO],
       deviceMap
-    ) as NewComplianceResponse
+    ) as ComplianceResult
 
     /* If there was a problem with the overflow logic, then the violation
      * from the first rule would have overflowed into evaluation for the

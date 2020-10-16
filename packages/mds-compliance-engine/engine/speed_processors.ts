@@ -14,17 +14,10 @@ import {
   Telemetry
 } from '@mds-core/mds-types'
 
-import { MatchedVehicleInformation, ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
 import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
-import { isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
-
-interface MatchedVehicle {
-  device: Device
-  event: VehicleEvent
-}
-
-type MatchedVehiclePlusRule = MatchedVehicle & { rule_id: UUID }
+import { ComplianceResult, MatchedVehicleInformation } from '../@types'
+import { annotateVehicleMap, isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 
 export function isSpeedRuleMatch(
   rule: SpeedRule,
@@ -54,10 +47,8 @@ export function processSpeedPolicy(
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
-) {
-  const matchedVehicles: {
-    [d: string]: { device: Device; event: VehicleEvent; rule_applied: UUID; rules_matched: UUID[] }
-  } = {}
+): ComplianceResult | undefined {
+  const matchedVehicles: { [d: string]: { device: Device; rule_applied: UUID } } = {}
   if (isPolicyActive(policy)) {
     const sortedEvents = events.sort((e_1, e_2) => {
       return e_1.timestamp - e_2.timestamp
@@ -69,9 +60,7 @@ export function processSpeedPolicy(
           if (isSpeedRuleMatch(rule as SpeedRule, geographies, device, event)) {
             matchedVehicles[device.device_id] = {
               device,
-              event,
-              rule_applied: rule.rule_id,
-              rules_matched: [rule.rule_id]
+              rule_applied: rule.rule_id
             }
             /* eslint-reason need to remove matched vehicles */
             /* eslint-disable-next-line no-param-reassign */
@@ -80,6 +69,11 @@ export function processSpeedPolicy(
         }
       })
     })
+    const matchedVehiclesArr = annotateVehicleMap(policy, sortedEvents, geographies, matchedVehicles, isSpeedRuleMatch)
+    return {
+      vehicles_found: matchedVehiclesArr,
+      excess_vehicles_count: 0,
+      total_violations: matchedVehiclesArr.length
+    }
   }
-  return matchedVehicles
 }

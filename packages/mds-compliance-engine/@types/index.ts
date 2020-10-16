@@ -11,7 +11,7 @@ export interface MatchedVehicleInformation {
      for instance, with a count policy.
   */
   rules_matched: UUID[]
-  rule_applied: UUID | null // a device can only ever match one rule at most for the purpose of computing compliance, however
+  rule_applied?: UUID | null // a device can only ever match one rule at most for the purpose of computing compliance, however
   speed?: number | null
   gps: {
     lat: number
@@ -19,19 +19,17 @@ export interface MatchedVehicleInformation {
   }
 }
 
-export interface MatchedVehicleInformationMap {
-  [d: string]: MatchedVehicleInformation
-}
-
-export interface NewComplianceResponse {
-  compliance_as_of: Timestamp
-  compliance_id: UUID
+export interface ComplianceResult {
+  vehicles_found: MatchedVehicleInformation[]
   excess_vehicles_count: number
   total_violations: number
+}
+export type NewComplianceResponse = ComplianceResult & {
+  compliance_as_of: Timestamp
+  compliance_id: UUID
   policy: {
     name: string
     policy_id: UUID
   }
   provider_id: UUID
-  vehicles_found: MatchedVehicleInformation[]
 }
