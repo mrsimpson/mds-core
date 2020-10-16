@@ -1,3 +1,33 @@
-import { Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import { Telemetry, Timestamp, UUID, VehicleEvent, VEHICLE_EVENT, VEHICLE_STATE } from '@mds-core/mds-types'
 
 export type VehicleEventWithTelemetry = VehicleEvent & { telemetry: Telemetry }
+
+export interface MatchedVehicleInformation {
+  device_id: UUID
+  state: VEHICLE_STATE
+  event_types: VEHICLE_EVENT[]
+  timestamp: Timestamp
+  /* Sometimes a device can match more than one rule, and it's helpful to know all of them,
+     for instance, with a count policy.
+  */
+  rules_matched: UUID[]
+  rule_applied: UUID | null // a device can only ever match one rule at most for the purpose of computing compliance, however
+  speed?: number | null
+  gps: {
+    lat: number
+    lng: number
+  }
+}
+
+export interface NewComplianceResponse {
+  compliance_as_of: Timestamp
+  compliance_id: UUID
+  excess_vehicles_count?: number
+  total_violations: number
+  policy: {
+    name: string
+    policy_id: UUID
+  }
+  provider_id: UUID
+  vehicles_found: MatchedVehicleInformation[]
+}

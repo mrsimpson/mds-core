@@ -395,25 +395,6 @@ export function processPolicyByProviderId(
   }
 }
 
-function createMatchedVehicleInformation(
-  device: Device,
-  event: VehicleEvent & { telemetry: Telemetry }
-): Partial<MatchedVehicleInformation> {
-  return {
-    device_id: device.device_id,
-    state: event.vehicle_state,
-    event_types: event.event_types,
-    timestamp: event.timestamp,
-    //      rules_matched: UUID[],
-    //      rule_applied: UUID, // a device can only ever match one rule for the purpose of computing compliance, however
-    speed: event.telemetry?.gps.speed,
-    gps: {
-      lat: event.telemetry?.gps?.lat,
-      lng: event.telemetry?.gps?.lng
-    }
-  }
-}
-
 /*
 function processCountRuleNewTypes(
   rule: CountRule,

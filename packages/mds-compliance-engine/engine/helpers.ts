@@ -13,7 +13,9 @@ import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
 import { now, RuntimeError } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
+import { VehicleEventWithTelemetry } from 'packages/mds-compliance/types'
 import { AllowedProviderIDs } from './constants'
+import { MatchedVehicleInformation } from '../@types'
 
 const { env } = process
 
@@ -120,4 +122,24 @@ export function getRecentEvents(events: VehicleEvent[], end_time = now()): Vehic
      */
     return event.timestamp > end_time - TWO_DAYS_IN_MS && event.telemetry
   })
+}
+
+export function createMatchedVehicleInformation(
+  device: Device,
+  event: VehicleEventWithTelemetry,
+  rule: Rule
+): MatchedVehicleInformation {
+  return {
+    device_id: device.device_id,
+    state: event.vehicle_state,
+    event_types: event.event_types,
+    timestamp: event.timestamp,
+    rules_matched: [rule.rule_id],
+    rule_applied: null, // a device can only ever match at most one rule for the purpose of computing compliance
+    speed: event.telemetry.gps.speed,
+    gps: {
+      lat: event.telemetry.gps.lat,
+      lng: event.telemetry.gps.lng
+    }
+  }
 }
