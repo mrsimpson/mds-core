@@ -112,6 +112,7 @@ export const COUNT_POLICY_JSON_5: Policy = {
 
 export const VENICE_POLICY_UUID = 'dd9ace3e-14c8-461b-b5e7-1326505ff176'
 
+// A geo contained within Venice Beach
 export const INNER_GEO: Geography = {
   name: 'inner venice geo',
   geography_id: 'b4c75556-3842-47a9-b8f6-d721b98c8ca5',
@@ -138,6 +139,7 @@ export const INNER_GEO: Geography = {
   }
 }
 
+// This geo is all of Venice Beach.
 export const OUTER_GEO: Geography = {
   geography_id: 'e0e4a085-7a50-43e0-afa4-6792ca897c5a',
   name: 'outer venice geo',
@@ -146,19 +148,9 @@ export const OUTER_GEO: Geography = {
     features: [{ properties: {}, type: 'Feature', geometry: veniceSpecOps.features[0].geometry }]
   }
 }
-export const OUTER_POLYGON: Polygon = {
-  type: 'Polygon',
-  coordinates: [
-    [
-      [-118.47261428833006, 33.98888290068113],
-      [-118.4684944152832, 33.98888290068113],
-      [-118.4684944152832, 33.99044854215088],
-      [-118.47261428833006, 33.99044854215088],
-      [-118.47261428833006, 33.98888290068113]
-    ]
-  ]
-}
 
+// This is another geo contained within Venice Beach, near the canals.
+// It is contained within INNER_GEO.
 export const INNER_POLYGON: Polygon = {
   type: 'Polygon',
   coordinates: [
@@ -168,6 +160,20 @@ export const INNER_POLYGON: Polygon = {
       [-118.46694946289064, 33.982797974722246],
       [-118.46853733062744, 33.982797974722246],
       [-118.46853733062744, 33.98187274314647]
+    ]
+  ]
+}
+
+// This geo is a subset of Venice Beach, near the elementary school.
+export const INNER_POLYGON_2: Polygon = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [-118.47261428833006, 33.98888290068113],
+      [-118.4684944152832, 33.98888290068113],
+      [-118.4684944152832, 33.99044854215088],
+      [-118.47261428833006, 33.99044854215088],
+      [-118.47261428833006, 33.98888290068113]
     ]
   ]
 }

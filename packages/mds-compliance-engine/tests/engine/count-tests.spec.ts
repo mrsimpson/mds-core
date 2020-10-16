@@ -41,7 +41,7 @@ import {
   INNER_POLYGON,
   LA_GEOGRAPHY,
   VENICE_POLICY_UUID,
-  OUTER_POLYGON,
+  INNER_POLYGON_2,
   COUNT_POLICY_JSON_3,
   LA_BEACH,
   LA_BEACH_GEOGRAPHY,
@@ -549,7 +549,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       })
 
       const devices_b: Device[] = makeDevices(2, now())
-      const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now() - 10, OUTER_POLYGON, {
+      const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now() - 10, INNER_POLYGON_2, {
         event_types: ['provider_drop_off'],
         vehicle_state: 'available',
         speed: 0
@@ -614,7 +614,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
     })
 
     const devices_b: Device[] = makeDevices(2, now())
-    const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now() - 10, OUTER_POLYGON, {
+    const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now() - 10, INNER_POLYGON_2, {
       event_types: ['provider_drop_off'],
       vehicle_state: 'available',
       speed: 0
