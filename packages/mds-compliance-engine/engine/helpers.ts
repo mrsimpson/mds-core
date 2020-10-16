@@ -7,15 +7,15 @@ import {
   Rule,
   DAY_OF_WEEK,
   TIME_FORMAT,
-  DAYS_OF_WEEK
+  DAYS_OF_WEEK,
+  Optional
 } from '@mds-core/mds-types'
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
 import { now, RuntimeError } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
-import { VehicleEventWithTelemetry } from 'packages/mds-compliance/types'
 import { AllowedProviderIDs } from './constants'
-import { MatchedVehicleInformation } from '../@types'
+import { MatchedVehicleInformation, VehicleEventWithTelemetry } from '../@types'
 
 const { env } = process
 

@@ -41,7 +41,6 @@ import {
   INNER_POLYGON,
   LA_GEOGRAPHY,
   VENICE_POLICY_UUID,
-  INNER_POLYGON_2,
   COUNT_POLICY_JSON_3,
   LA_BEACH,
   LA_BEACH_GEOGRAPHY,
@@ -52,7 +51,8 @@ import {
   OUTER_GEO,
   TANZANIA_GEO,
   TANZANIA_POLYGON,
-  HIGH_COUNT_POLICY
+  HIGH_COUNT_POLICY,
+  INNER_POLYGON_2
 } from '../../test_data/fixtures'
 import { isCountRuleMatch, processCountPolicy } from '../../engine/count_processors'
 

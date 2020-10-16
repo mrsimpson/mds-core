@@ -42,7 +42,6 @@ import {
   INNER_POLYGON,
   LA_GEOGRAPHY,
   VENICE_POLICY_UUID,
-  INNER_POLYGON_2,
   COUNT_POLICY_JSON_3,
   LA_BEACH,
   LA_BEACH_GEOGRAPHY,
@@ -58,12 +57,13 @@ import {
   VENICE_OVERFLOW_POLICY,
   VENICE_MIXED_VIOLATIONS_POLICY,
   MANY_OVERFLOWS_POLICY,
-  TEST_ZONE_NO_VALID_DROP_OFF_POINTS
+  TEST_ZONE_NO_VALID_DROP_OFF_POINTS,
+  INNER_POLYGON_2
 } from '../../test_data/fixtures'
 import { isCountRuleMatch, processCountPolicy } from '../../engine/count_processors'
 
 process.env.TIMEZONE = 'America/Los_Angeles'
-let policies: Policy[] = []
+const policies: Policy[] = []
 const COUNT_POLICY = {
   policy_id: '221975ef-569c-40a1-a9b0-646e6155c764',
   name: 'LADOT Pilot Caps',
@@ -92,10 +92,6 @@ const COUNT_POLICY = {
 const GEOGRAPHIES = [{ name: 'la', geography_id: CITY_OF_LA, geography_json: la_city_boundary as FeatureCollection }]
 
 describe('Tests Compliance Engine Count Functionality:', () => {
-  before(async () => {
-    policies = await readJson('test_data/policies.json')
-  })
-
   describe('basic count compliance cases', () => {
     it('isCountRuleMatch is accurate', done => {
       const LAdevices: Device[] = makeDevices(1, now())
@@ -250,7 +246,6 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       // Verifies on a Saturday that vehicles are banned
       MockDate.set('2019-05-25T20:00:00.000Z')
       const saturdayResult = processCountPolicy(COUNT_POLICY_JSON_2, events, [LA_BEACH_GEOGRAPHY], SaturdayDeviceMap)
-      console.log(saturdayResult)
       test.assert(saturdayResult.total_violations === 15)
       test.assert(Object.keys(saturdayResult.overflowedVehicles).length === 15)
       MockDate.reset()
@@ -402,8 +397,11 @@ describe('Tests Compliance Engine Count Functionality:', () => {
     })
 
     it('does overflow correctly', done => {
-      // The polygons within which these events are being created do not overlap
-      // with each other at all.
+      /* The polygons within which these events are being created do not overlap
+       with each other at all. They are both contained within the greater Venice
+       geography. The devices in INNER_POLYGON should overflow into the rule evaluation
+       for the second rule.
+       */
       const devices_a: Device[] = makeDevices(3, now())
       const events_a: VehicleEvent[] = makeEventsWithTelemetry(devices_a, now() - 10, INNER_POLYGON, {
         event_types: ['provider_drop_off'],
