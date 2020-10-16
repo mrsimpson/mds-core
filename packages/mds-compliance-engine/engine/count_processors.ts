@@ -30,7 +30,6 @@ import {
   Telemetry
 } from '@mds-core/mds-types'
 
-import { MatchedVehicleInformation, ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
 import {
   pointInShape,
   getPolygon,
@@ -41,7 +40,8 @@ import {
   isDefined
 } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
-import { isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
+import { MatchedVehicleInformation } from '../@types'
+import { createMatchedVehicleInformation, isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 
 export function isCountRuleMatch(
   rule: CountRule,
@@ -71,7 +71,7 @@ export function processCountPolicy(
   devicesToCheck: { [d: string]: Device }
 ): any {
   const matchedVehicles: {
-    [d: string]: { device: Device; event: VehicleEvent; rule_applied: UUID; rules_matched: UUID[] }
+    [d: string]: MatchedVehicleInformation
   } = {}
   const overflowedVehicles: {
     [d: string]: boolean
@@ -89,12 +89,7 @@ export function processCountPolicy(
           const device = devicesToCheck[event.device_id]
           if (isCountRuleMatch(rule as CountRule, geographies, device, event)) {
             if (i < maximum) {
-              matchedVehicles[device.device_id] = {
-                device,
-                event,
-                rule_applied: rule.rule_id,
-                rules_matched: [rule.rule_id]
-              }
+              matchedVehicles[device.device_id] = createMatchedVehicleInformation(device, event, rule)
               /* eslint-reason need to remove matched vehicles */
               /* eslint-disable-next-line no-param-reassign */
               delete devicesToCheck[device.device_id]
