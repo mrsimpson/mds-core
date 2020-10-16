@@ -37,10 +37,12 @@ import {
   now,
   RuntimeError,
   RULE_UNIT_MAP,
-  isDefined
+  isDefined,
+  uuid
 } from '@mds-core/mds-utils'
+import { create } from 'domain'
 import moment from 'moment-timezone'
-import { MatchedVehicleInformation } from '../@types'
+import { VehicleEventWithTelemetry, MatchedVehicleInformation, MatchedVehicleInformationMap, NewComplianceResponse } from '../@types'
 import { createMatchedVehicleInformation, isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 
 export function isCountRuleMatch(
@@ -64,20 +66,41 @@ export function isCountRuleMatch(
   return false
 }
 
+function annotateVehicleMap(
+  policy: Policy,
+  sortedEvents: VehicleEventWithTelemetry[],
+  geographies: Geography[],
+  vehicleMap: { [d: string]: { device: Device; rule_applied?: UUID } }
+): MatchedVehicleInformation[] {
+  const vehiclesFoundMap: { [d: string]: MatchedVehicleInformation } = {}
+  policy.rules.forEach(rule => {
+    sortedEvents.forEach(event => {
+      if (vehicleMap[event.device_id]) {
+        const { device, rule_applied } = vehicleMap[event.device_id]
+        if (isCountRuleMatch(rule as CountRule, geographies, device, event)){
+          if (!vehiclesFoundMap[device.device_id]) {
+            vehiclesFoundMap[event.device_id] = createMatchedVehicleInformation(device, event, rule_applied)
+          }
+          vehiclesFoundMap[event.device_id].rules_matched.push(rule.rule_id)
+        }
+      }
+    })
+  })
+  return Object.values(vehiclesFoundMap)
+}
+
 export function processCountPolicy(
   policy: Policy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
-): any {
-  const matchedVehicles: {
-    [d: string]: MatchedVehicleInformation
-  } = {}
-  const overflowedVehicles: {
-    [d: string]: boolean
-  } = {}
+): Partial<NewComplianceResponse> | undefined {
+  const matchedVehicles: { [d: string]: { device: Device; rule_applied: UUID } } = {}
+  const overflowedVehicles: { [d: string]: { device: Device;  } } = {}
   let countMinimumViolations = 0
+  let excess_vehicles_count = 0
   if (isPolicyActive(policy)) {
+    const compliance_as_of = now()
     const sortedEvents = events.sort((e_1, e_2) => {
       return e_1.timestamp - e_2.timestamp
     })
@@ -89,13 +112,13 @@ export function processCountPolicy(
           const device = devicesToCheck[event.device_id]
           if (isCountRuleMatch(rule as CountRule, geographies, device, event)) {
             if (i < maximum) {
-              matchedVehicles[device.device_id] = createMatchedVehicleInformation(device, event, rule)
+              matchedVehicles[device.device_id] = { device,  rule_applied: rule.rule_id }
               /* eslint-reason need to remove matched vehicles */
               /* eslint-disable-next-line no-param-reassign */
               delete devicesToCheck[device.device_id]
               delete overflowedVehicles[device.device_id]
             } else {
-              overflowedVehicles[device.device_id] = true
+              overflowedVehicles[device.device_id] = { device }
             }
           }
           /* If there's a match, increase i.
@@ -108,11 +131,21 @@ export function processCountPolicy(
         countMinimumViolations += minimum - i
       }
     })
-  }
-  return {
-    matchedVehicles,
-    measured: Object.keys(matchedVehicles).length,
-    overflowedVehicles,
-    total_violations: countMinimumViolations + Object.keys(overflowedVehicles).length
+    excess_vehicles_count = Object.keys(overflowedVehicles).length
+    const matchedVehiclesArr = annotateVehicleMap(policy, sortedEvents, geographies, matchedVehicles)
+    const overflowedVehiclesArr = annotateVehicleMap(policy, sortedEvents, geographies, overflowedVehicles)
+    console.dir([...matchedVehiclesArr, ...overflowedVehiclesArr], { depth: null })
+    return {
+      compliance_as_of,
+      compliance_id: uuid(),
+      policy: {
+        name: policy.name,
+        policy_id: policy.policy_id
+      },
+//      provider_id:
+      vehicles_found: [...matchedVehiclesArr, ...overflowedVehiclesArr],
+      excess_vehicles_count,
+      total_violations: countMinimumViolations + excess_vehicles_count
+    }
   }
 }

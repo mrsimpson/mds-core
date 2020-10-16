@@ -19,10 +19,14 @@ export interface MatchedVehicleInformation {
   }
 }
 
+export interface MatchedVehicleInformationMap {
+  [d: string]: MatchedVehicleInformation
+}
+
 export interface NewComplianceResponse {
   compliance_as_of: Timestamp
   compliance_id: UUID
-  excess_vehicles_count?: number
+  excess_vehicles_count: number
   total_violations: number
   policy: {
     name: string
