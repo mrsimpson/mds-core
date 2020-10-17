@@ -6,16 +6,10 @@ import { RULE_TYPES, Geography, Policy, Device, VehicleEvent, Telemetry, TimeRul
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
 import { minutes } from '@mds-core/mds-utils'
-import { validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
-import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
-import { ComplianceResult } from 'packages/mds-compliance-engine/@types'
+import { ComplianceResult, MatchedVehicleInformation, VehicleEventWithTelemetry } from '../../@types'
 import { ComplianceResponse, processPolicyByProviderId } from '../../engine/mds-compliance-engine'
-import { getSupersedingPolicies, getRecentEvents } from '../../engine/helpers'
 import { readJson, generateDeviceMap } from './helpers'
 import { isTimeRuleMatch, processTimePolicy } from '../../engine/time_processors'
-import { MatchedVehicleInformation } from '../../@types'
-
-let policies: Policy[] = []
 
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
@@ -53,79 +47,24 @@ const TIME_POLICY: Policy = {
 }
 
 describe('Tests Compliance Engine Time Functionality', () => {
-  before(async () => {
-    policies = await readJson('test_data/policies.json')
-  })
-
   it('Verifies time compliance', done => {
     const devices = makeDevices(400, now())
     const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
       event_types: ['trip_end'],
       vehicle_state: 'available',
       speed: 0
-    })
+    }) as VehicleEventWithTelemetry[]
 
-    const recentEvents = getRecentEvents(events)
-    const supersedingPolicies = getSupersedingPolicies(policies)
     const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
 
-    const results = supersedingPolicies.map(policy =>
-      processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, geographies, deviceMap)
-    )
-    results.forEach(result => {
-      if (result) {
-        result.compliance.forEach(compliance => {
-          if (
-            compliance.rule.geographies.includes(CITY_OF_LA) &&
-            compliance.matches &&
-            compliance.rule.rule_type === RULE_TYPES.time
-          ) {
-            test.assert.deepEqual(compliance.matches.length, 0)
-          }
-        })
-      }
-    })
+    const result = processTimePolicy(TIME_POLICY, events, geographies, deviceMap) as ComplianceResult
+    test.assert.deepEqual(result.vehicles_found.length, 0)
+    test.assert.deepEqual(result.total_violations, 0)
+
     done()
   })
 
   it('Verifies time compliance violation', done => {
-    const devices = makeDevices(400, now())
-    const events = makeEventsWithTelemetry(devices, now() - minutes(21), CITY_OF_LA, {
-      event_types: ['trip_end'],
-      vehicle_state: 'available',
-      speed: 0
-    })
-
-    const goodDevices = makeDevices(2, now())
-    const goodEvents = makeEventsWithTelemetry(goodDevices, now(), CITY_OF_LA, {
-      event_types: ['trip_end'],
-      vehicle_state: 'available',
-      speed: 0
-    })
-
-    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices, ...goodDevices])
-
-    const result = processPolicyByProviderId(
-      TIME_POLICY,
-      TEST1_PROVIDER_ID,
-      [...events, ...goodEvents],
-      geographies,
-      deviceMap
-    ) as ComplianceResponse
-    result.compliance.forEach(compliance => {
-      if (
-        compliance.rule.geographies.includes(CITY_OF_LA) &&
-        compliance.matches &&
-        compliance.rule.rule_type === RULE_TYPES.time
-      ) {
-        test.assert.notEqual(compliance.matches.length, 0)
-        test.assert.deepEqual(result.total_violations, 400)
-      }
-    })
-    done()
-  })
-
-  it('Verifies time compliance violation with new processor', done => {
     const badDevices = makeDevices(400, now())
     const badEvents = makeEventsWithTelemetry(badDevices, now() - minutes(21), CITY_OF_LA, {
       event_types: ['trip_end'],

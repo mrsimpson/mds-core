@@ -10,7 +10,7 @@ import { processPolicyByProviderId, ComplianceResponse } from '../../engine/mds-
 import { isSpeedRuleMatch, processSpeedPolicy } from '../../engine/speed_processors'
 import { getRecentEvents } from '../../engine/helpers'
 import { generateDeviceMap } from './helpers'
-import { ComplianceResult, MatchedVehicleInformation } from '../../@types'
+import { ComplianceResult, MatchedVehicleInformation, VehicleEventWithTelemetry } from '../../@types'
 
 const SPEED_POLICY: Policy = {
   policy_id: '95645117-fd85-463e-a2c9-fc95ea47463e',
@@ -55,67 +55,17 @@ describe('Tests Compliance Engine Speed Violations', () => {
       event_types: ['trip_start'],
       vehicle_state: 'on_trip',
       speed: 5
-    })
+    }) as VehicleEventWithTelemetry[]
 
-    const recentEvents = getRecentEvents(events)
     const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
-    const result = processPolicyByProviderId(
-      SPEED_POLICY,
-      TEST1_PROVIDER_ID,
-      recentEvents,
-      geographies,
-      deviceMap
-    ) as ComplianceResponse
-    result.compliance.forEach(compliance => {
-      if (
-        compliance.rule.geographies.includes(CITY_OF_LA) &&
-        compliance.matches &&
-        compliance.rule.rule_type === RULE_TYPES.speed
-      ) {
-        test.assert.deepEqual(compliance.matches.length, 0)
-      }
-    })
+
+    const result = processSpeedPolicy(SPEED_POLICY, events, geographies, deviceMap) as ComplianceResult
+    test.assert.deepEqual(result.total_violations, 0)
+    test.assert.deepEqual(result.vehicles_found, [])
     done()
   })
 
-  it('Verifies speed compliance violation', done => {
-    const devicesA = makeDevices(5, now())
-    const eventsA = makeEventsWithTelemetry(devicesA, now(), CITY_OF_LA, {
-      event_types: ['trip_start'],
-      vehicle_state: 'on_trip',
-      speed: 500
-    })
-    const devicesB = makeDevices(5, now())
-    const eventsB = makeEventsWithTelemetry(devicesB, now(), CITY_OF_LA, {
-      event_types: ['trip_start'],
-      vehicle_state: 'on_trip',
-      speed: 1
-    })
-
-    const recentEvents = getRecentEvents([...eventsA, ...eventsB])
-    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devicesA, ...devicesB])
-
-    const result = processPolicyByProviderId(
-      SPEED_POLICY,
-      TEST1_PROVIDER_ID,
-      recentEvents,
-      geographies,
-      deviceMap
-    ) as ComplianceResponse
-    result.compliance.forEach(compliance => {
-      if (
-        compliance.rule.geographies.includes(CITY_OF_LA) &&
-        compliance.matches &&
-        compliance.rule.rule_type === RULE_TYPES.speed
-      ) {
-        test.assert.deepEqual(compliance.matches.length, 5)
-        test.assert.deepEqual(result.total_violations, 5)
-      }
-    })
-    done()
-  })
-
-  it('works with new speed processor', done => {
+  it('verifies speed compliance violation', done => {
     const devicesA = makeDevices(5, now())
     const eventsA = makeEventsWithTelemetry(devicesA, now(), CITY_OF_LA, {
       event_types: ['trip_start'],

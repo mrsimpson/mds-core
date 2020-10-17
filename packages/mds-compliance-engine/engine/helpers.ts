@@ -7,13 +7,13 @@ import {
   Rule,
   DAY_OF_WEEK,
   TIME_FORMAT,
-  DAYS_OF_WEEK,
-  Optional
+  DAYS_OF_WEEK
 } from '@mds-core/mds-types'
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
-import { now, RuntimeError } from '@mds-core/mds-utils'
+import { isDefined, now, RuntimeError } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
+import { providers } from '@mds-core/mds-providers'
 import { AllowedProviderIDs } from './constants'
 import { MatchedVehicleInformation, VehicleEventWithTelemetry } from '../@types'
 
@@ -49,10 +49,7 @@ export function clientCanViewPolicyCompliance(
 }
 
 export async function getComplianceInputs(provider_id: string | undefined) {
-  const [geographies, deviceRecords] = await Promise.all([
-    db.readGeographies() as Promise<Geography[]>,
-    db.readDeviceIds(provider_id)
-  ])
+  const deviceRecords = await db.readDeviceIds(provider_id)
   const deviceIdSubset = deviceRecords.map((record: { device_id: UUID; provider_id: UUID }) => record.device_id)
   const devices = await cache.readDevices(deviceIdSubset)
   // Get last event for each of these devices.
@@ -66,7 +63,7 @@ export async function getComplianceInputs(provider_id: string | undefined) {
      So we throw old events out and do not consider them.
   */
   const filteredEvents = getRecentEvents(events)
-  return { filteredEvents, geographies, deviceMap }
+  return { filteredEvents, deviceMap }
 }
 
 export function isPolicyActive(policy: Policy, end_time: number = now()): boolean {
@@ -120,7 +117,7 @@ export function getRecentEvents(events: VehicleEvent[], end_time = now()): Vehic
     /* Keep events that are less than two days old.
      * This is a somewhat arbitrary window of time.
      */
-    return event.timestamp > end_time - TWO_DAYS_IN_MS && event.telemetry
+    return event.telemetry && event.timestamp > end_time - TWO_DAYS_IN_MS
   })
 }
 export function annotateVehicleMap<T extends Rule>(
@@ -165,4 +162,14 @@ export function createMatchedVehicleInformation(
       lng: event.telemetry.gps.lng
     }
   }
+}
+
+export function getProviderIDs(provider_ids: UUID[] | undefined | null) {
+  if (!isDefined(provider_ids)) {
+    return Object.keys(providers)
+  }
+  if (provider_ids === []) {
+    return Object.keys(providers)
+  }
+  return provider_ids
 }

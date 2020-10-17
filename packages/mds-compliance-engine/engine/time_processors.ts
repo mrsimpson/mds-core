@@ -14,25 +14,9 @@
     limitations under the License.
  */
 
-import {
-  Device,
-  Geography,
-  Policy,
-  VehicleEvent,
-  DAY_OF_WEEK,
-  TIME_FORMAT,
-  DAYS_OF_WEEK,
-  UUID,
-  CountRule,
-  Rule,
-  SpeedRule,
-  TimeRule,
-  Telemetry
-} from '@mds-core/mds-types'
+import { Device, Geography, Policy, VehicleEvent, UUID, Rule, TimeRule, Telemetry } from '@mds-core/mds-types'
 
-import { MatchedVehicleInformation, ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
-import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
-import moment from 'moment-timezone'
+import { pointInShape, getPolygon, isInStatesOrEvents, now, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import { annotateVehicleMap, isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 import { ComplianceResult } from '../@types'
 
