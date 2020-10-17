@@ -33,7 +33,8 @@ import {
 import { MatchedVehicleInformation, ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
 import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import moment from 'moment-timezone'
-import { isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
+import { annotateVehicleMap, isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
+import { ComplianceResult } from '../@types'
 
 interface MatchedVehicle {
   device: Device
@@ -105,9 +106,9 @@ export function processTimePolicy(
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
-) {
+): ComplianceResult | undefined {
   const matchedVehicles: {
-    [d: string]: { device: Device; event: VehicleEvent; rule_applied: UUID; rules_matched: UUID[] }
+    [d: string]: { device: Device; rule_applied: UUID }
   } = {}
   if (isPolicyActive(policy)) {
     const sortedEvents = events.sort((e_1, e_2) => {
@@ -120,9 +121,7 @@ export function processTimePolicy(
           if (isTimeRuleMatch(rule as TimeRule, geographies, device, event)) {
             matchedVehicles[device.device_id] = {
               device,
-              event,
-              rule_applied: rule.rule_id,
-              rules_matched: [rule.rule_id]
+              rule_applied: rule.rule_id
             }
             /* eslint-reason need to remove matched vehicles */
             /* eslint-disable-next-line no-param-reassign */
@@ -131,6 +130,11 @@ export function processTimePolicy(
         }
       })
     })
+    const matchedVehiclesArr = annotateVehicleMap(policy, sortedEvents, geographies, matchedVehicles, isTimeRuleMatch)
+    return {
+      vehicles_found: matchedVehiclesArr,
+      excess_vehicles_count: 0,
+      total_violations: matchedVehiclesArr.length
+    }
   }
-  return matchedVehicles
 }

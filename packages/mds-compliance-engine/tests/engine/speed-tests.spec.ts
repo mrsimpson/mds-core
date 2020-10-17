@@ -141,6 +141,7 @@ describe('Tests Compliance Engine Speed Violations', () => {
     test.assert.deepEqual(result.vehicles_found.length, 5)
     test.assert.deepEqual(result.total_violations, 5)
     const { rule_id } = SPEED_POLICY.rules[0]
+    // Note that for speed rule matches, `rule_applied` is never null.
     const speedingCount = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
       if (vehicle.rule_applied === rule_id && vehicle.rules_matched.includes(rule_id)) {
         // eslint-disable-next-line no-param-reassign
@@ -149,14 +150,6 @@ describe('Tests Compliance Engine Speed Violations', () => {
       return count
     }, 0)
     test.assert.deepEqual(speedingCount, 5)
-    const nonSpeedingCount = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
-      if (vehicle.rule_applied === null) {
-        // eslint-disable-next-line no-param-reassign
-        count += 1
-      }
-      return count
-    }, 0)
-    test.assert.deepEqual(nonSpeedingCount, 0)
     done()
   })
 

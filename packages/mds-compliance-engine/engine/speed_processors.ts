@@ -1,22 +1,7 @@
-import {
-  Device,
-  Geography,
-  Policy,
-  VehicleEvent,
-  DAY_OF_WEEK,
-  TIME_FORMAT,
-  DAYS_OF_WEEK,
-  UUID,
-  CountRule,
-  Rule,
-  SpeedRule,
-  TimeRule,
-  Telemetry
-} from '@mds-core/mds-types'
+import { Device, Geography, Policy, VehicleEvent, UUID, SpeedRule, Telemetry } from '@mds-core/mds-types'
 
-import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
-import moment from 'moment-timezone'
-import { ComplianceResult, MatchedVehicleInformation } from '../@types'
+import { pointInShape, getPolygon, isInStatesOrEvents } from '@mds-core/mds-utils'
+import { ComplianceResult } from '../@types'
 import { annotateVehicleMap, isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 
 export function isSpeedRuleMatch(

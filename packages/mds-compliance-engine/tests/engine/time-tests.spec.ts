@@ -8,10 +8,12 @@ import { FeatureCollection } from 'geojson'
 import { minutes } from '@mds-core/mds-utils'
 import { validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
 import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
+import { ComplianceResult } from 'packages/mds-compliance-engine/@types'
 import { ComplianceResponse, processPolicyByProviderId } from '../../engine/mds-compliance-engine'
 import { getSupersedingPolicies, getRecentEvents } from '../../engine/helpers'
 import { readJson, generateDeviceMap } from './helpers'
 import { isTimeRuleMatch, processTimePolicy } from '../../engine/time_processors'
+import { MatchedVehicleInformation } from '../../@types'
 
 let policies: Policy[] = []
 
@@ -124,27 +126,42 @@ describe('Tests Compliance Engine Time Functionality', () => {
   })
 
   it('Verifies time compliance violation with new processor', done => {
-    const devices = makeDevices(400, now())
-    const events = makeEventsWithTelemetry(devices, now() - minutes(21), CITY_OF_LA, {
+    const badDevices = makeDevices(400, now())
+    const badEvents = makeEventsWithTelemetry(badDevices, now() - minutes(21), CITY_OF_LA, {
       event_types: ['trip_end'],
       vehicle_state: 'available',
       speed: 0
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
-    test.assert.doesNotThrow(() => validateGeographies(geographies))
-    test.assert.doesNotThrow(() => validateEvents(events))
 
-    const recentEvents = getRecentEvents(events)
-    const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
+    const goodDevices = makeDevices(5, now())
+    const goodEvents = makeEventsWithTelemetry(goodDevices, now(), CITY_OF_LA, {
+      event_types: ['trip_end'],
+      vehicle_state: 'available',
+      speed: 0
+    })
+
+    const deviceMap: { [d: string]: Device } = generateDeviceMap([...badDevices, ...goodDevices])
 
     const result = processTimePolicy(
       TIME_POLICY,
-      recentEvents as (VehicleEvent & { telemetry: Telemetry })[],
+      [...badEvents, ...goodEvents] as (VehicleEvent & { telemetry: Telemetry })[],
       geographies,
       deviceMap
-    )
-    console.log('result', result)
-    test.assert.deepEqual(Object.keys(result).length, 400)
+    ) as ComplianceResult
+    test.assert.deepEqual(result.vehicles_found.length, 400)
+    test.assert.deepEqual(result.total_violations, 400)
+
+    const { rule_id } = TIME_POLICY.rules[0]
+
+    // Note that for speed rule matches, `rule_applied` is never null.
+    const finalCount = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
+      if (vehicle.rule_applied === rule_id && vehicle.rules_matched.includes(rule_id)) {
+        // eslint-disable-next-line no-param-reassign
+        count += 1
+      }
+      return count
+    }, 0)
+    test.assert.deepEqual(finalCount, 400)
     done()
   })
 
