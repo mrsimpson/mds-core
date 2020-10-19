@@ -1,12 +1,10 @@
 import test from 'unit.js'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { RULE_TYPES, Geography, Policy, Device, SpeedRule, Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import { Geography, Policy, Device, SpeedRule, Telemetry, VehicleEvent } from '@mds-core/mds-types'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
-import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
-import { processPolicyByProviderId, ComplianceResponse } from '../../engine/mds-compliance-engine'
 import { isSpeedRuleMatch, processSpeedPolicy } from '../../engine/speed_processors'
 import { getRecentEvents } from '../../engine/helpers'
 import { generateDeviceMap } from './helpers'

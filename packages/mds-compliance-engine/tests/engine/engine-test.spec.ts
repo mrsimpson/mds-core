@@ -1,14 +1,17 @@
 import test from 'unit.js'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { RULE_TYPES, Geography, Policy, Device } from '@mds-core/mds-types'
+import { Geography, Policy, Device } from '@mds-core/mds-types'
+import cache from '@mds-core/mds-agency-cache'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
-import { RuntimeError } from '@mds-core/mds-utils'
-import { ValidationError, validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
-import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
-import { processPolicyByProviderId } from '../../engine/mds-compliance-engine'
+import db from '@mds-core/mds-db'
+import assert from 'assert'
+import { processCountPolicy } from '../../engine/count_processors'
+import { processSpeedPolicy } from '../../engine/speed_processors'
+import { ComplianceResult, NewComplianceResponse, VehicleEventWithTelemetry } from '../../@types'
+import { processPolicy } from '../../engine/mds-compliance-engine'
 import {
   getSupersedingPolicies,
   getRecentEvents // ,
@@ -35,50 +38,43 @@ describe('Tests General Compliance Engine Functionality', () => {
     policies = await readJson('test_data/policies.json')
   })
 
-  it('Verifies not considering events older than 48 hours', done => {
+  beforeEach(async () => {
+    await db.initialize()
+    await cache.reset()
+  })
+
+  it('Verifies not considering events older than 48 hours', async () => {
     const TWO_DAYS_IN_MS = 172800000
-    const devices = makeDevices(400, now())
-    const events = makeEventsWithTelemetry(devices, now() - TWO_DAYS_IN_MS, CITY_OF_LA, {
+    const curTime = now()
+    const devices = makeDevices(400, curTime)
+    const events = makeEventsWithTelemetry(devices, curTime - TWO_DAYS_IN_MS, CITY_OF_LA, {
       event_types: ['trip_end'],
       vehicle_state: 'available',
       speed: 0
     })
+    await cache.seed({ devices, events, telemetry: [] })
+    await Promise.all(devices.map(async device => db.writeDevice(device)))
 
-    const recentEvents = getRecentEvents(events)
-
+    // make sure this helper works
+    const recentEvents = getRecentEvents(events) as VehicleEventWithTelemetry[]
     test.assert.deepEqual(recentEvents.length, 0)
 
     // Mimic what we do in the real world to get inputs to feed into the compliance engine.
     const supersedingPolicies = getSupersedingPolicies(policies)
-    const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
-    const results = supersedingPolicies.map(policy =>
-      processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, geographies, deviceMap)
-    )
-    results.forEach(result => {
-      if (result) {
-        result.compliance.forEach(compliance => {
-          if (
-            compliance.rule.geographies.includes(CITY_OF_LA) &&
-            compliance.matches &&
-            compliance.rule.rule_type === RULE_TYPES.time
-          ) {
-            test.assert.deepEqual(compliance.matches.length, 0)
-          }
-        })
-      }
+
+    const policyResults = await Promise.all(supersedingPolicies.map(async policy => processPolicy(policy, geographies)))
+    policyResults.forEach(complianceResponses => {
+      complianceResponses.forEach(complianceResponse => {
+        if (complianceResponse) {
+          test.assert.deepEqual(complianceResponse.vehicles_found.length, 0)
+        }
+      })
     })
-    done()
   })
 })
 
-describe('Verifies errors are being properly thrown', () => {
-  it('Verify garbage does not pass schema compliance', done => {
-    const devices = { foo: { potato: 'POTATO!' } }
-    test.assert.throws(() => validateEvents(devices), ValidationError)
-    done()
-  })
-
-  it('Verifies RuntimeErrors are being thrown with an invalid TIMEZONE env_var', done => {
+describe('Verifies errors are being properly thrown', async () => {
+  it('Verifies RuntimeErrors are being thrown with an invalid TIMEZONE env_var', async () => {
     const oldTimezone = process.env.TIMEZONE
     process.env.TIMEZONE = 'Pluto/Potato_Land'
     const devices = makeDevices(1, now())
@@ -87,21 +83,16 @@ describe('Verifies errors are being properly thrown', () => {
       vehicle_state: 'available',
       speed: 0
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
-    test.assert.doesNotThrow(() => validateGeographies(geographies))
-    test.assert.doesNotThrow(() => validateEvents(events))
 
-    const recentEvents = getRecentEvents(events)
-    const supersedingPolicies = getSupersedingPolicies(policies)
-    const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
-    test.assert.throws(
-      () =>
-        supersedingPolicies.map(policy =>
-          processPolicyByProviderId(policy, TEST1_PROVIDER_ID, recentEvents, geographies, deviceMap)
-        ),
-      RuntimeError
+    await cache.seed({ devices, events, telemetry: [] })
+    await Promise.all(devices.map(async device => db.writeDevice(device)))
+
+    await assert.rejects(
+      async () => {
+        await processPolicy(policies[0], geographies)
+      },
+      { name: 'RuntimeError' }
     )
     process.env.TIMEZONE = oldTimezone
-    done()
   })
 })
