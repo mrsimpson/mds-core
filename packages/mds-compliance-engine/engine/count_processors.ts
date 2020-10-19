@@ -41,6 +41,16 @@ export function isCountRuleMatch(
   return false
 }
 
+/*
+ * This one has the trickiest logic to understand. Basically, if a vehicle matches a rule, it is not
+ * necessarily in violation of it. This is confusing because when a vehicle matches a speed rule or a
+ * time rule, it's in violation of those rules. It's better to think of the vehicle as being captured
+ * by a count rule.
+ * Anyway, say a vehicle is captured by a count rule with a maximum of 5, and this is vehicle number
+ * six. It overflows into evaluation for the next rule. If the vehicle is a match for the next rule,
+ * and under that rule's maximum, it wouldn't count as violating anything. If a vehicle overflows, and
+ * never matches for a subsequent rule, then it is considered in violation of the policy.
+ */
 export function processCountPolicy(
   policy: Policy,
   events: (VehicleEvent & { telemetry: Telemetry })[],

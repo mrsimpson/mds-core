@@ -91,7 +91,7 @@ describe('Tests Compliance Engine Time Functionality', () => {
 
     const { rule_id } = TIME_POLICY.rules[0]
 
-    // Note that for speed rule matches, `rule_applied` is never null.
+    // Note that for time rule matches, `rule_applied` is never null.
     const finalCount = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
       if (vehicle.rule_applied === rule_id && vehicle.rules_matched.includes(rule_id)) {
         // eslint-disable-next-line no-param-reassign

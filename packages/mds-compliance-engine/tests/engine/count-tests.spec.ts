@@ -183,8 +183,6 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       const result = processCountPolicy(HIGH_COUNT_POLICY, events, GEOGRAPHIES, deviceMap) as ComplianceResult
 
       test.assert.deepEqual(result.total_violations, 490)
-      // test.assert.deepEqual(result.vehicles_in_violation.length, 0)
-      // test.assert.deepEqual(compliance.matches.length, 1)
       test.assert.deepEqual(result.vehicles_found.length, 10)
       done()
     })
@@ -391,13 +389,6 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         deviceMap
       ) as ComplianceResult
       test.assert(result.total_violations === 10)
-      // for these count results, matches are sorted by geography
-      // for the first compliance result, there's one or two vehicle matches for each of the 20 or so geographies
-      //      test.assert(result.compliance[0].matches.length === 22)
-      // for the second compliance result, there's one geography
-      //     test.assert(result.compliance[1].matches.length === 1)
-      // and therefore 10 vehicles that match for that geography
-      //    test.assert(result.compliance[1].matches[0].measured === 10)
       done()
     })
 
@@ -428,10 +419,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         deviceMap
       ) as ComplianceResult
 
-      //      test.assert.equal(result.compliance[0].matches[0].measured, 1)
-      //      test.assert.equal(result.compliance[1].matches[0].measured, 2)
       test.assert.equal(result.total_violations, 2)
-      //     test.assert.equal(result.vehicles_in_violation.length, 2)
       done()
     })
   })
@@ -462,10 +450,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       deviceMap
     ) as ComplianceResult
 
-    //    test.assert.equal(result.compliance[0].matches[0].measured, 1)
-    //    test.assert.equal(result.compliance[1].matches[0].measured, 4)
     test.assert.equal(result.total_violations, 6)
-    //    test.assert.equal(result.vehicles_in_violation.length, 0)
     done()
   })
 
@@ -497,10 +482,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
      * from the first rule would have overflowed into evaluation for the
      * second rule, and there would be no violations at all.
      */
-    //    test.assert.equal(result.compliance[0].matches[0].measured, 1)
-    //    test.assert.equal(result.compliance[1].matches[0].measured, 4)
     test.assert.equal(result.total_violations, 1)
-    //    test.assert.equal(result.vehicles_in_violation.length, 1)
     const rule_0_id = MANY_OVERFLOWS_POLICY.rules[0].rule_id
     const rule_1_id = MANY_OVERFLOWS_POLICY.rules[1].rule_id
 
