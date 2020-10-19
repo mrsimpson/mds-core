@@ -315,28 +315,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Tests: mds-compliance-batch-processor",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "--project",
-        "${workspaceFolder}/tsconfig.json",
-        "-r",
-        "ts-node/register",
-        "--timeout",
-        "0"
-      ],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
-      "cwd": "${workspaceFolder}/packages/mds-compliance-batch-processor",
-      "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "PATH_PREFIX": "/compliance-batch-processor"
-      }
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "Tests: mds-daily",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
