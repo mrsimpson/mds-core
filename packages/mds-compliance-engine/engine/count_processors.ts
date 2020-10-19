@@ -67,6 +67,7 @@ export function processCountPolicy(
     })
     policy.rules.forEach(rule => {
       const maximum = isDefined(rule.maximum) ? rule.maximum : Number.POSITIVE_INFINITY
+      // Think of `i` as indicating the # of matches for this rule seen so far.
       let i = 0
       sortedEvents.forEach(event => {
         if (devicesToCheck[event.device_id]) {
