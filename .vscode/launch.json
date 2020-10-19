@@ -294,7 +294,6 @@
       "type": "node",
       "request": "launch",
       "name": "Tests: mds-compliance-engine",
-      "runtimeExecutable": "/Users/jane/.nvm/versions/node/v14.2.0/bin/node",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
         "--project",
