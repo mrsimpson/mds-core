@@ -14,50 +14,15 @@
     limitations under the License.
  */
 
-import {
-  Device,
-  Geography,
-  Policy,
-  VehicleEvent,
-  DAY_OF_WEEK,
-  TIME_FORMAT,
-  DAYS_OF_WEEK,
-  UUID,
-  CountRule,
-  Rule,
-  SpeedRule,
-  TimeRule,
-  Telemetry,
-  RULE_TYPES
-} from '@mds-core/mds-types'
+import { Device, Geography, Policy, UUID, RULE_TYPES } from '@mds-core/mds-types'
 
-import { MatchedVehicleInformation, ComplianceResponseDomainModel } from '@mds-core/mds-compliance-service'
-import {
-  pointInShape,
-  getPolygon,
-  isInStatesOrEvents,
-  now,
-  isDefined,
-  RULE_UNIT_MAP,
-  UnsupportedTypeError,
-  uuid
-} from '@mds-core/mds-utils'
-import moment from 'moment-timezone'
-import { readGeographies } from '@mds-core/mds-db/geographies'
-import { VehicleEventWithTelemetry } from 'packages/mds-compliance/types'
-import {
-  getProviderIDs,
-  getRecentEvents,
-  isInVehicleTypes,
-  isPolicyActive,
-  isRuleActive,
-  getComplianceInputs
-} from './helpers'
+import { now, UnsupportedTypeError, uuid } from '@mds-core/mds-utils'
+import { VehicleEventWithTelemetry, ComplianceResult, NewComplianceResponse } from '../@types'
+import { getProviderIDs, getComplianceInputs } from './helpers'
 
 import { processCountPolicy } from './count_processors'
 import { processSpeedPolicy } from './speed_processors'
 import { processTimePolicy } from './time_processors'
-import { ComplianceResult, NewComplianceResponse } from '../@types'
 
 function getProcessorType(rule_type: string) {
   switch (rule_type) {
@@ -91,7 +56,7 @@ export async function createComplianceResponse(
   const compliance_as_of = now()
   const complianceResult = processorFunction(
     policy,
-    filteredEvents as VehicleEventWithTelemetry,
+    filteredEvents as VehicleEventWithTelemetry[],
     geographies,
     deviceMap
   )

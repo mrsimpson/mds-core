@@ -1,7 +1,7 @@
 import test from 'unit.js'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { RULE_TYPES, Geography, Policy, Device, VehicleEvent, Telemetry, TimeRule } from '@mds-core/mds-types'
+import { Geography, Policy, Device, VehicleEvent, Telemetry, TimeRule } from '@mds-core/mds-types'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'

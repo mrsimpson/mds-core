@@ -1,23 +1,17 @@
 import test from 'unit.js'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { Geography, Policy, Device } from '@mds-core/mds-types'
+import { Geography, Policy } from '@mds-core/mds-types'
 import cache from '@mds-core/mds-agency-cache'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
 import db from '@mds-core/mds-db'
 import assert from 'assert'
-import { processCountPolicy } from '../../engine/count_processors'
-import { processSpeedPolicy } from '../../engine/speed_processors'
-import { ComplianceResult, NewComplianceResponse, VehicleEventWithTelemetry } from '../../@types'
+import { VehicleEventWithTelemetry } from '../../@types'
 import { processPolicy } from '../../engine/mds-compliance-engine'
-import {
-  getSupersedingPolicies,
-  getRecentEvents // ,
-  // processCountRuleNewTypes
-} from '../../engine/helpers'
-import { readJson, generateDeviceMap } from './helpers'
+import { getSupersedingPolicies, getRecentEvents } from '../../engine/helpers'
+import { readJson } from './helpers'
 
 let policies: Policy[] = []
 
@@ -65,9 +59,7 @@ describe('Tests General Compliance Engine Functionality', () => {
     const policyResults = await Promise.all(supersedingPolicies.map(async policy => processPolicy(policy, geographies)))
     policyResults.forEach(complianceResponses => {
       complianceResponses.forEach(complianceResponse => {
-        if (complianceResponse) {
-          test.assert.deepEqual(complianceResponse.vehicles_found.length, 0)
-        }
+        test.assert.deepEqual(complianceResponse?.vehicles_found.length, 0)
       })
     })
   })
