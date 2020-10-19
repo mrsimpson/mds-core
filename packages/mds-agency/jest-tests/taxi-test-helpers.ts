@@ -1,4 +1,4 @@
-import { Device, TripMetadata, VehicleEvent, VEHICLE_TYPES } from '@mds-core/mds-types'
+import { Device, TripMetadata, UUID, VehicleEvent, VEHICLE_TYPES } from '@mds-core/mds-types'
 import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
 import { now, uuid } from '@mds-core/mds-utils'
 import type supertest from 'supertest'
@@ -144,10 +144,9 @@ export const constructTripMetadata = (
 export const basicTripFlow = async (
   request: supertest.SuperTest<supertest.Test>,
   eventsContext: POSTableVehicleEvent[],
-  vehicle: Omit<Device, 'recorded'>
+  vehicle: Omit<Device, 'recorded'>,
+  trip_id: UUID = uuid()
 ) => {
-  const trip_id = uuid()
-
   await postEvent(request, eventsContext, vehicle, { event_types: ['service_start'], vehicle_state: 'available' })
 
   await postEvent(request, eventsContext, vehicle, {

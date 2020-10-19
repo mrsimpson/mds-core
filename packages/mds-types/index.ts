@@ -116,6 +116,7 @@ export const TAXI_VEHICLE_EVENTS = [
   'leave_jurisdiction',
   'maintenance',
   'passenger_cancellation',
+  'provider_cancellation',
   'recommissioned',
   'reservation_start',
   'reservation_stop',
@@ -133,6 +134,7 @@ export const TAXI_TRIP_EXIT_EVENTS: TAXI_VEHICLE_EVENT[] = [
   'trip_end',
   'leave_jurisdiction',
   'passenger_cancellation',
+  'provider_cancellation',
   'driver_cancellation'
 ]
 
@@ -190,6 +192,7 @@ export const TAXI_EVENT_STATES_MAP: {
   leave_jurisdiction: ['elsewhere'],
   maintenance: ['available', 'non_operational'],
   passenger_cancellation: ['available', 'on_trip', 'reserved', 'stopped'],
+  provider_cancellation: ['available', 'on_trip', 'reserved', 'stopped'],
   recommissioned: ['non_operational'],
   reservation_start: ['reserved'],
   reservation_stop: ['stopped'],
@@ -242,7 +245,14 @@ export const MICRO_MOBILITY_STATE_EVENT_MAP = MicroMobilityStatusEventMap({
 })
 
 export const TAXI_STATE_EVENT_MAP = TaxiStatusEventMap({
-  available: ['driver_cancellation', 'enter_jurisdiction', 'passenger_cancellation', 'service_start', 'trip_end'],
+  available: [
+    'driver_cancellation',
+    'enter_jurisdiction',
+    'passenger_cancellation',
+    'provider_cancellation',
+    'service_start',
+    'trip_end'
+  ],
   reserved: ['reservation_start', 'comms_restored', 'enter_jurisdiction'],
   non_operational: ['enter_jurisdiction', 'maintenance', 'maintenance_end', 'recommissioned', 'service_end'],
   on_trip: ['trip_start', 'enter_jurisdiction', 'comms_restored', 'trip_resume'],

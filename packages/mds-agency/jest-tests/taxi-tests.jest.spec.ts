@@ -4,6 +4,7 @@ import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
 import { shutdown as socketShutdown } from '@mds-core/mds-web-sockets'
+import { uuid } from '@mds-core/mds-utils'
 import { api } from '../api'
 import {
   basicTripFlow,
@@ -210,6 +211,43 @@ describe('Taxi Tests', () => {
               }
             })
           )
+        })
+      })
+
+      describe('2.d Trip Reallocation', () => {
+        it('2.d.i Tests reallocation', async () => {
+          const events: POSTableVehicleEvent[] = []
+          const firstVehicle = fakeVehicle()
+
+          await registerVehicleRequest(request, firstVehicle)
+
+          const trip_id = uuid()
+
+          await postEvent(request, events, firstVehicle, {
+            event_types: ['service_start'],
+            vehicle_state: 'available'
+          })
+
+          await postEvent(request, events, firstVehicle, {
+            event_types: ['reservation_start'],
+            vehicle_state: 'reserved',
+            trip_state: 'reserved',
+            trip_id
+          })
+
+          await postEvent(request, events, firstVehicle, {
+            event_types: ['provider_cancellation'],
+            vehicle_state: 'available',
+            trip_id
+          })
+
+          const secondVehicle = fakeVehicle()
+
+          await registerVehicleRequest(request, secondVehicle)
+
+          await basicTripFlow(request, events, secondVehicle, trip_id)
+
+          await postTripMetadata(request, constructTripMetadata(events))
         })
       })
     })
