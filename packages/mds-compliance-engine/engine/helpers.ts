@@ -36,8 +36,9 @@ export async function getComplianceInputs(provider_id: string | undefined) {
   }, {})
 
   /* We do not evaluate violations for vehicles that have not sent events within the last 48 hours.
-     So we throw old events out and do not consider them.
-  */
+   * So we throw old events out and do not consider them.
+   * We also don't consider events that have no associated telemetry.
+   */
   const filteredEvents = getRecentEvents(events)
   return { filteredEvents, deviceMap }
 }

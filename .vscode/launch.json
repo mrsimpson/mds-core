@@ -70,7 +70,6 @@
         "PATH_PREFIX": "/compliance"
       }
     },
-
     {
       "type": "node",
       "request": "launch",
