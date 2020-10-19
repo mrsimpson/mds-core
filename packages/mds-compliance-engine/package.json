@@ -32,9 +32,9 @@
     "@types/moment-timezone": "0.5.13",
     "@mds-core/mds-types": "0.1.23",
     "@mds-core/mds-utils": "0.1.26",
-    "@types/yargs": "15.0.5",
+    "@types/yargs": "15.0.8",
     "fs": "0.0.1-security",
     "moment-timezone": "0.5.31",
-    "yargs": "15.4.1"
+    "yargs": "16.0.3"
   }
 }
