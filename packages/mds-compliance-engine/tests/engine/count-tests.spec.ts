@@ -172,15 +172,27 @@ describe('Tests Compliance Engine Count Functionality:', () => {
     })
 
     it('Verifies count compliance minimum violation', done => {
-      const devices = makeDevices(10, now())
-      const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
+      const matchingDevices = makeDevices(10, now())
+      const notMatchingDevices = makeDevices(10, now())
+      const matchingEvents = makeEventsWithTelemetry(matchingDevices, now(), CITY_OF_LA, {
         event_types: ['trip_start'],
         vehicle_state: 'on_trip',
         speed: 0
       }) as VehicleEventWithTelemetry[]
 
-      const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
-      const result = processCountPolicy(HIGH_COUNT_POLICY, events, GEOGRAPHIES, deviceMap) as ComplianceResult
+      const notMatchingEvents = makeEventsWithTelemetry(notMatchingDevices, now(), CITY_OF_LA, {
+        event_types: ['unspecified'],
+        vehicle_state: 'unknown',
+        speed: 0
+      }) as VehicleEventWithTelemetry[]
+
+      const deviceMap: { [d: string]: Device } = generateDeviceMap([...matchingDevices, ...notMatchingDevices])
+      const result = processCountPolicy(
+        HIGH_COUNT_POLICY,
+        [...matchingEvents, ...notMatchingEvents],
+        GEOGRAPHIES,
+        deviceMap
+      ) as ComplianceResult
 
       test.assert.deepEqual(result.total_violations, 490)
       test.assert.deepEqual(result.vehicles_found.length, 10)

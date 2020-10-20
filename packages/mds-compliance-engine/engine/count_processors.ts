@@ -82,10 +82,9 @@ export function processCountPolicy(
             } else {
               overflowedVehicles[device.device_id] = { device }
             }
+            // Increment whenever there's a match.
+            i += 1
           }
-          /* If there's a match, increase i.
-           */
-          i += 1
         }
       })
       const minimum = rule.minimum == null ? Number.NEGATIVE_INFINITY : rule.minimum
