@@ -33,7 +33,7 @@ export function processSpeedPolicy(
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
 ): ComplianceResult | undefined {
-  const matchedVehicles: { [d: string]: { device: Device; rule_applied: UUID } } = {}
+  const matchedVehicles: { [d: string]: { device: Device; rule_applied: UUID; rules_matched: UUID[] } } = {}
   if (isPolicyActive(policy)) {
     const sortedEvents = events.sort((e_1, e_2) => {
       return e_1.timestamp - e_2.timestamp
@@ -45,7 +45,8 @@ export function processSpeedPolicy(
           if (isSpeedRuleMatch(rule as SpeedRule, geographies, device, event)) {
             matchedVehicles[device.device_id] = {
               device,
-              rule_applied: rule.rule_id
+              rule_applied: rule.rule_id,
+              rules_matched: [rule.rule_id]
             }
             /* eslint-reason need to remove matched vehicles */
             /* eslint-disable-next-line no-param-reassign */

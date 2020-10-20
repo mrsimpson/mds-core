@@ -57,8 +57,8 @@ export function processCountPolicy(
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
 ): ComplianceResult | undefined {
-  const matchedVehicles: { [d: string]: { device: Device; rule_applied: UUID } } = {}
-  const overflowedVehicles: { [d: string]: { device: Device } } = {}
+  const matchedVehicles: { [d: string]: { device: Device; rule_applied: UUID; rules_matched?: UUID[] } } = {}
+  const overflowedVehicles: { [d: string]: { device: Device; rules_matched: UUID[] } } = {}
   let countMinimumViolations = 0
   let excess_vehicles_count = 0
   if (isPolicyActive(policy)) {
@@ -67,6 +67,7 @@ export function processCountPolicy(
     })
     policy.rules.forEach(rule => {
       const maximum = isDefined(rule.maximum) ? rule.maximum : Number.POSITIVE_INFINITY
+      const { rule_id } = rule
       // Think of `i` as indicating the # of matches for this rule seen so far.
       let i = 0
       sortedEvents.forEach(event => {
@@ -74,13 +75,18 @@ export function processCountPolicy(
           const device = devicesToCheck[event.device_id]
           if (isCountRuleMatch(rule as CountRule, geographies, device, event)) {
             if (i < maximum) {
-              matchedVehicles[device.device_id] = { device, rule_applied: rule.rule_id }
+              matchedVehicles[device.device_id] = { device, rule_applied: rule_id, rules_matched: [rule_id] }
               /* eslint-reason need to remove matched vehicles */
               /* eslint-disable-next-line no-param-reassign */
               delete devicesToCheck[device.device_id]
               delete overflowedVehicles[device.device_id]
+            } else if (overflowedVehicles[device.device_id]) {
+              overflowedVehicles[device.device_id].rules_matched.push(rule_id)
             } else {
-              overflowedVehicles[device.device_id] = { device }
+              overflowedVehicles[device.device_id] = {
+                device,
+                rules_matched: [rule.rule_id]
+              }
             }
             // Increment whenever there's a match.
             i += 1

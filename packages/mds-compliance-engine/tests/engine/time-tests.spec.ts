@@ -9,6 +9,13 @@ import { minutes } from '@mds-core/mds-utils'
 import { ComplianceResult, MatchedVehicleInformation, VehicleEventWithTelemetry } from '../../@types'
 import { generateDeviceMap } from './helpers'
 import { isTimeRuleMatch, processTimePolicy } from '../../engine/time_processors'
+import {
+  INNER_POLYGON_2,
+  INNER_POLYGON,
+  OVERLAPPING_GEOS_TIME_POLICY,
+  INNER_GEO,
+  OUTER_GEO
+} from '../../test_data/fixtures'
 
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
@@ -63,7 +70,7 @@ describe('Tests Compliance Engine Time Functionality', () => {
     done()
   })
 
-  it('Verifies time compliance violation', done => {
+  it('Verifies time compliance violation (simple case)', done => {
     const badDevices = makeDevices(400, now())
     const badEvents = makeEventsWithTelemetry(badDevices, now() - minutes(21), CITY_OF_LA, {
       event_types: ['trip_end'],
@@ -100,6 +107,67 @@ describe('Tests Compliance Engine Time Functionality', () => {
       return count
     }, 0)
     test.assert.deepEqual(finalCount, 400)
+    done()
+  })
+
+  it('Verifies time compliance violation with overlapping geographies and rules_matched and rule_applied are correct', done => {
+    const devicesA = makeDevices(4, now())
+    const eventsA = makeEventsWithTelemetry(devicesA, now() - minutes(30), INNER_POLYGON, {
+      event_types: ['trip_end'],
+      vehicle_state: 'available',
+      speed: 0
+    })
+
+    const devicesB = makeDevices(5, now())
+    const eventsB = makeEventsWithTelemetry(devicesB, now() - minutes(30), INNER_POLYGON_2, {
+      event_types: ['trip_end'],
+      vehicle_state: 'available',
+      speed: 0
+    })
+
+    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devicesA, ...devicesB])
+
+    const result = processTimePolicy(
+      OVERLAPPING_GEOS_TIME_POLICY,
+      [...eventsA, ...eventsB] as (VehicleEvent & { telemetry: Telemetry })[],
+      [INNER_GEO, OUTER_GEO],
+      deviceMap
+    ) as ComplianceResult
+    test.assert.deepEqual(result.vehicles_found.length, 9)
+    test.assert.deepEqual(result.total_violations, 9)
+
+    console.dir(result, { depth: null })
+    const { rule_id } = OVERLAPPING_GEOS_TIME_POLICY.rules[0]
+    const rule_id_2 = OVERLAPPING_GEOS_TIME_POLICY.rules[1].rule_id
+
+    // Note that for time rule matches, `rule_applied` is never null.
+    const rule_count_1 = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
+      if (
+        vehicle.rule_applied === rule_id &&
+        // basically ensure that vehicle.rules_matched is equal to [rule_id, rule_id_2]
+        vehicle.rules_matched.includes(rule_id) &&
+        vehicle.rules_matched.includes(rule_id_2) &&
+        vehicle.rules_matched.length === 2
+      ) {
+        // eslint-disable-next-line no-param-reassign
+        count += 1
+      }
+      return count
+    }, 0)
+    test.assert.deepEqual(rule_count_1, 4)
+
+    const rule_count_2 = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
+      if (
+        vehicle.rule_applied === rule_id_2 &&
+        vehicle.rules_matched.includes(rule_id_2) &&
+        vehicle.rules_matched.length === 1
+      ) {
+        // eslint-disable-next-line no-param-reassign
+        count += 1
+      }
+      return count
+    }, 0)
+    test.assert.deepEqual(rule_count_2, 5)
     done()
   })
 

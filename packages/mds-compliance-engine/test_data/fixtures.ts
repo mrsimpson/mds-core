@@ -360,3 +360,75 @@ export const TEST_ZONE_NO_VALID_DROP_OFF_POINTS: Polygon = {
     ]
   ]
 }
+
+export const OVERLAPPING_GEOS_SPEED_POLICY: Policy = {
+  policy_id: 'fc9b02f0-9c0d-4b0a-85d6-7684b8e9e769',
+  name: 'Multiple Speed Limits',
+  description: 'LADOT Pilot Speed Limit Limitations',
+  start_date: 1552678594428,
+  end_date: null,
+  prev_policies: null,
+  provider_ids: [],
+  rules: [
+    {
+      name: 'Slow Zone in Venice Beach',
+      rule_id: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      rule_type: 'speed',
+      rule_units: 'mph',
+      geographies: [INNER_GEO.geography_id],
+      states: {
+        on_trip: []
+      },
+      vehicle_types: ['bicycle', 'scooter'],
+      maximum: 10
+    },
+    {
+      name: 'Venice Beach',
+      rule_id: '178b570d-e0ba-41d5-a9a9-e8a91440c0e8',
+      rule_type: 'speed',
+      rule_units: 'mph',
+      geographies: [OUTER_GEO.geography_id],
+      states: {
+        on_trip: []
+      },
+      vehicle_types: ['bicycle', 'scooter'],
+      maximum: 25
+    }
+  ]
+}
+
+export const OVERLAPPING_GEOS_TIME_POLICY: Policy = {
+  policy_id: 'fc9b02f0-9c0d-4b0a-85d6-7684b8e9e769',
+  name: 'Multiple Speed Limits',
+  description: 'LADOT Pilot Speed Limit Limitations',
+  start_date: 1552678594428,
+  end_date: null,
+  prev_policies: null,
+  provider_ids: [],
+  rules: [
+    {
+      name: 'No Drop-Off Zone in Venice',
+      rule_id: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      rule_type: 'time',
+      rule_units: 'minutes',
+      geographies: [INNER_GEO.geography_id],
+      states: {
+        available: []
+      },
+      vehicle_types: ['bicycle', 'scooter'],
+      maximum: 0
+    },
+    {
+      name: 'Venice Beach',
+      rule_id: '178b570d-e0ba-41d5-a9a9-e8a91440c0e8',
+      rule_type: 'time',
+      rule_units: 'minutes',
+      geographies: [OUTER_GEO.geography_id],
+      states: {
+        available: []
+      },
+      vehicle_types: ['bicycle', 'scooter'],
+      maximum: 25
+    }
+  ]
+}

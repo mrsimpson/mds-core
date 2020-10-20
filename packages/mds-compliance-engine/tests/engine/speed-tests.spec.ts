@@ -5,6 +5,13 @@ import { Geography, Policy, Device, SpeedRule, Telemetry, VehicleEvent } from '@
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
+import {
+  INNER_GEO,
+  OUTER_GEO,
+  INNER_POLYGON_2,
+  INNER_POLYGON,
+  OVERLAPPING_GEOS_SPEED_POLICY
+} from '../../test_data/fixtures'
 import { isSpeedRuleMatch, processSpeedPolicy } from '../../engine/speed_processors'
 import { getRecentEvents } from '../../engine/helpers'
 import { generateDeviceMap } from './helpers'
@@ -63,7 +70,7 @@ describe('Tests Compliance Engine Speed Violations', () => {
     done()
   })
 
-  it('verifies speed compliance violation', done => {
+  it('verifies speed compliance violation (simple case)', done => {
     const devicesA = makeDevices(5, now())
     const eventsA = makeEventsWithTelemetry(devicesA, now(), CITY_OF_LA, {
       event_types: ['trip_start'],
@@ -98,6 +105,65 @@ describe('Tests Compliance Engine Speed Violations', () => {
       return count
     }, 0)
     test.assert.deepEqual(speedingCount, 5)
+    done()
+  })
+
+  it('correctly handles a speed policy with overlapping geos and assigns the values of `rules_matched` and `rule_applied`', done => {
+    const devicesA = makeDevices(3, now())
+    const eventsA = makeEventsWithTelemetry(devicesA, now(), INNER_POLYGON, {
+      event_types: ['trip_start'],
+      vehicle_state: 'on_trip',
+      speed: 500
+    })
+    const devicesB = makeDevices(5, now())
+    const eventsB = makeEventsWithTelemetry(devicesB, now(), INNER_POLYGON_2, {
+      event_types: ['trip_start'],
+      vehicle_state: 'on_trip',
+      speed: 100
+    })
+
+    const recentEvents = getRecentEvents([...eventsA, ...eventsB])
+    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devicesA, ...devicesB])
+
+    const result = processSpeedPolicy(
+      OVERLAPPING_GEOS_SPEED_POLICY,
+      recentEvents as (VehicleEvent & { telemetry: Telemetry })[],
+      [INNER_GEO, OUTER_GEO],
+      deviceMap
+    ) as ComplianceResult
+    test.assert.deepEqual(result.vehicles_found.length, 8)
+    test.assert.deepEqual(result.total_violations, 8)
+    const { rule_id } = OVERLAPPING_GEOS_SPEED_POLICY.rules[0]
+    const rule_id_2 = OVERLAPPING_GEOS_SPEED_POLICY.rules[1].rule_id
+
+    // Note that for speed rule matches, `rule_applied` is never null.
+    const speedingCount_1 = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
+      if (
+        vehicle.rule_applied === rule_id &&
+        // i.e. `vehicle.rules_matched === [rule_id_1, rule_id_2], if `===` worked for array equality
+        vehicle.rules_matched.includes(rule_id) &&
+        vehicle.rules_matched.includes(rule_id_2) &&
+        vehicle.rules_matched.length === 2
+      ) {
+        // eslint-disable-next-line no-param-reassign
+        count += 1
+      }
+      return count
+    }, 0)
+    test.assert.deepEqual(speedingCount_1, 3)
+    const speedingCount_2 = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
+      if (
+        vehicle.rule_applied === rule_id_2 &&
+        // i.e. `vehicle.rules_matched === [rule_id_2], if `===` worked for array equality
+        vehicle.rules_matched.includes(rule_id_2) &&
+        vehicle.rules_matched.length === 1
+      ) {
+        // eslint-disable-next-line no-param-reassign
+        count += 1
+      }
+      return count
+    }, 0)
+    test.assert.deepEqual(speedingCount_2, 5)
     done()
   })
 

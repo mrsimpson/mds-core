@@ -14,52 +14,11 @@
     limitations under the License.
  */
 
-import { Device, Geography, Policy, VehicleEvent, UUID, Rule, TimeRule, Telemetry } from '@mds-core/mds-types'
+import { Device, Geography, Policy, VehicleEvent, UUID, TimeRule, Telemetry } from '@mds-core/mds-types'
 
 import { pointInShape, getPolygon, isInStatesOrEvents, now, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import { annotateVehicleMap, isInVehicleTypes, isPolicyActive, isRuleActive } from './helpers'
 import { ComplianceResult } from '../@types'
-
-interface MatchedVehicle {
-  device: Device
-  event: VehicleEvent
-}
-
-interface CountMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicles: MatchedVehicle[]
-}
-
-interface TimeMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-interface SpeedMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-interface ReducedMatch {
-  measured: number
-  geography_id: UUID
-}
-
-type MatchedVehiclePlusRule = MatchedVehicle & { rule_id: UUID }
-
-export interface Compliance {
-  rule: Rule
-  matches: ReducedMatch[] | CountMatch[] | TimeMatch[] | SpeedMatch[]
-}
-export interface ComplianceResponse {
-  policy: Policy
-  compliance: Compliance[]
-  total_violations: number
-  vehicles_in_violation: MatchedVehiclePlusRule[]
-}
 
 export function isTimeRuleMatch(
   rule: TimeRule,
@@ -92,7 +51,7 @@ export function processTimePolicy(
   devicesToCheck: { [d: string]: Device }
 ): ComplianceResult | undefined {
   const matchedVehicles: {
-    [d: string]: { device: Device; rule_applied: UUID }
+    [d: string]: { device: Device; rule_applied: UUID; rules_matched: UUID[] }
   } = {}
   if (isPolicyActive(policy)) {
     const sortedEvents = events.sort((e_1, e_2) => {
@@ -105,7 +64,8 @@ export function processTimePolicy(
           if (isTimeRuleMatch(rule as TimeRule, geographies, device, event)) {
             matchedVehicles[device.device_id] = {
               device,
-              rule_applied: rule.rule_id
+              rule_applied: rule.rule_id,
+              rules_matched: [rule.rule_id]
             }
             /* eslint-reason need to remove matched vehicles */
             /* eslint-disable-next-line no-param-reassign */
