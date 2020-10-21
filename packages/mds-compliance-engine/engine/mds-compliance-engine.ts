@@ -84,10 +84,9 @@ export async function createComplianceResponse(
 export async function processPolicy(policy: Policy, geographies: Geography[]) {
   const provider_ids = getProviderIDs(policy.provider_ids)
   const processorFunction = getProcessorType(policy.rules[0].rule_type)
-  const complianceResponsePromises = []
-  for (const provider_id of provider_ids) {
-    complianceResponsePromises.push(createComplianceResponse(policy, provider_id, geographies, processorFunction))
-  }
+  const complianceResponsePromises = provider_ids.map(async provider_id =>
+    createComplianceResponse(policy, provider_id, geographies, processorFunction)
+  )
   const results = await Promise.all(complianceResponsePromises)
   // filter out undefined results
   return results.filter(result => !!result)
