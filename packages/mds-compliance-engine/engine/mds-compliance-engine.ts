@@ -17,7 +17,7 @@
 import { Device, Geography, Policy, UUID, RULE_TYPES } from '@mds-core/mds-types'
 
 import { now, UnsupportedTypeError, uuid } from '@mds-core/mds-utils'
-import { VehicleEventWithTelemetry, ComplianceResult, NewComplianceResponse } from '../@types'
+import { VehicleEventWithTelemetry, ComplianceResult, ComplianceResponse } from '../@types'
 import { getProviderIDs, getComplianceInputs } from './helpers'
 
 import { processCountPolicy } from './count_processors'
@@ -61,7 +61,7 @@ export async function createComplianceResponse(
     deviceMap
   )
   if (complianceResult) {
-    const complianceResponse: NewComplianceResponse = {
+    const complianceResponse: ComplianceResponse = {
       compliance_as_of,
       compliance_id: uuid(),
       excess_vehicles_count: complianceResult.excess_vehicles_count,
