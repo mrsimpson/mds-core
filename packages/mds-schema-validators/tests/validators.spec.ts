@@ -35,7 +35,9 @@ import {
   isValidNumber,
   ValidationError,
   validateEvents,
-  isValidEvent
+  validatePolicies,
+  isValidEvent,
+  validateGeographies
 } from '../validators'
 
 describe('Tests validators', () => {
@@ -200,6 +202,91 @@ describe('Tests validators', () => {
     done()
   })
 
+  it('verifies policy validator', done => {
+    test.assert.doesNotThrow(() =>
+      validatePolicies([
+        {
+          name: 'LADOT Mobility Caps',
+          description: 'Mobility caps as described in the One-Year Permit',
+          policy_id: uuid(),
+          start_date: 1558389669540,
+          end_date: null,
+          prev_policies: null,
+          provider_ids: [],
+          rules: [
+            {
+              name: 'Greater LA',
+              rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
+              rule_type: 'count',
+              geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
+              states: { available: [], non_operational: [], reserved: [], on_trip: [] },
+              vehicle_types: ['scooter'],
+              maximum: 10,
+              minimum: 5
+            }
+          ]
+        }
+      ])
+    )
+
+    test.assert.throws(
+      () =>
+        validatePolicies([
+          {
+            name: 'LADOT Mobility Caps',
+            description: 'Mobility caps as described in the One-Year Permit',
+            policy_id: uuid(),
+            start_date: 1558389669540,
+            end_date: null,
+            prev_policies: null,
+            provider_ids: [],
+            rules: [
+              {
+                name: 'Greater LA',
+                rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
+                rule_type: 'count',
+                geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
+                states: { available: [], non_operational: [], reserved: [], on_trip: [] },
+                vehicle_types: ['trololol'],
+                maximum: 10,
+                minimum: 5
+              }
+            ]
+          }
+        ]),
+      ValidationError
+    )
+
+    test.assert.throws(
+      () =>
+        validatePolicies([
+          {
+            name: 'LADOT Mobility Caps',
+            description: 'Mobility caps as described in the One-Year Permit',
+            policy_id: uuid(),
+            start_date: 1558389669540,
+            end_date: null,
+            prev_policies: null,
+            provider_ids: [],
+            rules: [
+              {
+                name: 'Greater LA',
+                rule_id: '47c8c7d4-14b5-43a3-b9a5-a32ecc2fb2c6',
+                rule_type: 'count',
+                geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
+                states: { not_a_state: [] },
+                vehicle_types: ['scooter'],
+                maximum: 10,
+                minimum: 5
+              }
+            ]
+          }
+        ]),
+      ValidationError
+    )
+    done()
+  })
+
   it('verifies vehicle event validation (single)', done => {
     test.assert.doesNotThrow(() =>
       isValidEvent({
@@ -267,6 +354,69 @@ describe('Tests validators', () => {
     // @ts-ignore: make a bad event for the sake of exercising the validator
     events[0].event_types = ['notreal']
     test.assert.throws(() => validateEvents(events), ValidationError)
+    done()
+  })
+
+  it('verifies geographies validatory (array)', done => {
+    const geographies = [
+      {
+        name: 'inner venice geo',
+        geography_id: 'b4c75556-3842-47a9-b8f6-d721b98c8ca5',
+        geography_json: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-118.46941709518433, 33.9807517760146],
+                    [-118.46564054489136, 33.9807517760146],
+                    [-118.46564054489136, 33.98356306245639],
+                    [-118.46941709518433, 33.98356306245639],
+                    [-118.46941709518433, 33.9807517760146]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        name: 'a random utah geo',
+        geography_id: 'a345a55d-6b31-4c18-b082-3a37bba49982',
+        geography_json: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-112.587890625, 37.71859032558816],
+                    [-109.3798828125, 37.71859032558816],
+                    [-109.3798828125, 38.58252615935333],
+                    [-112.587890625, 38.58252615935333],
+                    [-112.587890625, 37.71859032558816]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+
+    test.assert.doesNotThrow(() => validateGeographies(geographies))
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: make a bad event for the sake of exercising the validator
+    geographies[0].geography_json = {}
+    test.assert.throws(() => validateGeographies(geographies), ValidationError)
     done()
   })
 })

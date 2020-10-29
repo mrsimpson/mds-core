@@ -31,8 +31,8 @@ import {
   Telemetry,
   Stop,
   PROPULSION_TYPES,
-  VEHICLE_STATES,
-  Device
+  Device,
+  VEHICLE_STATES
 } from '@mds-core/mds-types'
 import * as Joi from 'joi'
 import joiToJson from 'joi-to-json'
@@ -89,7 +89,7 @@ const ruleSchema = Joi.object().keys({
     .valid(...Object.values(RULE_TYPES))
     .required(),
   rule_units: Joi.string().valid('seconds', 'minutes', 'hours', 'mph', 'kph'),
-  geographies: Joi.array().items(Joi.string().guid()),
+  geographies: Joi.array().items(uuidSchema),
   states: Joi.object()
     .keys(
       VEHICLE_STATES.reduce(
@@ -147,13 +147,13 @@ export const geographySchema = Joi.object().keys({
 
 const geographiesSchema = Joi.array().items(geographySchema)
 
-const vehicleEventTypeSchema = stringSchema.valid(...VEHICLE_EVENTS)
+export const vehicleEventTypeSchema = stringSchema.valid(...VEHICLE_EVENTS)
 
 const vehicleTypeSchema = stringSchema.valid(...Object.keys(VEHICLE_TYPES))
 
 const propulsionTypeSchema = stringSchema.valid(...Object.keys(PROPULSION_TYPES))
 
-const vehicleStatusSchema = stringSchema.valid(...VEHICLE_STATES)
+export const vehicleStatusSchema = stringSchema.valid(...VEHICLE_STATES)
 
 const eventSchema = Joi.object().keys({
   device_id: uuidSchema.required(),

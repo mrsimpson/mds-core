@@ -38,7 +38,6 @@ function getDeviceMap(devices: Device[]): { [d: string]: Device } {
 describe('Tests Compliance Engine', () => {
   before(async () => {
     policies = await readJson('test_data/policies.json')
-    // geographies = await readJson('test_data/geographies.json')
   })
 
   // it('Verify Devices Schema Compliance', done => {
@@ -79,6 +78,8 @@ describe('Tests Compliance Engine', () => {
         result.compliance.forEach(compliance => {
           if (compliance.matches && compliance.rule.rule_type === RULE_TYPES.count) {
             test.assert.deepEqual(compliance.matches.length, 1)
+            test.assert.deepEqual(compliance.matches[0].measured, 800)
+            test.assert.deepEqual(result.total_violations, 0)
           }
         })
       }
@@ -114,6 +115,7 @@ describe('Tests Compliance Engine', () => {
 
     results.forEach(result => {
       if (result) {
+        console.dir(result, { depth: null })
         result.compliance.forEach(compliance => {
           if (
             compliance.matches &&
@@ -413,6 +415,8 @@ describe('Verifies compliance engine processes by vehicle most recent event', as
     }, [])
     const deviceMap = getDeviceMap(devices)
     const results = low_count_policies.map(policy => processPolicy(policy, events, geographies, deviceMap))
+    console.log('foofoo')
+    console.dir(results, { depth: null })
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {
