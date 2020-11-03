@@ -79,6 +79,7 @@ registry:
 useLatestImage: true
 domain: "*"
 ingressgateway: ingressgateway
+backendNamespace: backend
 tls:
   enabled: false
   elbTermination: false
