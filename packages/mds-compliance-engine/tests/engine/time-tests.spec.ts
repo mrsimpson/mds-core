@@ -6,7 +6,8 @@ import { Geography, Policy, Device, VehicleEvent, Telemetry, TimeRule } from '@m
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
 import { minutes } from '@mds-core/mds-utils'
-import { ComplianceEngineResult, MatchedVehicleInformation, VehicleEventWithTelemetry } from '../../@types'
+import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service/@types'
+import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { generateDeviceMap } from './helpers'
 import { isTimeRuleMatch, processTimePolicy } from '../../engine/time_processors'
 import {

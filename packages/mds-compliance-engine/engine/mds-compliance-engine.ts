@@ -17,7 +17,8 @@
 import { Device, Geography, Policy, UUID, RULE_TYPES } from '@mds-core/mds-types'
 
 import { now, UnsupportedTypeError, uuid } from '@mds-core/mds-utils'
-import { VehicleEventWithTelemetry, ComplianceEngineResult, ComplianceSnapshot } from '../@types'
+import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
+import { VehicleEventWithTelemetry, ComplianceEngineResult } from '../@types'
 import { getProviderIDs, getComplianceInputs, isPolicyActive } from './helpers'
 
 import { processCountPolicy } from './count_processors'
@@ -51,7 +52,7 @@ export async function createComplianceSnapshot(
     geos: Geography[],
     devicesToCheck: { [d: string]: Device }
   ) => ComplianceEngineResult | undefined
-) {
+): Promise<ComplianceSnapshotDomainModel | undefined> {
   const { filteredEvents, deviceMap } = await getComplianceInputs(provider_id)
   const compliance_as_of = now()
   const complianceResult = processorFunction(
@@ -61,9 +62,9 @@ export async function createComplianceSnapshot(
     deviceMap
   )
   if (complianceResult) {
-    const complianceSnapshot: ComplianceSnapshot = {
+    const complianceSnapshot: ComplianceSnapshotDomainModel = {
       compliance_as_of,
-      compliance_id: uuid(),
+      compliance_snapshot_id: uuid(),
       excess_vehicles_count: complianceResult.excess_vehicles_count,
       total_violations: complianceResult.total_violations,
       policy: {
