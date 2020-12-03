@@ -21,8 +21,6 @@ apis:
     version: ${JURISDICTION_SERVICE_VERSION}
   mds-policy-author:
     version: ${POLICY_AUTHOR_VERSION}
-  mds-web-sockets:
-    version: ${WEB_SOCKETS_VERSION}
   mds-geography:
     version: ${GEOGRAPHY_VERSION}
   mds-geography-author:
