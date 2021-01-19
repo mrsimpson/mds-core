@@ -8,8 +8,6 @@ BASE_DIR=$(dirname $0)/..
 NODE_ENV=${NODE_ENV:-""}
 REGISTRY=${REGISTRY:=""}
 
-cat /dev/null > $BASE_DIR/dist/images.txt
-
 buildImage() {
   local image=$1
   if [[ "$NODE_ENV" == "development" ]]; then
@@ -23,6 +21,7 @@ buildImage() {
 }
 
 pushImages() {
+  cat /dev/null > $BASE_DIR/dist/images.txt
   if [[ "$REGISTRY" =~ amazonaws.com$ ]]; then
     eval $(aws ecr get-login --no-include-email)
   fi
