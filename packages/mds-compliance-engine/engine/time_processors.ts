@@ -30,8 +30,8 @@ export function isTimeRuleMatch(
   if (isRuleActive(rule)) {
     for (const geography of rule.geographies) {
       if (
-        isInStatesOrEvents(rule, event) &&
-        isInVehicleTypes(rule, device) &&
+        isInStatesOrEvents(rule, device, event) &&
+        isInVehicleTypes(rule, device, event) &&
         (!rule.maximum || (now() - event.timestamp) / RULE_UNIT_MAP[rule.rule_units] >= rule.maximum)
       ) {
         const poly = getPolygon(geographies, geography)

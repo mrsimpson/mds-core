@@ -1,20 +1,47 @@
-import { Device, Geography, Policy, VehicleEvent, UUID, SpeedRule, Telemetry } from '@mds-core/mds-types'
+import {
+  Device,
+  Geography,
+  Policy,
+  VehicleEvent,
+  UUID,
+  SpeedRule,
+  Telemetry,
+  CoreDevice,
+  CoreEvent,
+  BaseRule
+} from '@mds-core/mds-types'
 
 import { pointInShape, getPolygon, isInStatesOrEvents } from '@mds-core/mds-utils'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../@types'
 import { annotateVehicleMap, isInVehicleTypes, isRuleActive } from './helpers'
 
-export function isSpeedRuleMatch(
+export interface MatcherFunction<R extends BaseRule, D extends CoreDevice, E extends CoreEvent> {
+  (rule: R, device: D, event: E): boolean
+}
+
+export function checkMatchers<R extends BaseRule, D extends CoreDevice, E extends CoreEvent>(
+  rule: R,
+  device: D,
+  event: E,
+  ...matchers: MatcherFunction<R, D, E>[]
+) {
+  matchers.forEach(matcher => {
+    if (!matcher(rule, device, event)) return false
+  })
+  return true
+}
+
+export function isGenericSpeedRuleMatch<D extends CoreDevice, E extends CoreEvent>(
   rule: SpeedRule,
   geographies: Geography[],
-  device: Device,
-  event: VehicleEventWithTelemetry
+  device: D,
+  event: E,
+  matchers: MatcherFunction<SpeedRule, D, E>[]
 ) {
   if (isRuleActive(rule)) {
     for (const geography of rule.geographies) {
       if (
-        isInStatesOrEvents(rule, event) &&
-        isInVehicleTypes(rule, device) &&
+        checkMatchers(rule, device, event, ...matchers) &&
         event.telemetry.gps.speed &&
         pointInShape(event.telemetry.gps, getPolygon(geographies, geography)) &&
         (!rule.maximum || event.telemetry.gps.speed >= rule.maximum)
@@ -24,6 +51,15 @@ export function isSpeedRuleMatch(
     }
   }
   return false
+}
+
+export function isSpeedRuleMatch(
+  rule: SpeedRule,
+  geographies: Geography[],
+  device: Device,
+  event: VehicleEventWithTelemetry
+) {
+  return isGenericSpeedRuleMatch(rule, geographies, device, event, [isInStatesOrEvents, isInVehicleTypes])
 }
 
 export function processSpeedPolicy(

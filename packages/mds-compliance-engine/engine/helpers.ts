@@ -78,7 +78,7 @@ export function isRuleActive(rule: Rule): boolean {
   return false
 }
 
-export function isInVehicleTypes(rule: Rule, device: Device): boolean {
+export function isInVehicleTypes(rule: Rule, device: Device, event: VehicleEvent): boolean {
   return !rule.vehicle_types || (rule.vehicle_types && rule.vehicle_types.includes(device.vehicle_type))
 }
 
