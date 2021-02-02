@@ -174,11 +174,14 @@ export type NullableKeys<T> = {
 export type Optional<T, P extends keyof T> = Omit<T, P> & Partial<Pick<T, P>>
 export type NonEmptyArray<T> = [T, ...T[]]
 
-// Represents a row in the "devices" table
-export interface Device_v1_0_0 {
+export interface CoreDevice {
   device_id: UUID
   provider_id: UUID
   vehicle_id: string
+}
+
+// Represents a row in the "devices" table
+export interface Device_v1_0_0 extends CoreDevice {
   vehicle_type: VEHICLE_TYPE // changed name in 1.0
   propulsion_types: PROPULSION_TYPE[] // changed name in 1.0
   year?: number | null
@@ -194,21 +197,24 @@ export type Device = Device_v1_0_0
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
 
+export interface CoreEvent {
+  device_id: UUID
+  provider_id: UUID
+  timestamp: Timestamp
+  telemetry: Telemetry
+}
+
 /**
  *  Represents a row in the "events" table
  * Named "VehicleEvent" to avoid confusion with the DOM's Event interface
  * Keeping 1_0_0 types in here and not in transformers/@types to avoid circular imports.
  * This alias must be updated if this type is updated.
  */
-export interface VehicleEvent_v1_0_0 {
-  device_id: UUID
-  provider_id: UUID
-  timestamp: Timestamp
+export interface VehicleEvent_v1_0_0 extends CoreEvent {
   timestamp_long?: string | null
   delta?: Timestamp | null
   event_types: VEHICLE_EVENT[]
   telemetry_timestamp?: Timestamp | null
-  telemetry?: Telemetry | null
   trip_id?: UUID | null
   vehicle_state: VEHICLE_STATE
   recorded: Timestamp
@@ -333,16 +339,18 @@ export interface PolicyMessage {
 
 // This gets you a type where the keys must be VEHICLE_STATES, such as 'available',
 // and the values are an array of events.
-export type StatesToEvents = { [S in VEHICLE_STATE]: VEHICLE_EVENT[] | [] }
+export type MDSStatesToEvents = { [S in VEHICLE_STATE]: VEHICLE_EVENT[] | [] }
 
-interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
+export type GenericStatesToEvents = { string: string[] }
+
+export interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   // TODO 'rate'
   name: string
   rule_id: UUID
   geographies: UUID[]
-  states: Partial<StatesToEvents> | null
+  states: Partial<GenericStatesToEvents> | null
   rule_type: RuleType
-  vehicle_types?: VEHICLE_TYPE[] | null
+  vehicle_types?: string[] | null
   maximum?: number | null
   minimum?: number | null
   start_time?: string | null
@@ -354,19 +362,24 @@ interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   value_url?: URL | null
 }
 
-export type CountRule = BaseRule<'count'>
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface MDSBaseRule<RuleType> extends BaseRule {
+  vehicle_types?: VEHICLE_TYPE[] | null
+}
 
-export interface TimeRule extends BaseRule<'time'> {
+export type CountRule = MDSBaseRule<'count'>
+
+export interface TimeRule extends MDSBaseRule<'time'> {
   rule_units: 'minutes' | 'hours'
 }
 
-export interface SpeedRule extends BaseRule<'speed'> {
+export interface SpeedRule extends MDSBaseRule<'speed'> {
   rule_units: 'kph' | 'mph'
 }
 
-export type UserRule = BaseRule<'user'>
+export type UserRule = MDSBaseRule<'user'>
 
-export type Rule = CountRule | TimeRule | SpeedRule | UserRule
+export type MDSRule = CountRule | TimeRule | SpeedRule | UserRule
 
 export interface Policy {
   name: string
@@ -377,7 +390,7 @@ export interface Policy {
   start_date: Timestamp
   end_date: Timestamp | null
   prev_policies: UUID[] | null
-  rules: Rule[]
+  rules: BaseRule[]
   publish_date?: Timestamp
 }
 
