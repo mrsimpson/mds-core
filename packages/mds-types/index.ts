@@ -381,7 +381,7 @@ export type UserRule = MDSBaseRule<'user'>
 
 export type MDSRule = CountRule | TimeRule | SpeedRule | UserRule
 
-export interface Policy {
+export interface Policy<R> {
   name: string
   description: string
   provider_ids?: UUID[]
@@ -390,7 +390,7 @@ export interface Policy {
   start_date: Timestamp
   end_date: Timestamp | null
   prev_policies: UUID[] | null
-  rules: BaseRule[]
+  rules: (R extends BaseRule)[]
   publish_date?: Timestamp
 }
 
