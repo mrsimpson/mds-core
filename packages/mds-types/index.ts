@@ -337,18 +337,20 @@ export interface PolicyMessage {
 //   value_url?: URL | null
 // }
 
+export type GenericStatesToEvents<S extends string, E extends string> = {
+  [K in S]?: E[] | []
+}
+
 // This gets you a type where the keys must be VEHICLE_STATES, such as 'available',
 // and the values are an array of events.
 export type MDSStatesToEvents = { [S in VEHICLE_STATE]: VEHICLE_EVENT[] | [] }
 
-export type GenericStatesToEvents = { string: string[] }
-
-export interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
+export interface BaseRule<S extends string, E extends string, RuleType extends RULE_TYPE = RULE_TYPE> {
   // TODO 'rate'
   name: string
   rule_id: UUID
   geographies: UUID[]
-  states: Partial<GenericStatesToEvents> | null
+  states: GenericStatesToEvents<S, E> | null
   rule_type: RuleType
   vehicle_types?: string[] | null
   maximum?: number | null
@@ -363,8 +365,9 @@ export interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface MDSBaseRule<RuleType> extends BaseRule {
+export interface MDSBaseRule<RuleType extends RULE_TYPE> extends BaseRule<VEHICLE_STATE, VEHICLE_EVENT, RuleType> {
   vehicle_types?: VEHICLE_TYPE[] | null
+  states: MDSStatesToEvents | null
 }
 
 export type CountRule = MDSBaseRule<'count'>
@@ -381,7 +384,12 @@ export type UserRule = MDSBaseRule<'user'>
 
 export type MDSRule = CountRule | TimeRule | SpeedRule | UserRule
 
-export interface Policy<R> {
+export interface Policy<
+  S extends string,
+  E extends string,
+  RuleType extends RULE_TYPE,
+  R extends BaseRule<S, E, RuleType>
+> {
   name: string
   description: string
   provider_ids?: UUID[]
@@ -390,9 +398,11 @@ export interface Policy<R> {
   start_date: Timestamp
   end_date: Timestamp | null
   prev_policies: UUID[] | null
-  rules: (R extends BaseRule)[]
+  rules: R[]
   publish_date?: Timestamp
 }
+
+type MDSPolicy = Policy<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MDSBaseRule<RULE_TYPE>>
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface PolicyMetadata<M extends {} = Record<string, any>> {

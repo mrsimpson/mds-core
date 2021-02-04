@@ -25,7 +25,7 @@ import {
   Telemetry,
   BoundingBox,
   Geography,
-  Rule,
+  MDSRule,
   EVENT_STATES_MAP,
   VEHICLE_STATE,
   BBox,
@@ -529,7 +529,7 @@ function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
  * ```
  */
 function isInStatesOrEvents(
-  rule: Pick<Rule, 'states'>,
+  rule: Pick<MDSRule, 'states'>,
   _: Device,
   event: Pick<VehicleEvent, 'event_types' | 'vehicle_state'>
 ): boolean {
