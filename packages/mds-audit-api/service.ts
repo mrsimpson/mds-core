@@ -43,7 +43,7 @@ export async function deleteAudit(audit_trip_id: UUID): Promise<number> {
 }
 
 // Currently, many of the database methods are a little heavy handed in the way they throw exceptions on read (not found)
-// requests. In mds-audit, there are valid scenarios where a particular audit or device may not exist. These service methods
+// requests. In mds-audit-api, there are valid scenarios where a particular audit or device may not exist. These service methods
 // exist to wrap the database calls and return null rather than forcing the caller to catch and handle exceptions for expected
 // scenarios.
 //

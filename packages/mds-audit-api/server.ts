@@ -26,5 +26,5 @@ cache
   })
   // eslint-disable-next-line promise/prefer-await-to-callbacks
   .catch(err => {
-    logger.error('mds-audit startup failure', err)
+    logger.error('mds-audit-api startup failure', err)
   })
