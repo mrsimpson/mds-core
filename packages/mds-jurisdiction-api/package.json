@@ -1,5 +1,5 @@
 {
-  "name": "@mds-core/mds-jurisdiction",
+  "name": "@mds-core/mds-jurisdiction-api",
   "description": "MDS Jurisdictions API",
   "version": "0.1.0",
   "author": "City of Los Angeles",
