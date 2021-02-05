@@ -1,5 +1,5 @@
 {
-  "name": "@mds-core/mds-policy",
+  "name": "@mds-core/mds-policy-api",
   "description": "MDS Policy API",
   "version": "0.0.27",
   "author": "City of Los Angeles",
