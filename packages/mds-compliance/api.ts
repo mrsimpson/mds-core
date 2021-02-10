@@ -30,7 +30,7 @@ import {
   BadParamsError,
   AuthorizationError
 } from '@mds-core/mds-utils'
-import { Geography, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { Geography, MDSPolicy, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { providerName } from '@mds-core/mds-providers'
 import { Geometry, FeatureCollection } from 'geojson'
 import { parseRequest } from '@mds-core/mds-api-helpers'
@@ -159,7 +159,7 @@ function api(app: express.Express): express.Express {
 
     const { rule_id } = req.params
     try {
-      const activePolicies = await db.readActivePolicies(query_date)
+      const activePolicies = ((await db.readActivePolicies(query_date)) as unknown) as MDSPolicy[]
       const [policy] = activePolicies.filter(activePolicy => {
         const matches = activePolicy.rules.filter(policy_rule => policy_rule.rule_id === rule_id)
         return matches.length !== 0
