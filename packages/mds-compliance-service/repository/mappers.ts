@@ -1,7 +1,11 @@
 import { Optional, Timestamp } from '@mds-core/mds-types'
 import { IdentityColumn, ModelMapper, RecordedColumn } from '@mds-core/mds-repository'
 import { ComplianceSnapshotEntityModel } from './entities/compliance-snapshot-entity'
-import { ComplianceSnapshotDomainModel } from '../@types'
+import {
+  ComplianceSnapshotDomainModel,
+  ComplianceViolationPeriodDomainModel,
+  ComplianceViolationPeriodEntityModel
+} from '../@types'
 
 type ComplianceSnapshotEntityToDomainOptions = Partial<{}>
 
@@ -40,4 +44,12 @@ export const ComplianceSnapshotDomainToEntityCreate = ModelMapper<
     ...entity
   } = domain
   return { ...entity, policy_name, policy_id, recorded }
+})
+
+export const ComplianceViolationPeriodEntityToDomainCreate = ModelMapper<
+  ComplianceViolationPeriodEntityModel,
+  ComplianceViolationPeriodDomainModel
+>((entity, _) => {
+  const { start_time, real_end_time: end_time, compliance_snapshot_ids } = entity
+  return { start_time, end_time, compliance_snapshot_ids }
 })

@@ -30,8 +30,37 @@ export interface ComplianceSnapshotDomainModel {
   total_violations: number
 }
 
+/**
+ * A violation period starts with the first compliance snapshot that has a violation, and ends
+ * with the first snapshot that has no violations. E.g. if A, B, C, D, and E are snapshots,
+ * and A and E have no violations, the violation period contains B, C and D, and the end_time is
+ * the compliance_as_of timestamp on E.
+ */
+export interface ComplianceViolationPeriodDomainModel {
+  compliance_snapshot_ids: UUID[]
+  start_time: Timestamp
+  end_time: Timestamp | null
+}
+
+export interface ComplianceAggregateDomainModel {
+  policy_id: UUID
+  provider_id: UUID
+  provider_name: string
+  violation_periods: ComplianceViolationPeriodDomainModel[]
+}
+
+export interface ComplianceViolationPeriodEntityModel {
+  provider_id: UUID
+  policy_id: UUID
+  start_time: Timestamp
+  end_time: Timestamp
+  real_end_time: Timestamp | null
+  compliance_snapshot_ids: UUID[]
+  sum_total_violations: number
+}
+
 export type GetComplianceSnapshotOptions =
-  |{
+  | {
       compliance_snapshot_id: UUID
     }
   | {
@@ -47,7 +76,14 @@ export type GetComplianceSnapshotsByTimeIntervalOptions = Partial<{
   provider_ids: UUID[]
 }>
 
-export interface ComplianceSnapshotService {
+export type GetComplianceViolationPeriodsOptions = {
+  start_time: Timestamp
+  provider_ids?: UUID[]
+  policy_ids?: UUID[]
+  end_time?: Timestamp
+}
+
+export interface ComplianceService {
   createComplianceSnapshots: (complianceSnapshots: ComplianceSnapshotDomainModel[]) => ComplianceSnapshotDomainModel[]
   createComplianceSnapshot: (complianceSnapshot: ComplianceSnapshotDomainModel) => ComplianceSnapshotDomainModel
   getComplianceSnapshotsByTimeInterval: (
@@ -55,12 +91,14 @@ export interface ComplianceSnapshotService {
   ) => ComplianceSnapshotDomainModel[]
   getComplianceSnapshotsByIDs: (ids: UUID[]) => ComplianceSnapshotDomainModel[]
   getComplianceSnapshot: (options: GetComplianceSnapshotOptions) => ComplianceSnapshotDomainModel
+  getComplianceViolationPeriods: (options: GetComplianceViolationPeriodsOptions) => ComplianceAggregateDomainModel[]
 }
 
-export const ComplianceSnapshotServiceDefinition: RpcServiceDefinition<ComplianceSnapshotService> = {
-  createComplianceSnapshots: RpcRoute<ComplianceSnapshotService['createComplianceSnapshots']>(),
-  createComplianceSnapshot: RpcRoute<ComplianceSnapshotService['createComplianceSnapshot']>(),
-  getComplianceSnapshotsByTimeInterval: RpcRoute<ComplianceSnapshotService['getComplianceSnapshotsByTimeInterval']>(),
-  getComplianceSnapshotsByIDs: RpcRoute<ComplianceSnapshotService['getComplianceSnapshotsByIDs']>(),
-  getComplianceSnapshot: RpcRoute<ComplianceSnapshotService['getComplianceSnapshot']>()
+export const ComplianceServiceDefinition: RpcServiceDefinition<ComplianceService> = {
+  createComplianceSnapshots: RpcRoute<ComplianceService['createComplianceSnapshots']>(),
+  createComplianceSnapshot: RpcRoute<ComplianceService['createComplianceSnapshot']>(),
+  getComplianceSnapshotsByTimeInterval: RpcRoute<ComplianceService['getComplianceSnapshotsByTimeInterval']>(),
+  getComplianceSnapshotsByIDs: RpcRoute<ComplianceService['getComplianceSnapshotsByIDs']>(),
+  getComplianceSnapshot: RpcRoute<ComplianceService['getComplianceSnapshot']>(),
+  getComplianceViolationPeriods: RpcRoute<ComplianceService['getComplianceViolationPeriods']>()
 }
