@@ -1,47 +1,20 @@
-import {
-  Device,
-  Geography,
-  Policy,
-  VehicleEvent,
-  UUID,
-  SpeedRule,
-  Telemetry,
-  CoreDevice,
-  CoreEvent,
-  BaseRule
-} from '@mds-core/mds-types'
+import { Device, Geography, VehicleEvent, UUID, SpeedRule, Telemetry, MDSPolicy, RULE_TYPES } from '@mds-core/mds-types'
 
-import { pointInShape, getPolygon, isInStatesOrEvents } from '@mds-core/mds-utils'
+import { pointInShape, getPolygon, isInStatesOrEvents, UnsupportedTypeError } from '@mds-core/mds-utils'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../@types'
-import { annotateVehicleMap, isInVehicleTypes, isRuleActive } from './helpers'
+import { annotateVehicleMap, getPolicyType, isInVehicleTypes, isRuleActive } from './helpers'
 
-export interface MatcherFunction<R extends BaseRule, D extends CoreDevice, E extends CoreEvent> {
-  (rule: R, device: D, event: E): boolean
-}
-
-export function checkMatchers<R extends BaseRule, D extends CoreDevice, E extends CoreEvent>(
-  rule: R,
-  device: D,
-  event: E,
-  ...matchers: MatcherFunction<R, D, E>[]
-) {
-  matchers.forEach(matcher => {
-    if (!matcher(rule, device, event)) return false
-  })
-  return true
-}
-
-export function isGenericSpeedRuleMatch<D extends CoreDevice, E extends CoreEvent>(
+export function isSpeedRuleMatch(
   rule: SpeedRule,
   geographies: Geography[],
-  device: D,
-  event: E,
-  matchers: MatcherFunction<SpeedRule, D, E>[]
+  device: Device,
+  event: VehicleEventWithTelemetry
 ) {
   if (isRuleActive(rule)) {
     for (const geography of rule.geographies) {
       if (
-        checkMatchers(rule, device, event, ...matchers) &&
+        isInStatesOrEvents(rule, event) &&
+        isInVehicleTypes(rule, device, event) &&
         event.telemetry.gps.speed &&
         pointInShape(event.telemetry.gps, getPolygon(geographies, geography)) &&
         (!rule.maximum || event.telemetry.gps.speed >= rule.maximum)
@@ -53,21 +26,17 @@ export function isGenericSpeedRuleMatch<D extends CoreDevice, E extends CoreEven
   return false
 }
 
-export function isSpeedRuleMatch(
-  rule: SpeedRule,
-  geographies: Geography[],
-  device: Device,
-  event: VehicleEventWithTelemetry
-) {
-  return isGenericSpeedRuleMatch(rule, geographies, device, event, [isInStatesOrEvents, isInVehicleTypes])
-}
-
 export function processSpeedPolicy(
-  policy: Policy,
+  policy: MDSPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
 ): ComplianceEngineResult | undefined {
+  if (getPolicyType(policy) !== RULE_TYPES.speed) {
+    console.log('about to fail')
+    console.log(policy.policy_id)
+    throw new UnsupportedTypeError(`${getPolicyType(policy)} with id ${policy.policy_id} submitted to speed processor`)
+  }
   const matchedVehicles: {
     [d: string]: { device: Device; speed?: number; rule_applied: UUID; rules_matched: UUID[] }
   } = {}

@@ -1,4 +1,13 @@
-import { UUID, Policy, Timestamp, Recorded, Rule, PolicyMetadata, Nullable } from '@mds-core/mds-types'
+import {
+  UUID,
+  MDSPolicy,
+  Timestamp,
+  Recorded,
+  MDSPolicyMetadata,
+  Nullable,
+  MDSBaseRule,
+  RULE_TYPE
+} from '@mds-core/mds-types'
 import {
   now,
   NotFoundError,
@@ -24,7 +33,7 @@ export async function readPolicies(params?: {
   start_date?: Timestamp
   get_unpublished?: Nullable<boolean>
   get_published?: Nullable<boolean>
-}): Promise<Policy[]> {
+}): Promise<MDSPolicy[]> {
   // use params to filter
   // query
   // return policies
@@ -70,7 +79,7 @@ export async function readPolicies(params?: {
   return res.rows.map(row => row.policy_json)
 }
 
-export async function readActivePolicies(timestamp: Timestamp = now()): Promise<Policy[]> {
+export async function readActivePolicies(timestamp: Timestamp = now()): Promise<MDSPolicy[]> {
   const client = await getReadOnlyClient()
   const conditions = []
   const vals = new SqlVals()
@@ -92,7 +101,7 @@ export async function readBulkPolicyMetadata(params?: {
   start_date?: Timestamp
   get_unpublished: Nullable<boolean>
   get_published: Nullable<boolean>
-}): Promise<PolicyMetadata[]> {
+}): Promise<MDSPolicyMetadata[]> {
   const policies = await readPolicies(params)
   const policy_ids = policies.map(policy => {
     return `'${policy.policy_id}'`
@@ -110,7 +119,7 @@ export async function readBulkPolicyMetadata(params?: {
   })
 }
 
-export async function readSinglePolicyMetadata(policy_id: UUID): Promise<PolicyMetadata> {
+export async function readSinglePolicyMetadata(policy_id: UUID): Promise<MDSPolicyMetadata> {
   const client = await getReadOnlyClient()
 
   const sql = `select * from ${schema.TABLE.policy_metadata} where policy_id = '${policy_id}'`
@@ -119,11 +128,11 @@ export async function readSinglePolicyMetadata(policy_id: UUID): Promise<PolicyM
     const { policy_metadata } = res.rows[0]
     return { policy_id, policy_metadata }
   }
-  logger.info(`readSinglePolicyMetadata db failed for ${policy_id}: rows=${res.rows.length}`)
+  logger.info(`readSingleMDSPolicyMetadata db failed for ${policy_id}: rows=${res.rows.length}`)
   throw new NotFoundError(`metadata for policy_id ${policy_id} not found`)
 }
 
-export async function readPolicy(policy_id: UUID): Promise<Policy> {
+export async function readPolicy(policy_id: UUID): Promise<MDSPolicy> {
   const client = await getReadOnlyClient()
 
   const sql = `select * from ${schema.TABLE.policies} where policy_id = '${policy_id}'`
@@ -131,12 +140,12 @@ export async function readPolicy(policy_id: UUID): Promise<Policy> {
   if (res.rows.length === 1) {
     return res.rows[0].policy_json
   }
-  logger.info(`readPolicy db failed for ${policy_id}: rows=${res.rows.length}`)
+  logger.info(`readMDSPolicy db failed for ${policy_id}: rows=${res.rows.length}`)
   throw new NotFoundError(`policy_id ${policy_id} not found`)
 }
 
-async function throwIfRulesAlreadyExist(policy: Policy) {
-  const unflattenedPolicies: Policy[][] = await Promise.all(
+async function throwIfRulesAlreadyExist(policy: MDSPolicy) {
+  const unflattenedPolicies: MDSPolicy[][] = await Promise.all(
     policy.rules.map(rule => {
       return readPolicies({ rule_id: rule.rule_id })
     })
@@ -151,7 +160,7 @@ async function throwIfRulesAlreadyExist(policy: Policy) {
   })
 }
 
-export async function writePolicy(policy: Policy): Promise<Recorded<Policy>> {
+export async function writePolicy(policy: MDSPolicy): Promise<Recorded<MDSPolicy>> {
   // validate TODO
   const client = await getWriteableClient()
   await throwIfRulesAlreadyExist(policy)
@@ -163,11 +172,11 @@ export async function writePolicy(policy: Policy): Promise<Recorded<Policy>> {
   try {
     const {
       rows: [recorded_policy]
-    }: { rows: Recorded<Policy>[] } = await client.query(sql, values)
+    }: { rows: Recorded<MDSPolicy>[] } = await client.query(sql, values)
     return { ...policy, ...recorded_policy }
   } catch (error) {
     if (error.code === '23505') {
-      throw new ConflictError(`Policy ${policy.policy_id} already exists! Did you mean to PUT?`)
+      throw new ConflictError(`MDSPolicy ${policy.policy_id} already exists! Did you mean to PUT?`)
     } else {
       throw error
     }
@@ -184,7 +193,7 @@ export async function isPolicyPublished(policy_id: UUID) {
   return Boolean(result.rows[0].policy_json.publish_date)
 }
 
-export async function editPolicy(policy: Policy) {
+export async function editPolicy(policy: MDSPolicy) {
   // validate TODO
   const { policy_id } = policy
 
@@ -259,7 +268,7 @@ export async function publishPolicy(policy_id: UUID, publish_date = now()) {
      where policy_id='${policy_id}' RETURNING *`
     const {
       rows: [published_policy]
-    }: { rows: Policy[] } = await client.query(publishPolicySQL).catch(err => {
+    }: { rows: MDSPolicy[] } = await client.query(publishPolicySQL).catch(err => {
       throw err
     })
     return { ...published_policy }
@@ -269,7 +278,7 @@ export async function publishPolicy(policy_id: UUID, publish_date = now()) {
   }
 }
 
-export async function writePolicyMetadata(policy_metadata: PolicyMetadata) {
+export async function writePolicyMetadata(policy_metadata: MDSPolicyMetadata) {
   const client = await getWriteableClient()
   const sql = `INSERT INTO ${schema.TABLE.policy_metadata} (${cols_sql(
     schema.TABLE_COLUMNS.policy_metadata
@@ -280,14 +289,14 @@ export async function writePolicyMetadata(policy_metadata: PolicyMetadata) {
   })
   const {
     rows: [recorded_metadata]
-  }: { rows: Recorded<PolicyMetadata>[] } = await client.query(sql, values)
+  }: { rows: Recorded<MDSPolicyMetadata>[] } = await client.query(sql, values)
   return {
     ...policy_metadata,
     ...recorded_metadata
   }
 }
 
-export async function updatePolicyMetadata(policy_metadata: PolicyMetadata) {
+export async function updateMDSPolicyMetadata(policy_metadata: MDSPolicyMetadata) {
   try {
     await readSinglePolicyMetadata(policy_metadata.policy_id)
     const client = await getWriteableClient()
@@ -296,7 +305,7 @@ export async function updatePolicyMetadata(policy_metadata: PolicyMetadata) {
       WHERE policy_id = '${policy_metadata.policy_id}'`
     const {
       rows: [recorded_metadata]
-    }: { rows: Recorded<PolicyMetadata>[] } = await client.query(sql)
+    }: { rows: Recorded<MDSPolicyMetadata>[] } = await client.query(sql)
     return {
       ...policy_metadata,
       ...recorded_metadata
@@ -307,7 +316,7 @@ export async function updatePolicyMetadata(policy_metadata: PolicyMetadata) {
   }
 }
 
-export async function readRule(rule_id: UUID): Promise<Rule> {
+export async function readRule(rule_id: UUID): Promise<MDSBaseRule<RULE_TYPE>> {
   const client = await getReadOnlyClient()
   const sql = `SELECT * from ${schema.TABLE.policies} where EXISTS(SELECT FROM json_array_elements(policy_json->'rules') elem WHERE (elem->'rule_id')::jsonb ? '${rule_id}');`
   const res = await client.query(sql).catch(err => {
@@ -316,7 +325,7 @@ export async function readRule(rule_id: UUID): Promise<Rule> {
   if (res.rowCount !== 1) {
     throw new Error(`invalid rule_id ${rule_id}`)
   } else {
-    const [{ policy_json }]: { policy_json: Policy }[] = res.rows
+    const [{ policy_json }]: { policy_json: MDSPolicy }[] = res.rows
     const [rule] = policy_json.rules.filter(r => {
       return r.rule_id === rule_id
     })
@@ -324,7 +333,7 @@ export async function readRule(rule_id: UUID): Promise<Rule> {
   }
 }
 
-export async function findPoliciesByGeographyID(geography_id: UUID): Promise<Policy[]> {
+export async function findPoliciesByGeographyID(geography_id: UUID): Promise<MDSPolicy[]> {
   const client = await getReadOnlyClient()
   const sql = `select * from ${schema.TABLE.policies}
     where ${schema.COLUMN.policy_json}::jsonb

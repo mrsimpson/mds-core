@@ -201,7 +201,7 @@ export interface CoreEvent {
   device_id: UUID
   provider_id: UUID
   timestamp: Timestamp
-  telemetry: Telemetry
+  telemetry?: Telemetry | null
 }
 
 /**
@@ -319,31 +319,13 @@ export interface PolicyMessage {
   [key: string]: string
 }
 
-// interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
-//   name: string
-//   rule_id: UUID
-//   geographies: UUID[]
-//   statuses: Partial<{ [S in VEHICLE_STATE]: (keyof typeof STATUS_EVENT_MAP[S])[] | [] }> | null
-//   rule_type: RuleType
-//   vehicle_types?: VEHICLE_TYPE[] | null
-//   maximum?: number | null
-//   minimum?: number | null
-//   start_time?: string | null
-//   end_time?: string | null
-//   days?: DAY_OF_WEEK[] | null
-//   /* eslint-reason TODO: message types haven't been defined well yet */
-//   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-//   messages?: PolicyMessage
-//   value_url?: URL | null
-// }
-
 export type GenericStatesToEvents<S extends string, E extends string> = {
   [K in S]?: E[] | []
 }
 
 // This gets you a type where the keys must be VEHICLE_STATES, such as 'available',
 // and the values are an array of events.
-export type MDSStatesToEvents = { [S in VEHICLE_STATE]: VEHICLE_EVENT[] | [] }
+export type MDSStatesToEvents = Partial<{ [S in VEHICLE_STATE]: VEHICLE_EVENT[] | [] }>
 
 export interface BaseRule<S extends string, E extends string, RuleType extends RULE_TYPE = RULE_TYPE> {
   // TODO 'rate'
@@ -352,6 +334,7 @@ export interface BaseRule<S extends string, E extends string, RuleType extends R
   geographies: UUID[]
   states: GenericStatesToEvents<S, E> | null
   rule_type: RuleType
+  rule_units?: string
   vehicle_types?: string[] | null
   maximum?: number | null
   minimum?: number | null
@@ -382,9 +365,7 @@ export interface SpeedRule extends MDSBaseRule<'speed'> {
 
 export type UserRule = MDSBaseRule<'user'>
 
-export type MDSRule = CountRule | TimeRule | SpeedRule | UserRule
-
-export interface Policy<
+export interface BasePolicy<
   S extends string,
   E extends string,
   RuleType extends RULE_TYPE,
@@ -402,10 +383,13 @@ export interface Policy<
   publish_date?: Timestamp
 }
 
-type MDSPolicy = Policy<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MDSBaseRule<RULE_TYPE>>
+export type MDSPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MDSBaseRule<RULE_TYPE>>
+export type MDSCountPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'count', CountRule>
+export type MDSSpeedPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'speed', SpeedRule>
+export type MDSTimePolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'time', TimeRule>
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface PolicyMetadata<M extends {} = Record<string, any>> {
+export interface MDSPolicyMetadata<M extends {} = Record<string, any>> {
   policy_id: UUID
   policy_metadata: M
 }

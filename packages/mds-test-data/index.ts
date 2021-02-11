@@ -24,7 +24,7 @@ import {
   Timestamp,
   Telemetry,
   VehicleEvent,
-  Policy,
+  MDSPolicy,
   VEHICLE_STATE
 } from '@mds-core/mds-types'
 import { Geometry } from 'geojson'
@@ -86,9 +86,9 @@ const START_YESTERDAY = now() - (now() % days(1))
 const START_TOMORROW = now() + (now() % days(1))
 const START_NOW = now()
 
-const POLICY_JSON: Policy = {
+const POLICY_JSON: MDSPolicy = {
   // TODO guts
-  name: 'Policy 1',
+  name: 'MDSPolicy 1',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: POLICY_UUID,
   start_date: START_TOMORROW,
@@ -110,9 +110,9 @@ const POLICY_JSON: Policy = {
   ]
 }
 
-const SUPERSEDING_POLICY_JSON: Policy = {
+const SUPERSEDING_POLICY_JSON: MDSPolicy = {
   // TODO guts
-  name: 'Supersedes Policy 1',
+  name: 'Supersedes MDSPolicy 1',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: SUPERSEDING_POLICY_UUID,
   start_date: START_YESTERDAY,
@@ -137,9 +137,9 @@ const START_ONE_MONTH_AGO = now() - (now() % days(1)) - days(30)
 const START_ONE_WEEK_AGO = now() - (now() % days(1)) - days(7)
 
 // in the past
-const POLICY2_JSON: Policy = {
+const POLICY2_JSON: MDSPolicy = {
   // TODO guts
-  name: 'Policy 2',
+  name: 'MDSPolicy 2',
   description: 'LADOT Idle Time Limitations',
   policy_id: POLICY2_UUID,
   start_date: START_ONE_MONTH_AGO,
@@ -173,10 +173,10 @@ const POLICY2_JSON: Policy = {
 const START_ONE_MONTH_FROM_NOW = now() - (now() % days(1)) + days(30)
 
 // in the future
-const POLICY3_JSON: Policy = {
+const POLICY3_JSON: MDSPolicy = {
   // TODO guts
   policy_id: POLICY3_UUID,
-  name: 'Policy 3',
+  name: 'MDSPolicy 3',
   description: 'LADOT Pilot Speed Limit Limitations From the Future',
   start_date: START_ONE_MONTH_FROM_NOW,
   end_date: null,
@@ -213,10 +213,10 @@ const POLICY3_JSON: Policy = {
   ]
 }
 
-const POLICY4_JSON: Policy = {
+const POLICY4_JSON: MDSPolicy = {
   // TODO guts
   policy_id: POLICY4_UUID,
-  name: 'Policy 4',
+  name: 'MDSPolicy 4',
   description: 'LADOT Pilot Speed Limit Limitations',
   start_date: now(),
   end_date: null,
@@ -236,9 +236,9 @@ const POLICY4_JSON: Policy = {
   ]
 }
 
-const POLICY5_JSON: Policy = {
+const POLICY5_JSON: MDSPolicy = {
   policy_id: uuid(),
-  name: 'Policy 5',
+  name: 'MDSPolicy 5',
   description: 'just here to enable testing for policies by start date',
   start_date: START_ONE_MONTH_AGO,
   end_date: null,
@@ -258,9 +258,9 @@ const POLICY5_JSON: Policy = {
   ]
 }
 
-const PUBLISH_DATE_VALIDATION_JSON: Policy = {
+const PUBLISH_DATE_VALIDATION_JSON: MDSPolicy = {
   policy_id: '682ab342-0127-4eed-8c26-fb674c25af74',
-  name: 'Future Policy',
+  name: 'Future MDSPolicy',
   description: 'just here to help show that publish_date must be before start_date',
   start_date: START_ONE_MONTH_AGO,
   end_date: null,
@@ -301,7 +301,7 @@ const POLICY_JSON_MISSING_POLICY_ID = {
   ]
 }
 
-const POLICY_WITH_DUPE_RULE: Policy = {
+const POLICY_WITH_DUPE_RULE: MDSPolicy = {
   policy_id: 'ddb4fbc7-0f3d-49cf-869d-f9c1d0b5471f',
   name: 'I am a no good copycat',
   description: 'LADOT Pilot Speed Limit Limitations',
@@ -323,7 +323,7 @@ const POLICY_WITH_DUPE_RULE: Policy = {
   ]
 }
 
-const PUBLISHED_POLICY: Policy = {
+const PUBLISHED_POLICY: MDSPolicy = {
   policy_id: 'a337afd5-f8a9-4291-b176-11f965bc9f3d',
   name: 'I am published but do not do much',
   description: 'LADOT Pilot Speed Limit Limitations',
@@ -346,7 +346,7 @@ const PUBLISHED_POLICY: Policy = {
   ]
 }
 
-const DELETEABLE_POLICY: Policy = {
+const DELETEABLE_POLICY: MDSPolicy = {
   policy_id: '55396abd-e32b-4370-ac02-7f3294eef49e',
   name: 'I am published but do not do much',
   description: 'LADOT Pilot Speed Limit Limitations',
