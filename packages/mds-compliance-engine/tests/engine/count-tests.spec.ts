@@ -5,13 +5,19 @@
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { makeDevices, makeEventsWithTelemetry, veniceSpecOps, makeTelemetryInArea } from '@mds-core/mds-test-data'
+import {
+  makeDevices,
+  makeEventsWithTelemetry,
+  veniceSpecOps,
+  makeTelemetryInArea,
+  LA_CITY_BOUNDARY
+} from '@mds-core/mds-test-data'
 import test from 'unit.js'
 import { FeatureCollection, Feature } from 'geojson'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
 import {
   Device,
-  Policy,
+  MDSPolicy,
   Geography,
   VehicleEvent,
   UUID,
@@ -22,7 +28,6 @@ import {
 } from '@mds-core/mds-types'
 
 import MockDate from 'mockdate'
-import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { generateDeviceMap } from '../../engine/helpers'
 import {
@@ -76,7 +81,7 @@ const COUNT_POLICY = {
   ]
 }
 
-const GEOGRAPHIES = [{ name: 'la', geography_id: CITY_OF_LA, geography_json: la_city_boundary as FeatureCollection }]
+const GEOGRAPHIES = [{ name: 'la', geography_id: CITY_OF_LA, geography_json: LA_CITY_BOUNDARY as FeatureCollection }]
 
 describe('Tests Compliance Engine Count Functionality:', () => {
   describe('basic count compliance cases', () => {
@@ -319,7 +324,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         }
       }) as unknown) as Geography[]
 
-      const VENICE_SPEC_OPS_POLICY: Policy = {
+      const VENICE_SPEC_OPS_POLICY: MDSPolicy = {
         name: 'Venice Special Operations Zone',
         description: 'LADOT Venice Drop-off/no-fly zones',
         policy_id: VENICE_POLICY_UUID,

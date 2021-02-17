@@ -1,7 +1,7 @@
 import test from 'unit.js'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { Geography, Policy, Device, VehicleEvent, Telemetry, TimeRule } from '@mds-core/mds-types'
+import { Geography, MDSPolicy, Device, VehicleEvent, Telemetry, TimeRule } from '@mds-core/mds-types'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
@@ -30,7 +30,7 @@ function now(): number {
   return Date.now()
 }
 
-const TIME_POLICY: Policy = {
+const TIME_POLICY: MDSPolicy = {
   policy_id: 'a2c9a65f-fd85-463e-9564-fc95ea473f7d',
   name: 'Maximum Idle Time',
   description: 'LADOT Pilot Idle Time Limitations',

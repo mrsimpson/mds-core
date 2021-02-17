@@ -17,7 +17,7 @@
 import { providers } from '@mds-core/mds-providers' // map of uuids -> obb
 import {
   Geography,
-  Policy,
+  MDSPolicy,
   VehicleEvent,
   VEHICLE_TYPES,
   DAYS_OF_WEEK,
@@ -331,7 +331,7 @@ export const isValidAuditNote = (value: unknown, options: Partial<ValidatorOptio
 export const HasPropertyAssertion = <T>(obj: unknown, ...props: (keyof T)[]): obj is T =>
   typeof obj === 'object' && obj !== null && props.every(prop => prop in obj)
 
-export function validatePolicies(policies: unknown): policies is Policy[] {
+export function validatePolicies(policies: unknown): policies is MDSPolicy[] {
   const { error } = policiesSchema.validate(policies)
   if (error) {
     throw new ValidationError('invalid_policies', {
@@ -364,7 +364,7 @@ export function validateEvents(events: unknown): events is VehicleEvent[] {
   return true
 }
 
-export function policyValidationDetails(policy: Policy): Joi.ValidationErrorItem[] | null {
+export function policyValidationDetails(policy: MDSPolicy): Joi.ValidationErrorItem[] | null {
   const { error } = policySchema.validate(policy, { allowUnknown: false })
   if (error) {
     return error.details
@@ -380,7 +380,7 @@ export function geographyValidationDetails(geography: Geography): Joi.Validation
   return null
 }
 
-export function rawValidatePolicy(policy: Policy): Joi.ValidationResult {
+export function rawValidatePolicy(policy: MDSPolicy): Joi.ValidationResult {
   return policySchema.validate(policy)
 }
 

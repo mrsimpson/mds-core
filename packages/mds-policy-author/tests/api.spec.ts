@@ -28,7 +28,7 @@ import supertest from 'supertest'
 import test from 'unit.js'
 import db from '@mds-core/mds-db'
 import { clone, isUUID, uuid, pathPrefix } from '@mds-core/mds-utils'
-import { Policy } from '@mds-core/mds-types'
+import { MDSPolicy } from '@mds-core/mds-types'
 import { ApiServer } from '@mds-core/mds-api-server'
 import {
   POLICY_JSON,
@@ -95,7 +95,7 @@ describe('Tests app', () => {
     })
 
     it('tries to post invalid policy', done => {
-      const bad_policy_json: Policy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
+      const bad_policy_json: MDSPolicy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
 
       /* eslint-reason test intentionally does things that the compiler dissuades,
          as it's testing an invalid data case.
@@ -194,7 +194,7 @@ describe('Tests app', () => {
     })
 
     it('verifies cannot PUT invalid policy', async () => {
-      const bad_policy_json: Policy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
+      const bad_policy_json: MDSPolicy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
 
       /* eslint-reason test intentionally does things that the compiler dissuades,
          as it's testing an invalid data case.

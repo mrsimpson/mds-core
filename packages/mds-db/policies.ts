@@ -296,7 +296,7 @@ export async function writePolicyMetadata(policy_metadata: MDSPolicyMetadata) {
   }
 }
 
-export async function updateMDSPolicyMetadata(policy_metadata: MDSPolicyMetadata) {
+export async function updatePolicyMetadata(policy_metadata: MDSPolicyMetadata) {
   try {
     await readSinglePolicyMetadata(policy_metadata.policy_id)
     const client = await getWriteableClient()

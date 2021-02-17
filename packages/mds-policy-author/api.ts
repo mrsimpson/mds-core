@@ -50,6 +50,7 @@ import {
   PolicyAuthorApiGetPolicyMetadatumRequest,
   PolicyAuthorApiEditPolicyMetadataRequest
 } from './types'
+import { MDSPolicy, MDSPolicyMetadata } from '@mds-core/mds-types'
 
 const checkPolicyAuthorApiAccess = (validator: AccessTokenScopeValidator<PolicyAuthorApiAccessTokenScopes>) =>
   checkAccess(validator)
@@ -67,14 +68,14 @@ function api(app: express.Express): express.Express {
     ) => {
       const policy = { policy_id: uuid(), ...req.body }
 
-      const details = policyValidationDetails(policy)
+      const details = policyValidationDetails(policy as MDSPolicy)
 
       if (details != null) {
         return res.status(400).send({ error: new ValidationError(JSON.stringify(details)) })
       }
 
       try {
-        await db.writePolicy(policy)
+        await db.writePolicy(policy as MDSPolicy)
         return res.status(201).send({ version: res.locals.version, data: { policy } })
       } catch (error) {
         if (error instanceof ConflictError) {
@@ -256,7 +257,7 @@ function api(app: express.Express): express.Express {
     ) => {
       const policy_metadata = req.body
       try {
-        await db.updatePolicyMetadata(policy_metadata)
+        await db.updatePolicyMetadata(policy_metadata as MDSPolicyMetadata)
         return res.status(200).send({ version: res.locals.version, data: { policy_metadata } })
       } catch (updateErr) {
         if (updateErr instanceof NotFoundError) {

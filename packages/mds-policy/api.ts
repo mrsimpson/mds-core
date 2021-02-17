@@ -16,7 +16,7 @@
 
 import express, { NextFunction } from 'express'
 // import { isProviderId, providerName } from '@mds-core/mds-providers'
-import { Policy, UUID } from '@mds-core/mds-types'
+import { MDSPolicy, UUID } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import { now, pathPrefix, NotFoundError, isUUID, BadParamsError, ServerError } from '@mds-core/mds-utils'
 import logger from '@mds-core/mds-logger'
@@ -93,7 +93,7 @@ function api(app: express.Express): express.Express {
           throw new BadParamsError(`start_date ${start_date} > end_date ${end_date}`)
         }
         const policies = await db.readPolicies({ get_published, get_unpublished })
-        const prev_policies: UUID[] = policies.reduce((prev_policies_acc: UUID[], policy: Policy) => {
+        const prev_policies: UUID[] = policies.reduce((prev_policies_acc: UUID[], policy: MDSPolicy) => {
           if (policy.prev_policies) {
             prev_policies_acc.push(...policy.prev_policies)
           }

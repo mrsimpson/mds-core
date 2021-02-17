@@ -1,4 +1,4 @@
-import { VehicleEvent, UUID, Timestamp, Policy, Device, Rule } from '@mds-core/mds-types'
+import { VehicleEvent, UUID, Timestamp, MDSPolicy, Device, MDSBaseRule, RULE_TYPE } from '@mds-core/mds-types'
 import {
   ApiRequest,
   ApiVersionedResponse,
@@ -24,7 +24,7 @@ export type ComplianceApiResponse<B = {}> = ApiVersionedResponse<COMPLIANCE_API_
 
 export type ComplianceApiSnapshotResponse = ComplianceApiResponse<ComplianceResponse & { timestamp: Timestamp }>
 export type ComplianceApiCountResponse = ComplianceApiResponse<{
-  policy: Policy
+  policy: MDSPolicy
   count: number
   timestamp: Timestamp
 }>
@@ -61,11 +61,11 @@ export interface ReducedMatch {
 }
 
 export interface Compliance {
-  rule: Rule
+  rule: MDSBaseRule<RULE_TYPE>
   matches: ReducedMatch[] | CountMatch[] | TimeMatch[] | SpeedMatch[]
 }
 export interface ComplianceResponse {
-  policy: Policy
+  policy: MDSPolicy
   compliance: Compliance[]
   total_violations: number
   vehicles_in_violation: MatchedVehiclePlusRule[]
