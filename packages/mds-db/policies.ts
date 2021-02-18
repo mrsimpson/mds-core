@@ -6,7 +6,11 @@ import {
   MDSPolicyMetadata,
   Nullable,
   MDSBaseRule,
-  RULE_TYPE
+  RULE_TYPE,
+  BasePolicy,
+  BaseRule,
+  VEHICLE_STATE,
+  VEHICLE_EVENT
 } from '@mds-core/mds-types'
 import {
   now,
@@ -25,7 +29,13 @@ import { vals_sql, cols_sql, vals_list, SqlVals } from './sql-utils'
 import { isGeographyPublished } from './geographies'
 import { getReadOnlyClient, getWriteableClient } from './client'
 
-export async function readPolicies(params?: {
+export async function readPolicies<
+  S extends string,
+  E extends string,
+  RuleType extends RULE_TYPE,
+  R extends BaseRule<S, E, RuleType>,
+  P extends BasePolicy<S, E, RuleType, R> // <S, E, RuleType, R>
+>(params?: {
   policy_id?: UUID
   rule_id?: UUID
   name?: string
@@ -33,7 +43,7 @@ export async function readPolicies(params?: {
   start_date?: Timestamp
   get_unpublished?: Nullable<boolean>
   get_published?: Nullable<boolean>
-}): Promise<MDSPolicy[]> {
+}): Promise<P[]> {
   // use params to filter
   // query
   // return policies
@@ -147,7 +157,9 @@ export async function readPolicy(policy_id: UUID): Promise<MDSPolicy> {
 async function throwIfRulesAlreadyExist(policy: MDSPolicy) {
   const unflattenedPolicies: MDSPolicy[][] = await Promise.all(
     policy.rules.map(rule => {
-      return readPolicies({ rule_id: rule.rule_id })
+      return readPolicies<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MDSBaseRule<RULE_TYPE>, MDSPolicy>({
+        rule_id: rule.rule_id
+      })
     })
   )
 

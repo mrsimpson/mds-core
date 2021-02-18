@@ -3,7 +3,18 @@ import assert from 'assert'
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import should from 'should'
 import { FeatureCollection } from 'geojson'
-import { Telemetry, Recorded, VehicleEvent, Device, Geography } from '@mds-core/mds-types'
+import {
+  Telemetry,
+  Recorded,
+  VehicleEvent,
+  Device,
+  Geography,
+  MDSPolicy,
+  VEHICLE_STATE,
+  VEHICLE_EVENT,
+  RULE_TYPE,
+  MDSBaseRule
+} from '@mds-core/mds-types'
 import {
   JUMP_TEST_DEVICE_1,
   makeDevices,
@@ -197,7 +208,13 @@ if (pg_info.database) {
         await MDSDBPostgres.writePolicy(DELETEABLE_POLICY)
         assert(!(await MDSDBPostgres.isPolicyPublished(policy_id)))
         await MDSDBPostgres.deletePolicy(policy_id)
-        const policy_result = await MDSDBPostgres.readPolicies({
+        const policy_result = await MDSDBPostgres.readPolicies<
+          VEHICLE_STATE,
+          VEHICLE_EVENT,
+          RULE_TYPE,
+          MDSBaseRule<RULE_TYPE>,
+          MDSPolicy
+        >({
           policy_id,
           get_published: null,
           get_unpublished: null
