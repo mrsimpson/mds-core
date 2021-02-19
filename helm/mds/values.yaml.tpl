@@ -17,3 +17,7 @@ apis:
     version: ${GEOGRAPHY_VERSION}
   mds-geography-author:
     version: ${GEOGRAPHY_AUTHOR_VERSION}
+  mds-compliance-api:
+    version: ${COMPLIANCE_API_VERSION}
+  mds-compliance-service:
+    version: ${COMPLIANCE_SERVICE_VERSION}
