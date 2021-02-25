@@ -13,7 +13,8 @@ import {
   VEHICLE_STATE,
   VEHICLE_EVENT,
   RULE_TYPE,
-  MDSBaseRule
+  MDSBaseRule,
+  BaseRule
 } from '@mds-core/mds-types'
 import {
   JUMP_TEST_DEVICE_1,
@@ -233,12 +234,30 @@ if (pg_info.database) {
         await MDSDBPostgres.writePolicy(POLICY3_JSON)
 
         // Read all policies, no matter whether published or not.
-        const policies = await MDSDBPostgres.readPolicies()
-        assert.deepEqual(policies.length, 3)
-        const unpublishedPolicies = await MDSDBPostgres.readPolicies({ get_unpublished: true, get_published: null })
-        assert.deepEqual(unpublishedPolicies.length, 2)
-        const publishedPolicies = await MDSDBPostgres.readPolicies({ get_published: true, get_unpublished: null })
-        assert.deepEqual(publishedPolicies.length, 1)
+        const policies = await MDSDBPostgres.readPolicies<
+          VEHICLE_STATE,
+          VEHICLE_EVENT,
+          RULE_TYPE,
+          BaseRule<VEHICLE_STATE, VEHICLE_EVENT>,
+          MDSPolicy
+        >()
+        assert.deepStrictEqual(policies.length, 3)
+        const unpublishedPolicies = await MDSDBPostgres.readPolicies<
+          VEHICLE_STATE,
+          VEHICLE_EVENT,
+          RULE_TYPE,
+          BaseRule<VEHICLE_STATE, VEHICLE_EVENT>,
+          MDSPolicy
+        >({ get_unpublished: true, get_published: null })
+        assert.deepStrictEqual(unpublishedPolicies.length, 2)
+        const publishedPolicies = await MDSDBPostgres.readPolicies<
+          VEHICLE_STATE,
+          VEHICLE_EVENT,
+          RULE_TYPE,
+          BaseRule<VEHICLE_STATE, VEHICLE_EVENT>,
+          MDSPolicy
+        >({ get_published: true, get_unpublished: null })
+        assert.deepStrictEqual(publishedPolicies.length, 1)
       })
 
       it('throws a ConflictError when writing a policy that already exists', async () => {
