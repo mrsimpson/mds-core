@@ -381,6 +381,9 @@ export interface BasePolicy<
   prev_policies: UUID[] | null
   rules: R[]
   publish_date?: Timestamp
+  // Needed to set the index signature
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
 }
 
 export type MDSPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MDSBaseRule<RULE_TYPE>>

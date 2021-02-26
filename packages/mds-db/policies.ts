@@ -160,10 +160,16 @@ export async function readPolicy(policy_id: UUID): Promise<MDSPolicy> {
   throw new NotFoundError(`policy_id ${policy_id} not found`)
 }
 
-async function throwIfRulesAlreadyExist(policy: MDSPolicy) {
-  const unflattenedPolicies: MDSPolicy[][] = await Promise.all(
+async function throwIfRulesAlreadyExist<
+  S extends string,
+  E extends string,
+  RuleType extends RULE_TYPE,
+  R extends BaseRule<S, E, RuleType>,
+  P extends BasePolicy<S, E, RuleType, R>
+>(policy: P) {
+  const unflattenedPolicies: P[][] = await Promise.all(
     policy.rules.map(rule => {
-      return readPolicies<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MDSBaseRule<RULE_TYPE>, MDSPolicy>({
+      return readPolicies<S, E, RuleType, R, P>({
         rule_id: rule.rule_id
       })
     })
@@ -178,7 +184,13 @@ async function throwIfRulesAlreadyExist(policy: MDSPolicy) {
   })
 }
 
-export async function writePolicy(policy: MDSPolicy): Promise<Recorded<MDSPolicy>> {
+export async function writePolicy<
+  S extends string,
+  E extends string,
+  RuleType extends RULE_TYPE,
+  R extends BaseRule<S, E, RuleType>,
+  P extends BasePolicy<S, E, RuleType, R>
+>(policy: P): Promise<Recorded<P>> {
   // validate TODO
   const client = await getWriteableClient()
   await throwIfRulesAlreadyExist(policy)
