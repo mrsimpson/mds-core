@@ -10,8 +10,7 @@ import {
   BasePolicy,
   BaseRule,
   VEHICLE_STATE,
-  VEHICLE_EVENT,
-  BasePolicyType
+  VEHICLE_EVENT
 } from '@mds-core/mds-types'
 import {
   now,
@@ -30,7 +29,13 @@ import { vals_sql, cols_sql, vals_list, SqlVals } from './sql-utils'
 import { isGeographyPublished } from './geographies'
 import { getReadOnlyClient, getWriteableClient } from './client'
 
-export async function readPolicies<P extends BasePolicyType>(params?: {
+export async function readPolicies<
+  S extends string,
+  E extends string,
+  RuleType extends RULE_TYPE,
+  R extends BaseRule<S, E, RuleType>,
+  P extends BasePolicy<S, E, RuleType, R>
+>(params?: {
   policy_id?: UUID
   rule_id?: UUID
   name?: string

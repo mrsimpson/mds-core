@@ -383,14 +383,6 @@ export interface BasePolicy<
   publish_date?: Timestamp
 }
 
-export type BasePolicyType<
-  S extends string,
-  E extends string
-  //  RuleType = RULE_TYPE,
-  //  R extends BaseRule<S, E, RuleType>,
-  //  P = BasePolicy<string, string, RULE_TYPE, R>
-> = { S: S; E: E } // RuleType: RuleType; R: R; P: P }
-
 export type MDSPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MDSBaseRule<RULE_TYPE>>
 export type MDSCountPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'count', CountRule>
 export type MDSSpeedPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'speed', SpeedRule>
