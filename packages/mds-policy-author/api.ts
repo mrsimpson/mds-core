@@ -32,6 +32,7 @@ import { policyValidationDetails } from '@mds-core/mds-schema-validators'
 import logger from '@mds-core/mds-logger'
 
 import { checkAccess, AccessTokenScopeValidator, ApiRequest, ApiResponse } from '@mds-core/mds-api-server'
+import { MDSPolicy, MDSPolicyMetadata } from '@mds-core/mds-types'
 import { PolicyAuthorApiVersionMiddleware } from './middleware/policy-author-api-version'
 import {
   PolicyAuthorApiPostPolicyResponse,
@@ -50,7 +51,6 @@ import {
   PolicyAuthorApiGetPolicyMetadatumRequest,
   PolicyAuthorApiEditPolicyMetadataRequest
 } from './types'
-import { MDSPolicy, MDSPolicyMetadata } from '@mds-core/mds-types'
 
 const checkPolicyAuthorApiAccess = (validator: AccessTokenScopeValidator<PolicyAuthorApiAccessTokenScopes>) =>
   checkAccess(validator)
