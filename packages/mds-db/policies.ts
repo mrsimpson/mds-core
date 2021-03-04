@@ -1,17 +1,4 @@
-import {
-  UUID,
-  MDSPolicy,
-  Timestamp,
-  Recorded,
-  MDSPolicyMetadata,
-  Nullable,
-  MDSBaseRule,
-  RULE_TYPE,
-  BasePolicy,
-  BaseRule,
-  VEHICLE_STATE,
-  VEHICLE_EVENT
-} from '@mds-core/mds-types'
+import { UUID, MDSPolicy, Timestamp, Recorded, PolicyMetadata, Nullable, PolicyTypeInfo } from '@mds-core/mds-types'
 import {
   now,
   NotFoundError,
@@ -29,13 +16,7 @@ import { vals_sql, cols_sql, vals_list, SqlVals } from './sql-utils'
 import { isGeographyPublished } from './geographies'
 import { getReadOnlyClient, getWriteableClient } from './client'
 
-export async function readPolicies<
-  S extends string,
-  E extends string,
-  RuleType extends RULE_TYPE,
-  R extends BaseRule<S, E, RuleType>,
-  P extends BasePolicy<S, E, RuleType, R>
->(params?: {
+export async function readPolicies<PInfo extends PolicyTypeInfo>(params?: {
   policy_id?: UUID
   rule_id?: UUID
   name?: string
@@ -43,7 +24,7 @@ export async function readPolicies<
   start_date?: Timestamp
   get_unpublished?: Nullable<boolean>
   get_published?: Nullable<boolean>
-}): Promise<P[]> {
+}): Promise<PInfo['Policy'][]> {
   // use params to filter
   // query
   // return policies
@@ -89,13 +70,9 @@ export async function readPolicies<
   return res.rows.map(row => row.policy_json)
 }
 
-export async function readActivePolicies<
-  S extends string,
-  E extends string,
-  RuleType extends RULE_TYPE,
-  R extends BaseRule<S, E, RuleType>,
-  P extends BasePolicy<S, E, RuleType, R>
->(timestamp: Timestamp = now()): Promise<P[]> {
+export async function readActivePolicies<PInfo extends PolicyTypeInfo>(
+  timestamp: Timestamp = now()
+): Promise<PInfo['Policy'][]> {
   const client = await getReadOnlyClient()
   const conditions = []
   const vals = new SqlVals()
@@ -117,7 +94,7 @@ export async function readBulkPolicyMetadata(params?: {
   start_date?: Timestamp
   get_unpublished: Nullable<boolean>
   get_published: Nullable<boolean>
-}): Promise<MDSPolicyMetadata[]> {
+}): Promise<PolicyMetadata[]> {
   const policies = await readPolicies(params)
   const policy_ids = policies.map(policy => {
     return `'${policy.policy_id}'`
@@ -135,7 +112,7 @@ export async function readBulkPolicyMetadata(params?: {
   })
 }
 
-export async function readSinglePolicyMetadata(policy_id: UUID): Promise<MDSPolicyMetadata> {
+export async function readSinglePolicyMetadata(policy_id: UUID): Promise<PolicyMetadata> {
   const client = await getReadOnlyClient()
 
   const sql = `select * from ${schema.TABLE.policy_metadata} where policy_id = '${policy_id}'`
@@ -144,11 +121,11 @@ export async function readSinglePolicyMetadata(policy_id: UUID): Promise<MDSPoli
     const { policy_metadata } = res.rows[0]
     return { policy_id, policy_metadata }
   }
-  logger.info(`readSingleMDSPolicyMetadata db failed for ${policy_id}: rows=${res.rows.length}`)
+  logger.info(`readSinglePolicyMetadata db failed for ${policy_id}: rows=${res.rows.length}`)
   throw new NotFoundError(`metadata for policy_id ${policy_id} not found`)
 }
 
-export async function readPolicy(policy_id: UUID): Promise<MDSPolicy> {
+export async function readPolicy<PInfo extends PolicyTypeInfo>(policy_id: UUID): Promise<PInfo['Policy']> {
   const client = await getReadOnlyClient()
 
   const sql = `select * from ${schema.TABLE.policies} where policy_id = '${policy_id}'`
@@ -156,20 +133,14 @@ export async function readPolicy(policy_id: UUID): Promise<MDSPolicy> {
   if (res.rows.length === 1) {
     return res.rows[0].policy_json
   }
-  logger.info(`readMDSPolicy db failed for ${policy_id}: rows=${res.rows.length}`)
+  logger.info(`readPolicy db failed for ${policy_id}: rows=${res.rows.length}`)
   throw new NotFoundError(`policy_id ${policy_id} not found`)
 }
 
-async function throwIfRulesAlreadyExist<
-  S extends string,
-  E extends string,
-  RuleType extends RULE_TYPE,
-  R extends BaseRule<S, E, RuleType>,
-  P extends BasePolicy<S, E, RuleType, R>
->(policy: P) {
-  const unflattenedPolicies: P[][] = await Promise.all(
+async function throwIfRulesAlreadyExist<PInfo extends PolicyTypeInfo>(policy: PInfo['Policy']) {
+  const unflattenedPolicies: PInfo['Policy'][][] = await Promise.all(
     policy.rules.map(rule => {
-      return readPolicies<S, E, RuleType, R, P>({
+      return readPolicies<PInfo>({
         rule_id: rule.rule_id
       })
     })
@@ -184,13 +155,9 @@ async function throwIfRulesAlreadyExist<
   })
 }
 
-export async function writePolicy<
-  S extends string,
-  E extends string,
-  RuleType extends RULE_TYPE,
-  R extends BaseRule<S, E, RuleType>,
-  P extends BasePolicy<S, E, RuleType, R>
->(policy: P): Promise<Recorded<P>> {
+export async function writePolicy<PInfo extends PolicyTypeInfo>(
+  policy: PInfo['Policy']
+): Promise<Recorded<PInfo['Policy']>> {
   // validate TODO
   const client = await getWriteableClient()
   await throwIfRulesAlreadyExist(policy)
@@ -202,11 +169,11 @@ export async function writePolicy<
   try {
     const {
       rows: [recorded_policy]
-    }: { rows: Recorded<MDSPolicy>[] } = await client.query(sql, values)
+    }: { rows: Recorded<PInfo['Policy']>[] } = await client.query(sql, values)
     return { ...policy, ...recorded_policy }
   } catch (error) {
     if (error.code === '23505') {
-      throw new ConflictError(`MDSPolicy ${policy.policy_id} already exists! Did you mean to PUT?`)
+      throw new ConflictError(`Policy ${policy.policy_id} already exists! Did you mean to PUT?`)
     } else {
       throw error
     }
@@ -223,8 +190,7 @@ export async function isPolicyPublished(policy_id: UUID) {
   return Boolean(result.rows[0].policy_json.publish_date)
 }
 
-export async function editPolicy(policy: MDSPolicy) {
-  // validate TODO
+export async function editPolicy<PInfo extends PolicyTypeInfo>(policy: PInfo['Policy']) {
   const { policy_id } = policy
 
   if (await isPolicyPublished(policy_id)) {
@@ -308,7 +274,7 @@ export async function publishPolicy(policy_id: UUID, publish_date = now()) {
   }
 }
 
-export async function writePolicyMetadata(policy_metadata: MDSPolicyMetadata) {
+export async function writePolicyMetadata(policy_metadata: PolicyMetadata) {
   const client = await getWriteableClient()
   const sql = `INSERT INTO ${schema.TABLE.policy_metadata} (${cols_sql(
     schema.TABLE_COLUMNS.policy_metadata
@@ -319,14 +285,14 @@ export async function writePolicyMetadata(policy_metadata: MDSPolicyMetadata) {
   })
   const {
     rows: [recorded_metadata]
-  }: { rows: Recorded<MDSPolicyMetadata>[] } = await client.query(sql, values)
+  }: { rows: Recorded<PolicyMetadata>[] } = await client.query(sql, values)
   return {
     ...policy_metadata,
     ...recorded_metadata
   }
 }
 
-export async function updatePolicyMetadata(policy_metadata: MDSPolicyMetadata) {
+export async function updatePolicyMetadata(policy_metadata: PolicyMetadata) {
   try {
     await readSinglePolicyMetadata(policy_metadata.policy_id)
     const client = await getWriteableClient()
@@ -335,7 +301,7 @@ export async function updatePolicyMetadata(policy_metadata: MDSPolicyMetadata) {
       WHERE policy_id = '${policy_metadata.policy_id}'`
     const {
       rows: [recorded_metadata]
-    }: { rows: Recorded<MDSPolicyMetadata>[] } = await client.query(sql)
+    }: { rows: Recorded<PolicyMetadata>[] } = await client.query(sql)
     return {
       ...policy_metadata,
       ...recorded_metadata
@@ -346,7 +312,7 @@ export async function updatePolicyMetadata(policy_metadata: MDSPolicyMetadata) {
   }
 }
 
-export async function readRule(rule_id: UUID): Promise<MDSBaseRule<RULE_TYPE>> {
+export async function readRule<PInfo extends PolicyTypeInfo>(rule_id: UUID): Promise<PInfo['Rule']> {
   const client = await getReadOnlyClient()
   const sql = `SELECT * from ${schema.TABLE.policies} where EXISTS(SELECT FROM json_array_elements(policy_json->'rules') elem WHERE (elem->'rule_id')::jsonb ? '${rule_id}');`
   const res = await client.query(sql).catch(err => {
@@ -355,7 +321,7 @@ export async function readRule(rule_id: UUID): Promise<MDSBaseRule<RULE_TYPE>> {
   if (res.rowCount !== 1) {
     throw new Error(`invalid rule_id ${rule_id}`)
   } else {
-    const [{ policy_json }]: { policy_json: MDSPolicy }[] = res.rows
+    const [{ policy_json }]: { policy_json: PInfo['Policy'] }[] = res.rows
     const [rule] = policy_json.rules.filter(r => {
       return r.rule_id === rule_id
     })
@@ -363,7 +329,9 @@ export async function readRule(rule_id: UUID): Promise<MDSBaseRule<RULE_TYPE>> {
   }
 }
 
-export async function findPoliciesByGeographyID(geography_id: UUID): Promise<MDSPolicy[]> {
+export async function findPoliciesByGeographyID<PInfo extends PolicyTypeInfo>(
+  geography_id: UUID
+): Promise<PInfo['Policy'][]> {
   const client = await getReadOnlyClient()
   const sql = `select * from ${schema.TABLE.policies}
     where ${schema.COLUMN.policy_json}::jsonb

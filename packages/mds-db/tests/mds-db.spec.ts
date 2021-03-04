@@ -14,7 +14,8 @@ import {
 import { now, clone, ConflictError, days } from '@mds-core/mds-utils'
 import { isNullOrUndefined } from 'util'
 import MDSDBPostgres from '../index'
-import { pg_info, seedDB, setFreshDB, startTime, LAGeography, DistrictSeven } from './helpers'
+import { pg_info, seedDB, setFreshDB, startTime } from './helpers'
+import { LAGeography, DistrictSeven } from './fixtures'
 import { dropTables, createTables, updateSchema } from '../migration'
 import { configureClient, MDSPostgresClient } from '../sql-utils'
 

@@ -2,15 +2,7 @@ import assert from 'assert'
 /* eslint-reason extends object.prototype */
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import should from 'should'
-import {
-  MDSPolicy,
-  VEHICLE_STATE,
-  VEHICLE_EVENT,
-  RULE_TYPE,
-  MDSBaseRule,
-  BaseRule,
-  BasePolicy
-} from '@mds-core/mds-types'
+import { RULE_TYPE, BaseRule, BasePolicy, MDSPolicyTypeInfo } from '@mds-core/mds-types'
 import {
   POLICY_JSON,
   POLICY2_JSON,
@@ -23,7 +15,8 @@ import {
   DELETEABLE_POLICY
 } from '@mds-core/mds-test-data'
 import { now, clone, NotFoundError, ConflictError, yesterday } from '@mds-core/mds-utils'
-import { setFreshDB, LAGeography, pg_info } from './helpers'
+import { setFreshDB, pg_info } from './helpers'
+import { LAGeography } from './fixtures'
 import MDSDBPostgres from '../index'
 
 const ACTIVE_POLICY_JSON = { ...POLICY_JSON, publish_date: yesterday(), start_date: yesterday() }
@@ -42,10 +35,9 @@ const SIMPLE_POLICY_JSON: SimplePolicy = {
   // TODO guts
   name: 'MDSPolicy 1',
   description: 'Mobility caps as described in the One-Year Permit',
-  policy_id: 'ecbfb408-c24a-44f5-90a8-54d423468cf6',
-  start_date: START_ONE_MONTH_AGO,
+  policy_id: 'a7ca9ece-ca59-42fb-af5d-4668655b547a',
+  start_date: START_ONE_MONTH_FROM_NOW,
   end_date: null,
-  publish_date: START_ONE_MONTH_AGO,
   prev_policies: null,
   provider_ids: [],
   rules: [
@@ -53,7 +45,7 @@ const SIMPLE_POLICY_JSON: SimplePolicy = {
       rule_type: 'count',
       rule_id: '7ea0d16e-ad15-4337-9722-9924e3af9146',
       name: 'Greater LA',
-      geographies: ['dff0ed7a-e069-4f4e-8dd1-26d9636bfa07'],
+      geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
       states: { available: [] },
       vehicle_types: [],
       maximum: 3000,
@@ -68,8 +60,8 @@ const SIMPLE_POLICY_JSON: SimplePolicy = {
 /* istanbul ignore next */
 
 if (pg_info.database) {
-  describe('unit test policy functions with SimplePolicy', () => {
-    before(async () => {
+  describe('spot check unit test policy functions with SimplePolicy', () => {
+    beforeEach(async () => {
       await setFreshDB()
     })
 
@@ -77,8 +69,31 @@ if (pg_info.database) {
       await MDSDBPostgres.shutdown()
     })
 
-    it('can write a SimplePolicy', async () => {
+    it('can CRUD a SimplePolicy', async () => {
       await MDSDBPostgres.writePolicy(SIMPLE_POLICY_JSON)
+      const policy = await MDSDBPostgres.readPolicy(SIMPLE_POLICY_JSON.policy_id)
+      assert.deepStrictEqual(policy.policy_id, SIMPLE_POLICY_JSON.policy_id)
+      assert.deepStrictEqual(policy.name, SIMPLE_POLICY_JSON.name)
+      await MDSDBPostgres.editPolicy({ ...SIMPLE_POLICY_JSON, name: 'simpleton' })
+      const updatedPolicy = await MDSDBPostgres.readPolicy(SIMPLE_POLICY_JSON.policy_id)
+      assert.deepStrictEqual(updatedPolicy.policy_id, SIMPLE_POLICY_JSON.policy_id)
+      assert.deepStrictEqual(updatedPolicy.name, 'simpleton')
+      await MDSDBPostgres.deletePolicy(policy.policy_id)
+      await assert.rejects(
+        async () => {
+          await MDSDBPostgres.readPolicy(policy.policy_id)
+        },
+        { name: 'NotFoundError' }
+      )
+    })
+
+    it('can publish a SimplePolicy', async () => {
+      await MDSDBPostgres.writeGeography(LAGeography)
+      await MDSDBPostgres.publishGeography({ geography_id: LAGeography.geography_id })
+      await MDSDBPostgres.writePolicy(SIMPLE_POLICY_JSON)
+      await MDSDBPostgres.publishPolicy(SIMPLE_POLICY_JSON.policy_id)
+      const result = await MDSDBPostgres.readPolicies({ get_published: true })
+      assert.deepStrictEqual(result.length, 1)
     })
   })
 
@@ -93,21 +108,16 @@ if (pg_info.database) {
 
     it('can delete an unpublished Policy', async () => {
       const { policy_id } = DELETEABLE_POLICY
-      await MDSDBPostgres.writePolicy(DELETEABLE_POLICY)
+      await MDSDBPostgres.writePolicy<MDSPolicyTypeInfo>(DELETEABLE_POLICY)
+
       assert(!(await MDSDBPostgres.isPolicyPublished(policy_id)))
       await MDSDBPostgres.deletePolicy(policy_id)
-      const policy_result = await MDSDBPostgres.readPolicies<
-        VEHICLE_STATE,
-        VEHICLE_EVENT,
-        RULE_TYPE,
-        MDSBaseRule<RULE_TYPE>,
-        MDSPolicy
-      >({
+      const policy_result = await MDSDBPostgres.readPolicies<MDSPolicyTypeInfo>({
         policy_id,
         get_published: null,
         get_unpublished: null
       })
-      assert.deepEqual(policy_result, [])
+      assert.deepStrictEqual(policy_result, [])
     })
 
     it('can write, read, and publish a Policy', async () => {
@@ -121,29 +131,17 @@ if (pg_info.database) {
       await MDSDBPostgres.writePolicy(POLICY3_JSON)
 
       // Read all policies, no matter whether published or not.
-      const policies = await MDSDBPostgres.readPolicies<
-        VEHICLE_STATE,
-        VEHICLE_EVENT,
-        RULE_TYPE,
-        BaseRule<VEHICLE_STATE, VEHICLE_EVENT>,
-        MDSPolicy
-      >()
+      const policies = await MDSDBPostgres.readPolicies<MDSPolicyTypeInfo>()
       assert.deepStrictEqual(policies.length, 3)
-      const unpublishedPolicies = await MDSDBPostgres.readPolicies<
-        VEHICLE_STATE,
-        VEHICLE_EVENT,
-        RULE_TYPE,
-        BaseRule<VEHICLE_STATE, VEHICLE_EVENT>,
-        MDSPolicy
-      >({ get_unpublished: true, get_published: null })
+      const unpublishedPolicies = await MDSDBPostgres.readPolicies<MDSPolicyTypeInfo>({
+        get_unpublished: true,
+        get_published: null
+      })
       assert.deepStrictEqual(unpublishedPolicies.length, 2)
-      const publishedPolicies = await MDSDBPostgres.readPolicies<
-        VEHICLE_STATE,
-        VEHICLE_EVENT,
-        RULE_TYPE,
-        BaseRule<VEHICLE_STATE, VEHICLE_EVENT>,
-        MDSPolicy
-      >({ get_published: true, get_unpublished: null })
+      const publishedPolicies = await MDSDBPostgres.readPolicies<MDSPolicyTypeInfo>({
+        get_published: true,
+        get_unpublished: null
+      })
       assert.deepStrictEqual(publishedPolicies.length, 1)
     })
 
@@ -154,16 +152,16 @@ if (pg_info.database) {
     it('can retrieve Policies that were active at a particular date', async () => {
       await MDSDBPostgres.writePolicy(PUBLISHED_POLICY)
       const monthAgoPolicies = await MDSDBPostgres.readActivePolicies(START_ONE_MONTH_AGO)
-      assert.deepEqual(monthAgoPolicies.length, 1)
+      assert.deepStrictEqual(monthAgoPolicies.length, 1)
 
       const currentlyActivePolicies = await MDSDBPostgres.readActivePolicies()
-      assert.deepEqual(currentlyActivePolicies.length, 2)
+      assert.deepStrictEqual(currentlyActivePolicies.length, 2)
     })
 
     it('can read a single Policy', async () => {
       const policy = await MDSDBPostgres.readPolicy(ACTIVE_POLICY_JSON.policy_id)
-      assert.deepEqual(policy.policy_id, ACTIVE_POLICY_JSON.policy_id)
-      assert.deepEqual(policy.name, ACTIVE_POLICY_JSON.name)
+      assert.deepStrictEqual(policy.policy_id, ACTIVE_POLICY_JSON.policy_id)
+      assert.deepStrictEqual(policy.name, ACTIVE_POLICY_JSON.name)
     })
 
     it('can find Policies by rule id', async () => {
@@ -182,9 +180,9 @@ if (pg_info.database) {
 
     it('can tell a Policy is published', async () => {
       const publishedResult = await MDSDBPostgres.isPolicyPublished(ACTIVE_POLICY_JSON.policy_id)
-      assert.deepEqual(publishedResult, true)
+      assert.deepStrictEqual(publishedResult, true)
       const unpublishedResult = await MDSDBPostgres.isPolicyPublished(POLICY3_JSON.policy_id)
-      assert.deepEqual(unpublishedResult, false)
+      assert.deepStrictEqual(unpublishedResult, false)
     })
 
     it('can edit a Policy', async () => {
@@ -196,7 +194,7 @@ if (pg_info.database) {
         get_unpublished: true,
         get_published: null
       })
-      assert.deepEqual(result[0].name, 'a shiny new name')
+      assert.deepStrictEqual(result[0].name, 'a shiny new name')
     })
 
     it('cannot add a rule that already exists in some other policy', async () => {
@@ -256,14 +254,14 @@ if (pg_info.database) {
       })
 
       const noParamsResult = await MDSDBPostgres.readBulkPolicyMetadata()
-      assert.deepEqual(noParamsResult.length, 3)
+      assert.deepStrictEqual(noParamsResult.length, 3)
       const withStartDateResult = await MDSDBPostgres.readBulkPolicyMetadata({
         start_date: now(),
         get_published: null,
         get_unpublished: null
       })
-      assert.deepEqual(withStartDateResult.length, 1)
-      assert.deepEqual(withStartDateResult[0].policy_metadata.name, 'policy3_json')
+      assert.deepStrictEqual(withStartDateResult.length, 1)
+      assert.deepStrictEqual(withStartDateResult[0].policy_metadata.name, 'policy3_json')
     })
   })
 }

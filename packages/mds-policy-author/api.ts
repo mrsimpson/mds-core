@@ -32,7 +32,7 @@ import { policyValidationDetails } from '@mds-core/mds-schema-validators'
 import logger from '@mds-core/mds-logger'
 
 import { checkAccess, AccessTokenScopeValidator, ApiRequest, ApiResponse } from '@mds-core/mds-api-server'
-import { MDSPolicy, MDSPolicyMetadata } from '@mds-core/mds-types'
+import { MDSPolicy, PolicyMetadata } from '@mds-core/mds-types'
 import { PolicyAuthorApiVersionMiddleware } from './middleware/policy-author-api-version'
 import {
   PolicyAuthorApiPostPolicyResponse,
@@ -257,7 +257,7 @@ function api(app: express.Express): express.Express {
     ) => {
       const policy_metadata = req.body
       try {
-        await db.updatePolicyMetadata(policy_metadata as MDSPolicyMetadata)
+        await db.updatePolicyMetadata(policy_metadata as PolicyMetadata)
         return res.status(200).send({ version: res.locals.version, data: { policy_metadata } })
       } catch (updateErr) {
         if (updateErr instanceof NotFoundError) {

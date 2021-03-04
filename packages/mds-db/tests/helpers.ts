@@ -1,14 +1,5 @@
-import { Telemetry, VehicleEvent, Device, Geography } from '@mds-core/mds-types'
-import {
-  JUMP_TEST_DEVICE_1,
-  makeDevices,
-  makeEventsWithTelemetry,
-  JUMP_PROVIDER_ID,
-  GEOGRAPHY_UUID,
-  GEOGRAPHY2_UUID,
-  LA_CITY_BOUNDARY,
-  DISTRICT_SEVEN
-} from '@mds-core/mds-test-data'
+import { Telemetry, VehicleEvent, Device } from '@mds-core/mds-types'
+import { JUMP_TEST_DEVICE_1, makeDevices, makeEventsWithTelemetry, JUMP_PROVIDER_ID } from '@mds-core/mds-test-data'
 import { now, rangeRandomInt } from '@mds-core/mds-utils'
 import MDSDBPostgres from '../index'
 import { dropTables, createTables, updateSchema } from '../migration'
@@ -57,15 +48,4 @@ export async function setFreshDB() {
   await createTables(client)
   await updateSchema(client)
   await client.end()
-}
-
-export const LAGeography: Geography = {
-  name: 'Los Angeles',
-  geography_id: GEOGRAPHY_UUID,
-  geography_json: LA_CITY_BOUNDARY
-}
-export const DistrictSeven: Geography = {
-  name: 'District Seven',
-  geography_id: GEOGRAPHY2_UUID,
-  geography_json: DISTRICT_SEVEN
 }

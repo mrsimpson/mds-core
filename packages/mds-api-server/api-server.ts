@@ -23,8 +23,8 @@ export interface ApiServerOptions {
   prometheus: PrometheusMiddlewareOptions
 }
 
-export const ApiServer = (
-  api: (server: express.Express) => express.Express,
+export const ApiServer = <T extends {} = {}>(
+  api: <G>(server: express.Express) => express.Express,
   options: Partial<ApiServerOptions> = {},
   app: express.Express = express()
 ): express.Express => {
@@ -65,5 +65,5 @@ export const ApiServer = (
   // Health Route
   app.get(pathPrefix('/health'), HealthRequestHandler)
 
-  return api(app)
+  return api<T>(app)
 }

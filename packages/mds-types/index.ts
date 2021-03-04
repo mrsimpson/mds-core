@@ -387,12 +387,29 @@ export interface BasePolicy<
 }
 
 export type MDSPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MDSBaseRule<RULE_TYPE>>
+
+export type PolicyTypeInfo<
+  State extends string = VEHICLE_STATE,
+  Event extends string = VEHICLE_EVENT,
+  RuleType extends RULE_TYPE = RULE_TYPE,
+  Rule extends BaseRule<State, Event, RuleType> = BaseRule<State, Event, RuleType>,
+  Policy extends BasePolicy<State, Event, RuleType, Rule> = BasePolicy<State, Event, RuleType, Rule>
+> = { State: State; Event: Event; RuleType: RuleType; Rule: Rule; Policy: Policy }
+
+export type MDSPolicyTypeInfo = PolicyTypeInfo<
+  VEHICLE_STATE,
+  VEHICLE_EVENT,
+  RULE_TYPE,
+  MDSBaseRule<RULE_TYPE>,
+  MDSPolicy
+>
+
 export type MDSCountPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'count', CountRule>
 export type MDSSpeedPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'speed', SpeedRule>
 export type MDSTimePolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'time', TimeRule>
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface MDSPolicyMetadata<M extends {} = Record<string, any>> {
+export interface PolicyMetadata<M extends {} = Record<string, any>> {
   policy_id: UUID
   policy_metadata: M
 }

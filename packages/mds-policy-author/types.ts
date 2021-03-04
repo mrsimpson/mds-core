@@ -1,4 +1,4 @@
-import { MDSPolicy, UUID, MDSPolicyMetadata, Optional } from '@mds-core/mds-types'
+import { MDSPolicy, UUID, PolicyMetadata, Optional } from '@mds-core/mds-types'
 import {
   ApiRequest,
   ApiVersionedResponse,
@@ -20,7 +20,7 @@ export type PolicyAuthorApiDeletePolicyRequest = PolicyAuthorApiRequest & ApiReq
 export type PolicyAuthorApiGetPolicyMetadataRequest = PolicyAuthorApiRequest &
   ApiRequestQuery<'get_published' | 'get_unpublished'>
 export type PolicyAuthorApiGetPolicyMetadatumRequest = PolicyAuthorApiRequest & ApiRequestParams<'policy_id'>
-export type PolicyAuthorApiEditPolicyMetadataRequest = PolicyAuthorApiRequest<MDSPolicyMetadata>
+export type PolicyAuthorApiEditPolicyMetadataRequest = PolicyAuthorApiRequest<PolicyMetadata>
 
 export type PolicyAuthorApiAccessTokenScopes =
   | 'policies:read'
@@ -39,11 +39,11 @@ export type PolicyAuthorApiEditPolicyResponse = PolicyAuthorApiResponse<{ data: 
 export type PolicyAuthorApiDeletePolicyResponse = PolicyAuthorApiResponse<{ data: { policy_id: UUID } }>
 
 export type PolicyAuthorApiGetPolicyMetadatumResponse = PolicyAuthorApiResponse<{
-  data: { policy_metadata: MDSPolicyMetadata }
+  data: { policy_metadata: PolicyMetadata }
 }>
 export type PolicyAuthorApiGetPolicyMetadataResponse = PolicyAuthorApiResponse<{
-  data: { policy_metadata: MDSPolicyMetadata[] }
+  data: { policy_metadata: PolicyMetadata[] }
 }>
 export type PolicyAuthorApiEditPolicyMetadataResponse = PolicyAuthorApiResponse<{
-  data: { policy_metadata: MDSPolicyMetadata }
+  data: { policy_metadata: PolicyMetadata }
 }>

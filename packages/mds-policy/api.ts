@@ -16,7 +16,7 @@
 
 import express, { NextFunction } from 'express'
 // import { isProviderId, providerName } from '@mds-core/mds-providers'
-import { MDSPolicy, UUID } from '@mds-core/mds-types'
+import { PolicyTypeInfo, UUID } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import { now, pathPrefix, NotFoundError, isUUID, BadParamsError, ServerError } from '@mds-core/mds-utils'
 import logger from '@mds-core/mds-logger'
@@ -33,7 +33,7 @@ import {
 } from './types'
 import { PolicyApiVersionMiddleware } from './middleware'
 
-function api(app: express.Express): express.Express {
+function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Express {
   app.use(PolicyApiVersionMiddleware)
   /**
    * Policy-specific middleware to extract provider_id into locals, do some logging, etc.
@@ -75,7 +75,11 @@ function api(app: express.Express): express.Express {
 
   app.get(
     pathPrefix('/policies'),
-    async (req: PolicyApiGetPoliciesRequest, res: PolicyApiGetPoliciesResponse, next: express.NextFunction) => {
+    async (
+      req: PolicyApiGetPoliciesRequest,
+      res: PolicyApiGetPoliciesResponse<PolicyTypeInfo>,
+      next: express.NextFunction
+    ) => {
       const { start_date = now(), end_date = now() } = req.query
       const { scopes } = res.locals
 
@@ -92,8 +96,8 @@ function api(app: express.Express): express.Express {
         if (start_date > end_date) {
           throw new BadParamsError(`start_date ${start_date} > end_date ${end_date}`)
         }
-        const policies = await db.readPolicies({ get_published, get_unpublished })
-        const prev_policies: UUID[] = policies.reduce((prev_policies_acc: UUID[], policy: MDSPolicy) => {
+        const policies = await db.readPolicies<PolicyTypeInfo>({ get_published, get_unpublished })
+        const prev_policies: UUID[] = policies.reduce((prev_policies_acc: UUID[], policy: PInfo['Policy']) => {
           if (policy.prev_policies) {
             prev_policies_acc.push(...policy.prev_policies)
           }
@@ -125,7 +129,7 @@ function api(app: express.Express): express.Express {
 
   app.get(
     pathPrefix('/policies/:policy_id'),
-    async (req: PolicyApiGetPolicyRequest, res: PolicyApiGetPolicyResponse, next: express.NextFunction) => {
+    async (req: PolicyApiGetPolicyRequest, res: PolicyApiGetPolicyResponse<PInfo>, next: express.NextFunction) => {
       const { policy_id } = req.params
       const { scopes } = res.locals
 
