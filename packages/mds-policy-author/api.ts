@@ -32,7 +32,7 @@ import { policyValidationDetails } from '@mds-core/mds-schema-validators'
 import logger from '@mds-core/mds-logger'
 
 import { checkAccess, AccessTokenScopeValidator, ApiRequest, ApiResponse } from '@mds-core/mds-api-server'
-import { MDSPolicy, PolicyMetadata } from '@mds-core/mds-types'
+import { MDSPolicy, PolicyMetadata, PolicyTypeInfo } from '@mds-core/mds-types'
 import { PolicyAuthorApiVersionMiddleware } from './middleware/policy-author-api-version'
 import {
   PolicyAuthorApiPostPolicyResponse,
@@ -55,27 +55,27 @@ import {
 const checkPolicyAuthorApiAccess = (validator: AccessTokenScopeValidator<PolicyAuthorApiAccessTokenScopes>) =>
   checkAccess(validator)
 
-function api(app: express.Express): express.Express {
+function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Express {
   app.use(PolicyAuthorApiVersionMiddleware)
 
   app.post(
     pathPrefix('/policies'),
     checkPolicyAuthorApiAccess(scopes => scopes.includes('policies:write')),
     async (
-      req: PolicyAuthorApiPostPolicyRequest,
-      res: PolicyAuthorApiPostPolicyResponse,
+      req: PolicyAuthorApiPostPolicyRequest<PInfo>,
+      res: PolicyAuthorApiPostPolicyResponse<PInfo>,
       next: express.NextFunction
     ) => {
       const policy = { policy_id: uuid(), ...req.body }
 
-      const details = policyValidationDetails(policy as MDSPolicy)
+      const details = policyValidationDetails(policy as MDSPolicy) //  as PInfo['Policy'])
 
       if (details != null) {
         return res.status(400).send({ error: new ValidationError(JSON.stringify(details)) })
       }
 
       try {
-        await db.writePolicy(policy as MDSPolicy)
+        await db.writePolicy(policy as PInfo['Policy'])
         return res.status(201).send({ version: res.locals.version, data: { policy } })
       } catch (error) {
         if (error instanceof ConflictError) {
@@ -92,7 +92,7 @@ function api(app: express.Express): express.Express {
     checkPolicyAuthorApiAccess(scopes => scopes.includes('policies:publish')),
     async (
       req: PolicyAuthorApiPublishPolicyRequest,
-      res: PolicyAuthorApiPublishPolicyResponse,
+      res: PolicyAuthorApiPublishPolicyResponse<PInfo>,
       next: express.NextFunction
     ) => {
       const { policy_id } = req.params
@@ -127,7 +127,7 @@ function api(app: express.Express): express.Express {
     checkPolicyAuthorApiAccess(scopes => scopes.includes('policies:write')),
     async (
       req: PolicyAuthorApiEditPolicyRequest,
-      res: PolicyAuthorApiEditPolicyResponse,
+      res: PolicyAuthorApiEditPolicyResponse<PInfo>,
       next: express.NextFunction
     ) => {
       const policy = req.body

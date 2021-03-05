@@ -12,6 +12,7 @@
  */
 
 import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
+import { MDSPolicyTypeInfo } from '@mds-core/mds-types'
 import { api } from './api'
 
-HttpServer(ApiServer(api), { port: process.env.POLICY_AUTHOR_API_HTTP_PORT })
+HttpServer(ApiServer<MDSPolicyTypeInfo>(api), { port: process.env.POLICY_AUTHOR_API_HTTP_PORT })

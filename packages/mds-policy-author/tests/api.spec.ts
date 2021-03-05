@@ -28,7 +28,7 @@ import supertest from 'supertest'
 import test from 'unit.js'
 import db from '@mds-core/mds-db'
 import { clone, isUUID, uuid, pathPrefix } from '@mds-core/mds-utils'
-import { MDSPolicy } from '@mds-core/mds-types'
+import { MDSPolicy, MDSPolicyTypeInfo } from '@mds-core/mds-types'
 import { ApiServer } from '@mds-core/mds-api-server'
 import {
   POLICY_JSON,
@@ -48,7 +48,7 @@ import { POLICY_AUTHOR_API_DEFAULT_VERSION } from '../types'
 /* eslint-disable-next-line no-console */
 const log = console.log.bind(console)
 
-const request = supertest(ApiServer(api))
+const request = supertest(ApiServer<MDSPolicyTypeInfo>(api))
 
 const APP_JSON = 'application/vnd.mds.policy-author+json; charset=utf-8; version=0.4'
 const EMPTY_SCOPE = SCOPED_AUTH([], '')

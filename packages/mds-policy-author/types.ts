@@ -1,4 +1,4 @@
-import { MDSPolicy, UUID, PolicyMetadata, Optional } from '@mds-core/mds-types'
+import { MDSPolicy, UUID, PolicyMetadata, Optional, PolicyTypeInfo } from '@mds-core/mds-types'
 import {
   ApiRequest,
   ApiVersionedResponse,
@@ -13,7 +13,9 @@ export const [POLICY_AUTHOR_API_DEFAULT_VERSION] = POLICY_AUTHOR_API_SUPPORTED_V
 
 export type PolicyAuthorApiRequest<B = {}> = ApiRequest<B>
 
-export type PolicyAuthorApiPostPolicyRequest = PolicyAuthorApiRequest<Optional<MDSPolicy, 'policy_id'>>
+export type PolicyAuthorApiPostPolicyRequest<PInfo extends PolicyTypeInfo> = PolicyAuthorApiRequest<
+  Optional<PInfo['Policy'], 'policy_id'>
+>
 export type PolicyAuthorApiPublishPolicyRequest = PolicyAuthorApiRequest & ApiRequestParams<'policy_id'>
 export type PolicyAuthorApiEditPolicyRequest = PolicyAuthorApiRequest<MDSPolicy>
 export type PolicyAuthorApiDeletePolicyRequest = PolicyAuthorApiRequest & ApiRequestParams<'policy_id'>
@@ -31,12 +33,24 @@ export type PolicyAuthorApiAccessTokenScopes =
 type PolicyAuthorApiResponse<B = {}> = ApiVersionedResponse<POLICY_AUTHOR_API_SUPPORTED_VERSION, B> &
   ApiResponseLocalsClaims<PolicyAuthorApiAccessTokenScopes>
 
-export type PolicyAuthorApiGetPoliciesResponse = PolicyAuthorApiResponse<{ data: { policies: MDSPolicy[] } }>
-export type PolicyAuthorApiGetPolicyResponse = PolicyAuthorApiResponse<{ data: { policy: MDSPolicy } }>
-export type PolicyAuthorApiPostPolicyResponse = PolicyAuthorApiResponse<{ data: { policy: MDSPolicy } }>
-export type PolicyAuthorApiPublishPolicyResponse = PolicyAuthorApiResponse<{ data: { policy: MDSPolicy } }>
-export type PolicyAuthorApiEditPolicyResponse = PolicyAuthorApiResponse<{ data: { policy: MDSPolicy } }>
-export type PolicyAuthorApiDeletePolicyResponse = PolicyAuthorApiResponse<{ data: { policy_id: UUID } }>
+export type PolicyAuthorApiGetPoliciesResponse<PInfo extends PolicyTypeInfo> = PolicyAuthorApiResponse<{
+  data: { policies: PInfo['Policy'][] }
+}>
+export type PolicyAuthorApiGetPolicyResponse<PInfo extends PolicyTypeInfo> = PolicyAuthorApiResponse<{
+  data: { policy: PInfo['Policy'] }
+}>
+export type PolicyAuthorApiPostPolicyResponse<PInfo extends PolicyTypeInfo> = PolicyAuthorApiResponse<{
+  data: { policy: PInfo['Policy'] }
+}>
+export type PolicyAuthorApiPublishPolicyResponse<PInfo extends PolicyTypeInfo> = PolicyAuthorApiResponse<{
+  data: { policy: PInfo['Policy'] }
+}>
+export type PolicyAuthorApiEditPolicyResponse<PInfo extends PolicyTypeInfo> = PolicyAuthorApiResponse<{
+  data: { policy: PInfo['Policy'] }
+}>
+export type PolicyAuthorApiDeletePolicyResponse = PolicyAuthorApiResponse<{
+  data: { policy_id: UUID }
+}>
 
 export type PolicyAuthorApiGetPolicyMetadatumResponse = PolicyAuthorApiResponse<{
   data: { policy_metadata: PolicyMetadata }

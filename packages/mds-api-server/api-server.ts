@@ -24,6 +24,8 @@ export interface ApiServerOptions {
 }
 
 export const ApiServer = <T extends {} = {}>(
+  // The linter does not realize that the type variable is used.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   api: <G>(server: express.Express) => express.Express,
   options: Partial<ApiServerOptions> = {},
   app: express.Express = express()
