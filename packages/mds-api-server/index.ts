@@ -1,5 +1,5 @@
 export * from './@types'
-export { ApiServerOptions, ApiServer } from './api-server'
+export { ApiServerMiddlewareOptions as ApiServerOptions, ApiServer } from './api-server'
 export { HttpServerOptions, HttpServer } from './http-server'
 export { HealthRequestHandler } from './handlers/health'
 export { ApiVersionMiddleware } from './middleware/api-version'

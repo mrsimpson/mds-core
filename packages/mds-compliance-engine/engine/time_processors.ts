@@ -14,7 +14,16 @@
     limitations under the License.
  */
 
-import { Device, Geography, VehicleEvent, UUID, TimeRule, Telemetry, MDSPolicy, RULE_TYPES } from '@mds-core/mds-types'
+import {
+  Device,
+  Geography,
+  VehicleEvent,
+  UUID,
+  TimeRule,
+  Telemetry,
+  MicromobilityPolicy,
+  RULE_TYPES
+} from '@mds-core/mds-types'
 
 import {
   pointInShape,
@@ -52,13 +61,13 @@ export function isTimeRuleMatch(
 }
 
 export function processTimePolicy(
-  policy: MDSPolicy,
+  policy: MicromobilityPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
 ): ComplianceEngineResult | undefined {
-  if (getPolicyType(policy) !== RULE_TYPES.speed) {
-    throw new UnsupportedTypeError(`${getPolicyType(policy)} submitted to speed processor`)
+  if (getPolicyType(policy) !== RULE_TYPES.time) {
+    throw new UnsupportedTypeError(`${getPolicyType(policy)} submitted to time processor`)
   }
   const matchedVehicles: {
     [d: string]: { device: Device; rule_applied: UUID; rules_matched: UUID[] }

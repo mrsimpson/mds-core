@@ -22,7 +22,7 @@ import { now, pathPrefix, NotFoundError, isUUID, BadParamsError, ServerError } f
 import logger from '@mds-core/mds-logger'
 import { parseRequest } from '@mds-core/mds-api-helpers'
 import { ApiRequest, ApiResponse } from '@mds-core/mds-api-server'
-import { policySchemaJson } from '@mds-core/mds-schema-validators'
+import { micromobilityPolicySchema, micromobilityPolicySchemaJson } from '@mds-core/mds-schema-validators'
 import {
   PolicyApiRequest,
   PolicyApiResponse,
@@ -168,9 +168,12 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
     }
   )
 
+  /*
+  // TODO
   app.get(pathPrefix('/schema/policy'), (req, res) => {
     res.status(200).send(policySchemaJson)
   })
+  */
 
   /* eslint-reason global error handling middleware */
   /* istanbul ignore next */
@@ -183,4 +186,15 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
   return app
 }
 
-export { api }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function injectSchema(schema: any, app: express.Express): express.Express {
+  app.get(pathPrefix('/schema/policy'), (req, res) => {
+    res.status(200).send(schema)
+  })
+  return app
+}
+
+export { api, injectSchema }
+// idea: function that takes an express object, the URL, the validator, and returns another express object
+// after calling app.post/app.put on whatever
+// could also possibly handle the schema stuff

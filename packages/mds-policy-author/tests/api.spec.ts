@@ -25,10 +25,11 @@
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import should from 'should'
 import supertest from 'supertest'
+import express from 'express'
 import test from 'unit.js'
 import db from '@mds-core/mds-db'
 import { clone, isUUID, uuid, pathPrefix } from '@mds-core/mds-utils'
-import { MDSPolicy, MDSPolicyTypeInfo } from '@mds-core/mds-types'
+import { MicromobilityPolicy, MDSPolicyTypeInfo } from '@mds-core/mds-types'
 import { ApiServer } from '@mds-core/mds-api-server'
 import {
   POLICY_JSON,
@@ -42,13 +43,23 @@ import {
   SCOPED_AUTH,
   PUBLISHED_POLICY
 } from '@mds-core/mds-test-data'
-import { api } from '../api'
+import { api, injectMicromobilityValidator, injectVersion } from '../api'
 import { POLICY_AUTHOR_API_DEFAULT_VERSION } from '../types'
 
 /* eslint-disable-next-line no-console */
 const log = console.log.bind(console)
 
-const request = supertest(ApiServer<MDSPolicyTypeInfo>(api))
+const request = supertest(
+  api<MDSPolicyTypeInfo>(
+    injectMicromobilityValidator(
+      injectVersion(
+        ApiServer((app: express.Express) => {
+          return app
+        })
+      )
+    )
+  )
+)
 
 const APP_JSON = 'application/vnd.mds.policy-author+json; charset=utf-8; version=0.4'
 const EMPTY_SCOPE = SCOPED_AUTH([], '')
@@ -95,7 +106,7 @@ describe('Tests app', () => {
     })
 
     it('tries to post invalid policy', done => {
-      const bad_policy_json: MDSPolicy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
+      const bad_policy_json: MicromobilityPolicy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
 
       /* eslint-reason test intentionally does things that the compiler dissuades,
          as it's testing an invalid data case.
@@ -112,7 +123,8 @@ describe('Tests app', () => {
         .expect(400)
         .end((err, result) => {
           const body = result.body
-          test.value(body.error.reason).contains('rule_type')
+          log('zazzy', body)
+          test.value(body.error.info.details[0].message).contains('rule_type')
           test.value(result).hasHeader('content-type', APP_JSON)
           done(err)
         })
@@ -194,7 +206,7 @@ describe('Tests app', () => {
     })
 
     it('verifies cannot PUT invalid policy', async () => {
-      const bad_policy_json: MDSPolicy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
+      const bad_policy_json: MicromobilityPolicy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
 
       /* eslint-reason test intentionally does things that the compiler dissuades,
          as it's testing an invalid data case.

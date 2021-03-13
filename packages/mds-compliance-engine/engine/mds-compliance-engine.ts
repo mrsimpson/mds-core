@@ -14,7 +14,7 @@
     limitations under the License.
  */
 
-import { Device, Geography, UUID, RULE_TYPES, VehicleEvent, MDSPolicy } from '@mds-core/mds-types'
+import { Device, Geography, UUID, RULE_TYPES, VehicleEvent, MicromobilityPolicy } from '@mds-core/mds-types'
 
 import { now, UnsupportedTypeError, uuid } from '@mds-core/mds-utils'
 import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
@@ -26,7 +26,7 @@ import { processSpeedPolicy } from './speed_processors'
 import { processTimePolicy } from './time_processors'
 
 function computeComplianceSnapshot(
-  policy: MDSPolicy,
+  policy: MicromobilityPolicy,
   filteredEvents: VehicleEventWithTelemetry[],
   geographies: Geography[],
   deviceMap: { [d: string]: Device }
@@ -50,7 +50,7 @@ function computeComplianceSnapshot(
 
 export async function createComplianceSnapshot(
   provider_id: UUID,
-  policy: MDSPolicy,
+  policy: MicromobilityPolicy,
   geographies: Geography[],
   filteredEvents: VehicleEvent[],
   deviceMap: { [d: string]: Device }
@@ -83,7 +83,7 @@ export async function createComplianceSnapshot(
  * The geographies should be the result of calling
  * `await readGeographies({ get_published: true })`
  */
-export async function processPolicy(policy: MDSPolicy, geographies: Geography[]) {
+export async function processPolicy(policy: MicromobilityPolicy, geographies: Geography[]) {
   if (isPolicyActive(policy)) {
     const provider_ids = getProviderIDs(policy.provider_ids)
     const ComplianceSnapshotPromises = provider_ids.map(async provider_id => {

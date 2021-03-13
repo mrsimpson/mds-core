@@ -1,4 +1,13 @@
-import { Device, Geography, VehicleEvent, UUID, SpeedRule, Telemetry, MDSPolicy, RULE_TYPES } from '@mds-core/mds-types'
+import {
+  Device,
+  Geography,
+  VehicleEvent,
+  UUID,
+  SpeedRule,
+  Telemetry,
+  MicromobilityPolicy,
+  RULE_TYPES
+} from '@mds-core/mds-types'
 
 import { pointInShape, getPolygon, isInStatesOrEvents, UnsupportedTypeError } from '@mds-core/mds-utils'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../@types'
@@ -27,7 +36,7 @@ export function isSpeedRuleMatch(
 }
 
 export function processSpeedPolicy(
-  policy: MDSPolicy,
+  policy: MicromobilityPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }

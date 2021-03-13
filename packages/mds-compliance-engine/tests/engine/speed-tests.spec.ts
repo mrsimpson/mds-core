@@ -1,7 +1,7 @@
 import test from 'unit.js'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { Geography, MDSPolicy, Device, SpeedRule, Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import { Geography, MicromobilityPolicy, Device, SpeedRule, Telemetry, VehicleEvent } from '@mds-core/mds-types'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
@@ -18,7 +18,7 @@ import { filterEvents, generateDeviceMap } from '../../engine/helpers'
 
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 
-const SPEED_POLICY: MDSPolicy = {
+const SPEED_POLICY: MicromobilityPolicy = {
   policy_id: '95645117-fd85-463e-a2c9-fc95ea47463e',
   name: 'Speed Limits',
   description: 'LADOT Pilot Speed Limit Limitations',

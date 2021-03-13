@@ -1,7 +1,14 @@
 import { Polygon } from 'geojson'
 import { veniceSpecOps, LA_CITY_BOUNDARY, restrictedAreas } from '@mds-core/mds-test-data'
 
-import { Geography, MDSCountPolicy, MDSPolicy, MDSSpeedPolicy, RULE_TYPES, VEHICLE_TYPES } from '@mds-core/mds-types'
+import {
+  Geography,
+  MDSCountPolicy,
+  MicromobilityPolicy,
+  MDSSpeedPolicy,
+  RULE_TYPES,
+  VEHICLE_TYPES
+} from '@mds-core/mds-types'
 import { days, now } from '@mds-core/mds-utils'
 
 export const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
@@ -420,7 +427,7 @@ export const OVERLAPPING_GEOS_SPEED_POLICY: MDSSpeedPolicy = {
   ]
 }
 
-export const OVERLAPPING_GEOS_TIME_POLICY: MDSPolicy = {
+export const OVERLAPPING_GEOS_TIME_POLICY: MicromobilityPolicy = {
   policy_id: 'fc9b02f0-9c0d-4b0a-85d6-7684b8e9e769',
   name: 'Multiple Speed Limits',
   description: 'LADOT Pilot Speed Limit Limitations',

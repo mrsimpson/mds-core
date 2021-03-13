@@ -15,6 +15,7 @@
  */
 
 import express, { NextFunction } from 'express'
+import HttpStatus from 'http-status-codes'
 import {
   uuid,
   pathPrefix,
@@ -24,15 +25,17 @@ import {
   ValidationError,
   ServerError,
   isUUID,
-  ConflictError
+  ConflictError,
+  isDefined
 } from '@mds-core/mds-utils'
 import db from '@mds-core/mds-db'
 
-import { policyValidationDetails } from '@mds-core/mds-schema-validators'
+// import { policyValidationDetails } from '@mds-core/mds-schema-validators'
 import logger from '@mds-core/mds-logger'
 
 import { checkAccess, AccessTokenScopeValidator, ApiRequest, ApiResponse } from '@mds-core/mds-api-server'
-import { MDSPolicy, PolicyMetadata, PolicyTypeInfo } from '@mds-core/mds-types'
+import { PolicyMetadata, PolicyTypeInfo } from '@mds-core/mds-types'
+import { validateMicromobilityPolicy } from '@mds-core/mds-schema-validators'
 import { PolicyAuthorApiVersionMiddleware } from './middleware/policy-author-api-version'
 import {
   PolicyAuthorApiPostPolicyResponse,
@@ -57,7 +60,6 @@ const checkPolicyAuthorApiAccess = (validator: AccessTokenScopeValidator<PolicyA
 
 function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Express {
   app.use(PolicyAuthorApiVersionMiddleware)
-
   app.post(
     pathPrefix('/policies'),
     checkPolicyAuthorApiAccess(scopes => scopes.includes('policies:write')),
@@ -66,12 +68,19 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
       res: PolicyAuthorApiPostPolicyResponse<PInfo>,
       next: express.NextFunction
     ) => {
-      const policy = { policy_id: uuid(), ...req.body }
+      if (!isDefined(req.body.policy_id)) {
+        req.body.policy_id = uuid()
+      }
+      const policy = req.body
+      logger.info('posting policy', policy)
 
-      const details = policyValidationDetails(policy as MDSPolicy) //  as PInfo['Policy'])
-
-      if (details != null) {
-        return res.status(400).send({ error: new ValidationError(JSON.stringify(details)) })
+      if (policy.publish_date) {
+        return next(
+          new ValidationError('publish_date cannot be set via policy creation endpoint', {
+            details:
+              'publish_date cannot be set via policy creation endpoint. publish_date can only be set via the publishing endpoint'
+          })
+        )
       }
 
       try {
@@ -132,10 +141,13 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
     ) => {
       const policy = req.body
 
-      const details = policyValidationDetails(policy)
-
-      if (details !== null) {
-        return res.status(400).send({ error: new ValidationError(JSON.stringify(details)) })
+      if (policy.publish_date) {
+        return next(
+          new ValidationError('publish_date cannot be set via policy editing endpoint', {
+            details:
+              'publish_date cannot be set via policy editing endpoint. publish_date can only be set via the publishing endpoint'
+          })
+        )
       }
 
       try {
@@ -280,10 +292,39 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   app.use(async (error: Error, req: ApiRequest, res: ApiResponse, next: NextFunction) => {
     await logger.error(req.method, req.originalUrl, error)
+
+    if (error instanceof ValidationError && error.info) return res.status(HttpStatus.BAD_REQUEST).send({ error })
     return res.status(500).send({ error })
   })
 
   return app
 }
 
-export { api }
+function injectVersion(app: express.Express): express.Express {
+  app.use(PolicyAuthorApiVersionMiddleware)
+  return app
+}
+
+function injectMicromobilityValidator(app: express.Express): express.Express {
+  app.post(pathPrefix('/policies'), (req, res, next) => {
+    try {
+      validateMicromobilityPolicy(req.body)
+      return next()
+    } catch (error) {
+      return next(error)
+    }
+  })
+
+  app.put(pathPrefix('/policies/:policy_id'), (req, res, next) => {
+    try {
+      validateMicromobilityPolicy(req.body)
+      return next()
+    } catch (error) {
+      return next(error)
+    }
+  })
+
+  return app
+}
+
+export { api, injectMicromobilityValidator, injectVersion }

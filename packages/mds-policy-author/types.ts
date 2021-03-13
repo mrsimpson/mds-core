@@ -1,4 +1,4 @@
-import { MDSPolicy, UUID, PolicyMetadata, Optional, PolicyTypeInfo } from '@mds-core/mds-types'
+import { MicromobilityPolicy, UUID, PolicyMetadata, PolicyTypeInfo } from '@mds-core/mds-types'
 import {
   ApiRequest,
   ApiVersionedResponse,
@@ -13,11 +13,9 @@ export const [POLICY_AUTHOR_API_DEFAULT_VERSION] = POLICY_AUTHOR_API_SUPPORTED_V
 
 export type PolicyAuthorApiRequest<B = {}> = ApiRequest<B>
 
-export type PolicyAuthorApiPostPolicyRequest<PInfo extends PolicyTypeInfo> = PolicyAuthorApiRequest<
-  Optional<PInfo['Policy'], 'policy_id'>
->
+export type PolicyAuthorApiPostPolicyRequest<PInfo extends PolicyTypeInfo> = PolicyAuthorApiRequest<PInfo['Policy']>
 export type PolicyAuthorApiPublishPolicyRequest = PolicyAuthorApiRequest & ApiRequestParams<'policy_id'>
-export type PolicyAuthorApiEditPolicyRequest = PolicyAuthorApiRequest<MDSPolicy>
+export type PolicyAuthorApiEditPolicyRequest = PolicyAuthorApiRequest<MicromobilityPolicy>
 export type PolicyAuthorApiDeletePolicyRequest = PolicyAuthorApiRequest & ApiRequestParams<'policy_id'>
 export type PolicyAuthorApiGetPolicyMetadataRequest = PolicyAuthorApiRequest &
   ApiRequestQuery<'get_published' | 'get_unpublished'>

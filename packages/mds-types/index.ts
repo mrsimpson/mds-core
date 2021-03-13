@@ -348,22 +348,23 @@ export interface BaseRule<S extends string, E extends string, RuleType extends R
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface MDSBaseRule<RuleType extends RULE_TYPE> extends BaseRule<VEHICLE_STATE, VEHICLE_EVENT, RuleType> {
+export interface MicromobilityBaseRule<RuleType extends RULE_TYPE>
+  extends BaseRule<VEHICLE_STATE, VEHICLE_EVENT, RuleType> {
   vehicle_types?: VEHICLE_TYPE[] | null
   states: MDSStatesToEvents | null
 }
 
-export type CountRule = MDSBaseRule<'count'>
+export type CountRule = MicromobilityBaseRule<'count'>
 
-export interface TimeRule extends MDSBaseRule<'time'> {
+export interface TimeRule extends MicromobilityBaseRule<'time'> {
   rule_units: 'minutes' | 'hours'
 }
 
-export interface SpeedRule extends MDSBaseRule<'speed'> {
+export interface SpeedRule extends MicromobilityBaseRule<'speed'> {
   rule_units: 'kph' | 'mph'
 }
 
-export type UserRule = MDSBaseRule<'user'>
+export type UserRule = MicromobilityBaseRule<'user'>
 
 export interface BasePolicy<
   S extends string,
@@ -386,7 +387,7 @@ export interface BasePolicy<
   [key: string]: any
 }
 
-export type MDSPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MDSBaseRule<RULE_TYPE>>
+export type MicromobilityPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MicromobilityBaseRule<RULE_TYPE>>
 
 export type PolicyTypeInfo<
   State extends string = VEHICLE_STATE,
@@ -400,8 +401,8 @@ export type MDSPolicyTypeInfo = PolicyTypeInfo<
   VEHICLE_STATE,
   VEHICLE_EVENT,
   RULE_TYPE,
-  MDSBaseRule<RULE_TYPE>,
-  MDSPolicy
+  MicromobilityBaseRule<RULE_TYPE>,
+  MicromobilityPolicy
 >
 
 export type MDSCountPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'count', CountRule>

@@ -26,7 +26,14 @@ import test from 'unit.js'
 import { now, days, clone, yesterday, pathPrefix } from '@mds-core/mds-utils'
 import { ApiServer } from '@mds-core/mds-api-server'
 import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
-import { BasePolicy, BaseRule, MDSPolicy, MDSPolicyTypeInfo, PolicyTypeInfo, RULE_TYPE } from '@mds-core/mds-types'
+import {
+  BasePolicy,
+  BaseRule,
+  MicromobilityPolicy,
+  MDSPolicyTypeInfo,
+  PolicyTypeInfo,
+  RULE_TYPE
+} from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import {
   POLICY_JSON,
@@ -176,10 +183,10 @@ describe('Tests app', () => {
     test.value(policies.length).is(3)
     test.value(body.version).is(POLICY_API_DEFAULT_VERSION)
     test.value(result).hasHeader('content-type', APP_JSON)
-    const isSupersededPolicyPresent = policies.some((policy: MDSPolicy) => {
+    const isSupersededPolicyPresent = policies.some((policy: MicromobilityPolicy) => {
       return policy.policy_id === ACTIVE_POLICY_JSON.policy_id
     })
-    const isSupersedingPolicyPresent = policies.some((policy: MDSPolicy) => {
+    const isSupersedingPolicyPresent = policies.some((policy: MicromobilityPolicy) => {
       return policy.policy_id === SUPERSEDING_POLICY_JSON.policy_id
     })
     test.value(isSupersededPolicyPresent).is(false)

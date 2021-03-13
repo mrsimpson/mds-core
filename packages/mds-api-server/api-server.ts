@@ -1,4 +1,5 @@
 import express from 'express'
+import * as Joi from 'joi'
 import logger from '@mds-core/mds-logger'
 import { ProviderIdClaim, UserEmailClaim, JurisdictionsClaim } from '@mds-core/mds-api-authorizer'
 import { pathPrefix } from '@mds-core/mds-utils'
@@ -13,7 +14,7 @@ import { serverVersion } from './utils'
 import { HealthRequestHandler } from './handlers/health'
 import { HttpContextMiddleware } from './middleware/http-context'
 
-export interface ApiServerOptions {
+export interface ApiServerMiddlewareOptions {
   authorization: AuthorizationMiddlewareOptions
   compression: CompressionMiddlewareOptions
   cors: CorsMiddlewareOptions
@@ -26,8 +27,8 @@ export interface ApiServerOptions {
 export const ApiServer = <T extends {} = {}>(
   // The linter does not realize that the type variable is used.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  api: <G>(server: express.Express) => express.Express,
-  options: Partial<ApiServerOptions> = {},
+  api: <G = T>(server: express.Express) => express.Express,
+  options: Partial<ApiServerMiddlewareOptions> = {},
   app: express.Express = express()
 ): express.Express => {
   logger.info(`${serverVersion()} starting`)

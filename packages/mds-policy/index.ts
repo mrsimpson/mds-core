@@ -1,1 +1,1 @@
-export { api } from './api'
+export { api, injectSchema } from './api'
