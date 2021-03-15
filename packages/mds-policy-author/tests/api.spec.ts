@@ -43,7 +43,8 @@ import {
   SCOPED_AUTH,
   PUBLISHED_POLICY
 } from '@mds-core/mds-test-data'
-import { api, injectMicromobilityValidator, injectVersion } from '../api'
+import { injectMicromobilityValidator, injectVersion } from '@mds-core/mds-policy-author-middleware'
+import { api } from '../api'
 import { POLICY_AUTHOR_API_DEFAULT_VERSION } from '../types'
 
 /* eslint-disable-next-line no-console */

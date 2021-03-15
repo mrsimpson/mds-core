@@ -35,6 +35,8 @@ import logger from '@mds-core/mds-logger'
 
 import { checkAccess, AccessTokenScopeValidator, ApiRequest, ApiResponse } from '@mds-core/mds-api-server'
 import { PolicyMetadata, PolicyTypeInfo } from '@mds-core/mds-types'
+import { validateMicromobilityPolicy } from '@mds-core/mds-schema-validators'
+import { PolicyAuthorApiVersionMiddleware } from './middleware/policy-author-api-version'
 import {
   PolicyAuthorApiPostPolicyResponse,
   PolicyAuthorApiEditPolicyResponse,
@@ -297,4 +299,31 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
   return app
 }
 
-export { api }
+function injectVersion(app: express.Express): express.Express {
+  app.use(PolicyAuthorApiVersionMiddleware)
+  return app
+}
+
+function injectMicromobilityValidator(app: express.Express): express.Express {
+  app.post(pathPrefix('/policies'), (req, res, next) => {
+    try {
+      validateMicromobilityPolicy(req.body)
+      return next()
+    } catch (error) {
+      return next(error)
+    }
+  })
+
+  app.put(pathPrefix('/policies/:policy_id'), (req, res, next) => {
+    try {
+      validateMicromobilityPolicy(req.body)
+      return next()
+    } catch (error) {
+      return next(error)
+    }
+  })
+
+  return app
+}
+
+export { api, injectMicromobilityValidator, injectVersion }
