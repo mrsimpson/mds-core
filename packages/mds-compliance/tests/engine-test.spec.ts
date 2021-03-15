@@ -2,16 +2,21 @@ import test from 'unit.js'
 import fs from 'fs'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { RULE_TYPES, Geography, Policy, Device, VehicleEvent } from '@mds-core/mds-types'
+import { RULE_TYPES, Geography, MicromobilityPolicy, Device, VehicleEvent } from '@mds-core/mds-types'
 
 import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
 import { FeatureCollection } from 'geojson'
-import { processPolicy, getSupersedingPolicies, getRecentEvents } from '@mds-core/mds-compliance/mds-compliance-engine'
 import { RuntimeError, minutes } from '@mds-core/mds-utils'
-import { ValidationError, validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
+import {
+  ValidationError,
+  validateEvents,
+  validateGeographies,
+  validateMicromobilityPolicies
+} from '@mds-core/mds-schema-validators'
+import { processPolicy, getSupersedingPolicies, getRecentEvents } from '../mds-compliance-engine'
 
-let policies: Policy[] = []
-let low_count_policies: Policy[] = []
+let policies: MicromobilityPolicy[] = []
+let low_count_policies: MicromobilityPolicy[] = []
 
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
@@ -25,7 +30,7 @@ function now(): number {
   return Date.now()
 }
 
-async function readJson(path: string): Promise<Policy[]> {
+async function readJson(path: string): Promise<MicromobilityPolicy[]> {
   return Promise.resolve(JSON.parse(fs.readFileSync(path).toString()))
 }
 
@@ -60,7 +65,7 @@ describe('Tests Compliance Engine', () => {
       vehicle_state: 'on_trip',
       speed: 0
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
 
@@ -72,7 +77,9 @@ describe('Tests Compliance Engine', () => {
       },
       {}
     )
-    const results = supersedingPolicies.map(policy => processPolicy(policy, recentEvents, geographies, deviceMap))
+    const results = supersedingPolicies.map((policy: MicromobilityPolicy) =>
+      processPolicy(policy, recentEvents, geographies, deviceMap)
+    )
     results.forEach(result => {
       if (result) {
         result.compliance.forEach(compliance => {
@@ -95,11 +102,11 @@ describe('Tests Compliance Engine', () => {
       speed: 0
     })
     try {
-      validatePolicies(policies)
+      validateMicromobilityPolicies(policies)
     } catch (err) {
       console.dir(err)
     }
-    test.assert.doesNotThrow(() => validatePolicies(policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
 
@@ -138,7 +145,7 @@ describe('Tests Compliance Engine', () => {
       vehicle_state: 'on_trip',
       speed: 0
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
 
@@ -176,7 +183,7 @@ describe('Tests Compliance Engine', () => {
       vehicle_state: 'on_trip',
       speed: 5
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
 
@@ -212,7 +219,7 @@ describe('Tests Compliance Engine', () => {
       vehicle_state: 'on_trip',
       speed: 500
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
 
@@ -249,7 +256,7 @@ describe('Tests Compliance Engine', () => {
       vehicle_state: 'available',
       speed: 0
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
 
@@ -285,7 +292,7 @@ describe('Tests Compliance Engine', () => {
       vehicle_state: 'available',
       speed: 0
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
 
@@ -323,7 +330,7 @@ describe('Tests Compliance Engine', () => {
       vehicle_state: 'available',
       speed: 0
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
 
@@ -372,7 +379,7 @@ describe('Verifies errors are being properly thrown', () => {
       vehicle_state: 'available',
       speed: 0
     })
-    test.assert.doesNotThrow(() => validatePolicies(policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(policies))
     test.assert.doesNotThrow(() => validateGeographies(geographies))
     test.assert.doesNotThrow(() => validateEvents(events))
 
@@ -400,7 +407,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', as
   })
 
   it('should process count violation vehicles with the most recent event last', done => {
-    test.assert.doesNotThrow(() => validatePolicies(low_count_policies))
+    test.assert.doesNotThrow(() => validateMicromobilityPolicies(low_count_policies))
     const devices = makeDevices(6, now())
     const start_time = now() - 10000000
     const latest_device: Device = devices[0]
