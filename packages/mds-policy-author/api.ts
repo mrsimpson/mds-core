@@ -59,7 +59,6 @@ const checkPolicyAuthorApiAccess = (validator: AccessTokenScopeValidator<PolicyA
   checkAccess(validator)
 
 function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Express {
-  app.use(PolicyAuthorApiVersionMiddleware)
   app.post(
     pathPrefix('/policies'),
     checkPolicyAuthorApiAccess(scopes => scopes.includes('policies:write')),

@@ -13,6 +13,20 @@
 
 import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
 import { MDSPolicyTypeInfo } from '@mds-core/mds-types'
-import { api } from './api'
+import express from 'express'
+import { api, injectMicromobilityValidator, injectVersion } from './api'
 
-HttpServer(ApiServer<MDSPolicyTypeInfo>(api), { port: process.env.POLICY_AUTHOR_API_HTTP_PORT })
+// HttpServer(ApiServer<MDSPolicyTypeInfo>(api), { port: process.env.POLICY_AUTHOR_API_HTTP_PORT })
+
+HttpServer(
+  api<MDSPolicyTypeInfo>(
+    injectMicromobilityValidator(
+      injectVersion(
+        ApiServer((app: express.Express) => {
+          return app
+        })
+      )
+    )
+  ),
+  { port: process.env.POLICY_AUTHOR_API_HTTP_PORT }
+)
