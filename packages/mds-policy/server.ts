@@ -12,11 +12,11 @@
  */
 
 import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
-import { MDSPolicyTypeInfo } from '@mds-core/mds-types'
+import { MicromobilityPolicyTypeInfo } from '@mds-core/mds-types'
 import { micromobilityPolicySchemaJson } from '@mds-core/mds-schema-validators'
 import { api, injectSchema } from './api'
 
 // TODO eliminate this file from this package and create mds-micromobility-policy package
-HttpServer(injectSchema(micromobilityPolicySchemaJson, ApiServer<MDSPolicyTypeInfo>(api)), {
+HttpServer(injectSchema(micromobilityPolicySchemaJson, ApiServer<MicromobilityPolicyTypeInfo>(api)), {
   port: process.env.POLICY_API_HTTP_PORT
 })

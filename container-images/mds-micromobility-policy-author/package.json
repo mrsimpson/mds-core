@@ -1,7 +1,7 @@
 {
-  "name": "@container-images/mds-policy-author",
+  "name": "@container-images/mds-micromobility-policy-author",
   "version": "0.1.26",
-  "description": "Docker Image for MDS policy-author API",
+  "description": "Docker Image for MDS micromobility policy-author API",
   "private": true,
   "main": "dist/index.js",
   "files": [
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "bundle": "webpack --mode=production --env.npm_package_name=${npm_package_name} --env.npm_package_version=${npm_package_version}",
-    "image": "yarn bundle && ../../bin/build-helper buildImage mds-policy-author:${npm_package_version}",
+    "image": "yarn bundle && ../../bin/build-helper buildImage mds-micromobility-policy-author:${npm_package_version}",
     "test": "yarn test:eslint",
     "test:eslint": "eslint --ignore-path ../../.gitignore '**/*.ts'"
   },
@@ -19,7 +19,7 @@
   "author": "City of Los Angeles",
   "license": "Apache-2.0",
   "dependencies": {
-    "@mds-core/mds-policy-author": "0.0.23",
+    "@mds-core/mds-micromobility-policy-author": "0.0.1",
     "@mds-core/mds-webpack-config": "0.1.0"
   }
 }

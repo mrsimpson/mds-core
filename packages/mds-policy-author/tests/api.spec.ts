@@ -29,7 +29,7 @@ import express from 'express'
 import test from 'unit.js'
 import db from '@mds-core/mds-db'
 import { clone, isUUID, uuid, pathPrefix } from '@mds-core/mds-utils'
-import { MicromobilityPolicy, MDSPolicyTypeInfo } from '@mds-core/mds-types'
+import { MicromobilityPolicy, MicromobilityPolicyTypeInfo } from '@mds-core/mds-types'
 import { ApiServer } from '@mds-core/mds-api-server'
 import {
   POLICY_JSON,
@@ -51,7 +51,7 @@ import { POLICY_AUTHOR_API_DEFAULT_VERSION } from '../types'
 const log = console.log.bind(console)
 
 const request = supertest(
-  api<MDSPolicyTypeInfo>(
+  api<MicromobilityPolicyTypeInfo>(
     injectMicromobilityValidator(
       injectVersion(
         ApiServer((app: express.Express) => {

@@ -17,7 +17,7 @@ import * as fs from 'fs'
 import logger from '@mds-core/mds-logger'
 import * as yargs from 'yargs'
 import { MicromobilityPolicy, Geography, VehicleEvent, Device } from '@mds-core/mds-types'
-import { validateEvents, validateGeographies, validatePolicies } from '@mds-core/mds-schema-validators'
+import { validateEvents, validateGeographies, validateMicromobilityPolicies } from '@mds-core/mds-schema-validators'
 import { ComplianceEngineResult } from './@types'
 import { getSupersedingPolicies, filterEvents, generateDeviceMap } from './engine/helpers'
 import { createComplianceSnapshot } from './engine'
@@ -66,7 +66,7 @@ async function main(): Promise<(ComplianceEngineResult | undefined)[]> {
   }
 
   const policies = (await readJson(args.policies)) as MicromobilityPolicy[]
-  if (!policies || !validatePolicies(policies)) {
+  if (!policies || !validateMicromobilityPolicies(policies)) {
     logger.error('unable to read policies')
     process.exit(1)
   }

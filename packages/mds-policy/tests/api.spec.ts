@@ -26,14 +26,7 @@ import test from 'unit.js'
 import { now, days, clone, yesterday, pathPrefix } from '@mds-core/mds-utils'
 import { ApiServer } from '@mds-core/mds-api-server'
 import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
-import {
-  BasePolicy,
-  BaseRule,
-  MicromobilityPolicy,
-  MDSPolicyTypeInfo,
-  PolicyTypeInfo,
-  RULE_TYPE
-} from '@mds-core/mds-types'
+import { MicromobilityPolicy, MicromobilityPolicyTypeInfo } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import {
   POLICY_JSON,
@@ -61,50 +54,7 @@ import { POLICY_API_DEFAULT_VERSION } from '../types'
 /* eslint-disable-next-line no-console */
 const log = console.log.bind(console)
 
-// server.ts
-// HttpServer(ApiServer(api), { port: process.env.POLICY_API_HTTP_PORT })
-type SimpleVehicleState = 'available' | 'unavailable'
-type SimpleVehicleEvent = 'trip_start' | 'trip_end'
-
-type SimplePolicy = BasePolicy<
-  SimpleVehicleState,
-  SimpleVehicleEvent,
-  RULE_TYPE,
-  BaseRule<SimpleVehicleState, SimpleVehicleEvent, RULE_TYPE>
->
-
-type SimplePolicyTypeInfo = PolicyTypeInfo<
-  SimpleVehicleState,
-  SimpleVehicleEvent,
-  RULE_TYPE,
-  BaseRule<SimpleVehicleState, SimpleVehicleEvent, RULE_TYPE>,
-  SimplePolicy
->
-
-const SIMPLE_POLICY_JSON: SimplePolicy = {
-  // TODO guts
-  name: 'MDSPolicy 1',
-  description: 'Mobility caps as described in the One-Year Permit',
-  policy_id: 'a7ca9ece-ca59-42fb-af5d-4668655b547a',
-  start_date: START_ONE_MONTH_FROM_NOW,
-  end_date: null,
-  prev_policies: null,
-  provider_ids: [],
-  rules: [
-    {
-      rule_type: 'count',
-      rule_id: '7ea0d16e-ad15-4337-9722-9924e3af9146',
-      name: 'Greater LA',
-      geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
-      states: { available: [] },
-      vehicle_types: [],
-      maximum: 3000,
-      minimum: 500
-    }
-  ]
-}
-
-const request = supertest(ApiServer<MDSPolicyTypeInfo>(api))
+const request = supertest(ApiServer<MicromobilityPolicyTypeInfo>(api))
 
 const ACTIVE_POLICY_JSON = clone(POLICY_JSON)
 ACTIVE_POLICY_JSON.publish_date = yesterday()

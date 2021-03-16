@@ -397,7 +397,7 @@ export type PolicyTypeInfo<
   Policy extends BasePolicy<State, Event, RuleType, Rule> = BasePolicy<State, Event, RuleType, Rule>
 > = { State: State; Event: Event; RuleType: RuleType; Rule: Rule; Policy: Policy }
 
-export type MDSPolicyTypeInfo = PolicyTypeInfo<
+export type MicromobilityPolicyTypeInfo = PolicyTypeInfo<
   VEHICLE_STATE,
   VEHICLE_EVENT,
   RULE_TYPE,

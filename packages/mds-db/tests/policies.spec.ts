@@ -2,7 +2,7 @@ import assert from 'assert'
 /* eslint-reason extends object.prototype */
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import should from 'should'
-import { RULE_TYPE, BaseRule, BasePolicy, MDSPolicyTypeInfo } from '@mds-core/mds-types'
+import { RULE_TYPE, BaseRule, BasePolicy, MicromobilityPolicyTypeInfo } from '@mds-core/mds-types'
 import {
   POLICY_JSON,
   POLICY2_JSON,
@@ -108,11 +108,11 @@ if (pg_info.database) {
 
     it('can delete an unpublished Policy', async () => {
       const { policy_id } = DELETEABLE_POLICY
-      await MDSDBPostgres.writePolicy<MDSPolicyTypeInfo>(DELETEABLE_POLICY)
+      await MDSDBPostgres.writePolicy<MicromobilityPolicyTypeInfo>(DELETEABLE_POLICY)
 
       assert(!(await MDSDBPostgres.isPolicyPublished(policy_id)))
       await MDSDBPostgres.deletePolicy(policy_id)
-      const policy_result = await MDSDBPostgres.readPolicies<MDSPolicyTypeInfo>({
+      const policy_result = await MDSDBPostgres.readPolicies<MicromobilityPolicyTypeInfo>({
         policy_id,
         get_published: null,
         get_unpublished: null
@@ -131,14 +131,14 @@ if (pg_info.database) {
       await MDSDBPostgres.writePolicy(POLICY3_JSON)
 
       // Read all policies, no matter whether published or not.
-      const policies = await MDSDBPostgres.readPolicies<MDSPolicyTypeInfo>()
+      const policies = await MDSDBPostgres.readPolicies<MicromobilityPolicyTypeInfo>()
       assert.deepStrictEqual(policies.length, 3)
-      const unpublishedPolicies = await MDSDBPostgres.readPolicies<MDSPolicyTypeInfo>({
+      const unpublishedPolicies = await MDSDBPostgres.readPolicies<MicromobilityPolicyTypeInfo>({
         get_unpublished: true,
         get_published: null
       })
       assert.deepStrictEqual(unpublishedPolicies.length, 2)
-      const publishedPolicies = await MDSDBPostgres.readPolicies<MDSPolicyTypeInfo>({
+      const publishedPolicies = await MDSDBPostgres.readPolicies<MicromobilityPolicyTypeInfo>({
         get_published: true,
         get_unpublished: null
       })
