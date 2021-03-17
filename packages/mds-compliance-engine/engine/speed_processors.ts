@@ -23,7 +23,7 @@ export function isSpeedRuleMatch(
     for (const geography of rule.geographies) {
       if (
         isInStatesOrEvents(rule, event) &&
-        isInVehicleTypes(rule, device, event) &&
+        isInVehicleTypes(rule, device) &&
         event.telemetry.gps.speed &&
         pointInShape(event.telemetry.gps, getPolygon(geographies, geography)) &&
         (!rule.maximum || event.telemetry.gps.speed >= rule.maximum)
@@ -42,8 +42,6 @@ export function processSpeedPolicy(
   devicesToCheck: { [d: string]: Device }
 ): ComplianceEngineResult | undefined {
   if (getPolicyType(policy) !== RULE_TYPES.speed) {
-    console.log('about to fail')
-    console.log(policy.policy_id)
     throw new UnsupportedTypeError(`${getPolicyType(policy)} with id ${policy.policy_id} submitted to speed processor`)
   }
   const matchedVehicles: {

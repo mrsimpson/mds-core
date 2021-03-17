@@ -41,7 +41,7 @@ export function isCountRuleMatch(
 ) {
   if (isRuleActive(rule)) {
     for (const geography of rule.geographies) {
-      if (isInStatesOrEvents(rule, event) && isInVehicleTypes(rule, device, event)) {
+      if (isInStatesOrEvents(rule, event) && isInVehicleTypes(rule, device)) {
         const poly = getPolygon(geographies, geography)
         if (poly && pointInShape(event.telemetry.gps, poly)) {
           return true

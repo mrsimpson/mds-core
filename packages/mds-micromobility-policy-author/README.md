@@ -1,2 +1,2 @@
-# mds-policy
-Delivery mechanism for MDS Policy documents
+# mds-micromobility-policy-author
+Authoring endpoints for micromobility policies.

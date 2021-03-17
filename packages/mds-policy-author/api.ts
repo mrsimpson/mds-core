@@ -30,7 +30,6 @@ import {
 } from '@mds-core/mds-utils'
 import db from '@mds-core/mds-db'
 
-// import { policyValidationDetails } from '@mds-core/mds-schema-validators'
 import logger from '@mds-core/mds-logger'
 
 import { checkAccess, AccessTokenScopeValidator, ApiRequest, ApiResponse } from '@mds-core/mds-api-server'

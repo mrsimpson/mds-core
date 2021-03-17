@@ -83,7 +83,7 @@ export function isRuleActive(rule: MicromobilityBaseRule<RULE_TYPE>): boolean {
   return false
 }
 
-export function isInVehicleTypes(rule: MicromobilityBaseRule<RULE_TYPE>, device: Device, event: VehicleEvent): boolean {
+export function isInVehicleTypes(rule: MicromobilityBaseRule<RULE_TYPE>, device: Device): boolean {
   return !rule.vehicle_types || (rule.vehicle_types && rule.vehicle_types.includes(device.vehicle_type))
 }
 

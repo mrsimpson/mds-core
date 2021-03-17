@@ -14,7 +14,7 @@ import { serverVersion } from './utils'
 import { HealthRequestHandler } from './handlers/health'
 import { HttpContextMiddleware } from './middleware/http-context'
 
-export interface ApiServerMiddlewareOptions {
+export interface ApiServerOptions {
   authorization: AuthorizationMiddlewareOptions
   compression: CompressionMiddlewareOptions
   cors: CorsMiddlewareOptions
@@ -28,7 +28,7 @@ export const ApiServer = <T extends {} = {}>(
   // The linter does not realize that the type variable is used.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   api: <G = T>(server: express.Express) => express.Express,
-  options: Partial<ApiServerMiddlewareOptions> = {},
+  options: Partial<ApiServerOptions> = {},
   app: express.Express = express()
 ): express.Express => {
   logger.info(`${serverVersion()} starting`)
