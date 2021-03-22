@@ -11,6 +11,10 @@ deployments:
     version: ${POLICY_VERSION}
   mds-policy-service:
     version: ${POLICY_SERVICE_VERSION}
+  mds-compliance-api:
+    version: ${COMPLIANCE_API_VERSION}
+  mds-compliance-service:
+    version: ${COMPLIANCE_SERVICE_VERSION}
   mds-jurisdiction:
     version: ${JURISDICTION_VERSION}
   mds-jurisdiction-service:
@@ -21,10 +25,6 @@ deployments:
     version: ${GEOGRAPHY_VERSION}
   mds-geography-author:
     version: ${GEOGRAPHY_AUTHOR_VERSION}
-  mds-compliance-api:
-    version: ${COMPLIANCE_API_VERSION}
-  mds-compliance-service:
-    version: ${COMPLIANCE_SERVICE_VERSION}
   mds-geography-service:
     version: ${GEOGRAPHY_SERVICE_VERSION}
   mds-ingest-service:
