@@ -28,11 +28,6 @@ apis:
     pathPrefix: /policy-author
     version: latest
     migration: false
-  mds-web-sockets:
-    enabled: true
-    pathPrefix: /web-sockets
-    version: latest
-    migration: false
   mds-geography:
     enabled: true
     pathPrefix: /geography
@@ -52,13 +47,52 @@ apis:
     enabled: true
     version: latest
     migration: false
+  mds-geography-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-policy-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-ingest-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-transaction-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-transaction-api:
+    enabled: true
+    version: latest
+    migration: false
+  mds-attachment-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-audit-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-collector-api:
+    enabled: true
+    version: latest
+    migration: false
+    pathPrefix: /collector
+  mds-collector-backend:
+    enabled: true
+    version: latest
+    migration: false
 tenantId:
 timezone: America/Los_Angeles
 registry:
 useLatestImage: true
 domain: "*"
+ingressgateway: ingressgateway
 tls:
   enabled: false
+  elbTermination: false
   domain:
 jwt:
   issuer:

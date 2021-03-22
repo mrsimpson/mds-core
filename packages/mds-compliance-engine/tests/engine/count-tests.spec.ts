@@ -22,7 +22,7 @@ import {
 } from '@mds-core/mds-types'
 
 import MockDate from 'mockdate'
-import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
+import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { generateDeviceMap } from '../../engine/helpers'
 import {
@@ -76,7 +76,7 @@ const COUNT_POLICY = {
   ]
 }
 
-const GEOGRAPHIES = [{ name: 'la', geography_id: CITY_OF_LA, geography_json: la_city_boundary as FeatureCollection }]
+const GEOGRAPHIES = [{ name: 'la', geography_id: CITY_OF_LA, geography_json: LA_CITY_BOUNDARY as FeatureCollection }]
 
 describe('Tests Compliance Engine Count Functionality:', () => {
   describe('basic count compliance cases', () => {

@@ -1,3 +1,19 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* eslint-disable promise/no-callback-in-promise */
 /* eslint-disable promise/no-nesting */
 /* eslint-disable promise/prefer-await-to-then */
@@ -5,21 +21,6 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable promise/catch-or-return */
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
- */
 
 import supertest from 'supertest'
 import {
@@ -42,6 +43,8 @@ import { ApiServer } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
 import { MOCHA_PROVIDER_ID } from '@mds-core/mds-providers'
 import Sinon from 'sinon'
+import { AttachmentServiceClient } from '@mds-core/mds-attachment-service'
+import { ServiceError } from '@mds-core/mds-service-helpers'
 import { api } from '../api'
 import * as attachments from '../attachments'
 import { AUDIT_API_DEFAULT_VERSION } from '../types'
@@ -73,7 +76,7 @@ const OLD_EVENT = Date.now() - 60000
 const audit_subject_id = 'user@mds-testing.info'
 
 before('Initializing Database', async () => {
-  await Promise.all([db.initialize(), cache.initialize()])
+  await Promise.all([db.reinitialize(), cache.reinitialize()])
 })
 
 describe('Testing API', () => {
@@ -574,7 +577,7 @@ describe('Testing API', () => {
         events: [...events_a, ...events_b],
         telemetry: [...telemetry_a, ...telemetry_b]
       }
-      Promise.all([db.initialize(), cache.initialize()]).then(() => {
+      Promise.all([db.reinitialize(), cache.reinitialize()]).then(() => {
         Promise.all([cache.seed(seedData), db.seed(seedData)]).then(() => {
           done()
         })
@@ -693,7 +696,7 @@ describe('Testing API', () => {
         audit_trip_id,
         recorded: AUDIT_START
       } as AuditAttachment
-      Promise.all([db.initialize(), cache.initialize()]).then(async () => {
+      Promise.all([db.reinitialize(), cache.reinitialize()]).then(async () => {
         await db.writeDevice({
           device_id: provider_device_id,
           provider_id,
@@ -808,14 +811,21 @@ describe('Testing API', () => {
 
     attachmentTests.forEach(testCase =>
       it(`verify post bad attachment (${testCase.name})`, done => {
+        Sinon.stub(AttachmentServiceClient, 'writeAttachment').rejects(
+          ServiceError({
+            type: testCase.errName,
+            message: 'Error Writing Attachment',
+            details: testCase.errReason
+          }).error
+        )
         request
           .post(pathPrefix(`/trips/${audit_trip_id}/attach/image%2Fpng`))
           .set('Authorization', SCOPED_AUTH(['audits:write'], audit_subject_id))
           .attach('file', `./tests/${testCase.file}`)
           .expect(testCase.status)
           .end((err, result) => {
-            test.value(result.body.error.name).is(testCase.errName)
-            test.value(result.body.error.reason).is(testCase.errReason)
+            test.value(result.body.error.type).is(testCase.errName)
+            test.value(result.body.error.details).is(testCase.errReason)
             done(err)
           })
       })

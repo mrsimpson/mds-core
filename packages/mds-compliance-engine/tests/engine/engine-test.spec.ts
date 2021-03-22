@@ -4,7 +4,7 @@ import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import { Device, Geography, Policy, VehicleEvent } from '@mds-core/mds-types'
 import cache from '@mds-core/mds-agency-cache'
 
-import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
+import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
 import { FeatureCollection } from 'geojson'
 import db from '@mds-core/mds-db'
 import assert from 'assert'
@@ -21,7 +21,7 @@ let policies: Policy[] = []
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
 const geographies: Geography[] = [
-  { name: 'la', geography_id: CITY_OF_LA, geography_json: la_city_boundary as FeatureCollection }
+  { name: 'la', geography_id: CITY_OF_LA, geography_json: LA_CITY_BOUNDARY as FeatureCollection }
 ]
 
 process.env.TIMEZONE = 'America/Los_Angeles'
@@ -36,7 +36,7 @@ describe('Tests General Compliance Engine Functionality', () => {
   })
 
   beforeEach(async () => {
-    await db.initialize()
+    await db.reinitialize()
     await cache.reset()
   })
 
@@ -83,7 +83,7 @@ describe('Tests General Compliance Engine Functionality', () => {
 
 describe('Verifies compliance engine processes by vehicle most recent event', () => {
   beforeEach(async () => {
-    await db.initialize()
+    await db.reinitialize()
     await cache.reset()
   })
   it('should process count violation vehicles with the most recent event last', async () => {

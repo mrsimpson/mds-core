@@ -1,22 +1,22 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable promise/prefer-await-to-callbacks */
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 // eslint directives:
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-useless-concat */
 /* eslint-disable prefer-destructuring */
@@ -43,10 +43,10 @@ import {
   GEOGRAPHY2_UUID,
   veniceSpecOps,
   SCOPED_AUTH,
-  START_ONE_MONTH_FROM_NOW
+  START_ONE_MONTH_FROM_NOW,
+  LA_CITY_BOUNDARY
 } from '@mds-core/mds-test-data'
 
-import { la_city_boundary } from './la-city-boundary'
 import { api } from '../api'
 import { POLICY_API_DEFAULT_VERSION } from '../types'
 /* eslint-disable-next-line @typescript-eslint/no-var-requires */
@@ -69,8 +69,8 @@ const POLICIES_READ_SCOPE = SCOPED_AUTH(['policies:read'])
 
 describe('Tests app', () => {
   before('Initialize the DB', async () => {
-    await db.initialize()
-    await db.writeGeography({ name: 'Los Angeles', geography_id: GEOGRAPHY_UUID, geography_json: la_city_boundary })
+    await db.reinitialize()
+    await db.writeGeography({ name: 'Los Angeles', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY })
   })
 
   after('Shutdown the DB', async () => {
@@ -169,13 +169,13 @@ describe('Tests app', () => {
     test.value(result).hasHeader('content-type', APP_JSON)
   })
 
-  it('cannot GET a nonexistant policy', async () => {
+  it('cannot GET a nonexistent policy', async () => {
     const result = await request
       .get(pathPrefix(`/policies/${GEOGRAPHY_UUID}`)) // obvs not a policy
       .set('Authorization', AUTH)
       .expect(404)
     const body = result.body
-    log('read back nonexistant policy response:', body)
+    log('read back nonexistent policy response:', body)
     test.value(result).hasHeader('content-type', APP_JSON)
   })
 

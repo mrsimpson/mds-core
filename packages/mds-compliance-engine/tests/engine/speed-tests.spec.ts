@@ -3,7 +3,7 @@ import test from 'unit.js'
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import { Geography, Policy, Device, SpeedRule, Telemetry, VehicleEvent } from '@mds-core/mds-types'
 
-import { la_city_boundary } from '@mds-core/mds-policy/tests/la-city-boundary'
+import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
 import { FeatureCollection } from 'geojson'
 import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service/@types'
 import {
@@ -45,7 +45,7 @@ const SPEED_POLICY: Policy = {
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
 const geographies: Geography[] = [
-  { name: 'la', geography_id: CITY_OF_LA, geography_json: la_city_boundary as FeatureCollection }
+  { name: 'la', geography_id: CITY_OF_LA, geography_json: LA_CITY_BOUNDARY as FeatureCollection }
 ]
 
 process.env.TIMEZONE = 'America/Los_Angeles'

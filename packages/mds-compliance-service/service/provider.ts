@@ -31,7 +31,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       )
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating ComplianceSnapshot', error)
-      logger.error(exception, error)
+      logger.error('mds-compliance-service::createComplianceSnapshot error', { exception, error })
       return exception
     }
   },
@@ -44,7 +44,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       )
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating ComplianceSnapshots', error)
-      logger.error(exception, error)
+      logger.error('mds-compliance-service::createComplianceSnapshots error', { exception, error })
       return exception
     }
   },
@@ -56,7 +56,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
         `Error Getting ComplianceSnapshot with these options: ${JSON.stringify(options)}`,
         error
       )
-      logger.error(exception, error)
+      logger.error('mds-compliance-service::getComplianceSnapshot error', { exception, error })
       return exception
     }
   },
@@ -69,7 +69,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       )
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting ComplianceSnapshots', error)
-      logger.error(exception, error)
+      logger.error('mds-compliance-service::getComplianceSnapshotsByTimeInterval error', { exception, error })
       return exception
     }
   },
@@ -78,7 +78,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return ServiceResult(await ComplianceRepository.getComplianceSnapshotsByIDs(ids))
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting ComplianceSnapshots', error)
-      logger.error(exception, error)
+      logger.error('mds-compliance-service::getComplianceSnapshotsByIDs error', { exception, error })
       return exception
     }
   },
@@ -117,7 +117,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return ServiceResult(results)
     } catch (error) {
       const exception = ServiceException('Error Getting Compliance Violation Periods', error)
-      logger.error(exception, error)
+      logger.error('mds-compliance-service::getComplianceViolationPeriods error', { exception, error })
       return exception
     }
   }

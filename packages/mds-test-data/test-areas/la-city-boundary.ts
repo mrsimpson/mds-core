@@ -1,23 +1,27 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { FeatureCollection } from 'geojson'
 
-export default {
+const LA_CITY_BOUNDARY: FeatureCollection = {
   type: 'FeatureCollection',
-  crs: {
-    type: 'name',
-    properties: {
-      name: 'EPSG:4326'
-    }
-  },
   features: [
     {
       type: 'Feature',
       id: 1,
-      properties: {
-        name: 'City Boundaries',
-        OBJECTID_1: 1,
-        OBJECTID: 1,
-        CITY: 'IN'
-      },
       geometry: {
         type: 'Polygon',
         coordinates: [
@@ -8769,7 +8773,16 @@ export default {
             [-118.443819758262, 34.2733849274111]
           ]
         ]
+      },
+      properties: {
+        name: 'City Boundaries',
+        OBJECTID_1: 1,
+        OBJECTID: 1,
+        CITY: 'IN'
       }
     }
   ]
-} as FeatureCollection
+}
+
+export { LA_CITY_BOUNDARY }
+export default LA_CITY_BOUNDARY
