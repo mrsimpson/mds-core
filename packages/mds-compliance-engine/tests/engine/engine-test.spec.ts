@@ -37,7 +37,7 @@ describe('Tests General Compliance Engine Functionality', () => {
 
   beforeEach(async () => {
     await db.reinitialize()
-    await cache.reset()
+    await cache.startup()
   })
 
   it('Verifies not considering events older than 48 hours', async () => {
