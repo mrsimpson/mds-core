@@ -1,7 +1,7 @@
 {
   "name": "@mds-core/mds-micromobility-policy-author",
   "description": "MDS Policy Author API",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "author": "City of Los Angeles",
   "licence": "Apache-2.0",
