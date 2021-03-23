@@ -1,7 +1,7 @@
 {
-  "name": "@container-images/mds-policy",
-  "version": "0.1.26",
-  "description": "Docker Image for MDS Policy API",
+  "name": "@container-images/mds-micromobility-policy",
+  "version": "0.0.1",
+  "description": "Docker Image for MDS Micromobility Policy API",
   "private": true,
   "main": "dist/index.js",
   "files": [
@@ -19,7 +19,7 @@
   "author": "City of Los Angeles",
   "license": "Apache-2.0",
   "dependencies": {
-    "@mds-core/mds-policy": "0.0.27",
+    "@mds-core/mds-micromobility-policy": "0.0.1",
     "@mds-core/mds-webpack-config": "0.1.0"
   }
 }
