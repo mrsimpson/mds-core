@@ -47,6 +47,43 @@ apis:
     enabled: true
     version: latest
     migration: false
+  mds-geography-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-policy-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-ingest-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-transaction-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-transaction-api:
+    enabled: true
+    version: latest
+    migration: false
+  mds-attachment-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-audit-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-collector-api:
+    enabled: true
+    version: latest
+    pathPrefix: /collector
+    migration: false
+  mds-collector-backend:
+    enabled: true
+    version: latest
+    migration: false
 tenantId:
 timezone: America/Los_Angeles
 registry:
