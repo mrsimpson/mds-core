@@ -1,3 +1,19 @@
+/**
+ * Copyright 2021 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import supertest from 'supertest'
 import HttpStatus from 'http-status-codes'
 import { ApiServer } from '@mds-core/mds-api-server'
@@ -25,7 +41,7 @@ import { api } from '../api'
 
 const request = supertest(ApiServer(api))
 const SNAPSHOT_IDS = COMPLIANCE_SNAPSHOTS_PROVIDER_2_POLICY_2.map(snapshot => snapshot.compliance_snapshot_id)
-const TOKEN =
+const COMPLIANCE_IDS_TOKEN =
   'YmE2MzY0MDYtMTg5OC00OWEwLWI5MzctNmY4MjViNzg5ZWUwLDhjYjRkMGE4LTVlZGMtNDZmNi1hNGU0LWE0MGY1YTVmNDU1OCw1OGZiZWZjMi1mNjRmLTQ3NDAtOTRhNi0yNDRjNzIzM2M3ZGEsM2ExMTE1MGItNWQ2NC00NjM4LWJkMmQtNzQ1OTA1ZWQ4Mjk0'
 
 jest.mock('@mds-core/mds-utils', () => ({
@@ -137,7 +153,7 @@ describe('Test Compliances API', () => {
       })
     })
 
-    it('Authorization fails without token', async () => {
+    it('Authorization fails without authorization token', async () => {
       await request.get(pathPrefix(`/violation_periods?start_time=${TIME}`)).expect(HttpStatus.FORBIDDEN)
     })
 
@@ -169,7 +185,8 @@ describe('Test Compliances API', () => {
                 {
                   start_time: 1605821758034,
                   end_time: null,
-                  snapshots_uri: '/compliance_snapshot_ids?token=MjQzZTEyMDktNjFhZC00ZDdjLTg0NjQtZGI1NTFmMWY4YzIx'
+                  snapshots_uri:
+                    '/compliance_snapshot_ids?compliance_ids_token=MjQzZTEyMDktNjFhZC00ZDdjLTg0NjQtZGI1NTFmMWY4YzIx'
                 }
               ]
             },
@@ -188,12 +205,13 @@ describe('Test Compliances API', () => {
                   start_time: 1605821758035,
                   end_time: 1605821758037,
                   snapshots_uri:
-                    '/compliance_snapshot_ids?token=YmE2MzY0MDYtMTg5OC00OWEwLWI5MzctNmY4MjViNzg5ZWUwLDhjYjRkMGE4LTVlZGMtNDZmNi1hNGU0LWE0MGY1YTVmNDU1OA=='
+                    '/compliance_snapshot_ids?compliance_ids_token=YmE2MzY0MDYtMTg5OC00OWEwLWI5MzctNmY4MjViNzg5ZWUwLDhjYjRkMGE4LTVlZGMtNDZmNi1hNGU0LWE0MGY1YTVmNDU1OA=='
                 },
                 {
                   start_time: 1605821758038,
                   end_time: null,
-                  snapshots_uri: '/compliance_snapshot_ids?token=M2ExMTE1MGItNWQ2NC00NjM4LWJkMmQtNzQ1OTA1ZWQ4Mjk0'
+                  snapshots_uri:
+                    '/compliance_snapshot_ids?compliance_ids_token=M2ExMTE1MGItNWQ2NC00NjM4LWJkMmQtNzQ1OTA1ZWQ4Mjk0'
                 }
               ]
             },
@@ -205,7 +223,8 @@ describe('Test Compliances API', () => {
                 {
                   start_time: 1605821758036,
                   end_time: null,
-                  snapshots_uri: '/compliance_snapshot_ids?token=MzllMjE3MWItYTlkZi00MTdjLWIyMTgtMmE4MmI0OTFhMGNj'
+                  snapshots_uri:
+                    '/compliance_snapshot_ids?compliance_ids_token=MzllMjE3MWItYTlkZi00MTdjLWIyMTgtMmE4MmI0OTFhMGNj'
                 }
               ]
             }
@@ -310,14 +329,14 @@ describe('Test Compliances API', () => {
   describe('GET /compliance_snapshot_ids', () => {
     it('gets compliance snapshot ids with the compliance:read scope', async () => {
       await request
-        .get(pathPrefix(`/compliance_snapshot_ids?token=${TOKEN}`))
+        .get(pathPrefix(`/compliance_snapshot_ids?compliance_ids_token=${COMPLIANCE_IDS_TOKEN}`))
         .set('Authorization', SCOPED_AUTH(['compliance:read'], ''))
         .expect(HttpStatus.OK, { version: '1.1.0', data: SNAPSHOT_IDS })
     })
 
     it('gets compliance snapshot ids with the compliance:read:provider scope', async () => {
       await request
-        .get(pathPrefix(`/compliance_snapshot_ids?token=${TOKEN}`))
+        .get(pathPrefix(`/compliance_snapshot_ids?compliance_ids_token=${COMPLIANCE_IDS_TOKEN}`))
         .set('Authorization', SCOPED_AUTH(['compliance:read:provider'], PROVIDER_ID_1))
         .expect(HttpStatus.OK, { version: '1.1.0', data: SNAPSHOT_IDS })
     })

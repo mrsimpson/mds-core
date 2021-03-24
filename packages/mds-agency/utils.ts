@@ -355,10 +355,13 @@ export async function badEvent(event: VehicleEvent) {
       ['trip_start', 'trip_end', 'trip_enter_jurisdiction', 'trip_leave_jurisdiction'],
       event.event_types
     )
-  )
+  ) {
     return badTelemetry(event.telemetry) || missingTripId()
+  }
 
-  if (event.event_types.includes('provider_drop_off')) return badTelemetry(event.telemetry)
+  if (event.event_types.includes('provider_drop_off')) {
+    return badTelemetry(event.telemetry)
+  }
 
   return null // we good
 }

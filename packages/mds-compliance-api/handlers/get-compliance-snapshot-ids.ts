@@ -1,19 +1,30 @@
-import { ApiRequestParams } from '@mds-core/mds-api-server'
+/**
+ * Copyright 2021 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { UUID } from '@mds-core/mds-types'
 import { parseRequest } from '@mds-core/mds-api-helpers'
 import { isDefined } from '@mds-core/mds-utils'
 import { ComplianceApiRequest, ComplianceApiResponse } from '../@types'
+import { base64DecodeComplianceIDsToken } from './helpers'
 
-export type ComplianceApiGetComplianceSnapshotIDsRequest = ComplianceApiRequest & ApiRequestParams<'token'>
+export type ComplianceApiGetComplianceSnapshotIDsRequest = ComplianceApiRequest
 
 export type ComplianceApiGetComplianceSnapshotIDsResponse = ComplianceApiResponse<{
   data: UUID[]
 }>
-
-function decodeToken(token: string): UUID[] {
-  const buffer = Buffer.from(token, 'base64')
-  return buffer.toString().split(',')
-}
 
 /**
  * A ComplianceAggregate might contain many, many snapshots. Instead of containing the snapshot ids
@@ -28,16 +39,16 @@ export const GetComplianceSnapshotIDsHandler = async (
   res: ComplianceApiGetComplianceSnapshotIDsResponse
 ) => {
   try {
-    const { token } = parseRequest(req)
+    const { compliance_ids_token } = parseRequest(req)
       .single({ parser: s => s })
-      .query('token')
+      .query('compliance_ids_token')
 
-    if (!isDefined(token)) {
+    if (!isDefined(compliance_ids_token)) {
       return res.status(400).send({ error: 'Token not provided' })
     }
 
     const { version } = res.locals
-    return res.status(200).send({ version, data: decodeToken(token) })
+    return res.status(200).send({ version, data: base64DecodeComplianceIDsToken(compliance_ids_token) })
   } catch (error) {
     return res.status(500).send({ error })
   }
