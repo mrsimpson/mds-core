@@ -699,6 +699,5 @@ export {
   asArray,
   pluralize,
   filterDefined,
-  areThereCommonElements,
-  base64EncodeArray
+  areThereCommonElements
 }
