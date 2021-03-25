@@ -23,6 +23,7 @@ import {
   PROPULSION_TYPE,
   TelemetryData,
   Timestamp,
+  TRIP_STATE,
   UUID,
   VEHICLE_EVENT,
   VEHICLE_STATE,
@@ -68,6 +69,7 @@ export interface EventDomainModel extends RecordedColumn {
   timestamp: Timestamp
   event_types: VEHICLE_EVENT[]
   vehicle_state: VEHICLE_STATE
+  trip_state: TRIP_STATE
 
   telemetry_timestamp: Nullable<Timestamp>
   telemetry: Nullable<TelemetryDomainModel>

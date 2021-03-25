@@ -21,11 +21,11 @@ const request = HOSTNAME ? supertest(HOSTNAME) : supertest(ApiServer(api))
 
 describe('Taxi Tests', () => {
   beforeAll(async () => {
-    if (!HOSTNAME) await Promise.all([db.startup(), db.reinitialize(), cache.startup(), cache.reinitialize()])
+    if (!HOSTNAME) await Promise.all([db.reinitialize(), cache.reinitialize()])
   })
 
   afterAll(async () => {
-    if (!HOSTNAME) await Promise.all([db.shutdown(), cache.shutdown(), stream.shutdown()])
+    if (!HOSTNAME) await Promise.all([cache.shutdown(), stream.shutdown()])
   })
 
   describe('Scenarios', () => {

@@ -1464,7 +1464,7 @@ describe('Tests pagination', async () => {
 
 describe('Tests for taxi modality', async () => {
   before(async () => {
-    await Promise.all([db.startup(), db.reinitialize(), db.startup(), db.reinitialize()])
+    await Promise.all([db.reinitialize()])
   })
 
   it('verifies post taxi success', done => {

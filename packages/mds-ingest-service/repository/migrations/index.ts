@@ -19,11 +19,13 @@ import { CreateDevicesTable1603212409274 } from './1603212409274-CreateDevicesTa
 import { CreateEventsTable1603212540962 } from './1603212540962-CreateEventsTable'
 import { CreateTelemetryTable1603212619514 } from './1603212619514-CreateTelemetryTable'
 import { AddAccessibilityOptionsColumn1616681612878 } from './1616681612878-AddAccessibilityOptionsColumn'
+import { AddTripStateColumn1616686180925 } from './1616686180925-AddTripStateColumn'
 
 export default [
   CreateDevicesTable1603212409274,
   CreateEventsTable1603212540962,
   CreateTelemetryTable1603212619514,
   AddAccessibilityOptionsColumn1616681612878,
-  AddModalityColumn1616682680014
+  AddModalityColumn1616682680014,
+  AddTripStateColumn1616686180925
 ]
