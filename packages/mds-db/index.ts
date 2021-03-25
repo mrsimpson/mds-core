@@ -1,24 +1,28 @@
-/*
-    Copyright 2019-2020 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import { VehicleEvent, Device, Telemetry } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 
-import { dropTables, updateSchema } from './migration'
-import { MDSPostgresClient } from './sql-utils'
+import { AttachmentRepository } from '@mds-core/mds-attachment-service'
+import { AuditRepository } from '@mds-core/mds-audit-service'
+import { GeographyRepository } from '@mds-core/mds-geography-service'
+import { IngestRepository } from '@mds-core/mds-ingest-service'
+import { PolicyRepository } from '@mds-core/mds-policy-service'
+import { dropTables, createTables } from './migration'
 import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
 
 import * as devices from './devices'
@@ -35,19 +39,21 @@ import * as trips from './trips'
 
 import * as telemetry from './telemetry'
 
-import * as stops from './stops'
-
 import * as attachments from './attachments'
 
 const { writeDevice } = devices
 const { writeTelemetry } = telemetry
 const { writeEvent } = events
 
-async function initialize() {
-  const client: MDSPostgresClient = await getWriteableClient()
-  await dropTables(client)
-  await updateSchema(client)
-  await getReadOnlyClient()
+async function reinitialize() {
+  await Promise.all([getWriteableClient(), getReadOnlyClient()])
+  await Promise.all(
+    [AttachmentRepository, AuditRepository, GeographyRepository, IngestRepository, PolicyRepository].map(repository =>
+      repository.initialize()
+    )
+  )
+  await dropTables()
+  await createTables()
   return 'postgres'
 }
 
@@ -91,14 +97,22 @@ async function health(): Promise<{
 
 async function startup() {
   await Promise.all([getWriteableClient(), getReadOnlyClient()])
+  await Promise.all(
+    [AttachmentRepository, AuditRepository, GeographyRepository, IngestRepository, PolicyRepository].map(repository =>
+      repository.initialize()
+    )
+  )
 }
 
 async function shutdown(): Promise<void> {
   try {
-    const writeableClient = await getWriteableClient()
-    await writeableClient.end()
-    const readOnlyClient = await getReadOnlyClient()
-    await readOnlyClient.end()
+    const [writeableClient, readOnlyClient] = await Promise.all([getWriteableClient(), getReadOnlyClient()])
+    await Promise.all([writeableClient.end(), readOnlyClient.end()])
+    await Promise.all(
+      [AttachmentRepository, AuditRepository, GeographyRepository, IngestRepository, PolicyRepository].map(repository =>
+        repository.shutdown()
+      )
+    )
   } catch (err) {
     logger.error('error during disconnection', err.stack)
   }
@@ -130,7 +144,7 @@ async function seed(data: {
 }
 
 export default {
-  initialize,
+  reinitialize,
   health,
   seed,
   startup,
@@ -142,6 +156,5 @@ export default {
   ...audit,
   ...trips,
   ...telemetry,
-  ...stops,
   ...attachments
 }

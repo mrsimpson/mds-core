@@ -3,7 +3,6 @@ import supertest from 'supertest'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
-import { shutdown as socketShutdown } from '@mds-core/mds-web-sockets'
 import { uuid } from '@mds-core/mds-utils'
 import { api } from '../api'
 import {
@@ -22,11 +21,11 @@ const request = HOSTNAME ? supertest(HOSTNAME) : supertest(ApiServer(api))
 
 describe('Taxi Tests', () => {
   beforeAll(async () => {
-    if (!HOSTNAME) await Promise.all([db.initialize(), cache.initialize()])
+    if (!HOSTNAME) await Promise.all([db.startup(), db.reinitialize(), cache.startup(), cache.reinitialize()])
   })
 
   afterAll(async () => {
-    if (!HOSTNAME) await Promise.all([db.shutdown(), cache.shutdown(), stream.shutdown(), socketShutdown()])
+    if (!HOSTNAME) await Promise.all([db.shutdown(), cache.shutdown(), stream.shutdown()])
   })
 
   describe('Scenarios', () => {

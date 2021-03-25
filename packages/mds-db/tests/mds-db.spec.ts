@@ -1,14 +1,31 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import assert from 'assert'
 /* eslint-reason extends object.prototype */
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import should from 'should'
+import test from 'unit.js'
+
 import { FeatureCollection } from 'geojson'
 import { Telemetry, Recorded, VehicleEvent, Device, Geography } from '@mds-core/mds-types'
 import {
   JUMP_TEST_DEVICE_1,
   makeDevices,
   makeEventsWithTelemetry,
-  makeEvents,
   JUMP_PROVIDER_ID,
   POLICY_JSON,
   POLICY2_JSON,
@@ -24,12 +41,16 @@ import {
   START_ONE_MONTH_FROM_NOW,
   DELETEABLE_POLICY
 } from '@mds-core/mds-test-data'
-import { now, clone, NotFoundError, rangeRandomInt, uuid, ConflictError, yesterday, days } from '@mds-core/mds-utils'
+import { now, clone, NotFoundError, rangeRandomInt, ConflictError, yesterday, days, uuid } from '@mds-core/mds-utils'
 import { isNullOrUndefined } from 'util'
+import { AttachmentRepository } from '@mds-core/mds-attachment-service'
+import { AuditRepository } from '@mds-core/mds-audit-service'
+import { GeographyRepository } from '@mds-core/mds-geography-service'
+import { IngestRepository } from '@mds-core/mds-ingest-service'
+import { PolicyRepository } from '@mds-core/mds-policy-service'
 import MDSDBPostgres from '../index'
-import { dropTables, createTables, updateSchema } from '../migration'
-import { Trip } from '../types'
-import { configureClient, MDSPostgresClient, PGInfo } from '../sql-utils'
+import { dropTables, createTables } from '../migration'
+import { PGInfo } from '../sql-utils'
 
 const { env } = process
 const ACTIVE_POLICY_JSON = { ...POLICY_JSON, publish_date: yesterday(), start_date: yesterday() }
@@ -55,49 +76,13 @@ const DistrictSeven: Geography = {
   geography_json: DISTRICT_SEVEN
 }
 
-function makeTrip(device: Device): Trip {
-  return {
-    provider_id: device.provider_id,
-    provider_name: device.provider_id,
-    device_id: device.device_id,
-    vehicle_id: device.vehicle_id,
-    vehicle_type: device.vehicle_type,
-    propulsion_types: device.propulsion_types,
-    provider_trip_id: uuid(),
-    trip_duration: rangeRandomInt(5),
-    trip_distance: rangeRandomInt(5),
-    route: {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          properties: {
-            timestamp: now()
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: [Math.random() * 10, Math.random() * 10]
-          }
-        }
-      ]
-    },
-    accuracy: Math.random() * 3,
-    trip_start: now() - 1000 * Math.random(),
-    trip_end: now(),
-    parking_verification_url: 'http://iamverified.com',
-    standard_cost: rangeRandomInt(5),
-    actual_cost: rangeRandomInt(5),
-    recorded: now()
-  }
-}
-
 /* You'll need postgres running and the env variable PG_NAME
  * to be set to run these tests.
  */
 /* istanbul ignore next */
 
 async function seedDB() {
-  await MDSDBPostgres.initialize()
+  await MDSDBPostgres.reinitialize()
   const devices: Device[] = makeDevices(9, startTime, JUMP_PROVIDER_ID) as Device[]
   devices.push(JUMP_TEST_DEVICE_1 as Device)
   const decommissionEvents: VehicleEvent[] = makeEventsWithTelemetry(devices.slice(0, 9), startTime + 10, shapeUUID, {
@@ -106,8 +91,8 @@ async function seedDB() {
     speed: rangeRandomInt(0, 10)
   })
   const tripEndEvent: VehicleEvent[] = makeEventsWithTelemetry(devices.slice(9, 10), startTime + 10, shapeUUID, {
-    event_types: ['decommissioned'],
-    vehicle_state: 'removed',
+    event_types: ['trip_end'],
+    vehicle_state: 'available',
     speed: rangeRandomInt(0, 10)
   })
   const telemetry: Telemetry[] = []
@@ -121,44 +106,84 @@ async function seedDB() {
   await MDSDBPostgres.seed({ devices, events, telemetry })
 }
 
-async function setFreshDB() {
-  const client: MDSPostgresClient = configureClient(pg_info)
-  await client.connect()
-  await dropTables(client)
-  await createTables(client)
-  await updateSchema(client)
-  await client.end()
+/**
+ * @param reinit wipe the data first
+ */
+async function seedTripEvents(reinit = true) {
+  reinit ? await MDSDBPostgres.reinitialize() : null
+
+  const devices: Device[] = makeDevices(9, startTime, JUMP_PROVIDER_ID) as Device[]
+  const trip_id = uuid()
+  const tripStartEvents: VehicleEvent[] = makeEventsWithTelemetry(devices.slice(0, 9), startTime + 10, shapeUUID, {
+    event_types: ['trip_start'],
+    vehicle_state: 'on_trip',
+    speed: rangeRandomInt(10),
+    trip_id
+  })
+  const tripEndEvents: VehicleEvent[] = makeEventsWithTelemetry(devices.slice(9, 10), startTime + 10, shapeUUID, {
+    event_types: ['trip_end'],
+    vehicle_state: 'available',
+    speed: rangeRandomInt(10),
+    trip_id
+  })
+  const telemetry: Telemetry[] = []
+  const events: VehicleEvent[] = tripStartEvents.concat(tripEndEvents)
+  events.map(event => {
+    if (event.telemetry) {
+      telemetry.push(event.telemetry)
+    }
+  })
+
+  await MDSDBPostgres.seed({ devices, events, telemetry })
+}
+
+async function initializeDB() {
+  await Promise.all(
+    [AttachmentRepository, AuditRepository, GeographyRepository, IngestRepository, PolicyRepository].map(repository =>
+      repository.initialize()
+    )
+  )
+  await dropTables()
+  await createTables()
+}
+
+async function shutdownDB() {
+  await MDSDBPostgres.shutdown()
+  await Promise.all(
+    [AttachmentRepository, AuditRepository, GeographyRepository, IngestRepository, PolicyRepository].map(repository =>
+      repository.shutdown()
+    )
+  )
 }
 
 if (pg_info.database) {
   describe('Test mds-db-postgres', () => {
     describe('test reads and writes', () => {
       beforeEach(async () => {
-        const client: MDSPostgresClient = configureClient(pg_info)
-        await client.connect()
-        await dropTables(client)
-        await createTables(client)
-        await updateSchema(client)
-        await client.end()
+        await initializeDB()
       })
 
       afterEach(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
+      })
+
+      // This is incredibly stupid and makes 0 sense, but if we don't import (and use) unit.js, should.js breaks...
+      it('Nonsensical test', () => {
+        // eslint-disable-next-line no-self-compare
+        test.assert(true === true)
       })
 
       it('can make successful writes', async () => {
-        await MDSDBPostgres.initialize()
+        await MDSDBPostgres.reinitialize()
         await MDSDBPostgres.writeDevice(JUMP_TEST_DEVICE_1)
         const device: Device = await MDSDBPostgres.readDevice(JUMP_TEST_DEVICE_1.device_id, JUMP_PROVIDER_ID)
         assert.deepEqual(device.device_id, JUMP_TEST_DEVICE_1.device_id)
       })
 
       it('can make a successful read query after shutting down a DB client', async () => {
-        await MDSDBPostgres.initialize()
-        await MDSDBPostgres.shutdown()
-
+        await shutdownDB()
         await MDSDBPostgres.writeDevice(JUMP_TEST_DEVICE_1)
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
         const device: Device = await MDSDBPostgres.readDevice(JUMP_TEST_DEVICE_1.device_id, JUMP_PROVIDER_ID)
         assert.deepEqual(device.device_id, JUMP_TEST_DEVICE_1.device_id)
       })
@@ -182,6 +207,34 @@ if (pg_info.database) {
         assert(telemetryResults.length > 0)
       })
 
+      it('can read VehicleEvents and Telemetry as collections of trips', async () => {
+        await seedTripEvents()
+        await seedTripEvents(false)
+
+        const devicesResult: Device[] = (await MDSDBPostgres.readDeviceIds(JUMP_PROVIDER_ID, 0, 18)) as Device[]
+        assert.deepEqual(devicesResult.length, 18)
+
+        const vehicleEventsResult = await MDSDBPostgres.readEvents({
+          start_time: String(startTime)
+        })
+        const trip_ids = vehicleEventsResult.events.reduce((acc, event) => acc.add(event.trip_id), new Set())
+
+        const tripEventsResult = await MDSDBPostgres.readTripEvents({
+          start_time: String(startTime)
+        })
+        assert.deepStrictEqual(tripEventsResult.tripCount, trip_ids.size)
+
+        // there should be X trips
+        assert.deepStrictEqual(Object.keys(tripEventsResult.trips).length, trip_ids.size)
+
+        // telemetry on each event should not be undefined
+        Object.values(tripEventsResult.trips).forEach(trip => {
+          trip.forEach(event => {
+            assert.notStrictEqual(event.telemetry, undefined)
+          })
+        })
+      })
+
       it('can wipe a device', async () => {
         await seedDB()
         const result = await MDSDBPostgres.wipeDevice(JUMP_PROVIDER_ID)
@@ -191,17 +244,12 @@ if (pg_info.database) {
 
     describe('unit test read only functions', () => {
       beforeEach(async () => {
-        const client: MDSPostgresClient = configureClient(pg_info)
-        await client.connect()
-        await dropTables(client)
-        await createTables(client)
-        await updateSchema(client)
-        await client.end()
+        await initializeDB()
         await seedDB()
       })
 
       afterEach(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('can get vehicle counts by provider', async () => {
@@ -209,68 +257,9 @@ if (pg_info.database) {
         assert.deepEqual(result[0].count, 10)
       })
 
-      it('.getEventCountsPerProviderSince', async () => {
-        const result = await MDSDBPostgres.getEventCountsPerProviderSince()
-        assert.deepEqual(result[0].provider_id, JUMP_PROVIDER_ID)
-        assert.deepEqual(result[0].event_type, 'decommissioned')
-        assert.deepEqual(result[0].count, 9)
-        assert.deepEqual(result[1].provider_id, JUMP_PROVIDER_ID)
-        assert.deepEqual(result[1].event_type, 'trip_end')
-        assert.deepEqual(result[1].count, 1)
-      })
-
-      it('.getEventsLast24HoursPerProvider', async () => {
-        const result = await MDSDBPostgres.getEventsLast24HoursPerProvider()
-        assert.deepEqual(result.length, 10)
-        const firstResult = result[0]
-        assert(firstResult.provider_id)
-        assert(firstResult.device_id)
-        assert(firstResult.event_types)
-        assert(firstResult.recorded)
-        assert(firstResult.timestamp)
-      })
-
-      it('.getTelemetryCountsPerProviderSince', async () => {
-        const result = await MDSDBPostgres.getTelemetryCountsPerProviderSince()
-        assert.deepEqual(result.length, 1)
-      })
-
-      it('.getTripCountsPerProviderSince', async () => {
-        const result = await MDSDBPostgres.getTripCountsPerProviderSince()
-        assert.deepEqual(result[0].count, 1)
-      })
-
       it('.getVehicleCountsPerProvider', async () => {
         const result = await MDSDBPostgres.getVehicleCountsPerProvider()
         assert.deepEqual(result[0].count, 10)
-      })
-
-      it('.getNumVehiclesRegisteredLast24HoursByProvider', async () => {
-        const result = await MDSDBPostgres.getNumVehiclesRegisteredLast24HoursByProvider()
-        assert.deepEqual(result[0].count, 10)
-      })
-
-      it('.getNumEventsLast24HoursByProvider', async () => {
-        const result = await MDSDBPostgres.getNumEventsLast24HoursByProvider()
-        assert.deepEqual(result[0].count, 10)
-      })
-
-      it('.getTripEventsLast24HoursByProvider', async () => {
-        const trip1: Trip = makeTrip(JUMP_TEST_DEVICE_1)
-        const trip2: Trip = makeTrip(JUMP_TEST_DEVICE_1)
-        const event1: VehicleEvent = makeEvents([JUMP_TEST_DEVICE_1], now() - 5)[0]
-        const event2: VehicleEvent = makeEvents([JUMP_TEST_DEVICE_1], now())[0]
-        event1.trip_id = trip1.provider_trip_id
-        event2.trip_id = trip2.provider_trip_id
-        await MDSDBPostgres.writeEvent(event1)
-        await MDSDBPostgres.writeEvent(event2)
-        const result = await MDSDBPostgres.getTripEventsLast24HoursByProvider()
-        assert.deepEqual(result.length, 2)
-      })
-
-      it('.getMostRecentEventByProvider', async () => {
-        const result = await MDSDBPostgres.getMostRecentEventByProvider()
-        assert.deepEqual(result.length, 1)
       })
 
       it('.health', async () => {
@@ -282,11 +271,11 @@ if (pg_info.database) {
 
     describe('unit test policy functions', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('can delete an unpublished Policy', async () => {
@@ -404,11 +393,11 @@ if (pg_info.database) {
 
     describe('unit test PolicyMetadata functions', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('.readBulkPolicyMetadata', async () => {
@@ -443,11 +432,11 @@ if (pg_info.database) {
 
     describe('unit test geography functions', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('can delete an unpublished Geography', async () => {
@@ -462,7 +451,6 @@ if (pg_info.database) {
       })
 
       it('can write, read, and publish a Geography', async () => {
-        await MDSDBPostgres.initialize()
         await MDSDBPostgres.writeGeography(LAGeography)
         const result = await MDSDBPostgres.readSingleGeography(LAGeography.geography_id)
         assert.deepEqual(result.geography_json, LAGeography.geography_json)
@@ -553,11 +541,11 @@ if (pg_info.database) {
 
     describe('test Geography Policy interaction', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('will throw an error if an attempt is made to publish a Policy but the Geography is unpublished', async () => {
@@ -592,11 +580,11 @@ if (pg_info.database) {
 
     describe('Geography metadata', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('should write a GeographyMetadata only if there is a Geography in the DB', async () => {
@@ -651,41 +639,4 @@ if (pg_info.database) {
       })
     })
   })
-
-  /*
-  TODO: finalize query semantics, then re-enable
-  it('Queries metrics correctly', async () => {
-    const fakeReadOnly = Sinon.fake.returns('boop')
-    Sinon.replace(dbClient, 'makeReadOnlyQuery', fakeReadOnly)
-    const start_time = 42
-    const end_time = 50
-    const provider_id: UUID[] = []
-    const geography_id = null
-    const vehicle_type: VEHICLE_TYPE[] = []
-    await getAllMetrics({ start_time, end_time, provider_id, geography_id, vehicle_type })
-    assert.strictEqual(
-      fakeReadOnly.args[0][0],
-      `SELECT * FROM reports_providers WHERE start_time BETWEEN ${start_time} AND ${end_time}`
-    )
-    Sinon.restore()
-  })
-
-  it('Queries optional fields correctly', async () => {
-    const fakeReadOnly = Sinon.fake.returns('boop')
-    Sinon.replace(dbClient, 'makeReadOnlyQuery', fakeReadOnly)
-    const start_time = 42
-    const end_time = 50
-    const provider_id = [uuid(), uuid()]
-    const geography_id = uuid()
-    const vehicle_type = [VEHICLE_TYPES.scooter]
-    await getAllMetrics({ start_time, end_time, provider_id, geography_id, vehicle_type })
-    assert.strictEqual(
-      fakeReadOnly.args[0][0],
-      `SELECT * FROM reports_providers WHERE start_time BETWEEN ${start_time} AND ${end_time} AND provider_id IN ${arrayToInQueryFormat(
-        provider_id
-      )}  AND geography_id = "${geography_id}"  AND vehicle_type IN ${arrayToInQueryFormat(vehicle_type)} `
-    )
-    Sinon.restore()
-  })
-  */
 }

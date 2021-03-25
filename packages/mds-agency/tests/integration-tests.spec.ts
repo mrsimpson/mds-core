@@ -1,17 +1,17 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 // eslint directives:
@@ -35,8 +35,6 @@ import {
   Timestamp,
   Device,
   VehicleEvent,
-  Geography,
-  Stop,
   TAXI_VEHICLE_EVENTS,
   TAXI_VEHICLE_EVENT,
   MICRO_MOBILITY_VEHICLE_EVENTS,
@@ -48,8 +46,7 @@ import {
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
-import { shutdown as socketShutdown } from '@mds-core/mds-web-sockets'
-import { makeDevices, makeEvents, GEOGRAPHY_UUID, LA_CITY_BOUNDARY, JUMP_TEST_DEVICE_1 } from '@mds-core/mds-test-data'
+import { makeDevices, makeEvents, JUMP_TEST_DEVICE_1 } from '@mds-core/mds-test-data'
 import { ApiServer } from '@mds-core/mds-api-server'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
 import { pathPrefix, uuid } from '@mds-core/mds-utils'
@@ -133,12 +130,6 @@ const test_event: Omit<VehicleEvent, 'recorded' | 'provider_id'> = {
 
 testTimestamp += 1
 
-const LAGeography: Geography = {
-  name: 'Los Angeles',
-  geography_id: GEOGRAPHY_UUID,
-  geography_json: LA_CITY_BOUNDARY
-}
-
 const JUMP_TEST_DEVICE_1_ID = JUMP_TEST_DEVICE_1.device_id
 
 function deepCopy<T>(obj: T): T {
@@ -151,11 +142,11 @@ const AUTH2 = `basic ${Buffer.from(`${TEST2_PROVIDER_ID}|${PROVIDER_SCOPES}`).to
 const AUTH_NO_SCOPE = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}`).toString('base64')}`
 
 before(async () => {
-  await Promise.all([db.initialize(), cache.initialize()])
+  await Promise.all([db.reinitialize(), cache.reinitialize()])
 })
 
 after(async () => {
-  await Promise.all([db.shutdown(), cache.shutdown(), stream.shutdown(), socketShutdown()])
+  await Promise.all([db.shutdown(), cache.shutdown(), stream.shutdown()])
 })
 
 describe('Tests API', () => {
@@ -1409,7 +1400,7 @@ describe('Tests pagination', async () => {
     const devices = makeDevices(100, now())
     const events = makeEvents(devices, now())
     const seedData = { devices, events, telemetry: [] }
-    await Promise.all([db.initialize(), cache.initialize()])
+    await Promise.all([db.reinitialize(), cache.reinitialize()])
     await Promise.all([cache.seed(seedData), db.seed(seedData)])
   })
 
@@ -1471,74 +1462,9 @@ describe('Tests pagination', async () => {
   })
 })
 
-describe('Tests Stops', async () => {
-  const TEST_STOP: Stop = {
-    stop_id: '821f8dee-dd43-4f03-99d4-3cf761f4fe7e',
-    stop_name: 'LA Stop',
-    geography_id: GEOGRAPHY_UUID,
-    lat: 34.0522,
-    lng: -118.2437,
-    capacity: {
-      bicycle: 10,
-      scooter: 10,
-      car: 5,
-      moped: 3
-    },
-    num_vehicles_available: {
-      bicycle: 3,
-      scooter: 7,
-      car: 0,
-      moped: 1
-    },
-    num_spots_available: {
-      bicycle: 7,
-      scooter: 3,
-      car: 5,
-      moped: 2
-    }
-  }
-
-  before(async () => {
-    await Promise.all([db.initialize(), cache.initialize()])
-  })
-
-  it('verifies failing to POST a stop (garbage data)', async () => {
-    await request.post(pathPrefix(`/stops`)).set('Authorization', AUTH).send({ foo: 'bar' }).expect(400)
-  })
-
-  it('verifies successfully POSTing a stop', async () => {
-    await db.writeGeography(LAGeography)
-    await db.publishGeography({ geography_id: GEOGRAPHY_UUID, publish_date: now() })
-    await request.post(pathPrefix(`/stops`)).set('Authorization', AUTH).send(TEST_STOP).expect(201)
-  })
-
-  it('verifies successfully GETing a stop', done => {
-    request
-      .get(pathPrefix(`/stops/${TEST_STOP.stop_id}`))
-      .set('Authorization', AUTH)
-      .expect(200)
-      .end((err, result) => {
-        test.assert(result.body.stop_id === TEST_STOP.stop_id)
-        done(err)
-      })
-  })
-
-  it('verifies successfully GETing all stops', done => {
-    request
-      .get(pathPrefix(`/stops`))
-      .set('Authorization', AUTH)
-      .expect(200)
-      .end((err, result) => {
-        test.assert(result.body.stops.length === 1)
-        test.assert(result.body.stops[0].stop_id === TEST_STOP.stop_id)
-        done(err)
-      })
-  })
-})
-
 describe('Tests for taxi modality', async () => {
   before(async () => {
-    await Promise.all([db.initialize(), cache.initialize()])
+    await Promise.all([db.startup(), db.reinitialize(), db.startup(), db.reinitialize()])
   })
 
   it('verifies post taxi success', done => {

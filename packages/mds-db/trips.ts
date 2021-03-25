@@ -1,12 +1,27 @@
-import { UUID, Timestamp, VEHICLE_EVENT } from '@mds-core/mds-types'
-import { now, yesterday } from '@mds-core/mds-utils'
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { UUID, Timestamp } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 
 import schema from './schema'
 
 import { logSql, SqlVals } from './sql-utils'
 
-import { getReadOnlyClient, makeReadOnlyQuery } from './client'
+import { getReadOnlyClient } from './client'
 
 export interface ReadTripIdsResult {
   count: number
@@ -67,26 +82,4 @@ export async function readTripIds(params: Partial<ReadTripIdsQueryParams> = {}):
     logger.error('readTripIds error', err)
     throw err
   }
-}
-
-export async function getTripCountsPerProviderSince(
-  start = yesterday(),
-  stop = now()
-): Promise<{ provider_id: string; count: number }[]> {
-  const vals = new SqlVals()
-  const sql = `select provider_id, count(event_type) from events where event_type='trip_end' and recorded > ${vals.add(
-    start
-  )} and recorded < ${vals.add(stop)} group by provider_id, event_type`
-  return makeReadOnlyQuery(sql, vals)
-}
-
-export async function getTripEventsLast24HoursByProvider(
-  start = yesterday(),
-  stop = now()
-): Promise<{ provider_id: UUID; trip_id: UUID; event_type: VEHICLE_EVENT; recorded: number; timestamp: number }[]> {
-  const vals = new SqlVals()
-  const sql = `select provider_id, trip_id, event_type, recorded, timestamp from ${
-    schema.TABLE.events
-  } where trip_id is not null and recorded > ${vals.add(start)} and recorded < ${vals.add(stop)} order by "timestamp"`
-  return makeReadOnlyQuery(sql, vals)
 }

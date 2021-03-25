@@ -1,4 +1,19 @@
-import logger from '@mds-core/mds-logger'
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { isUUID } from '@mds-core/mds-utils'
 import db from '@mds-core/mds-db'
 import { providerName } from '@mds-core/mds-providers'
@@ -15,8 +30,6 @@ export const readAllVehicleIds = async (req: AgencyApiRequest, res: AgencyApiRes
       error_description: `invalid provider_id ${query_provider_id} is not a UUID`
     })
   }
-
-  logger.info(query_provider_id ? providerName(query_provider_id) : null, 'get /vehicles')
 
   const items = await db.readDeviceIds(query_provider_id)
   const data: { [s: string]: string[] } = {}

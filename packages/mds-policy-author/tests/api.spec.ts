@@ -1,21 +1,21 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 // eslint directives:
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-useless-concat */
 /* eslint-disable prefer-destructuring */
@@ -64,7 +64,7 @@ POLICY_JSON_WITHOUT_PUBLISH_DATE.publish_date = undefined
 describe('Tests app', () => {
   describe('Policy tests', () => {
     before(async () => {
-      await db.initialize()
+      await db.reinitialize()
     })
 
     after(async () => {
@@ -587,32 +587,26 @@ describe('Tests app', () => {
         })
     })
 
-    it('Cannot PUT a policy with publish_date set', done => {
-      request
+    it('Cannot PUT a policy with publish_date set', async () => {
+      const result = await request
         .put(pathPrefix(`/policies/${PUBLISHED_POLICY.policy_id}`))
         .set('Authorization', POLICIES_WRITE_SCOPE)
         .send(PUBLISHED_POLICY)
         .expect(400)
-        .end((err, result) => {
-          test.assert(result.body.error.name === `ValidationError`)
-          test.assert(result.body.error.reason.includes('publish_date'))
-          test.value(result).hasHeader('content-type', APP_JSON)
-          done(err)
-        })
+      test.assert(result.body.error.name === `ValidationError`)
+      test.assert(result.body.error.reason.includes('publish_date'))
+      test.value(result).hasHeader('content-type', APP_JSON)
     })
 
-    it('Cannot POST a policy with publish_date set', done => {
-      request
+    it('Cannot POST a policy with publish_date set', async () => {
+      const result = await request
         .post(pathPrefix(`/policies`))
         .set('Authorization', POLICIES_WRITE_SCOPE)
         .send(PUBLISHED_POLICY)
         .expect(400)
-        .end((err, result) => {
-          test.assert(result.body.error.name === `ValidationError`)
-          test.assert(result.body.error.reason.includes('publish_date'))
-          test.value(result).hasHeader('content-type', APP_JSON)
-          done(err)
-        })
+      test.assert(result.body.error.name === `ValidationError`)
+      test.assert(result.body.error.reason.includes('publish_date'))
+      test.value(result).hasHeader('content-type', APP_JSON)
     })
   })
 })

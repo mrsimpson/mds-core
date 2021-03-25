@@ -1,3 +1,19 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   UUID,
   Device,
@@ -6,7 +22,6 @@ import {
   Timestamp,
   Recorded,
   VEHICLE_STATE,
-  Stop,
   VEHICLE_EVENT,
   TripMetadata
 } from '@mds-core/mds-types'
@@ -32,8 +47,6 @@ export type AgencyApiGetVehiclesByProviderRequest = AgencyApiRequest
 export type AgencyApiUpdateVehicleRequest = AgencyApiRequest<Device> & ApiRequestParams<'device_id'>
 export type AgencyApiSubmitVehicleEventRequest = AgencyApiRequest<VehicleEvent> & ApiRequestParams<'device_id'>
 export type AgencyApiSubmitVehicleTelemetryRequest = AgencyApiRequest<{ data: Telemetry[] }>
-export type AgencyApiRegisterStopRequest = AgencyApiRequest<Stop>
-export type AgencyApiReadStopRequest = AgencyApiRequest & ApiRequestParams<'stop_id'>
 export type AgencyApiPostTripMetadataRequest = AgencyApiRequest<TripMetadata>
 export type AgencyApiAccessTokenScopes = 'admin:all' | 'vehicles:read'
 
@@ -59,17 +72,6 @@ export type AgencyApiSubmitVehicleTelemetryResponse = AgencyApiResponse<{
   failures: string[]
 }>
 
-export type AgencyApiRegisterStopResponse = AgencyApiResponse<Recorded<Stop>>
-export type AgencyApiReadStopResponse = AgencyApiResponse<Recorded<Stop>>
-export type AgencyApiReadStopsResponse = AgencyApiResponse<{
-  stops: Readonly<
-    Required<
-      Stop & {
-        id: number
-      }
-    >
-  >[]
-}>
 export type AgencyApiPostTripMetadataResponse = AgencyApiResponse<TripMetadata>
 
 export interface ServiceArea {
