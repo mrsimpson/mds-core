@@ -34,7 +34,8 @@ import {
   Device,
   MODALITIES,
   ACCESSIBILITY_OPTIONS,
-  RATE_RECURRENCE_VALUES
+  RATE_RECURRENCE_VALUES,
+  TRIP_STATES
 } from '@mds-core/mds-types'
 import * as Joi from 'joi'
 import joiToJson from 'joi-to-json'
@@ -177,11 +178,15 @@ const eventSchema = Joi.object().keys({
   timestamp: timestampSchema.required(),
   timestamp_long: stringSchema.optional(),
   delta: timestampSchema.optional(),
-  event_types: Joi.array().items(vehicleEventTypeSchema.required()),
+  event_types: Joi.array().items(vehicleEventTypeSchema).required(),
   telemetry_timestamp: timestampSchema.optional(),
   telemetry: telemetrySchema.allow(null).optional(),
   trip_id: uuidSchema.allow(null).optional(),
   vehicle_state: vehicleStatusSchema.allow(null).optional(),
+  trip_state: stringSchema
+    .valid(...TRIP_STATES)
+    .allow(null)
+    .optional(),
   recorded: timestampSchema.optional()
 })
 
@@ -333,6 +338,7 @@ export function validateGeographies(geographies: unknown): geographies is Geogra
 export function validateEvents(events: unknown): events is VehicleEvent[] {
   const { error } = eventsSchema.validate(events)
   if (error) {
+    console.log(error)
     throw new ValidationError('invalid events', {
       events,
       details: Format('events', error)
