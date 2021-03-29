@@ -1,24 +1,37 @@
-import { Enum } from '@mds-core/mds-types'
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-// TODO providers are in CSV
+import { Enum } from '@mds-core/mds-types'
 
 const TABLE = Enum(
   'attachments',
+  'audits',
   'audit_attachments',
   'audit_events',
-  'audits',
   'devices',
   'events',
   'geographies',
   'geography_metadata',
-  'migrations',
   'policies',
   'policy_metadata',
   'telemetry'
 )
 export type TABLE_NAME = keyof typeof TABLE
+
 const TABLES = Object.keys(TABLE) as TABLE_NAME[]
-const DEPRECATED_PROVIDER_TABLES = ['status_changes', 'trips']
 
 const COLUMN = Enum(
   'accuracy',
@@ -47,7 +60,6 @@ const COLUMN = Enum(
   'lat',
   'lng',
   'mfgr',
-  'migration',
   'mimetype',
   'model',
   'name',
@@ -56,7 +68,6 @@ const COLUMN = Enum(
   'policy_json',
   'policy_metadata',
   'prev_geographies',
-  'propulsion_type',
   'propulsion',
   'provider_device_id',
   'provider_id',
@@ -73,7 +84,6 @@ const COLUMN = Enum(
   'trip_id',
   'type',
   'vehicle_id',
-  'vehicle_type',
   'year'
 )
 export type COLUMN_NAME = keyof typeof COLUMN
@@ -157,7 +167,6 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
     COLUMN.name
   ],
   [TABLE.geography_metadata]: [COLUMN.id, COLUMN.geography_id, COLUMN.geography_metadata],
-  [TABLE.migrations]: [COLUMN.id, COLUMN.migration, COLUMN.timestamp],
   [TABLE.policies]: [COLUMN.id, COLUMN.policy_id, COLUMN.policy_json],
   [TABLE.policy_metadata]: [COLUMN.id, COLUMN.policy_id, COLUMN.policy_metadata],
   [TABLE.telemetry]: [
@@ -176,85 +185,10 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
   ]
 }
 
-const TABLE_KEY: { [T in TABLE_NAME]: COLUMN_NAME[] } = {
-  [TABLE.attachments]: [COLUMN.attachment_id],
-  [TABLE.audit_attachments]: [COLUMN.attachment_id, COLUMN.audit_trip_id],
-  [TABLE.audits]: [COLUMN.audit_trip_id],
-  [TABLE.audit_events]: [COLUMN.audit_trip_id, COLUMN.timestamp],
-  [TABLE.devices]: [COLUMN.device_id],
-  [TABLE.events]: [COLUMN.device_id, COLUMN.timestamp],
-  [TABLE.geographies]: [COLUMN.geography_id],
-  [TABLE.geography_metadata]: [COLUMN.geography_id],
-  [TABLE.migrations]: [COLUMN.migration],
-  [TABLE.policies]: [COLUMN.policy_id],
-  [TABLE.policy_metadata]: [COLUMN.policy_id],
-  [TABLE.telemetry]: [COLUMN.device_id, COLUMN.timestamp]
-}
-
-const COLUMN_TYPE: { [C in COLUMN_NAME]: string } = {
-  [COLUMN.accuracy]: 'real',
-  [COLUMN.altitude]: 'real',
-  [COLUMN.attachment_filename]: 'varchar(64) NOT NULL',
-  [COLUMN.attachment_id]: 'uuid NOT NULL',
-  [COLUMN.audit_device_id]: 'uuid NOT NULL',
-  [COLUMN.audit_event_id]: 'uuid NOT NULL',
-  [COLUMN.audit_event_type]: 'varchar(31) NOT NULL',
-  [COLUMN.audit_issue_code]: 'varchar(31)',
-  [COLUMN.audit_subject_id]: 'varchar(255) NOT NULL',
-  [COLUMN.audit_trip_id]: 'uuid NOT NULL',
-  [COLUMN.base_url]: 'varchar(127) NOT NULL',
-  [COLUMN.charge]: 'real',
-  [COLUMN.deleted]: 'bigint',
-  [COLUMN.description]: 'varchar(255)',
-  [COLUMN.device_id]: 'uuid NOT NULL',
-  [COLUMN.effective_date]: 'bigint',
-  [COLUMN.event_type]: 'varchar(31) NOT NULL',
-  [COLUMN.event_type_reason]: 'varchar(31)',
-  [COLUMN.geography_id]: 'uuid NOT NULL',
-  [COLUMN.geography_json]: 'json NOT NULL',
-  [COLUMN.geography_metadata]: 'json',
-  [COLUMN.heading]: 'real',
-  [COLUMN.id]: 'bigint GENERATED ALWAYS AS IDENTITY',
-  [COLUMN.lat]: 'double precision NOT NULL',
-  [COLUMN.lng]: 'double precision NOT NULL',
-  [COLUMN.mfgr]: 'varchar(127)',
-  [COLUMN.migration]: 'varchar(255) NOT NULL',
-  [COLUMN.mimetype]: 'varchar(255) NOT NULL',
-  [COLUMN.model]: 'varchar(127)',
-  [COLUMN.name]: 'varchar(255)',
-  [COLUMN.note]: 'varchar(255)',
-  [COLUMN.policy_id]: 'uuid NOT NULL',
-  [COLUMN.policy_json]: 'json NOT NULL',
-  [COLUMN.policy_metadata]: 'json',
-  [COLUMN.prev_geographies]: 'uuid[]',
-  [COLUMN.propulsion_type]: 'varchar(31)[] NOT NULL',
-  [COLUMN.propulsion]: 'varchar(31)[] NOT NULL',
-  [COLUMN.provider_device_id]: 'uuid', // May be null if can't find
-  [COLUMN.provider_id]: 'uuid NOT NULL',
-  [COLUMN.provider_name]: 'varchar(127) NOT NULL',
-  [COLUMN.provider_vehicle_id]: 'varchar(255) NOT NULL',
-  [COLUMN.publish_date]: 'bigint',
-  [COLUMN.recorded]: 'bigint NOT NULL', // timestamp of when record was created
-  [COLUMN.service_area_id]: 'uuid',
-  [COLUMN.speed]: 'real',
-  [COLUMN.telemetry_timestamp]: 'bigint',
-  [COLUMN.thumbnail_filename]: 'varchar(64)',
-  [COLUMN.thumbnail_mimetype]: 'varchar(64)',
-  [COLUMN.timestamp]: 'bigint NOT NULL',
-  [COLUMN.trip_id]: 'uuid',
-  [COLUMN.type]: 'varchar(31) NOT NULL',
-  [COLUMN.vehicle_id]: 'varchar(255) NOT NULL',
-  [COLUMN.vehicle_type]: 'varchar(31) NOT NULL',
-  [COLUMN.year]: 'smallint'
-}
-
 export default {
   COLUMN,
   COLUMNS,
-  COLUMN_TYPE,
-  DEPRECATED_PROVIDER_TABLES,
   TABLE,
   TABLES,
-  TABLE_COLUMNS,
-  TABLE_KEY
+  TABLE_COLUMNS
 }

@@ -1,3 +1,19 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   Recorded,
   UUID,
@@ -6,10 +22,9 @@ import {
   TelemetryData,
   VEHICLE_TYPE,
   PROPULSION_TYPE,
-  PROVIDER_EVENT,
-  PROVIDER_REASON
+  Nullable
 } from '@mds-core/mds-types'
-import { Feature, FeatureCollection } from 'geojson'
+import { FeatureCollection } from 'geojson'
 
 export interface ReadEventsResult {
   events: Recorded<VehicleEvent>[]
@@ -37,24 +52,6 @@ export interface Trip {
   actual_cost?: number | null
   recorded: Timestamp
 }
-
-export interface StatusChange {
-  provider_id: UUID
-  provider_name: string
-  device_id: UUID
-  vehicle_id: string
-  vehicle_type: VEHICLE_TYPE
-  propulsion_type: PROPULSION_TYPE[]
-  event_type: PROVIDER_EVENT
-  event_type_reason: PROVIDER_REASON
-  event_time: Timestamp
-  event_location: Feature | null
-  battery_pct: number | null
-  associated_trip: UUID | null
-  recorded: Timestamp
-}
-
-export type StatusChangeEvent = Pick<StatusChange, 'event_type' | 'event_type_reason'>
 
 // Represents a row in the "telemetry" table
 export interface TelemetryRecord extends TelemetryData {
@@ -96,10 +93,12 @@ export interface VehicleEventCountResult {
 }
 
 export interface ReadGeographiesParams {
-  get_read_only: boolean
+  get_published: Nullable<boolean>
+  get_unpublished: Nullable<boolean>
+  geography_ids?: UUID[]
 }
 
 export interface PublishGeographiesParams {
-  publish_date: Timestamp
+  publish_date?: Timestamp
   geography_id: UUID
 }

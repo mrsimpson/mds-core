@@ -1,81 +1,86 @@
-import log from '@mds-core/mds-logger'
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import { updateSchema } from './migration'
-import { logSql, configureClient, MDSPostgresClient } from './sql-utils'
+import logger from '@mds-core/mds-logger'
+import AwaitLock from 'await-lock'
+
+import { logSql, configureClient, MDSPostgresClient, SqlVals } from './sql-utils'
 
 const { env } = process
-
-type ClientType = 'writeable' | 'readonly'
 
 let writeableCachedClient: MDSPostgresClient | null = null
 let readOnlyCachedClient: MDSPostgresClient | null = null
 
 async function setupClient(useWriteable: boolean): Promise<MDSPostgresClient> {
-  const { PG_NAME, PG_USER, PG_PASS, PG_PORT, PG_MIGRATIONS = 'false' } = env
-  let PG_HOST: string | undefined
-  if (useWriteable) {
-    ;({ PG_HOST } = env)
-  } else {
-    PG_HOST = env.PG_HOST_READER || env.PG_HOST
-  }
-
-  const client_type: ClientType = useWriteable ? 'writeable' : 'readonly'
+  const { PG_HOST, PG_HOST_READER, PG_NAME, PG_PASS, PG_PASS_READER, PG_PORT, PG_USER, PG_USER_READER } = env
 
   const info = {
-    client_type,
+    client_type: useWriteable ? 'writeable' : 'readonly',
     database: PG_NAME,
-    user: PG_USER,
-    host: PG_HOST || 'localhost',
+    user: (useWriteable ? PG_USER : PG_USER_READER) || PG_USER,
+    host: (useWriteable ? PG_HOST : PG_HOST_READER) || PG_HOST || 'localhost',
     port: Number(PG_PORT) || 5432
   }
 
-  await log.info('connecting to postgres:', ...Object.keys(info).map(key => (info as { [x: string]: unknown })[key]))
+  logger.info('connecting to postgres', { info })
 
-  const client = configureClient({ ...info, password: PG_PASS })
+  const client = configureClient({ ...info, password: (useWriteable ? PG_PASS : PG_PASS_READER) || PG_PASS })
 
   try {
     await client.connect()
-    if (useWriteable) {
-      if (PG_MIGRATIONS === 'true') {
-        await updateSchema(client)
-      }
-    }
     client.setConnected(true)
     return client
   } catch (err) {
-    await log.error('postgres connection error', err.stack)
+    logger.error('postgres connection error', err.stack)
     client.setConnected(false)
     throw err
   }
 }
 
+const readOnlyClientLock = new AwaitLock()
 export async function getReadOnlyClient(): Promise<MDSPostgresClient> {
-  if (readOnlyCachedClient && readOnlyCachedClient.connected) {
-    return readOnlyCachedClient
-  }
-
+  await readOnlyClientLock.acquireAsync()
   try {
-    readOnlyCachedClient = await setupClient(false)
+    if (!readOnlyCachedClient || !readOnlyCachedClient.connected) {
+      readOnlyCachedClient = await setupClient(false)
+    }
     return readOnlyCachedClient
   } catch (err) {
     readOnlyCachedClient = null
-    await log.error('postgres connection error', err)
+    logger.error('postgres connection error', err)
     throw err
+  } finally {
+    readOnlyClientLock.release()
   }
 }
 
+const writeableClientLock = new AwaitLock()
 export async function getWriteableClient(): Promise<MDSPostgresClient> {
-  if (writeableCachedClient && writeableCachedClient.connected) {
-    return writeableCachedClient
-  }
-
+  await writeableClientLock.acquireAsync()
   try {
-    writeableCachedClient = await setupClient(true)
+    if (!writeableCachedClient || !writeableCachedClient.connected) {
+      writeableCachedClient = await setupClient(true)
+    }
     return writeableCachedClient
   } catch (err) {
     writeableCachedClient = null
-    await log.error('postgres connection error', err)
+    logger.error('postgres connection error', err)
     throw err
+  } finally {
+    writeableClientLock.release()
   }
 }
 
@@ -84,14 +89,15 @@ export async function getWriteableClient(): Promise<MDSPostgresClient> {
 
 /* eslint-reason ambigous helper function that wraps a query as Readonly */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export async function makeReadOnlyQuery(sql: string): Promise<any[]> {
+export async function makeReadOnlyQuery(sql: string, vals?: SqlVals): Promise<any[]> {
   try {
+    const values = vals?.values()
     const client = await getReadOnlyClient()
     await logSql(sql)
-    const result = await client.query(sql)
+    const result = await client.query(sql, values)
     return result.rows
   } catch (err) {
-    await log.error(`error with SQL query ${sql}`, err.stack || err)
+    logger.error(`error with SQL query ${sql}`, err.stack || err)
     throw err
   }
 }

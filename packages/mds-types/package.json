@@ -1,21 +1,22 @@
 {
   "name": "@mds-core/mds-types",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "description": "Mobility Data Specification common types",
+  "keywords": [
+    "mds"
+  ],
+  "license": "Apache-2.0",
+  "author": "City of Los Angeles",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/"
   ],
-  "keywords": [
-    "mds"
-  ],
-  "author": "City of Los Angeles",
-  "license": "Apache-2.0",
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "test": "yarn test:eslint && yarn test:unit",
-    "test:eslint": "eslint --fix --ignore-path ../../.gitignore '**/*.ts'",
-    "test:unit": "DOTENV_CONFIG_PATH=../../.env nyc --lines 90 ts-mocha --project ../../tsconfig.json tests/**/*.ts"
+    "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap ts-mocha --project ../../tsconfig.json"
+  },
+  "dependencies": {
+    "@types/geojson": "7946.0.7"
   }
 }

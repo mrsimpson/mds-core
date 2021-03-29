@@ -1,3 +1,19 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Provider } from '@mds-core/mds-types'
 
 // Officially recognized providers, from:
@@ -19,6 +35,7 @@ export const BOLT_PROVIDER_ID = '3291c288-c9c8-42f1-bc3e-8502b077cd7f'
 export const CLEVR_PROVIDER_ID = 'daecbe87-a9f2-4a5a-b5df-8e3e14180513'
 export const SHERPA_LA_PROVIDER_ID = '3c95765d-4da6-41c6-b61e-1954472ec6c9'
 export const OJO_ELECTRIC_PROVIDER_ID = '8d293326-8464-4256-8312-617ebcd0efad'
+export const CIRC_PROVIDER_ID = '03d5d605-e5c9-45a1-a1dd-144aa8649525'
 
 // Additional provider IDs in use (should be registered)
 export const LADOT_PROVIDER_ID = '33bbcec3-f91b-4461-bc41-61711afb9460'
@@ -39,6 +56,7 @@ const PROVIDER_IDS = [
   LIME_PROVIDER_ID,
   BIRD_PROVIDER_ID,
   RAZOR_PROVIDER_ID,
+  CIRC_PROVIDER_ID,
   LYFT_PROVIDER_ID,
   SKIP_PROVIDER_ID,
   HOPR_PROVIDER_ID,
@@ -83,6 +101,12 @@ export const providers: Readonly<{ [P in PROVIDER_ID]: Readonly<Provider> }> = O
     url: 'https://www.bird.co',
     mds_api_url: 'https://mds.bird.co',
     gbfs_api_url: 'https://mds.bird.co/gbfs'
+  }),
+  [CIRC_PROVIDER_ID]: Object.freeze({
+    provider_id: CIRC_PROVIDER_ID,
+    provider_name: 'Circ',
+    url: 'https://www.circ.com',
+    mds_api_url: 'https://mds.bird.co'
   }),
   [RAZOR_PROVIDER_ID]: Object.freeze({
     provider_id: RAZOR_PROVIDER_ID,

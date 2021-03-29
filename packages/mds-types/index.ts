@@ -1,21 +1,19 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 import { FeatureCollection } from 'geojson'
-
-export { AccessTokenScope, AccessTokenScopes, ScopeDescriptions } from './scopes'
 
 export const Enum = <T extends string>(...keys: T[]) =>
   Object.freeze(
@@ -27,22 +25,19 @@ export const Enum = <T extends string>(...keys: T[]) =>
 export const isEnum = (enums: { [key: string]: string }, value: unknown) =>
   typeof value === 'string' && typeof enums === 'object' && enums[value] === value
 
-export const VEHICLE_TYPES = Enum('car', 'bicycle', 'scooter', 'recumbent')
+export const VEHICLE_TYPES = Enum('car', 'bicycle', 'scooter', 'moped', 'recumbent')
 export type VEHICLE_TYPE = keyof typeof VEHICLE_TYPES
 
 export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
 export type RULE_TYPE = keyof typeof RULE_TYPES
-
-export const RULE_UNIT_MAP = {
-  minutes: 60,
-  hours: 60 * 60
-}
 
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
 
 export const VEHICLE_STATUSES = Enum('available', 'reserved', 'unavailable', 'removed', 'inactive', 'trip', 'elsewhere')
 export type VEHICLE_STATUS = keyof typeof VEHICLE_STATUSES
+
+export const RIGHT_OF_WAY_STATUSES = ['available', 'reserved', 'unavailable', 'trip']
 
 export const VEHICLE_EVENTS = Enum(
   'register',
@@ -60,6 +55,7 @@ export const VEHICLE_EVENTS = Enum(
   'trip_end',
   'deregister'
 )
+
 export type VEHICLE_EVENT = keyof typeof VEHICLE_EVENTS
 
 export const VEHICLE_REASONS = Enum(
@@ -74,25 +70,6 @@ export const VEHICLE_REASONS = Enum(
   'rebalance'
 )
 export type VEHICLE_REASON = keyof typeof VEHICLE_REASONS
-
-export const PROVIDER_EVENTS = Enum('available', 'reserved', 'unavailable', 'removed')
-export type PROVIDER_EVENT = keyof typeof PROVIDER_EVENTS
-
-export const PROVIDER_REASONS = Enum(
-  'service_start',
-  'user_drop_off',
-  'rebalance_drop_off',
-  'maintenance_drop_off',
-  'agency_drop_off',
-  'user_pick_up',
-  'maintenance',
-  'low_battery',
-  'service_end',
-  'rebalance_pick_up',
-  'maintenance_pick_up',
-  'agency_pick_up'
-)
-export type PROVIDER_REASON = keyof typeof PROVIDER_REASONS
 
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
@@ -144,7 +121,23 @@ export const TIME_FORMAT = 'HH:mm:ss'
 export type UUID = string
 
 export type Timestamp = number
+export type TimestampInSeconds = number
 export type Stringify<T> = { [P in keyof T]: string }
+export type Nullable<T> = T | null
+export type NullableProperties<T extends object> = {
+  [P in keyof T]-?: T[P] extends null ? T[P] : Nullable<T[P]>
+}
+export type SingleOrArray<T> = T | T[]
+export type NullableKeys<T> = {
+  [P in keyof T]: null extends T[P] ? P : never
+}[keyof T]
+export type Optional<T, P extends keyof T> = Omit<T, P> & Partial<Pick<T, P>>
+export type NonEmptyArray<T> = [T, ...T[]]
+export type RequiredKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? never : K }[keyof T]
+export type OptionalKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? K : never }[keyof T]
+export type PickRequired<T> = Pick<T, RequiredKeys<T>>
+export type PickOptional<T> = Pick<T, OptionalKeys<T>>
+export type NullableOptional<T> = PickRequired<T> & NullableProperties<PickOptional<T>>
 
 // Represents a row in the "devices" table
 export interface Device {
@@ -192,6 +185,8 @@ export interface TelemetryData {
   charge?: number | null
 }
 
+export type GpsData = Omit<TelemetryData, 'charge'>
+
 // While telemetry data is stored in a flattened format, when passed as a parameter it has
 // a different shape: { gps: { lat, lng, speed, heading, accurace, altitude } charge }. This
 // type alias defines the parameter shape using the types of the underlying flattened data.
@@ -215,6 +210,7 @@ export interface Attachment {
   mimetype: string
   thumbnail_filename?: string | null
   thumbnail_mimetype?: string | null
+  attachment_list_id?: UUID | null
   recorded?: Timestamp | null
 }
 
@@ -271,7 +267,11 @@ export interface AuditDetails extends Audit {
   }
 }
 
-interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
+export interface PolicyMessage {
+  [key: string]: string
+}
+
+interface BaseRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> {
   name: string
   rule_id: UUID
   geographies: UUID[]
@@ -285,7 +285,7 @@ interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
   days?: DAY_OF_WEEK[] | null
   /* eslint-reason TODO: message types haven't been defined well yet */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  messages?: any
+  messages?: PolicyMessage
   value_url?: URL | null
 }
 
@@ -299,9 +299,11 @@ export interface SpeedRule extends BaseRule<'speed'> {
   rule_units: 'kph' | 'mph'
 }
 
-export type Rule = CountRule | TimeRule | SpeedRule
+export type UserRule = BaseRule<'user'>
 
-export interface Policy {
+export type Rule = CountRule | TimeRule | SpeedRule | UserRule
+
+export interface BasePolicy {
   name: string
   description: string
   provider_ids?: UUID[]
@@ -310,61 +312,36 @@ export interface Policy {
   start_date: Timestamp
   end_date: Timestamp | null
   prev_policies: UUID[] | null
-  rules: Rule[]
   publish_date?: Timestamp
 }
 
+export interface Policy extends BasePolicy {
+  rules: Rule[]
+}
+
+export const RATE_RECURRENCE_VALUES = ['once', 'each_time_unit', 'per_complete_time_unit'] as const
+export type RATE_RECURRENCE = typeof RATE_RECURRENCE_VALUES[number]
+
+/**
+ * A RateRule is a rule of any type that has a `rate_amount` property.
+ * @alpha Out-of-spec for MDS 0.4.1
+ */
+export type RateRule = Rule & { rate_amount: number }
+
+/**
+ * A RatePolicy is a policy whose rules are RateRules.
+ * @alpha Out-of-spec for MDS 0.4.1
+ */
+export interface RatePolicy extends BasePolicy {
+  rate_recurrence: RATE_RECURRENCE
+  currency: string
+  rules: RateRule[]
+}
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface PolicyMetadata {
+export interface PolicyMetadata<M extends {} = Record<string, any>> {
   policy_id: UUID
-  policy_metadata: Record<string, any>
-}
-
-export interface MatchedVehicle {
-  device_id: UUID
-  provider_id: UUID
-  vehicle_id: string
-  vehicle_type: VEHICLE_TYPE
-  vehicle_status: VEHICLE_STATUS
-  gps: {
-    lat: number
-    lng: number
-  }
-}
-
-export interface CountMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicles: MatchedVehicle[]
-}
-
-export interface TimeMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-export interface SpeedMatch {
-  measured: number
-  geography_id: UUID
-  matched_vehicle: MatchedVehicle
-}
-
-export interface ReducedMatch {
-  measured: number
-  geography_id: UUID
-}
-
-export interface Compliance {
-  rule: Rule
-  matches: ReducedMatch[] | CountMatch[] | TimeMatch[] | SpeedMatch[]
-}
-
-export interface ComplianceResponse {
-  policy: Policy
-  compliance: Compliance[]
-  total_violations: number
-  vehicles_in_violation: { device_id: UUID; rule_id: UUID }[]
+  policy_metadata: M
 }
 
 // We don't put the publish_date into the geography_json column
@@ -382,9 +359,9 @@ export interface Geography {
 
 export type GeographySummary = Omit<Geography, 'geography_json'>
 
-export interface GeographyMetadata {
+export interface GeographyMetadata<M extends {} = Record<string, any>> {
   geography_id: UUID
-  geography_metadata: Record<string, any>
+  geography_metadata: M
 }
 
 export interface ErrorObject {
@@ -424,3 +401,19 @@ export interface Provider {
   mds_api_url?: string
   gbfs_api_url?: string
 }
+
+// eslint-reason recursive declarations require interfaces
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface JsonArray extends Array<Json> {}
+
+export interface JsonObject {
+  [property: string]: Json
+}
+
+export type JsonValue = string | number | boolean | JsonArray | JsonObject
+
+export type Json = Nullable<JsonValue>
+// eslint-reason Function and constructor inference must use a single rest parameter of type 'any[]'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type AnyFunction<A = any> = (...args: any[]) => A
+export type AnyConstructor<A = object> = new (...args: any[]) => A

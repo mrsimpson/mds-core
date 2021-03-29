@@ -1,21 +1,21 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import test from 'unit.js'
-import uuid from 'uuid'
+import { uuid } from '@mds-core/mds-utils'
 import { AUDIT_EVENT_TYPES, VEHICLE_EVENTS } from '@mds-core/mds-types'
 import { providers } from '@mds-core/mds-providers' // map of uuids -> obj
 import {
@@ -32,7 +32,8 @@ import {
   isValidAuditIssueCode,
   isValidAuditNote,
   isValidNumber,
-  ValidationError
+  ValidationError,
+  validateEvent
 } from '../validators'
 
 describe('Tests validators', () => {
@@ -172,6 +173,96 @@ describe('Tests validators', () => {
     test.assert.throws(() => isValidVehicleEventType('invalid'), ValidationError)
     test.value(isValidVehicleEventType(AUDIT_EVENT_TYPES.telemetry, { assert: false })).is(false)
     test.value(isValidVehicleEventType(VEHICLE_EVENTS.trip_end)).is(true)
+    done()
+  })
+
+  it('verifies Vehicle Event validator', done => {
+    const DEREGISTER_EVENT_TYPE_REASONS = ['missing', 'decomissioned']
+    const PROVIDER_PICK_UP_EVENT_TYPE_REASONS = ['rebalance', 'maintenance', 'charge', 'compliance']
+    const SERVICE_END_EVENT_TYPE_REASONS = ['low_battery', 'maintenance', 'compliance', 'off_hours']
+
+    test.assert.throws(() => validateEvent(undefined), ValidationError)
+    test.assert.throws(() => validateEvent(null), ValidationError)
+    test.assert.throws(() => validateEvent('invalid'), ValidationError)
+    test.assert.throws(
+      () =>
+        validateEvent({
+          device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
+          provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
+          event_type: 'deregister',
+          telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
+          timestamp: Date.now()
+        }),
+      ValidationError
+    )
+    test.assert.throws(
+      () =>
+        validateEvent({
+          device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
+          provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
+          event_type: 'provider_pick_up',
+          telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
+          timestamp: Date.now()
+        }),
+      ValidationError
+    )
+    test.assert.throws(
+      () =>
+        validateEvent({
+          device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
+          provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
+          event_type: 'service_end',
+          telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
+          timestamp: Date.now()
+        }),
+      ValidationError
+    )
+
+    DEREGISTER_EVENT_TYPE_REASONS.forEach(event_type_reason => {
+      test
+        .value(
+          validateEvent({
+            device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
+            provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
+            event_type: 'deregister',
+            event_type_reason,
+            telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
+            timestamp: Date.now()
+          })
+        )
+        .is(true)
+    })
+
+    PROVIDER_PICK_UP_EVENT_TYPE_REASONS.forEach(event_type_reason => {
+      test
+        .value(
+          validateEvent({
+            device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
+            provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
+            event_type: 'provider_pick_up',
+            event_type_reason,
+            telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
+            timestamp: Date.now()
+          })
+        )
+        .is(true)
+    })
+
+    SERVICE_END_EVENT_TYPE_REASONS.forEach(event_type_reason => {
+      test
+        .value(
+          validateEvent({
+            device_id: '395144fb-ebef-4842-ba91-b5ba98d34945',
+            provider_id: 'b54c08c7-884a-4c5f-b9ed-2c7dc24638cb',
+            event_type: 'service_end',
+            event_type_reason,
+            telemetry: { timestamp: Date.now(), gps: { lat: 0, lng: 0 } },
+            timestamp: Date.now()
+          })
+        )
+        .is(true)
+    })
+
     done()
   })
 

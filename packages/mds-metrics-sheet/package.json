@@ -1,7 +1,9 @@
 {
   "name": "@mds-core/mds-metrics-sheet",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "Automate reporting api insert into LADOT compliance spreadsheet",
+  "license": "Apache-2.0",
+  "author": "City of Los Angeles",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -9,18 +11,16 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "test": "yarn test:eslint && yarn test:unit",
-    "test:eslint": "eslint --fix --ignore-path ../../.gitignore '**/*.ts'",
-    "test:unit": "DOTENV_CONFIG_PATH=../../.env nyc --lines 55 ts-mocha --project ../../tsconfig.json tests/**/*.ts"
+    "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap --lines 60  ts-mocha --project ../../tsconfig.json"
   },
-  "author": "City of Los Angeles",
-  "license": "Apache-2.0",
   "dependencies": {
-    "@mds-core/mds-logger": "0.1.24",
-    "@mds-core/mds-providers": "0.1.26",
-    "@mds-core/mds-types": "0.1.23",
-    "google-spreadsheet": "2.0.8",
-    "request": "2.88.0",
-    "request-promise": "4.2.5"
+    "@mds-core/mds-logger": "0.2.1",
+    "@mds-core/mds-providers": "0.1.27",
+    "@mds-core/mds-types": "0.1.24",
+    "@mds-core/mds-utils": "0.1.27",
+    "@types/request-promise": "4.1.47",
+    "google-spreadsheet": "3.1.15",
+    "request": "2.88.2",
+    "request-promise": "4.2.6"
   }
 }

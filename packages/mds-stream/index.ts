@@ -1,23 +1,22 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import logger from '@mds-core/mds-logger'
 import redis from 'redis'
 import bluebird from 'bluebird'
-import Cloudevent from 'cloudevents-sdk'
 import { Device, VehicleEvent, Telemetry } from '@mds-core/mds-types'
 import {
   Stream,
@@ -25,39 +24,22 @@ import {
   ReadStreamResult,
   DEVICE_INDEX_STREAM,
   DEVICE_RAW_STREAM,
-  PROVIDER_EVENT_STREAM,
   ReadStreamOptions,
   StreamItemID
 } from './types'
+import { AgencyStreamKafka } from './kafka/agency-stream-kafka'
+import { KafkaStreamConsumer, KafkaStreamProducer } from './kafka'
+
+import { NatsStreamConsumer } from './nats/stream-consumer'
+import { NatsStreamProducer } from './nats/stream-producer'
+
+import { AgencyStreamNats } from './nats/agency-stream-nats'
+import { mockStream } from './test-utils'
+
+export { KafkaStreamConsumerOptions, KafkaStreamProducerOptions } from './kafka'
+export { StreamConsumer, StreamProducer } from './stream-interface'
 
 const { env } = process
-
-/* eslint-reason no cloud-event typings */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-let binding: any = null
-
-function getBinding() {
-  if (!binding) {
-    const config = {
-      method: 'POST',
-      url: env.SINK
-    }
-
-    // eslint-disable-next-line new-cap
-    binding = new Cloudevent.bindings['http-binary0.2'](config)
-  }
-
-  return binding
-}
-
-async function writeCloudEvent(type: string, data: string) {
-  const cloudevent = new Cloudevent(Cloudevent.specs['0.2'])
-    .type(type)
-    .source(env.CE_NAME)
-    .data(data)
-
-  return getBinding().emit(cloudevent)
-}
 
 declare module 'redis' {
   interface RedisClient {
@@ -95,7 +77,7 @@ declare module 'redis' {
 
   interface Multi {
     xadd: (...args: unknown[]) => string
-    execAsync: () => Promise<string[]>
+    execAsync: () => Promise<object[]>
   }
 }
 
@@ -108,8 +90,7 @@ let cachedClient: redis.RedisClient | null = null
 
 const STREAM_MAXLEN: { [S in Stream]: number } = {
   'device:index': 10_000,
-  'device:raw': 1_000_000,
-  'provider:event': 100_000
+  'device:raw': 1_000_000
 }
 
 async function getClient() {
@@ -126,7 +107,7 @@ async function getClient() {
     logger.info(`connecting to redis on ${host}:${port}`)
     cachedClient = redis.createClient(Number(port), host)
     cachedClient.on('error', async err => {
-      await logger.error(`redis error ${err}`)
+      logger.error(`redis error ${err}`)
     })
     await cachedClient.dbsizeAsync().then(size => logger.info(`redis has ${size} keys`))
   }
@@ -134,11 +115,13 @@ async function getClient() {
 }
 
 async function initialize() {
-  if (env.SINK) {
-    getBinding()
-  } else {
-    await getClient()
+  if (process.env.KAFKA_HOST) {
+    await AgencyStreamKafka.initialize()
   }
+  if (process.env.NATS) {
+    await AgencyStreamNats.initialize()
+  }
+  await getClient()
 }
 
 async function reset() {
@@ -155,6 +138,8 @@ async function shutdown() {
     await cachedClient.quit()
     cachedClient = null
   }
+  await AgencyStreamKafka.shutdown()
+  await AgencyStreamNats.shutdown()
 }
 
 async function writeStream(stream: Stream, field: string, value: unknown) {
@@ -171,30 +156,38 @@ async function writeStreamBatch(stream: Stream, field: string, values: unknown[]
 
 // put basics of vehicle in the cache
 async function writeDevice(device: Device) {
-  if (env.SINK) {
-    return writeCloudEvent('mds.device', JSON.stringify(device))
+  if (env.NATS) {
+    await AgencyStreamNats.writeDevice(device)
+  }
+  if (env.KAFKA_HOST) {
+    await AgencyStreamKafka.writeDevice(device)
   }
   return writeStream(DEVICE_INDEX_STREAM, 'data', device)
 }
 
 async function writeEvent(event: VehicleEvent) {
-  if (env.SINK) {
-    return writeCloudEvent('mds.event', JSON.stringify(event))
+  if (env.NATS) {
+    await AgencyStreamNats.writeEvent(event)
   }
-  return Promise.all([DEVICE_RAW_STREAM, PROVIDER_EVENT_STREAM].map(stream => writeStream(stream, 'event', event)))
+  if (env.KAFKA_HOST) {
+    await AgencyStreamKafka.writeEvent(event)
+  }
+  return writeStream(DEVICE_RAW_STREAM, 'event', event)
 }
 
 // put latest locations in the cache
 async function writeTelemetry(telemetry: Telemetry[]) {
-  if (env.SINK) {
-    await Promise.all(telemetry.map(item => writeCloudEvent('mds.telemetry', JSON.stringify(item))))
-    return
+  if (env.NATS) {
+    await AgencyStreamNats.writeTelemetry(telemetry)
+  }
+  if (env.KAFKA_HOST) {
+    await AgencyStreamKafka.writeTelemetry(telemetry)
   }
   const start = now()
   await writeStreamBatch(DEVICE_RAW_STREAM, 'telemetry', telemetry)
   const delta = now() - start
   if (delta > 200) {
-    logger.info('stream writeTelemetry', telemetry.length, 'points in', delta, 'ms')
+    logger.info('mds-stream::writeTelemetry', { pointsInserted: telemetry.length, executionTime: delta })
   }
 }
 
@@ -291,7 +284,7 @@ async function health() {
   return { using: 'redis', status }
 }
 
-export = {
+export default {
   createStreamGroup,
   getStreamInfo,
   health,
@@ -305,5 +298,10 @@ export = {
   writeEvent,
   writeStream,
   writeStreamBatch,
-  writeTelemetry
+  writeTelemetry,
+  KafkaStreamConsumer,
+  KafkaStreamProducer,
+  NatsStreamConsumer,
+  NatsStreamProducer,
+  mockStream
 }

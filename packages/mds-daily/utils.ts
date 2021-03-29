@@ -1,7 +1,23 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { isTimestamp, now, days, inc, head, tail } from '@mds-core/mds-utils'
 import { UUID, CountMap, TripsStats, VEHICLE_EVENTS, VehicleEvent } from '@mds-core/mds-types'
-import cache from '@mds-core/mds-cache'
-import log from '@mds-core/mds-logger'
+import cache from '@mds-core/mds-agency-cache'
+import logger from '@mds-core/mds-logger'
 
 // TODO move to utils?
 export function asInt(n: string | number | undefined): number | undefined {
@@ -108,9 +124,9 @@ export async function getMaps(): Promise<{
 }> {
   try {
     // const telemetry: Telemetry[] = await cache.readAllTelemetry()
-    // log.info('read telemetry')
+    // logger.info('read telemetry')
     const events = await cache.readAllEvents()
-    log.info('read events')
+    logger.info('read events')
     const eventSeed: { [s: string]: VehicleEvent } = {}
     const eventMap: { [s: string]: VehicleEvent } = events.reduce((map, event) => {
       return event ? Object.assign(map, { [event.device_id]: event }) : map

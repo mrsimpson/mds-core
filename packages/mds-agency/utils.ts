@@ -1,7 +1,23 @@
-import express from 'express'
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import { isUUID, isPct, isTimestamp, isFloat, pointInShape, isInsideBoundingBox } from '@mds-core/mds-utils'
-import areas from 'ladot-service-areas'
+import express from 'express'
+import { Query } from 'express-serve-static-core'
+
+import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox } from '@mds-core/mds-utils'
 import stream from '@mds-core/mds-stream'
 import {
   UUID,
@@ -17,18 +33,16 @@ import {
   PROPULSION_TYPES,
   EVENT_STATUS_MAP,
   BoundingBox,
-  Timestamp,
-  Recorded,
   VEHICLE_STATUS,
   VEHICLE_EVENT
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
-import log from '@mds-core/mds-logger'
-import cache from '@mds-core/mds-cache'
+import logger from '@mds-core/mds-logger'
+import cache from '@mds-core/mds-agency-cache'
 import { isArray } from 'util'
-import { VehiclePayload, TelemetryResult } from './types'
+import { VehiclePayload, TelemetryResult, CompositeVehicle, PaginatedVehiclesList } from './types'
 
-export function badDevice(device: Device): Partial<{ error: string; error_description: string }> | boolean {
+export function badDevice(device: Device): { error: string; error_description: string } | null {
   if (!device.device_id) {
     return {
       error: 'missing_param',
@@ -100,21 +114,17 @@ export function badDevice(device: Device): Partial<{ error: string; error_descri
   //         error_description: 'missing string field "model"'
   //     }
   // }
-  return false
+  return null
 }
 
 export async function getVehicles(
   skip: number,
   take: number,
   url: string,
-  provider_id: string,
-  reqQuery: { [x: string]: string },
+  reqQuery: Query,
+  provider_id?: string,
   bbox?: BoundingBox
-): Promise<{
-  total: number
-  links: { first: string; last: string; prev: string | null; next: string | null }
-  vehicles: (Device & { updated?: number | null; telemetry?: Telemetry | null })[]
-}> {
+): Promise<PaginatedVehiclesList> {
   function fmt(query: { skip: number; take: number }): string {
     const flat: { [key: string]: number } = { ...reqQuery, ...query }
     let s = `${url}?`
@@ -126,9 +136,9 @@ export async function getVehicles(
 
   const rows = await db.readDeviceIds(provider_id)
   const total = rows.length
-  log.info(`read ${total} deviceIds in /vehicles`)
+  logger.info(`read ${total} deviceIds in /vehicles`)
 
-  const events = await cache.readEvents(rows.map(record => record.device_id))
+  const events = rows.length > 0 ? await cache.readEvents(rows.map(record => record.device_id)) : []
   const eventMap: { [s: string]: VehicleEvent } = {}
   events.map(event => {
     if (event) {
@@ -148,7 +158,7 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
-    const status = event ? EVENT_STATUS_MAP[event.event_type] : VEHICLE_STATUSES.removed
+    const status = event ? EVENT_STATUS_MAP[event.event_type] : VEHICLE_STATUSES.inactive
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
     return [...acc, { ...device, status, telemetry, updated }]
@@ -186,14 +196,10 @@ export async function getVehicles(
   }
 }
 
-const usBounds = {
-  latMax: 49.45,
-  latMin: 24.74,
-  lonMax: -66.94,
-  lonMin: -124.79
-}
-
 export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObject | null {
+  const [LATITUDE_LOWER_BOUND, LATITUDE_UPPER_BOUND] = [-90, 90]
+  const [LONGITUDE_LOWER_BOUND, LONGITUDE_UPPER_BOUND] = [-180, 180]
+
   if (!telemetry) {
     return {
       error: 'missing_param',
@@ -220,13 +226,25 @@ export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObje
       error_description: 'no device_id included in telemetry'
     }
   }
-  if (typeof lat !== 'number' || Number.isNaN(lat) || lat < usBounds.latMin || lat > usBounds.latMax) {
+  if (
+    typeof lat !== 'number' ||
+    Number.isNaN(lat) ||
+    lat < LATITUDE_LOWER_BOUND ||
+    lat > LATITUDE_UPPER_BOUND ||
+    lat === 0
+  ) {
     return {
       error: 'bad_param',
       error_description: `invalid lat ${lat}`
     }
   }
-  if (typeof lng !== 'number' || Number.isNaN(lng) || lng < usBounds.lonMin || lng > usBounds.lonMax) {
+  if (
+    typeof lng !== 'number' ||
+    Number.isNaN(lng) ||
+    lng < LONGITUDE_LOWER_BOUND ||
+    lng > LONGITUDE_UPPER_BOUND ||
+    lng === 0
+  ) {
     return {
       error: 'bad_param',
       error_description: `invalid lng ${lng}`
@@ -351,7 +369,7 @@ export async function badEvent(event: VehicleEvent) {
     case VEHICLE_EVENTS.cancel_reservation:
       return null
     default:
-      await log.warn(`unsure how to validate mystery event_type ${event.event_type}`)
+      logger.warn(`unsure how to validate mystery event_type ${event.event_type}`)
       break
   }
   return null // we good
@@ -364,55 +382,31 @@ export function lower(s: string): string {
   return s
 }
 
-/**
- * set the service area on an event based on its gps
- */
-export function getServiceArea(event: VehicleEvent): UUID | null {
-  const tel = event.telemetry
-  if (tel) {
-    // TODO: filter service areas by effective date and not having a replacement
-    const serviceAreaKeys = Object.keys(areas.serviceAreaMap).reverse()
-    const status = EVENT_STATUS_MAP[event.event_type]
-    switch (status) {
-      case VEHICLE_STATUSES.available:
-      case VEHICLE_STATUSES.unavailable:
-      case VEHICLE_STATUSES.reserved:
-      case VEHICLE_STATUSES.trip:
-        for (const key of serviceAreaKeys) {
-          const serviceArea = areas.serviceAreaMap[key]
-          if (pointInShape(tel.gps, serviceArea.area)) {
-            return key
-          }
-        }
-        break
-      default:
-        break
-    }
-  }
-  return null
-}
-
 export async function writeTelemetry(telemetry: Telemetry | Telemetry[]) {
   const recorded_telemetry = await db.writeTelemetry(Array.isArray(telemetry) ? telemetry : [telemetry])
-  await Promise.all([cache.writeTelemetry(recorded_telemetry), stream.writeTelemetry(recorded_telemetry)])
+  try {
+    await Promise.all([cache.writeTelemetry(recorded_telemetry), stream.writeTelemetry(recorded_telemetry)])
+  } catch (err) {
+    logger.warn(`Failed to write telemetry to cache/stream, ${err}`)
+  }
   return recorded_telemetry
 }
 
 export async function refresh(device_id: UUID, provider_id: UUID): Promise<string> {
   // TODO all of this back and forth between cache and db is slow
   const device = await db.readDevice(device_id, provider_id)
-  // log.info('refresh device', device)
+  // logger.info('refresh device', device)
   await cache.writeDevice(device)
   try {
     const event = await db.readEvent(device_id)
     await cache.writeEvent(event)
-  } catch (err) {
-    await log.info('no events for', device_id, err)
+  } catch (error) {
+    logger.info('no events for', { device_id, error })
   }
   try {
     await db.readTelemetry(device_id)
-  } catch (err) {
-    await log.info('no telemetry for', device_id, err)
+  } catch (error) {
+    logger.info('no telemetry for', { device_id, error })
   }
   return 'done'
 }
@@ -425,7 +419,7 @@ export async function validateDeviceId(req: express.Request, res: express.Respon
 
   /* istanbul ignore if This is never called with no device_id parameter */
   if (!device_id) {
-    await log.warn('agency: missing device_id', req.originalUrl)
+    logger.warn('agency: missing device_id', { originalUrl: req.originalUrl })
     res.status(400).send({
       error: 'missing_param',
       error_description: 'missing device_id'
@@ -433,7 +427,7 @@ export async function validateDeviceId(req: express.Request, res: express.Respon
     return
   }
   if (device_id && !isUUID(device_id)) {
-    await log.warn('agency: bogus device_id', device_id, req.originalUrl)
+    logger.warn('agency: bogus device_id', { device_id, originalUrl: req.originalUrl })
     res.status(400).send({
       error: 'bad_param',
       error_description: `invalid device_id ${device_id} is not a UUID`
@@ -462,10 +456,10 @@ export async function writeRegisterEvent(device: Device, recorded: number) {
       // writing to cache and stream is not fatal
       await Promise.all([cache.writeEvent(recorded_event), stream.writeEvent(recorded_event)])
     } catch (err) {
-      await log.warn('/event exception cache/stream', err)
+      logger.warn('/event exception cache/stream', err)
     }
   } catch (err) {
-    await log.error('writeRegisterEvent failure', err)
+    logger.error('writeRegisterEvent failure', err)
     throw new Error('writeEvent exception db')
   }
 }
@@ -473,7 +467,7 @@ export async function writeRegisterEvent(device: Device, recorded: number) {
 export function computeCompositeVehicleData(payload: VehiclePayload) {
   const { device, event, telemetry } = payload
 
-  const composite: Partial<Device & { prev_event?: string; updated?: Timestamp; gps?: Recorded<Telemetry>['gps'] }> = {
+  const composite: CompositeVehicle = {
     ...device
   }
 
@@ -482,7 +476,8 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
     composite.updated = event.timestamp
     composite.status = (EVENT_STATUS_MAP[event.event_type as VEHICLE_EVENT] || 'unknown') as VEHICLE_STATUS
   } else {
-    composite.status = VEHICLE_STATUSES.removed
+    composite.status = VEHICLE_STATUSES.inactive
+    composite.prev_event = VEHICLE_EVENTS.deregister
   }
   if (telemetry) {
     if (telemetry.gps) {
@@ -499,22 +494,22 @@ const normalizeTelemetry = (telemetry: TelemetryResult) => {
   return telemetry
 }
 
-export async function readPayload(store: typeof cache | typeof db, device_id: UUID): Promise<VehiclePayload> {
+export async function readPayload(device_id: UUID): Promise<VehiclePayload> {
   const payload: VehiclePayload = {}
   try {
-    payload.device = await store.readDevice(device_id)
+    payload.device = await db.readDevice(device_id)
   } catch (err) {
-    await log.error(err)
+    logger.error(err)
   }
   try {
-    payload.event = await store.readEvent(device_id)
+    payload.event = await cache.readEvent(device_id)
+    if (payload.event) {
+      if (payload.event.telemetry) {
+        payload.telemetry = normalizeTelemetry(payload.event.telemetry)
+      }
+    }
   } catch (err) {
-    await log.error(err)
-  }
-  try {
-    payload.telemetry = normalizeTelemetry(await store.readTelemetry(device_id))
-  } catch (err) {
-    await log.error(err)
+    logger.error(err)
   }
   return payload
 }

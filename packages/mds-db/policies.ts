@@ -1,21 +1,45 @@
-import { UUID, Policy, Timestamp, Recorded, Rule, PolicyMetadata } from '@mds-core/mds-types'
-import { now, NotFoundError, BadParamsError, AlreadyPublishedError } from '@mds-core/mds-utils'
-import log from '@mds-core/mds-logger'
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { UUID, Policy, Timestamp, Recorded, Rule, PolicyMetadata, Nullable } from '@mds-core/mds-types'
+import {
+  now,
+  NotFoundError,
+  BadParamsError,
+  AlreadyPublishedError,
+  DependencyMissingError,
+  ConflictError
+} from '@mds-core/mds-utils'
+import logger from '@mds-core/mds-logger'
 
 import schema from './schema'
 
 import { vals_sql, cols_sql, vals_list, SqlVals } from './sql-utils'
 
-import { publishGeography, isGeographyPublished } from './geographies'
+import { isGeographyPublished } from './geographies'
 import { getReadOnlyClient, getWriteableClient } from './client'
 
 export async function readPolicies(params?: {
   policy_id?: UUID
+  rule_id?: UUID
   name?: string
   description?: string
   start_date?: Timestamp
-  get_unpublished?: boolean
-  get_published?: boolean
+  get_unpublished?: Nullable<boolean>
+  get_published?: Nullable<boolean>
 }): Promise<Policy[]> {
   // use params to filter
   // query
@@ -29,6 +53,12 @@ export async function readPolicies(params?: {
   if (params) {
     if (params.policy_id) {
       conditions.push(`policy_id = ${vals.add(params.policy_id)}`)
+    }
+
+    if (params.rule_id) {
+      conditions.push(
+        `EXISTS(SELECT FROM json_array_elements(policy_json->'rules') elem WHERE (elem->'rule_id')::jsonb ? '${params.rule_id}')`
+      )
     }
 
     if (params.get_unpublished) {
@@ -56,13 +86,28 @@ export async function readPolicies(params?: {
   return res.rows.map(row => row.policy_json)
 }
 
+export async function readActivePolicies(timestamp: Timestamp = now()): Promise<Policy[]> {
+  const client = await getReadOnlyClient()
+  const conditions = []
+  const vals = new SqlVals()
+  conditions.push(`policy_json->>'start_date' <= ${vals.add(timestamp)}`)
+  conditions.push(`(policy_json->>'end_date' >= ${vals.add(timestamp)} OR policy_json->>'end_date' IS NULL)`)
+  conditions.push(
+    `(policy_json->>'publish_date' IS NOT NULL AND policy_json->>'publish_date' <= ${vals.add(timestamp)})`
+  )
+  const sql = `select * from ${schema.TABLE.policies} WHERE ${conditions.join(' AND ')}`
+  const values = vals.values()
+  const res = await client.query(sql, values)
+  return res.rows.map(row => row.policy_json)
+}
+
 export async function readBulkPolicyMetadata(params?: {
   policy_id?: UUID
   name?: string
   description?: string
   start_date?: Timestamp
-  get_unpublished?: boolean
-  get_published?: boolean
+  get_unpublished: Nullable<boolean>
+  get_published: Nullable<boolean>
 }): Promise<PolicyMetadata[]> {
   const policies = await readPolicies(params)
   const policy_ids = policies.map(policy => {
@@ -90,7 +135,7 @@ export async function readSinglePolicyMetadata(policy_id: UUID): Promise<PolicyM
     const { policy_metadata } = res.rows[0]
     return { policy_id, policy_metadata }
   }
-  await log.info(`readSinglePolicyMetadata db failed for ${policy_id}: rows=${res.rows.length}`)
+  logger.info(`readSinglePolicyMetadata db failed for ${policy_id}: rows=${res.rows.length}`)
   throw new NotFoundError(`metadata for policy_id ${policy_id} not found`)
 }
 
@@ -102,21 +147,47 @@ export async function readPolicy(policy_id: UUID): Promise<Policy> {
   if (res.rows.length === 1) {
     return res.rows[0].policy_json
   }
-  await log.info(`readPolicy db failed for ${policy_id}: rows=${res.rows.length}`)
+  logger.info(`readPolicy db failed for ${policy_id}: rows=${res.rows.length}`)
   throw new NotFoundError(`policy_id ${policy_id} not found`)
+}
+
+async function throwIfRulesAlreadyExist(policy: Policy) {
+  const unflattenedPolicies: Policy[][] = await Promise.all(
+    policy.rules.map(rule => {
+      return readPolicies({ rule_id: rule.rule_id })
+    })
+  )
+
+  unflattenedPolicies.map(policySubArr => {
+    policySubArr.map(p => {
+      if (p.policy_id !== policy.policy_id) {
+        throw new ConflictError(`Policies containing rules with the same id or ids already exist`)
+      }
+    })
+  })
 }
 
 export async function writePolicy(policy: Policy): Promise<Recorded<Policy>> {
   // validate TODO
   const client = await getWriteableClient()
+  await throwIfRulesAlreadyExist(policy)
+
   const sql = `INSERT INTO ${schema.TABLE.policies} (${cols_sql(schema.TABLE_COLUMNS.policies)}) VALUES (${vals_sql(
     schema.TABLE_COLUMNS.policies
   )}) RETURNING *`
   const values = vals_list(schema.TABLE_COLUMNS.policies, { ...policy, policy_json: policy })
-  const {
-    rows: [recorded_policy]
-  }: { rows: Recorded<Policy>[] } = await client.query(sql, values)
-  return { ...policy, ...recorded_policy }
+  try {
+    const {
+      rows: [recorded_policy]
+    }: { rows: Recorded<Policy>[] } = await client.query(sql, values)
+    return { ...policy, ...recorded_policy }
+  } catch (error) {
+    if (error.code === '23505') {
+      throw new ConflictError(`Policy ${policy.policy_id} already exists! Did you mean to PUT?`)
+    } else {
+      throw error
+    }
+  }
 }
 
 export async function isPolicyPublished(policy_id: UUID) {
@@ -137,11 +208,11 @@ export async function editPolicy(policy: Policy) {
     throw new AlreadyPublishedError('Cannot edit published policy')
   }
 
-  const result = await readPolicies({ policy_id, get_unpublished: true })
+  const result = await readPolicies({ policy_id, get_unpublished: true, get_published: false })
   if (result.length === 0) {
     throw new NotFoundError(`no policy of id ${policy_id} was found`)
   }
-
+  await throwIfRulesAlreadyExist(policy)
   const client = await getWriteableClient()
   const sql = `UPDATE ${schema.TABLE.policies} SET policy_json=$1 WHERE policy_id='${policy_id}' AND policy_json->>'publish_date' IS NULL`
   await client.query(sql, [policy])
@@ -159,19 +230,21 @@ export async function deletePolicy(policy_id: UUID) {
   return policy_id
 }
 
-export async function publishPolicy(policy_id: UUID) {
+export async function publishPolicy(policy_id: UUID, publish_date = now()) {
   try {
     const client = await getWriteableClient()
     if (await isPolicyPublished(policy_id)) {
       throw new AlreadyPublishedError('Cannot re-publish existing policy')
     }
 
-    const policy = (await readPolicies({ policy_id, get_unpublished: true }))[0]
+    const policy = (await readPolicies({ policy_id, get_unpublished: true, get_published: null }))[0]
     if (!policy) {
       throw new NotFoundError('cannot publish nonexistent policy')
     }
 
-    const publish_date = now()
+    if (policy.start_date < publish_date) {
+      throw new ConflictError('Policies cannot be published after their start_date')
+    }
 
     const geographies: UUID[] = []
     policy.rules.forEach(rule => {
@@ -179,27 +252,35 @@ export async function publishPolicy(policy_id: UUID) {
         geographies.push(geography_id)
       })
     })
-    await Promise.all(
-      geographies.map(geography_id => {
-        log.info('publishing geography', geography_id)
-        return publishGeography({ geography_id, publish_date })
-      })
-    )
-    await Promise.all(
-      geographies.map(geography_id => {
-        const ispublished = isGeographyPublished(geography_id)
-        log.info('published geography', geography_id, ispublished)
+
+    const unpublishedGeoIDs = await Promise.all(
+      geographies.map(async geography_id => {
+        const isPublished = await isGeographyPublished(geography_id)
+        if (!isPublished) {
+          return geography_id
+        }
+        return null
       })
     )
 
+    unpublishedGeoIDs.forEach(id => {
+      if (id) {
+        throw new DependencyMissingError(`Geography with ${id} is not published!`)
+      }
+    })
+
     // Only publish the policy if the geographies are successfully published first
-    const publishPolicySQL = `UPDATE ${schema.TABLE.policies} SET policy_json = policy_json::jsonb || '{"publish_date": ${publish_date}}' where policy_id='${policy_id}'`
-    await client.query(publishPolicySQL).catch(err => {
+    const publishPolicySQL = `UPDATE ${schema.TABLE.policies}
+     SET policy_json = policy_json::jsonb || '{"publish_date": ${publish_date}}'
+     where policy_id='${policy_id}' RETURNING *`
+    const {
+      rows: [published_policy]
+    }: { rows: Policy[] } = await client.query(publishPolicySQL).catch(err => {
       throw err
     })
-    return policy_id
+    return { ...published_policy }
   } catch (err) {
-    await log.error(err)
+    logger.error(err)
     throw err
   }
 }
@@ -237,7 +318,7 @@ export async function updatePolicyMetadata(policy_metadata: PolicyMetadata) {
       ...recorded_metadata
     }
   } catch (err) {
-    await log.error(err)
+    logger.error(err)
     throw err
   }
 }

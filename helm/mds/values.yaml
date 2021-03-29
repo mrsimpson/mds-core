@@ -1,9 +1,4 @@
 apis:
-  mds-provider:
-    enabled: true
-    pathPrefix: /provider
-    version: latest
-    migration: false
   mds-agency:
     enabled: true
     pathPrefix: /agency
@@ -29,44 +24,101 @@ apis:
     pathPrefix: /daily
     version: latest
     migration: false
-  mds-metrics:
+  mds-jurisdiction:
     enabled: true
-    pathPrefix: /metrics
+    pathPrefix: /jurisdiction
     version: latest
     migration: false
-  mds-native:
+  mds-jurisdiction-service:
     enabled: true
-    pathPrefix: /native
     version: latest
+    migration: false
   mds-policy-author:
     enabled: true
     pathPrefix: /policy-author
     version: latest
     migration: false
-  mds-config:
+  mds-geography:
     enabled: true
-    pathPrefix: /config
+    pathPrefix: /geography
     version: latest
     migration: false
-useEvents: false
+  mds-geography-author:
+    enabled: true
+    pathPrefix: /geography-author
+    version: latest
+    migration: false
+  mds-geography-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-policy-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-ingest-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-transaction-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-transaction-api:
+    enabled: true
+    version: latest
+    migration: false
+  mds-attachment-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-audit-service:
+    enabled: true
+    version: latest
+    migration: false
+  mds-collector-api:
+    enabled: true
+    version: latest
+    migration: false
+    pathPrefix: /collector
+  mds-collector-backend:
+    enabled: true
+    version: latest
+    migration: false
+tenantId:
 timezone: America/Los_Angeles
 registry:
 useLatestImage: true
-domain: '*'
+domain: "*"
+ingressgateway: ingressgateway
 tls:
   enabled: false
+  elbTermination: false
   domain:
 jwt:
   issuer:
   enabled: false
+  bypassInternal: false
+  firstInstall: false
   audiences: []
+nats:
+  internal: true
+  host:
+  podAnnotations:
+    sidecar.istio.io/inject: "false"
+kafka:
+  internal: true
+  host:
+  port: 9092
+  podAnnotations:
+    sidecar.istio.io/inject: "false"
 postgresql:
   internal: true
   host:
   hostReader:
   port: 5432
   existingSecret: mds-secrets
-  password: # for setting secret internally - not used by https://github.com/helm/charts/tree/master/stable/postgresql
+  password: CHANGEME
   postgresqlUsername: mdsadmin
   postgresqlDatabase: mds
   image:
@@ -83,6 +135,3 @@ redis:
     disableCommands: []
   slave:
     disableCommands: []
-slack:
-  channel:
-  token:

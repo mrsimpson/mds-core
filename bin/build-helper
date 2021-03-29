@@ -1,0 +1,73 @@
+#!/bin/bash
+
+set -e
+set -u
+set -o pipefail
+
+BASE_DIR=$(dirname $0)/..
+NODE_ENV=${NODE_ENV:-""}
+REGISTRY=${REGISTRY:=""}
+
+createImagesFileIfNotExists() {
+  if [[ ! -d $BASE_DIR/dist ]]; then
+    mkdir -p $BASE_DIR/dist
+  fi
+  if [[ ! -f $BASE_DIR/dist/images.txt ]]; then
+    touch $BASE_DIR/dist/images.txt
+  fi
+}
+
+buildImage() {
+  local image=$1
+  createImagesFileIfNotExists
+  if [[ "$NODE_ENV" == "development" ]]; then
+    image_name=$(echo $image | cut -f1 -d":")
+    docker build -t ${REGISTRY}${image_name}:latest .
+    echo ${REGISTRY}${image_name}:latest >> $BASE_DIR/dist/images.txt
+  else
+    docker build -t ${REGISTRY}${image}$(getBranchSuffix)$(getCommitHash) .
+    echo ${REGISTRY}${image}$(getBranchSuffix)$(getCommitHash) >> $BASE_DIR/dist/images.txt
+  fi
+}
+
+pushImages() {
+  createImagesFileIfNotExists
+  cat /dev/null > $BASE_DIR/dist/images.txt
+  if [[ "$REGISTRY" =~ amazonaws.com$ ]]; then
+    eval $(aws ecr get-login --no-include-email)
+  fi
+  for image in $(cat $BASE_DIR/dist/images.txt); do
+    docker push $image
+  done
+}
+
+getBranchSuffix() {
+  CI_BRANCH=${CI_BRANCH:-$(git rev-parse --abbrev-ref HEAD | sed -E -e 's/[^-a-zA-Z0-9]/-/g')}
+  echo -$CI_BRANCH
+}
+
+getCommitHash() {
+  git rev-parse --short HEAD | sed -E -e 's/[^-a-zA-Z0-9]/-/g' -e 's/^/-/'
+}
+
+images() {
+  for d in $BASE_DIR/container-images/*/package.json; do
+    basename $(dirname $d)
+  done
+}
+
+templateValues() {
+  createImagesFileIfNotExists
+  suffix="$(getBranchSuffix)$(getCommitHash)"
+  for image in $(images); do
+    version=$(jq -r '.version' < $BASE_DIR/container-images/$image/package.json)
+    varname="$(echo $image | sed -e 's/^lacuna-//' -e 's/^mds-//' -e 's/-/_/g' | tr a-z A-Z)_VERSION"
+    export $varname=${version}${suffix}
+  done
+  mkdir -p dist
+  envsubst < $BASE_DIR/values.yaml.tpl > $BASE_DIR/dist/values-mds.yaml
+  echo "Wrote dist/values.yaml"
+}
+
+CALL=$1; shift
+$CALL $@

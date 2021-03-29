@@ -1,5 +1,5 @@
 {{- range $name, $api := .Values.apis }}
-  {{- if $api.enabled }}
+{{- if $api.enabled }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -15,39 +15,37 @@ spec:
       app: {{ $name }}
   template:
     metadata:
+      annotations:
+        prometheus.io/path: /prometheus
+        prometheus.io/port: "4000"
+        prometheus.io/scrape: "true"
       labels:
         app: {{ $name }}
     spec:
-      {{- if (eq $name "mds-config") }}
-      volumes:
-        - name: mds-config-files
-          configMap:
-            name: mds-config-files
-      {{- end }}
       containers:
       - name: {{ $name }}
-        {{- if $.Values.registry }}
-        image: {{ $.Values.registry }}/{{ $name }}:{{ $api.version }}
-        {{- else }}
-        image: {{ $name }}:{{ $api.version }}
+        image: {{ if $.Values.registry }}{{ printf "%s/" $.Values.registry }}{{- end}}{{ $name }}:{{ $api.version }}
+        {{- if $.Values.imagePullPolicy }}
+        imagePullPolicy: {{ $.Values.imagePullPolicy }}
+        {{- else if $.Values.registry }}
         imagePullPolicy: IfNotPresent
+        {{- else }}
+        imagePullPolicy: Never
         {{- end }}
         resources:
           limits:
-            cpu: {{ $api.resourcesLimitsCpu | default ($.Values.resourcesLimitsCpu | default "500m") }}
-            memory: {{ $api.resourcesLimitsMemory | default ($.Values.resourcesLimitsMemory | default "512Mi") }}
+            cpu: {{ $api.resourcesLimitsCpu | default "1000m" }}
+            memory: {{ $api.resourcesLimitsMemory | default "1024Mi" }}
           requests:
-            cpu: {{ $api.resourcesRequestsCpu | default ($.Values.resourcesRequestsCpu | default "50m") }}
-            memory: {{ $api.resourcesRequestsMemory | default ($.Values.resourcesRequestsMemory | default "128Mi") }}
+            cpu: {{ $api.resourcesRequestsCpu | default "5m" }}
+            memory: {{ $api.resourcesRequestsMemory | default "64Mi" }}
         ports:
         - containerPort: 4000
           name: user-port
           protocol: TCP
-        {{- if (eq $name "mds-config") }}
-        volumeMounts:
-        - name: mds-config-files
-          mountPath: /mds-config/
-        {{- end }}
+        - containerPort: 7375
+          name: repl-port
+          protocol: TCP
         env:
           - name: PORT
             value: "4000"
@@ -66,7 +64,7 @@ spec:
                 key: postgresql-password
           - name: PG_HOST
           {{- if $.Values.postgresql.internal }}
-            value: mds-postgresql.{{ $.Release.Namespace }}.svc.cluster.local
+            value: {{ $.Release.Name }}-postgresql
           {{- else }}
             value: {{ $.Values.postgresql.host }}
           {{- end }}
@@ -77,36 +75,64 @@ spec:
           {{- if $.Values.postgresql.port }}
           - name: PG_PORT
             value: {{ $.Values.postgresql.port | quote }}
-          {{- end }}
+          {{- end}}
           {{- if $api.migration }}
           - name: PG_MIGRATIONS
             value: {{ $api.migration | quote }}
           {{- end }}
           - name: REDIS_HOST
           {{- if $.Values.redis.internal }}
-            value: mds-redis-master.{{ $.Release.Namespace }}.svc.cluster.local
+            value: {{ $.Release.Name }}-redis-master
           {{- else }}
             value: {{ $.Values.redis.host }}
           {{- end }}
           - name: REDIS_PORT
             value: {{ $.Values.redis.port | quote }}
-          {{- if $.Values.useEvents }}
-          - name: CE_NAME
-            value: {{ $name }}
-          - name: SINK
-            value: http://default-broker.{{ $.Release.Namespace }}.svc.cluster.local
+          {{- if $.Values.nats.enabled }}
+          - name: NATS
+          {{- if $.Values.nats.internal }}
+            value: {{ $.Release.Name }}-nats-client
+          {{- else }}
+            value: {{ $.Values.nats.host }}
           {{- end }}
-          {{- if $.Values.slack.channel }}
-          - name: SLACK_CHANNEL
-            value: {{ $.Values.slack.channel }}
-          - name: SLACK_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: mds-secrets
-                key: slack-token
+          {{- end }}
+          {{- if $.Values.kafka.enabled }}
+          - name: KAFKA_HOST
+          {{- if $.Values.kafka.internal }}
+            value: {{ $.Release.Name }}-kafka:{{ $.Values.kafka.port }}
+          {{- else }}
+            value: {{ $.Values.kafka.host }}:{{ $.Values.kafka.port }}
+          {{- end }}
+          {{- end }}
+          - name: ATTACHMENT_SERVICE_RPC_HOST
+            value: http://mds-attachment-service
+          - name: AUDIT_SERVICE_RPC_HOST
+            value: http://mds-audit-service
+          - name: GEOGRAPHY_SERVICE_RPC_HOST
+            value: http://mds-geography-service
+          - name: INGEST_SERVICE_RPC_HOST
+            value: http://mds-ingest-service
+          - name: JURISDICTION_SERVICE_RPC_HOST
+            value: http://mds-jurisdiction-service
+          - name: POLICY_SERVICE_RPC_HOST
+            value: http://mds-policy-service
+          - name: COLLECTOR_BACKEND_RPC_HOST
+            value: http://mds-collector-backend
+          - name: TRANSACTION_SERVICE_RPC_HOST
+            value: http://mds-transaction-service
+          - name: TENANT_ID
+          {{- if hasKey $.Values "tenantId" }}
+            value: {{ $.Values.tenantId }}
+          {{- else }}
+            value: {{ $.Release.Namespace }}
           {{- end }}
           {{- if $api.env }}
 {{ toYaml $api.env | indent 10 }}
+          {{- end }}
+          {{- if hasKey $.Values "global" }}
+          {{- if hasKey $.Values.global "env" }}
+{{ toYaml $.Values.global.env | indent 10 }}
+          {{- end }}
           {{- end }}
   {{- end }}
 {{- end }}
@@ -117,9 +143,6 @@ metadata:
   name: mds-secrets
   namespace: {{ $.Release.Namespace }}
 data:
-  {{- if .Values.slack.channel }}
-  slack-token: {{ .Values.slack.token | b64enc }}
-  {{- end }}
   {{- if .Values.postgresql.password }}
   postgresql-password: {{ .Values.postgresql.password | b64enc }}
   {{- end }}

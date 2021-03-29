@@ -1,21 +1,22 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import db from '@mds-core/mds-db'
-import cache from '@mds-core/mds-cache'
+import cache from '@mds-core/mds-agency-cache'
+import { Query } from 'express-serve-static-core'
 import {
   Audit,
   AuditEvent,
@@ -30,9 +31,10 @@ import {
   BoundingBox,
   EVENT_STATUS_MAP,
   VEHICLE_EVENT,
+  VEHICLE_EVENTS,
   VEHICLE_STATUSES
 } from '@mds-core/mds-types'
-import log from '@mds-core/mds-logger'
+import logger from '@mds-core/mds-logger'
 import { now } from '@mds-core/mds-utils'
 
 export async function deleteAudit(audit_trip_id: UUID): Promise<number> {
@@ -94,20 +96,20 @@ export async function readDevice(device_id: UUID, provider_id: UUID): Promise<Re
   return result
 }
 
-export async function readDeviceByVehicleId(provider_id: UUID, vehicle_id: string): Promise<Recorded<Device> | null> {
+export async function readDevicesByVehicleId(provider_id: UUID, vehicle_id: string): Promise<Recorded<Device>[]> {
   try {
     const start = now()
-    const result: Recorded<Device> = await db.readDeviceByVehicleId(
+    const results: Recorded<Device>[] = await db.readDevicesByVehicleId(
       provider_id,
       vehicle_id,
       vehicle_id.replace(/[\W_-]/g, '')
     )
     const finish = now()
     const timeElapsed = finish - start
-    log.info(`db.readDeviceByVehicleId ${provider_id} ${vehicle_id} time elapsed: ${timeElapsed}ms`)
-    return result
+    logger.info(`db.readDevicesByVehicleId ${provider_id} ${vehicle_id} time elapsed: ${timeElapsed}ms`)
+    return results
   } catch (err) {
-    return null
+    return []
   }
 }
 
@@ -168,28 +170,44 @@ export function withGpsProperty<T extends TelemetryData>({
 }
 
 export async function getVehicle(provider_id: UUID, vehicle_id: string) {
-  const device = await readDeviceByVehicleId(provider_id, vehicle_id)
-  if (!device) {
+  const devices = await readDevicesByVehicleId(provider_id, vehicle_id)
+  if (devices.length === 0) {
     return null
   }
-  const deviceStatus = (await cache.readDeviceStatus(device.device_id)) as VehicleEvent & Device
-  if (deviceStatus !== null) {
-    const status = EVENT_STATUS_MAP[deviceStatus.event_type as VEHICLE_EVENT]
-    const updated = deviceStatus.timestamp
-    return { ...device, ...deviceStatus, status, updated }
-  }
-  const { device_id } = device
-  log.info('Missing vehicle status', { provider_id, vehicle_id, device_id })
-  return device
+  const deviceStatusMap: {
+    active: (Device & { updated?: Timestamp | null })[]
+    inactive: (Device & { updated?: Timestamp | null })[]
+  } = { active: [], inactive: [] }
+  await Promise.all(
+    devices.map(async device => {
+      const deviceStatus = (await cache.readDeviceStatus(device.device_id)) as (VehicleEvent & Device) | null
+      if (deviceStatus === null || deviceStatus.event_type === VEHICLE_EVENTS.deregister) {
+        const { device_id } = device
+        logger.info('Bad vehicle status', { deviceStatus, provider_id, vehicle_id, device_id })
+        deviceStatusMap.inactive.push(device)
+      } else {
+        const status = EVENT_STATUS_MAP[deviceStatus.event_type as VEHICLE_EVENT]
+        const updated = deviceStatus.timestamp
+        // FIXME: There are currently some scenarios in which in the latest device information
+        // isn't properly reflected in the device cache. As a result, we overwrite these values
+        // using the device information from the database. If these scenarios can be resolved then
+        // using just the cached values would be the preferred approach as the cache should always
+        // reflect the most up to date information.
+        deviceStatusMap.active.push({ ...deviceStatus, ...device, status, updated })
+      }
+    })
+  )
+  return deviceStatusMap.active[0] || deviceStatusMap.inactive[0] || null
 }
 
 export async function getVehicles(
   skip: number,
   take: number,
   url: string,
-  provider_id: string,
-  reqQuery: { [x: string]: string },
-  bbox: BoundingBox
+  reqQuery: Query,
+  bbox: BoundingBox,
+  strict = true,
+  provider_id?: string
 ) {
   function fmt(query: { skip: number; take: number }): string {
     const flat: { [key: string]: number } = { ...reqQuery, ...query }
@@ -201,7 +219,7 @@ export async function getVehicles(
   }
 
   const start = now()
-  const statusesSuperset = ((await cache.readDevicesStatus({ bbox })) as (VehicleEvent & Device)[]).filter(
+  const statusesSuperset = ((await cache.readDevicesStatus({ bbox, strict })) as (VehicleEvent & Device)[]).filter(
     status =>
       EVENT_STATUS_MAP[status.event_type as VEHICLE_EVENT] !== VEHICLE_STATUSES.removed &&
       (!provider_id || status.provider_id === provider_id)
@@ -213,7 +231,9 @@ export async function getVehicles(
     return [...acc, { ...item, status, updated }]
   }, [])
   const finish = now()
-  log.info(`getVehicles processing ${JSON.stringify(bbox)} provider ${provider_id} time elapsed: ${finish - start}ms`)
+  logger.info(
+    `getVehicles processing ${JSON.stringify(bbox)} provider ${provider_id} time elapsed: ${finish - start}ms`
+  )
 
   const noNext = skip + take >= statusesSuperset.length
   const noPrev = skip === 0 || skip > statusesSuperset.length

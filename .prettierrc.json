@@ -1,0 +1,16 @@
+{
+  "overrides": [
+    {
+      "files": ["*.ts", "*.js"],
+      "options": {
+        "arrowParens": "avoid",
+        "printWidth": 120,
+        "semi": false,
+        "tabWidth": 2,
+        "trailingComma": "none",
+        "singleQuote": true
+      }
+    }
+  ],
+  "plugins": ["./node_modules/prettier-plugin-packagejson"]
+}

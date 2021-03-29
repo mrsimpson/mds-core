@@ -1,178 +1,166 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import express from 'express'
-import cache from '@mds-core/mds-cache'
+import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
-import log from '@mds-core/mds-logger'
+import logger from '@mds-core/mds-logger'
 import {
   isUUID,
   now,
-  days,
-  pathsFor,
+  pathPrefix,
   getPolygon,
   pointInShape,
   isInStatesOrEvents,
-  ServerError
+  ServerError,
+  NotFoundError,
+  BadParamsError,
+  AuthorizationError
 } from '@mds-core/mds-utils'
-import { Geography, Device, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID, BLUE_SYSTEMS_PROVIDER_ID, providerName } from '@mds-core/mds-providers'
+import { Geography, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { Geometry, FeatureCollection } from 'geojson'
+import { parseRequest } from '@mds-core/mds-api-helpers'
 import * as compliance_engine from './mds-compliance-engine'
-import { ComplianceApiRequest, ComplianceApiResponse } from './types'
-
-const AllowedProviderIDs = [TEST1_PROVIDER_ID, TEST2_PROVIDER_ID, BLUE_SYSTEMS_PROVIDER_ID]
+import {
+  ComplianceApiRequest,
+  ComplianceApiResponse,
+  ComplianceApiSnapshotResponse,
+  ComplianceApiCountResponse,
+  ComplianceApiSnapshotRequest,
+  ComplianceApiCountRequest
+} from './types'
+import { ComplianceApiVersionMiddleware } from './middleware'
+import { AllowedProviderIDs } from './constants'
+import { clientCanViewPolicyCompliance, getComplianceInputs } from './helpers'
 
 function api(app: express.Express): express.Express {
+  app.use(ComplianceApiVersionMiddleware)
   app.use(async (req: ComplianceApiRequest, res: ComplianceApiResponse, next: express.NextFunction) => {
     try {
       // verify presence of provider_id
-      if (!(req.path.includes('/health') || req.path === '/')) {
+      if (!req.path.includes('/health')) {
         if (res.locals.claims) {
           const { provider_id } = res.locals.claims
 
           /* istanbul ignore next */
           if (!provider_id) {
-            await log.warn('Missing provider_id in', req.originalUrl)
-            return res.status(400).send({
-              result: 'missing provider_id'
-            })
+            logger.warn('Missing provider_id', { originalUrl: req.originalUrl })
+            return res.status(400).send({ error: new BadParamsError('missing provider_id') })
           }
 
           /* istanbul ignore next */
           if (!isUUID(provider_id)) {
-            await log.warn(req.originalUrl, 'invalid provider_id is not a UUID', provider_id)
-            return res.status(400).send({
-              result: `invalid provider_id ${provider_id} is not a UUID`
-            })
+            logger.warn('invalid provider_id is not a UUID', { originalUrl: req.originalUrl, provider_id })
+            return res
+              .status(400)
+              .send({ error: new BadParamsError(`invalid provider_id ${provider_id} is not a UUID`) })
           }
 
           // stash provider_id
           res.locals.provider_id = provider_id
-
-          log.info(providerName(provider_id), req.method, req.originalUrl)
         } else {
-          return res.status(401).send('Unauthorized')
+          return res.status(401).send({ error: new AuthorizationError('Unauthorized') })
         }
       }
-    } catch (err) {
+    } catch (error) {
       /* istanbul ignore next */
-      await log.error(req.originalUrl, 'request validation fail:', err.stack)
+      logger.error('request validation fail:', { originalUrl: req.originalUrl, error })
     }
     next()
   })
 
-  app.get(pathsFor('/snapshot/:policy_uuid'), async (req: ComplianceApiRequest, res: ComplianceApiResponse) => {
-    const { provider_id } = res.locals
-    const { provider_id: queried_provider_id } = req.query
-
-    /* istanbul ignore next */
-    async function fail(err: Error) {
-      await log.error(err.stack || err)
-      return res.status(500).send(new ServerError())
-    }
-
-    const { policy_uuid } = req.params
-    const { end_date: query_end_date } = req.query
-
-    if (!isUUID(policy_uuid)) {
-      return res.status(400).send({ err: 'bad_param' })
-    }
-    const { start_date, end_date } = query_end_date
-      ? { end_date: parseInt(query_end_date), start_date: parseInt(query_end_date) - days(365) }
-      : { end_date: now() + days(365), start_date: now() - days(365) }
-    try {
-      const all_policies = await db.readPolicies({ start_date })
-      const policy = compliance_engine.filterPolicies(all_policies).find(p => {
-        return p.policy_id === policy_uuid
-      })
-      if (!policy) {
-        return res.status(404).send({ err: 'not found' })
+  app.get(
+    pathPrefix('/snapshot/:policy_uuid'),
+    async (req: ComplianceApiSnapshotRequest, res: ComplianceApiSnapshotResponse) => {
+      const { provider_id, version } = res.locals
+      const { provider_id: queried_provider_id, timestamp } = {
+        ...parseRequest(req).single().query('provider_id'),
+        ...parseRequest(req).single({ parser: Number }).query('timestamp')
       }
 
-      if (
-        policy &&
-        ((policy.provider_ids && policy.provider_ids.includes(provider_id)) ||
-          !policy.provider_ids ||
-          (AllowedProviderIDs.includes(provider_id) &&
-            ((policy.provider_ids &&
-              policy.provider_ids.length !== 0 &&
-              policy.provider_ids.includes(queried_provider_id)) ||
-              !policy.provider_ids ||
-              policy.provider_ids.length === 0)))
-      ) {
-        const target_provider_id = AllowedProviderIDs.includes(provider_id) ? queried_provider_id : provider_id
-        if (
-          compliance_engine
-            .filterPolicies(all_policies)
-            .map(p => p.policy_id)
-            .includes(policy.policy_id)
-        ) {
-          const [geographies, deviceRecords] = await Promise.all([
-            db.readGeographies() as Promise<Geography[]>,
-            db.readDeviceIds(target_provider_id)
-          ])
-          const deviceIdSubset = deviceRecords.map((record: { device_id: UUID; provider_id: UUID }) => record.device_id)
-          const devices = await cache.readDevices(deviceIdSubset)
-          const events =
-            query_end_date && end_date < now()
-              ? await db.readHistoricalEvents({ provider_id: target_provider_id, end_date })
-              : await cache.readEvents(deviceIdSubset)
+      // default to now() if no timestamp supplied
+      const query_date = timestamp || now()
 
-          const deviceMap = devices.reduce((map: { [d: string]: Device }, device) => {
-            return device ? Object.assign(map, { [device.device_id]: device }) : map
-          }, {})
+      const { policy_uuid } = req.params
 
-          const filteredEvents = compliance_engine.filterEvents(events)
-          const result = compliance_engine.processPolicy(policy, filteredEvents, geographies, deviceMap)
-          if (result === undefined) {
-            return res.status(400).send({ err: 'bad_param' })
-          }
-          return res.status(200).send(result)
+      if (!isUUID(policy_uuid)) {
+        return res.status(400).send({ error: new BadParamsError('Bad policy UUID') })
+      }
+
+      try {
+        /* Get all published policies that fulfill the conditions start_date <= query_date,
+         * and end_date >= query_date.
+         */
+        const all_policies = await db.readActivePolicies(query_date)
+        const policy = compliance_engine.getSupersedingPolicies(all_policies).find(p => {
+          return p.policy_id === policy_uuid
+        })
+        if (!policy) {
+          return res.status(404).send({ error: new NotFoundError('Policy not found') })
         }
-      } else {
-        return res.status(401).send({ err: 'Unauthorized' })
-      }
-    } catch (err) {
-      if (err.message.includes('not_found')) {
-        return res.status(400).send({ err: 'bad_param' })
-      }
-      await fail(err)
-    }
-  })
 
-  app.get(pathsFor('/count/:rule_id'), async (req: ComplianceApiRequest, res: ComplianceApiResponse) => {
+        if (clientCanViewPolicyCompliance(provider_id, queried_provider_id, policy)) {
+          /* If the client is one of the allowed providers, they can query for an arbitrary provider's vehicles. Otherwise, they may
+           only see compliance results for their own devices.
+           */
+          const target_provider_id = AllowedProviderIDs.includes(provider_id) ? queried_provider_id : provider_id
+          if (
+            // Check to see if the policy for which a snapshot is desired has been superseded or not.
+            compliance_engine
+              .getSupersedingPolicies(all_policies)
+              .map(p => p.policy_id)
+              .includes(policy.policy_id)
+          ) {
+            const { filteredEvents, geographies, deviceMap } = await getComplianceInputs(target_provider_id, timestamp)
+            const result = compliance_engine.processPolicy(policy, filteredEvents, geographies, deviceMap)
+            if (result === undefined) {
+              return res.status(400).send({ error: new BadParamsError('Unable to process compliance results') })
+            }
+
+            return res.status(200).send({ ...result, timestamp: query_date, version })
+          }
+        } else {
+          return res.status(401).send({ error: new AuthorizationError() })
+        }
+      } catch (err) {
+        return res.status(500).send({ error: new ServerError() })
+      }
+    }
+  )
+
+  app.get(pathPrefix('/count/:rule_id'), async (req: ComplianceApiCountRequest, res: ComplianceApiCountResponse) => {
+    const { timestamp } = {
+      ...parseRequest(req).single({ parser: Number }).query('timestamp')
+    }
+    const query_date = timestamp || now()
     if (!AllowedProviderIDs.includes(res.locals.provider_id)) {
-      return res.status(401).send({ result: 'unauthorized access' })
-    }
-
-    async function fail(err: Error) {
-      await log.error(err.stack || err)
-      if (err.message.includes('invalid rule_id')) {
-        return res.status(404).send(err.message)
-      }
-      /* istanbul ignore next */
-      return res
-        .status(500)
-        .send({ error: 'server_error', error_description: 'an internal server error has occurred and been logged' })
+      return res.status(401).send({ error: new AuthorizationError('Unauthorized') })
     }
 
     const { rule_id } = req.params
     try {
-      const rule = await db.readRule(rule_id)
+      const activePolicies = await db.readActivePolicies(query_date)
+      const [policy] = activePolicies.filter(activePolicy => {
+        const matches = activePolicy.rules.filter(policy_rule => policy_rule.rule_id === rule_id)
+        return matches.length !== 0
+      })
+      if (!policy) {
+        throw new NotFoundError('invalid rule_id')
+      }
+      const [rule] = policy.rules.filter(r => r.rule_id === rule_id)
       const geography_ids = rule.geographies.reduce((acc: UUID[], geo: UUID) => {
         return [...acc, geo]
       }, [])
@@ -191,11 +179,13 @@ function api(app: express.Express): express.Express {
         return [...acc, getPolygon(geographies, geography.geography_id)]
       }, [])
 
+      const events = timestamp ? await db.readHistoricalEvents({ end_date: timestamp }) : await cache.readAllEvents()
+
       // https://stackoverflow.com/a/51577579 to remove nulls in typesafe way
-      const events = (await cache.readAllEvents()).filter(
+      const filteredVehicleEvents = events.filter(
         (event): event is VehicleEvent => event !== null && isInStatesOrEvents(rule, event)
       )
-      const filteredEvents = compliance_engine.filterEvents(events)
+      const filteredEvents = compliance_engine.getRecentEvents(filteredVehicleEvents)
 
       const count = filteredEvents.reduce((count_acc, event) => {
         return (
@@ -209,9 +199,14 @@ function api(app: express.Express): express.Express {
         )
       }, 0)
 
-      return res.status(200).send({ count })
-    } catch (err) {
-      await fail(err)
+      const { version } = res.locals
+      return res.status(200).send({ policy, count, timestamp: query_date, version })
+    } catch (error) {
+      logger.error(error.stack)
+      if (error instanceof NotFoundError) {
+        return res.status(404).send({ error })
+      }
+      return res.status(500).send({ error: new ServerError('An internal server error has occurred and been logged') })
     }
   })
   return app

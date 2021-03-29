@@ -1,7 +1,24 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import assert from 'assert'
 /* eslint-reason extends object.prototype */
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import should from 'should'
+import test from 'unit.js'
 
 import { FeatureCollection } from 'geojson'
 import { Telemetry, Recorded, VehicleEvent, Device, VEHICLE_EVENTS, Geography } from '@mds-core/mds-types'
@@ -10,7 +27,6 @@ import {
   makeDevices,
   makeEventsWithTelemetry,
   makeEvents,
-  makeTrip,
   JUMP_PROVIDER_ID,
   POLICY_JSON,
   POLICY2_JSON,
@@ -18,18 +34,28 @@ import {
   GEOGRAPHY_UUID,
   GEOGRAPHY2_UUID,
   LA_CITY_BOUNDARY,
-  DISTRICT_SEVEN
+  DISTRICT_SEVEN,
+  START_ONE_MONTH_AGO,
+  POLICY_WITH_DUPE_RULE,
+  PUBLISHED_POLICY,
+  PUBLISH_DATE_VALIDATION_JSON,
+  START_ONE_MONTH_FROM_NOW,
+  DELETEABLE_POLICY
 } from '@mds-core/mds-test-data'
-import { now, clone, NotFoundError } from '@mds-core/mds-utils'
-
+import { now, clone, NotFoundError, rangeRandomInt, uuid, ConflictError, yesterday, days } from '@mds-core/mds-utils'
 import { isNullOrUndefined } from 'util'
+import { AttachmentRepository } from '@mds-core/mds-attachment-service'
+import { AuditRepository } from '@mds-core/mds-audit-service'
+import { GeographyRepository } from '@mds-core/mds-geography-service'
+import { IngestRepository } from '@mds-core/mds-ingest-service'
+import { PolicyRepository } from '@mds-core/mds-policy-service'
 import MDSDBPostgres from '../index'
-
-import { dropTables, createTables, updateSchema } from '../migration'
+import { dropTables, createTables } from '../migration'
 import { Trip } from '../types'
-import { configureClient, MDSPostgresClient, PGInfo } from '../sql-utils'
+import { PGInfo } from '../sql-utils'
 
 const { env } = process
+const ACTIVE_POLICY_JSON = { ...POLICY_JSON, publish_date: yesterday(), start_date: yesterday() }
 
 const pg_info: PGInfo = {
   database: env.PG_NAME,
@@ -52,20 +78,57 @@ const DistrictSeven: Geography = {
   geography_json: DISTRICT_SEVEN
 }
 
+function makeTrip(device: Device): Trip {
+  return {
+    provider_id: device.provider_id,
+    provider_name: device.provider_id,
+    device_id: device.device_id,
+    vehicle_id: device.vehicle_id,
+    vehicle_type: device.type,
+    propulsion_type: device.propulsion,
+    provider_trip_id: uuid(),
+    trip_duration: rangeRandomInt(5),
+    trip_distance: rangeRandomInt(5),
+    route: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {
+            timestamp: now()
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [Math.random() * 10, Math.random() * 10]
+          }
+        }
+      ]
+    },
+    accuracy: Math.random() * 3,
+    trip_start: now() - 1000 * Math.random(),
+    trip_end: now(),
+    parking_verification_url: 'http://iamverified.com',
+    standard_cost: rangeRandomInt(5),
+    actual_cost: rangeRandomInt(5),
+    recorded: now()
+  }
+}
+
 /* You'll need postgres running and the env variable PG_NAME
  * to be set to run these tests.
  */
 /* istanbul ignore next */
 
 async function seedDB() {
-  await MDSDBPostgres.initialize()
+  await MDSDBPostgres.reinitialize()
   const devices: Device[] = makeDevices(9, startTime, JUMP_PROVIDER_ID) as Device[]
   devices.push(JUMP_TEST_DEVICE_1 as Device)
   const deregisterEvents: VehicleEvent[] = makeEventsWithTelemetry(
     devices.slice(0, 9),
     startTime + 10,
     shapeUUID,
-    VEHICLE_EVENTS.deregister
+    VEHICLE_EVENTS.deregister,
+    rangeRandomInt(10)
   )
   const tripEndEvent: VehicleEvent[] = makeEventsWithTelemetry(
     devices.slice(9, 10),
@@ -84,44 +147,88 @@ async function seedDB() {
   await MDSDBPostgres.seed({ devices, events, telemetry })
 }
 
-async function setFreshDB() {
-  const client: MDSPostgresClient = configureClient(pg_info)
-  await client.connect()
-  await dropTables(client)
-  await createTables(client)
-  await updateSchema(client)
-  await client.end()
+/**
+ * @param reinit wipe the data first
+ */
+async function seedTripEvents(reinit = true) {
+  reinit ? await MDSDBPostgres.reinitialize() : null
+
+  const devices: Device[] = makeDevices(9, startTime, JUMP_PROVIDER_ID) as Device[]
+  const trip_id = uuid()
+  const tripStartEvents: VehicleEvent[] = makeEventsWithTelemetry(
+    devices.slice(0, 9),
+    startTime + 10,
+    shapeUUID,
+    VEHICLE_EVENTS.trip_start,
+    rangeRandomInt(10),
+    trip_id
+  )
+  const tripEndEvents: VehicleEvent[] = makeEventsWithTelemetry(
+    devices.slice(9, 10),
+    startTime + 10,
+    shapeUUID,
+    VEHICLE_EVENTS.trip_end,
+    rangeRandomInt(10),
+    trip_id
+  )
+  const telemetry: Telemetry[] = []
+  const events: VehicleEvent[] = tripStartEvents.concat(tripEndEvents)
+  events.map(event => {
+    if (event.telemetry) {
+      telemetry.push(event.telemetry)
+    }
+  })
+
+  await MDSDBPostgres.seed({ devices, events, telemetry })
+}
+
+async function initializeDB() {
+  await Promise.all(
+    [AttachmentRepository, AuditRepository, GeographyRepository, IngestRepository, PolicyRepository].map(repository =>
+      repository.initialize()
+    )
+  )
+  await dropTables()
+  await createTables()
+}
+
+async function shutdownDB() {
+  await MDSDBPostgres.shutdown()
+  await Promise.all(
+    [AttachmentRepository, AuditRepository, GeographyRepository, IngestRepository, PolicyRepository].map(repository =>
+      repository.shutdown()
+    )
+  )
 }
 
 if (pg_info.database) {
   describe('Test mds-db-postgres', () => {
     describe('test reads and writes', () => {
       beforeEach(async () => {
-        const client: MDSPostgresClient = configureClient(pg_info)
-        await client.connect()
-        await dropTables(client)
-        await createTables(client)
-        await updateSchema(client)
-        await client.end()
+        await initializeDB()
       })
 
       afterEach(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
+      })
+
+      // This is incredibly stupid and makes 0 sense, but if we don't import (and use) unit.js, should.js breaks...
+      it('Nonsensical test', () => {
+        // eslint-disable-next-line no-self-compare
+        test.assert(true === true)
       })
 
       it('can make successful writes', async () => {
-        await MDSDBPostgres.initialize()
+        await MDSDBPostgres.reinitialize()
         await MDSDBPostgres.writeDevice(JUMP_TEST_DEVICE_1)
         const device: Device = await MDSDBPostgres.readDevice(JUMP_TEST_DEVICE_1.device_id, JUMP_PROVIDER_ID)
         assert.deepEqual(device.device_id, JUMP_TEST_DEVICE_1.device_id)
       })
 
       it('can make a successful read query after shutting down a DB client', async () => {
-        await MDSDBPostgres.initialize()
-        await MDSDBPostgres.shutdown()
-
+        await shutdownDB()
         await MDSDBPostgres.writeDevice(JUMP_TEST_DEVICE_1)
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
         const device: Device = await MDSDBPostgres.readDevice(JUMP_TEST_DEVICE_1.device_id, JUMP_PROVIDER_ID)
         assert.deepEqual(device.device_id, JUMP_TEST_DEVICE_1.device_id)
       })
@@ -145,6 +252,34 @@ if (pg_info.database) {
         assert(telemetryResults.length > 0)
       })
 
+      it('can read VehicleEvents and Telemetry as collections of trips', async () => {
+        await seedTripEvents()
+        await seedTripEvents(false)
+
+        const devicesResult: Device[] = (await MDSDBPostgres.readDeviceIds(JUMP_PROVIDER_ID, 0, 18)) as Device[]
+        assert.deepEqual(devicesResult.length, 18)
+
+        const vehicleEventsResult = await MDSDBPostgres.readEvents({
+          start_time: String(startTime)
+        })
+        const trip_ids = vehicleEventsResult.events.reduce((acc, event) => acc.add(event.trip_id), new Set())
+
+        const tripEventsResult = await MDSDBPostgres.readTripEvents({
+          start_time: String(startTime)
+        })
+        assert.deepStrictEqual(tripEventsResult.tripCount, trip_ids.size)
+
+        // there should be X trips
+        assert.deepStrictEqual(Object.keys(tripEventsResult.trips).length, trip_ids.size)
+
+        // telemetry on each event should not be undefined
+        Object.values(tripEventsResult.trips).forEach(trip => {
+          trip.forEach(event => {
+            assert.notStrictEqual(event.telemetry, undefined)
+          })
+        })
+      })
+
       it('can wipe a device', async () => {
         await seedDB()
         const result = await MDSDBPostgres.wipeDevice(JUMP_PROVIDER_ID)
@@ -154,17 +289,12 @@ if (pg_info.database) {
 
     describe('unit test read only functions', () => {
       beforeEach(async () => {
-        const client: MDSPostgresClient = configureClient(pg_info)
-        await client.connect()
-        await dropTables(client)
-        await createTables(client)
-        await updateSchema(client)
-        await client.end()
+        await initializeDB()
         await seedDB()
       })
 
       afterEach(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('can get vehicle counts by provider', async () => {
@@ -245,44 +375,72 @@ if (pg_info.database) {
 
     describe('unit test policy functions', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('can delete an unpublished Policy', async () => {
-        const { policy_id } = POLICY_JSON
-        await MDSDBPostgres.writePolicy(POLICY_JSON)
+        const { policy_id } = DELETEABLE_POLICY
+        await MDSDBPostgres.writePolicy(DELETEABLE_POLICY)
         assert(!(await MDSDBPostgres.isPolicyPublished(policy_id)))
         await MDSDBPostgres.deletePolicy(policy_id)
-        const policy_result = await MDSDBPostgres.readPolicies({ policy_id })
+        const policy_result = await MDSDBPostgres.readPolicies({
+          policy_id,
+          get_published: null,
+          get_unpublished: null
+        })
         assert.deepEqual(policy_result, [])
       })
 
       it('can write, read, and publish a Policy', async () => {
-        await MDSDBPostgres.initialize()
-        await MDSDBPostgres.writePolicy(POLICY_JSON)
+        await MDSDBPostgres.writeGeography(LAGeography)
+        await MDSDBPostgres.publishGeography({ geography_id: LAGeography.geography_id })
+        // This one already has a publish_date. Not quite kosher, but publishing it the normal way through using
+        // .publishPolicy would require setting a future start_date, which means it wouldn't qualify as an active
+        // policy during future tests.
+        await MDSDBPostgres.writePolicy(ACTIVE_POLICY_JSON)
         await MDSDBPostgres.writePolicy(POLICY2_JSON)
         await MDSDBPostgres.writePolicy(POLICY3_JSON)
-
-        await MDSDBPostgres.writeGeography(LAGeography)
-        await MDSDBPostgres.publishPolicy(POLICY_JSON.policy_id)
 
         // Read all policies, no matter whether published or not.
         const policies = await MDSDBPostgres.readPolicies()
         assert.deepEqual(policies.length, 3)
-        const unpublishedPolicies = await MDSDBPostgres.readPolicies({ get_unpublished: true })
+        const unpublishedPolicies = await MDSDBPostgres.readPolicies({ get_unpublished: true, get_published: null })
         assert.deepEqual(unpublishedPolicies.length, 2)
-        const publishedPolicies = await MDSDBPostgres.readPolicies({ get_published: true })
+        const publishedPolicies = await MDSDBPostgres.readPolicies({ get_published: true, get_unpublished: null })
         assert.deepEqual(publishedPolicies.length, 1)
       })
 
+      it('throws a ConflictError when writing a policy that already exists', async () => {
+        await MDSDBPostgres.writePolicy(ACTIVE_POLICY_JSON).should.be.rejectedWith(ConflictError)
+      })
+
+      it('can retrieve Policies that were active at a particular date', async () => {
+        await MDSDBPostgres.writePolicy(PUBLISHED_POLICY)
+        const monthAgoPolicies = await MDSDBPostgres.readActivePolicies(START_ONE_MONTH_AGO)
+        assert.deepEqual(monthAgoPolicies.length, 1)
+
+        const currentlyActivePolicies = await MDSDBPostgres.readActivePolicies()
+        assert.deepEqual(currentlyActivePolicies.length, 2)
+      })
+
       it('can read a single Policy', async () => {
-        const policy = await MDSDBPostgres.readPolicy(POLICY_JSON.policy_id)
-        assert.deepEqual(policy.policy_id, POLICY_JSON.policy_id)
-        assert.deepEqual(policy.name, POLICY_JSON.name)
+        const policy = await MDSDBPostgres.readPolicy(ACTIVE_POLICY_JSON.policy_id)
+        assert.deepEqual(policy.policy_id, ACTIVE_POLICY_JSON.policy_id)
+        assert.deepEqual(policy.name, ACTIVE_POLICY_JSON.name)
+      })
+
+      it('can find Policies by rule id', async () => {
+        const rule_id = '7ea0d16e-ad15-4337-9722-9924e3af9146'
+        const policies = await MDSDBPostgres.readPolicies({ rule_id })
+        assert(policies[0].rules.map(rule => rule.rule_id).includes(rule_id))
+      })
+
+      it('ensures rules are unique when writing new policy', async () => {
+        await MDSDBPostgres.writePolicy(POLICY_WITH_DUPE_RULE).should.be.rejectedWith(ConflictError)
       })
 
       it('cannot find a nonexistent Policy', async () => {
@@ -290,22 +448,41 @@ if (pg_info.database) {
       })
 
       it('can tell a Policy is published', async () => {
-        const publishedResult = await MDSDBPostgres.isPolicyPublished(POLICY_JSON.policy_id)
+        const publishedResult = await MDSDBPostgres.isPolicyPublished(ACTIVE_POLICY_JSON.policy_id)
         assert.deepEqual(publishedResult, true)
-        const unpublishedResult = await MDSDBPostgres.isPolicyPublished(POLICY2_JSON.policy_id)
+        const unpublishedResult = await MDSDBPostgres.isPolicyPublished(POLICY3_JSON.policy_id)
         assert.deepEqual(unpublishedResult, false)
       })
 
       it('can edit a Policy', async () => {
-        const policy = clone(POLICY2_JSON)
+        const policy = clone(POLICY3_JSON)
         policy.name = 'a shiny new name'
         await MDSDBPostgres.editPolicy(policy)
-        const result = await MDSDBPostgres.readPolicies({ policy_id: POLICY2_JSON.policy_id, get_unpublished: true })
+        const result = await MDSDBPostgres.readPolicies({
+          policy_id: POLICY3_JSON.policy_id,
+          get_unpublished: true,
+          get_published: null
+        })
         assert.deepEqual(result[0].name, 'a shiny new name')
       })
 
+      it('cannot add a rule that already exists in some other policy', async () => {
+        const policy = clone(POLICY3_JSON)
+        policy.rules[0].rule_id = ACTIVE_POLICY_JSON.rules[0].rule_id
+        await MDSDBPostgres.editPolicy(policy).should.be.rejectedWith(ConflictError)
+      })
+
+      it('ensures the publish_date >= start_date', async () => {
+        await MDSDBPostgres.writePolicy(PUBLISH_DATE_VALIDATION_JSON)
+        await MDSDBPostgres.publishPolicy(PUBLISH_DATE_VALIDATION_JSON.policy_id).should.be.rejectedWith(ConflictError)
+        const validPolicy = clone(PUBLISH_DATE_VALIDATION_JSON)
+        validPolicy.start_date = START_ONE_MONTH_FROM_NOW
+        await MDSDBPostgres.editPolicy(validPolicy)
+        await MDSDBPostgres.publishPolicy(validPolicy.policy_id).should.not.rejected()
+      })
+
       it('will not edit or delete a published Policy', async () => {
-        const publishedPolicy = clone(POLICY_JSON)
+        const publishedPolicy = clone(ACTIVE_POLICY_JSON)
         publishedPolicy.name = 'a shiny new name'
         await MDSDBPostgres.editPolicy(publishedPolicy).should.be.rejected()
         await MDSDBPostgres.deletePolicy(publishedPolicy.policy_id).should.be.rejected()
@@ -320,20 +497,20 @@ if (pg_info.database) {
 
     describe('unit test PolicyMetadata functions', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('.readBulkPolicyMetadata', async () => {
-        await MDSDBPostgres.writePolicy(POLICY_JSON)
+        await MDSDBPostgres.writePolicy(ACTIVE_POLICY_JSON)
         await MDSDBPostgres.writePolicy(POLICY2_JSON)
         await MDSDBPostgres.writePolicy(POLICY3_JSON)
 
         await MDSDBPostgres.writePolicyMetadata({
-          policy_id: POLICY_JSON.policy_id,
+          policy_id: ACTIVE_POLICY_JSON.policy_id,
           policy_metadata: { name: 'policy_json' }
         })
         await MDSDBPostgres.writePolicyMetadata({
@@ -347,7 +524,11 @@ if (pg_info.database) {
 
         const noParamsResult = await MDSDBPostgres.readBulkPolicyMetadata()
         assert.deepEqual(noParamsResult.length, 3)
-        const withStartDateResult = await MDSDBPostgres.readBulkPolicyMetadata({ start_date: now() })
+        const withStartDateResult = await MDSDBPostgres.readBulkPolicyMetadata({
+          start_date: now(),
+          get_published: null,
+          get_unpublished: null
+        })
         assert.deepEqual(withStartDateResult.length, 1)
         assert.deepEqual(withStartDateResult[0].policy_metadata.name, 'policy3_json')
       })
@@ -355,11 +536,11 @@ if (pg_info.database) {
 
     describe('unit test geography functions', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('can delete an unpublished Geography', async () => {
@@ -374,18 +555,37 @@ if (pg_info.database) {
       })
 
       it('can write, read, and publish a Geography', async () => {
-        await MDSDBPostgres.initialize()
         await MDSDBPostgres.writeGeography(LAGeography)
         const result = await MDSDBPostgres.readSingleGeography(LAGeography.geography_id)
         assert.deepEqual(result.geography_json, LAGeography.geography_json)
         assert.deepEqual(result.geography_id, LAGeography.geography_id)
 
-        const noGeos = await MDSDBPostgres.readGeographies({ get_read_only: true })
+        const noGeos = await MDSDBPostgres.readGeographies({ get_published: true })
         assert.deepEqual(noGeos.length, 0)
 
-        await MDSDBPostgres.publishGeography({ geography_id: LAGeography.geography_id, publish_date: now() })
-        const writeableGeographies = await MDSDBPostgres.readGeographies({ get_read_only: false })
+        await MDSDBPostgres.publishGeography({
+          geography_id: LAGeography.geography_id,
+          publish_date: now()
+        })
+        const writeableGeographies = await MDSDBPostgres.readGeographies({ get_published: false })
         assert.deepEqual(writeableGeographies.length, 1)
+      })
+
+      it('can read published geographies, filter by date published', async () => {
+        const allPublishedGeographies = await MDSDBPostgres.readPublishedGeographies()
+        assert.deepEqual(allPublishedGeographies.length, 1)
+
+        const publishTimePastGeographies = await MDSDBPostgres.readPublishedGeographies(START_ONE_MONTH_AGO)
+        assert.deepEqual(publishTimePastGeographies.length, 1)
+
+        const ONE_MONTH_FROM_NOW = now() + days(30)
+        const publishTimeFutureGeographies = await MDSDBPostgres.readPublishedGeographies(ONE_MONTH_FROM_NOW)
+
+        assert.deepEqual(publishTimeFutureGeographies.length, 0)
+      })
+
+      it('does not write a geography if one with the same id already exists', async () => {
+        await MDSDBPostgres.writeGeography(LAGeography).should.be.rejectedWith(ConflictError)
       })
 
       it('can tell a Geography is published', async () => {
@@ -394,6 +594,18 @@ if (pg_info.database) {
         assert.deepEqual(publishedResult, true)
         const unpublishedResult = await MDSDBPostgres.isGeographyPublished(DistrictSeven.geography_id)
         assert.deepEqual(unpublishedResult, false)
+      })
+
+      it('.readGeographies understands all its parameters', async () => {
+        const publishedResult = await MDSDBPostgres.readGeographies({ get_published: true })
+        assert.deepEqual(publishedResult.length, 1)
+        assert.deepEqual(!!publishedResult[0].publish_date, true)
+        const unpublishedResult = await MDSDBPostgres.readGeographies({ get_unpublished: true })
+        assert.deepEqual(unpublishedResult.length, 1)
+        assert.deepEqual(!!unpublishedResult[0].publish_date, false)
+        const withIDsResult = await MDSDBPostgres.readGeographies({ geography_ids: [LAGeography.geography_id] })
+        assert.deepEqual(withIDsResult.length, 1)
+        assert.deepEqual(withIDsResult[0].geography_id, LAGeography.geography_id)
       })
 
       it('can edit a Geography', async () => {
@@ -433,43 +645,50 @@ if (pg_info.database) {
 
     describe('test Geography Policy interaction', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
-      it('will publish a Geography if a Policy is published', async () => {
+      it('will throw an error if an attempt is made to publish a Policy but the Geography is unpublished', async () => {
         await MDSDBPostgres.writeGeography(LAGeography)
         await MDSDBPostgres.writeGeography(DistrictSeven)
         assert(!(await MDSDBPostgres.isGeographyPublished(DistrictSeven.geography_id)))
         assert(!(await MDSDBPostgres.isGeographyPublished(LAGeography.geography_id)))
-
         await MDSDBPostgres.writePolicy(POLICY3_JSON)
-        await MDSDBPostgres.publishPolicy(POLICY3_JSON.policy_id)
-        assert(await MDSDBPostgres.isGeographyPublished(DistrictSeven.geography_id))
-        assert(await MDSDBPostgres.isGeographyPublished(LAGeography.geography_id))
 
-        const policy = await MDSDBPostgres.readPolicy(POLICY3_JSON.policy_id)
-        const geography = await MDSDBPostgres.readSingleGeography(DistrictSeven.geography_id)
-
-        assert.deepEqual(policy.publish_date, geography.publish_date)
+        await assert.rejects(
+          async () => {
+            await MDSDBPostgres.publishPolicy(POLICY3_JSON.policy_id)
+          },
+          { name: 'DependencyMissingError' }
+        )
       })
 
       it('can find policies using geographies by geography ID', async () => {
         const policies = await MDSDBPostgres.findPoliciesByGeographyID(LAGeography.geography_id)
         assert.deepEqual(policies[0].policy_id, POLICY3_JSON.policy_id)
       })
+
+      it('throws if both get_published and get_unpublished are true for bulk geo reads', async () => {
+        await assert.rejects(
+          async () => {
+            await MDSDBPostgres.readGeographies({ get_published: true, get_unpublished: true })
+          },
+          { name: 'BadParamsError' }
+        )
+      })
     })
 
     describe('Geography metadata', () => {
       before(async () => {
-        await setFreshDB()
+        await initializeDB()
       })
 
       after(async () => {
-        await MDSDBPostgres.shutdown()
+        await shutdownDB()
       })
 
       it('should write a GeographyMetadata only if there is a Geography in the DB', async () => {
@@ -477,24 +696,50 @@ if (pg_info.database) {
           geography_id: GEOGRAPHY_UUID,
           geography_metadata: { foo: 'afoo' }
         }
-        try {
-          await MDSDBPostgres.writeGeographyMetadata(geographyMetadata)
-          throw new Error('Should have thrown')
-        } catch (err) {
-          await MDSDBPostgres.writeGeography(LAGeography)
-          await MDSDBPostgres.writeGeographyMetadata(geographyMetadata)
-          const geographyMetadataResult = await MDSDBPostgres.readSingleGeographyMetadata(GEOGRAPHY_UUID)
-          assert.deepEqual(geographyMetadataResult, geographyMetadata)
-        }
+        await assert.rejects(
+          async () => {
+            await MDSDBPostgres.writeGeographyMetadata(geographyMetadata)
+          },
+          { name: 'DependencyMissingError' }
+        )
+        await MDSDBPostgres.writeGeography(LAGeography)
+        await MDSDBPostgres.writeGeographyMetadata(geographyMetadata)
+        const geographyMetadataResult = await MDSDBPostgres.readSingleGeographyMetadata(GEOGRAPHY_UUID)
+        assert.deepEqual(geographyMetadataResult, geographyMetadata)
       })
 
       it('can do bulk GeographyMetadata reads', async () => {
         const all = await MDSDBPostgres.readBulkGeographyMetadata()
         assert.deepEqual(all.length, 1)
-        const readOnlyResult = await MDSDBPostgres.readBulkGeographyMetadata({ get_read_only: true })
+        const readOnlyResult = await MDSDBPostgres.readBulkGeographyMetadata({
+          get_published: true,
+          get_unpublished: false
+        })
         assert.deepEqual(readOnlyResult.length, 0)
-        const notReadOnlyResult = await MDSDBPostgres.readBulkGeographyMetadata({ get_read_only: false })
+        const notReadOnlyResult = await MDSDBPostgres.readBulkGeographyMetadata({
+          get_published: null,
+          get_unpublished: null
+        })
         assert.deepEqual(notReadOnlyResult.length, 1)
+      })
+
+      it('updates GeographyMetadata', async () => {
+        const geographyMetadata = {
+          geography_id: GEOGRAPHY_UUID,
+          geography_metadata: { foo: 'notafoo' }
+        }
+        const res = await MDSDBPostgres.updateGeographyMetadata(geographyMetadata)
+        assert.deepEqual(res.geography_metadata.foo, 'notafoo')
+      })
+
+      it('deletes GeographyMetadata', async () => {
+        await MDSDBPostgres.deleteGeographyMetadata(GEOGRAPHY_UUID)
+        await assert.rejects(
+          async () => {
+            await MDSDBPostgres.readSingleGeographyMetadata(GEOGRAPHY_UUID)
+          },
+          { name: 'NotFoundError' }
+        )
       })
     })
   })

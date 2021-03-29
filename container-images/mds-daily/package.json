@@ -1,28 +1,27 @@
 {
   "name": "@container-images/mds-daily",
   "version": "0.1.26",
+  "private": true,
   "description": "MDS daily-reports prototype",
+  "keywords": [
+    "mds"
+  ],
+  "license": "Apache-2.0",
+  "author": "City of Los Angeles",
   "main": "dist/index.js",
   "files": [
     "dist/"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
-    "bundle": "yarn build && webpack --mode=production --env.npm_package_name=${npm_package_name} --env.npm_package_version=${npm_package_version}",
-    "image": "yarn bundle && ../../bin/mdsctl -c:image-name=mds-daily:${npm_package_version} buildImage",
-    "start": "yarn watch server",
-    "test": "yarn test:eslint && yarn test:unit",
-    "test:eslint": "eslint --fix --ignore-path ../../.gitignore '**/*.ts'",
-    "test:unit": "exit 0"
+    "bundle": "pnpm bundle:production",
+    "bundle:development": "webpack --mode=development --env npm_package_name=${npm_package_name} --env npm_package_version=${npm_package_version}",
+    "bundle:production": "webpack --mode=production --env npm_package_name=${npm_package_name} --env npm_package_version=${npm_package_version}",
+    "image": "pnpm image:production",
+    "image:development": "pnpm bundle:development && ../../bin/build-helper buildImage mds-daily:${npm_package_version}",
+    "image:production": "pnpm bundle:production && ../../bin/build-helper buildImage mds-daily:${npm_package_version}"
   },
-  "keywords": [
-    "mds"
-  ],
-  "author": "City of Los Angeles",
   "dependencies": {
-    "@container-images/env-inject": "0.1.25",
-    "@mds-core/mds-api-server": "0.1.26",
-    "@mds-core/mds-daily": "0.0.27"
-  },
-  "license": "Apache-2.0"
+    "@mds-core/mds-daily": "0.0.27",
+    "@mds-core/mds-webpack-config": "0.1.0"
+  }
 }

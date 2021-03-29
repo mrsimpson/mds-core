@@ -1,6 +1,12 @@
 .tern-project
 mds-*.zip
 dist
+dump.rdb
+
+# This project uses pnpm. Ignore npm/yarn lock files
+package-lock.json
+npm-shrinkwrap.json
+yarn.lock
 
 # Created by https://www.gitignore.io/api/osx,node,windows,serverless,sublimetext,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=osx,node,windows,serverless,sublimetext,visualstudiocode
@@ -13,6 +19,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+.pnpm-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -206,7 +213,7 @@ $RECYCLE.BIN/
 # helm
 .helmignore
 values.*.yaml
-helm/charts
+helm/*/charts
 helm/tools
 
 # docker
@@ -221,3 +228,6 @@ cypress/videos
 
 # tools
 tools
+
+# generated documentation
+docs

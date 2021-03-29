@@ -1,0 +1,69 @@
+{
+  "env": {
+    "node": true,
+    "es6": true,
+    "mocha": true
+  },
+  "plugins": [
+    "import",
+    "prettier",
+    "@typescript-eslint",
+    "promise",
+    "log",
+    "progress"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "project": "tsconfig.eslint.json"
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
+    "plugin:promise/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "ignorePatterns": ["*.d.ts"],
+  "rules": {
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-parameter-properties": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "ignoreRestSiblings": true, "args": "none" }
+    ],
+    "@typescript-eslint/no-useless-constructor": "error",
+    "array-callback-return": "off",
+    "camelcase": "off",
+    "class-methods-use-this": "off",
+    "consistent-return": "off",
+    "eqeqeq": "error",
+    "import/extensions": ["error", "ignorePackages", { "ts": "never" }],
+    "import/no-extraneous-dependencies": "error",
+    "import/no-unresolved": "off",
+    "import/prefer-default-export": "off",
+    "max-classes-per-file": "off",
+    "no-console": "warn",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-plusplus": "off",
+    "no-restricted-syntax": "off",
+    "no-use-before-define": "off",
+    "no-useless-constructor": "off",
+    "no-var": "error",
+    "prettier/prettier": "warn",
+    "progress/activate": "off",
+    "radix": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.spec.ts"],
+      "rules": {
+        "import/no-extraneous-dependencies": "off"
+      }
+    }
+  ]
+}
