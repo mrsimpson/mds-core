@@ -1,3 +1,19 @@
+/**
+ * Copyright 2021 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import logger from '@mds-core/mds-logger'
 import { ServiceResult, ServiceException, ServiceProvider, ProcessController } from '@mds-core/mds-service-helpers'
 import { UUID } from '@mds-core/mds-types'
@@ -16,10 +32,6 @@ import {
   ValidateGetComplianceSnapshotsByTimeIntervalOptions
 } from './validators'
 import { ComplianceViolationPeriodEntityToDomainCreate } from '../repository/mappers'
-
-interface ComplianceAggregateMap {
-  [k: string]: ComplianceViolationPeriodDomainModel[]
-}
 
 export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & ProcessController = {
   start: ComplianceRepository.initialize,
@@ -86,32 +98,33 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
   getComplianceViolationPeriods: async (options: GetComplianceViolationPeriodsOptions) => {
     try {
       const violationPeriodEntities = await ComplianceRepository.getComplianceViolationPeriods(options)
-      const complianceAggregateMap = violationPeriodEntities.reduce(
-        (acc: ComplianceAggregateMap, violationPeriodEntity) => {
-          const { provider_id, policy_id } = violationPeriodEntity
-          const key = `${provider_id}:${policy_id}`
+      const complianceAggregateMap = violationPeriodEntities.reduce((acc, violationPeriodEntity) => {
+        const { provider_id, policy_id } = violationPeriodEntity
+        const key = `${provider_id}:${policy_id}`
 
-          if (!isDefined(acc[key])) {
-            // eslint-disable-next-line no-param-reassign
-            acc[key] = []
-          }
-          if (violationPeriodEntity.sum_total_violations > 0) {
-            acc[key].push(ComplianceViolationPeriodEntityToDomainCreate.map(violationPeriodEntity))
-          }
-          return acc
-        },
-        {}
-      )
+        if (!isDefined(acc.get(key))) {
+          // eslint-disable-next-line no-param-reassign
+          acc.set(key, [])
+        }
+        if (violationPeriodEntity.sum_total_violations > 0) {
+          const arr = acc.get(key) ?? []
+          arr.push(ComplianceViolationPeriodEntityToDomainCreate.map(violationPeriodEntity))
+          acc.set(key, arr)
+        }
+        return acc
+      }, new Map<string, ComplianceViolationPeriodDomainModel[]>())
 
-      const results: ComplianceAggregateDomainModel[] = Object.keys(complianceAggregateMap).map(key => {
-        const { 0: provider_id, 1: policy_id } = key.split(':')
+      const results: ComplianceAggregateDomainModel[] = []
 
-        return {
+      complianceAggregateMap.forEach((value, key) => {
+        const [provider_id, policy_id] = key.split(':')
+
+        results.push({
           provider_id,
           policy_id,
           provider_name: providerName(provider_id),
-          violation_periods: complianceAggregateMap[key]
-        }
+          violation_periods: value
+        })
       })
 
       return ServiceResult(results)

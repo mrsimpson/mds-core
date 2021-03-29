@@ -46,7 +46,6 @@ apis:
   mds-compliance-service:
     enabled: true
     version: latest
-    migration: false
   mds-geography-service:
     enabled: true
     version: latest

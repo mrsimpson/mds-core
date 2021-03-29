@@ -226,14 +226,10 @@ export async function getVehicles(
   }
 }
 
-const usBounds = {
-  latMax: 49.45,
-  latMin: 24.74,
-  lonMax: -66.94,
-  lonMin: -124.79
-}
-
 export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObject | null {
+  const [LATITUDE_LOWER_BOUND, LATITUDE_UPPER_BOUND] = [-90, 90]
+  const [LONGITUDE_LOWER_BOUND, LONGITUDE_UPPER_BOUND] = [-180, 180]
+
   if (!telemetry) {
     return {
       error: 'missing_param',
@@ -260,13 +256,25 @@ export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObje
       error_description: 'no device_id included in telemetry'
     }
   }
-  if (typeof lat !== 'number' || Number.isNaN(lat) || lat < usBounds.latMin || lat > usBounds.latMax) {
+  if (
+    typeof lat !== 'number' ||
+    Number.isNaN(lat) ||
+    lat < LATITUDE_LOWER_BOUND ||
+    lat > LATITUDE_UPPER_BOUND ||
+    lat === 0
+  ) {
     return {
       error: 'bad_param',
       error_description: `invalid lat ${lat}`
     }
   }
-  if (typeof lng !== 'number' || Number.isNaN(lng) || lng < usBounds.lonMin || lng > usBounds.lonMax) {
+  if (
+    typeof lng !== 'number' ||
+    Number.isNaN(lng) ||
+    lng < LONGITUDE_LOWER_BOUND ||
+    lng > LONGITUDE_UPPER_BOUND ||
+    lng === 0
+  ) {
     return {
       error: 'bad_param',
       error_description: `invalid lng ${lng}`
@@ -415,10 +423,13 @@ export async function badEvent({ modality }: Pick<Device, 'modality'>, event: Ve
       ['trip_start', 'trip_end', 'trip_enter_jurisdiction', 'trip_leave_jurisdiction'],
       event.event_types
     )
-  )
+  ) {
     return badTelemetry(event.telemetry) || missingTripId()
+  }
 
-  if (event.event_types.includes('provider_drop_off')) return badTelemetry(event.telemetry)
+  if (event.event_types.includes('provider_drop_off')) {
+    return badTelemetry(event.telemetry)
+  }
 
   return null // we good
 }

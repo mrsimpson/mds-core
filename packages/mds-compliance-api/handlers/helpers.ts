@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import { ComplianceRepository } from './repository'
+import { UUID } from '@mds-core/mds-types'
 
-// Make connection options available to TypeORM CLI
-module.exports = ComplianceRepository.cli({ migrationsDir: 'repository/migrations' })
+export const base64EncodeArray = (ids: string[]): string => {
+  const buffer = Buffer.from(ids.join(','))
+  return buffer.toString('base64')
+}
+
+export const base64DecodeComplianceIDsToken = (token: string): UUID[] => {
+  const buffer = Buffer.from(token, 'base64')
+  return buffer.toString().split(',')
+}

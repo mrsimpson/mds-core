@@ -530,7 +530,7 @@ function api(app: express.Express): express.Express {
             if (start_time && end_time) {
               const deviceEvents = await readEvents(device.device_id, start_time, end_time)
               const deviceTelemetry = await readTelemetry(device.device_id, start_time, end_time)
-              const providerEvent = await db.readEventsWithTelemetry({
+              const [providerEvent] = await db.readEventsWithTelemetry({
                 device_id: device.device_id,
                 provider_id: device.provider_id,
                 end_time: audit_start, // Last provider event before the audit started
@@ -541,10 +541,10 @@ function api(app: express.Express): express.Express {
                 version: res.locals.version,
                 ...audit,
                 provider_vehicle_id: device.vehicle_id,
-                provider_event_types: providerEvent[0]?.event_types,
-                provider_vehicle_state: providerEvent[0]?.vehicle_state,
-                provider_telemetry: providerEvent[0]?.telemetry,
-                provider_event_time: providerEvent[0]?.timestamp,
+                provider_event_types: providerEvent.event_types,
+                provider_vehicle_state: providerEvent.vehicle_state,
+                provider_telemetry: providerEvent.telemetry,
+                provider_event_time: providerEvent.timestamp,
                 events: auditEvents.map(withGpsProperty),
                 attachments: attachments.map(attachmentSummary),
                 provider: {
