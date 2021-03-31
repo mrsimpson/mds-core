@@ -1,17 +1,17 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import { providers } from '@mds-core/mds-providers' // map of uuids -> obb
@@ -29,10 +29,10 @@ import {
   UUID,
   Timestamp,
   Telemetry,
-  Stop,
   PROPULSION_TYPES,
+  VEHICLE_STATES,
   Device,
-  VEHICLE_STATES
+  RATE_RECURRENCE_VALUES
 } from '@mds-core/mds-types'
 import * as Joi from 'joi'
 import joiToJson from 'joi-to-json'
@@ -112,6 +112,11 @@ const micromobilityRuleSchema = baseRuleSchema.keys({
   vehicle_types: Joi.array().items(Joi.string().valid(...Object.values(VEHICLE_TYPES)))
 })
 
+const rateRuleSchema = baseRuleSchema.keys({
+  rate_amount: Joi.number(),
+  rate_recurrence: Joi.string().valid(...RATE_RECURRENCE_VALUES)
+})
+
 export const basePolicySchema = Joi.object().keys({
   name: Joi.string().required(),
   description: Joi.string().required(),
@@ -120,12 +125,16 @@ export const basePolicySchema = Joi.object().keys({
   publish_date: Joi.date().timestamp('javascript').allow(null),
   end_date: Joi.date().timestamp('javascript').allow(null),
   prev_policies: Joi.array().items(Joi.string().guid()).allow(null),
-  provider_ids: Joi.array().items(Joi.string().guid()).allow(null),
-  rules: Joi.array().min(1).items(baseRuleSchema).required()
+  provider_ids: Joi.array().items(Joi.string().guid()).allow(null)
 })
 
 export const micromobilityPolicySchema = basePolicySchema.keys({
   rules: Joi.array().min(1).items(micromobilityRuleSchema).required()
+})
+
+export const ratePolicySchema = basePolicySchema.keys({
+  rules: Joi.array().min(1).items(rateRuleSchema).required(),
+  currency: Joi.string()
 })
 
 const micromobilityPoliciesSchema = Joi.array().items(micromobilityPolicySchema)
@@ -191,37 +200,6 @@ const auditIssueCodeSchema = stringSchema.max(31)
 
 const auditNoteSchema = stringSchema.max(255)
 
-const vehicleTypesCountMapSchema = Joi.object().keys({
-  scooter: Joi.number(),
-  bicycle: Joi.number(),
-  car: Joi.number(),
-  moped: Joi.number()
-})
-
-const stopSchema = Joi.object().keys({
-  stop_id: uuidSchema.required(),
-  stop_name: stringSchema.required(),
-  short_name: stringSchema.optional(),
-  platform_code: stringSchema.optional(),
-  geography_id: uuidSchema.optional(),
-  lat: numberSchema.min(-90).max(90).required(),
-  lng: numberSchema.min(-180).max(180).required(),
-  zone_id: uuidSchema.optional(),
-  address: stringSchema.optional(),
-  post_code: stringSchema.optional(),
-  rental_methods: stringSchema.optional(),
-  capacity: vehicleTypesCountMapSchema.required(),
-  location_type: stringSchema.optional(),
-  timezone: stringSchema.optional(),
-  cross_street: stringSchema.optional(),
-  num_vehicles_available: vehicleTypesCountMapSchema.required(),
-  num_vehicles_disabled: vehicleTypesCountMapSchema.optional(),
-  num_spots_available: vehicleTypesCountMapSchema.required(),
-  num_spots_disabled: vehicleTypesCountMapSchema.optional(),
-  wheelchair_boarding: Joi.bool(),
-  reservation_cost: vehicleTypesCountMapSchema.optional()
-})
-
 const deviceSchema = Joi.object().keys({
   device_id: uuidSchema.required(),
   provider_id: uuidSchema.required(),
@@ -271,6 +249,8 @@ export const isValidNumber = (value: unknown, options: Partial<NumberValidatorOp
     options
   )
 
+export const isValidUUID = (value: unknown): value is string => ValidateSchema(value, uuidSchema)
+
 export const isValidAuditTripId = (
   audit_trip_id: unknown,
   options: Partial<ValidatorOptions> = {}
@@ -278,17 +258,6 @@ export const isValidAuditTripId = (
 
 interface AuditEventValidatorOptions extends ValidatorOptions {
   accept: AUDIT_EVENT_TYPE[]
-}
-
-export const isValidStop = (value: unknown): value is Stop => {
-  const { error } = stopSchema.validate(value)
-  if (error) {
-    throw new ValidationError('invalid_stop', {
-      value,
-      details: Format('stop', error)
-    })
-  }
-  return true
 }
 
 export const isValidDeviceId = (value: unknown, options: Partial<ValidatorOptions> = {}): value is UUID =>

@@ -101,7 +101,7 @@ export function processCountPolicy(
         }
       }
     })
-    const rule_minimum = rule.minimum == null ? Number.NEGATIVE_INFINITY : rule.minimum
+    const rule_minimum = rule.minimum ?? Number.NEGATIVE_INFINITY
     if (num_matches < rule_minimum) {
       countMinimumViolations += rule_minimum - num_matches
     }

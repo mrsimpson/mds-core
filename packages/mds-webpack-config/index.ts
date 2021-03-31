@@ -1,22 +1,21 @@
-/*
-    Copyright 2019-2020 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-import { Configuration, ConfigurationFactory, ContextReplacementPlugin, IgnorePlugin } from 'webpack'
+import { Configuration, ContextReplacementPlugin, IgnorePlugin, BannerPlugin } from 'webpack'
 import GitRevisionPlugin from 'git-revision-webpack-plugin'
-import WrapperWebpackPlugin from 'wrapper-webpack-plugin'
 import { merge as WebpackMerge } from 'webpack-merge'
 import { parse, resolve } from 'path'
 
@@ -24,9 +23,8 @@ const gitRevisionPlugin = new GitRevisionPlugin({ commithashCommand: 'rev-parse 
 
 type CustomConfiguration = Omit<Configuration, 'entry'>
 
-const MergeConfigurations = (name: string, path: string, config: CustomConfiguration = {}): ConfigurationFactory => (
-  env,
-  argv
+const MergeConfigurations = (name: string, path: string, config: CustomConfiguration = {}) => (
+  env: Partial<Record<string, string>>
 ) => {
   const dirname = process.cwd()
 
@@ -44,9 +42,10 @@ const MergeConfigurations = (name: string, path: string, config: CustomConfigura
 
   const { npm_package_name = '', npm_package_version = '' } = parseEnv('npm_package_name', 'npm_package_version')
 
-  console.log('BUNDLE:', resolve(entry[name])) /* eslint-disable-line no-console */
+  // eslint-disable-next-line no-console
+  console.log(`BUNDLE: ${npm_package_name}@${npm_package_version} from ${resolve(entry[name])}`)
 
-  return WebpackMerge(
+  return WebpackMerge<Configuration>(
     {
       entry,
       output: { path: `${dirname}/dist`, filename: `${name}.js`, libraryTarget: 'commonjs' },
@@ -65,7 +64,7 @@ const MergeConfigurations = (name: string, path: string, config: CustomConfigura
         ...['app-root-path', 'express', 'google-spreadsheet', 'optional', 'typeorm'].map(
           module =>
             new ContextReplacementPlugin(
-              new RegExp(`node_modules/${module}`),
+              new RegExp(`node_modules[\\/\\\\]${module}`),
               (data: { dependencies: { critical: unknown }[] }) => {
                 // eslint-disable-next-line no-param-reassign
                 data.dependencies = data.dependencies.map(dependency => {
@@ -82,7 +81,10 @@ const MergeConfigurations = (name: string, path: string, config: CustomConfigura
           'hiredis', // Redis
           ...['bufferutil', 'utf-8-validate'], // https://github.com/adieuadieu/serverless-chrome/issues/103#issuecomment-358261003
           ...[
+            '@sap/hana-client',
             '@sap/hdbext',
+            'better-sqlite3',
+            'hdb-pool',
             'mongodb',
             'mssql',
             'mysql',
@@ -94,21 +96,23 @@ const MergeConfigurations = (name: string, path: string, config: CustomConfigura
             'sqlite3',
             'typeorm-aurora-data-api-driver'
           ] // TypeORM
-        ].map(dependency => new IgnorePlugin(new RegExp(`^${dependency}$`))),
+        ].map(dependency => new IgnorePlugin({ resourceRegExp: new RegExp(`^${dependency}$`) })),
         // Make npm package name/version available to bundle
-        new WrapperWebpackPlugin({
-          header: () =>
-            `Object.assign(process.env, {
+        new BannerPlugin({
+          banner: `Object.assign(process.env, {
               npm_package_name: '${npm_package_name}',
               npm_package_version: '${npm_package_version}',
               npm_package_git_branch: '${gitRevisionPlugin.branch()}',
               npm_package_git_commit: '${gitRevisionPlugin.commithash()}',
               npm_package_build_date: '${new Date().toISOString()}'
-            });`
+            });`,
+          raw: true,
+          entryOnly: true
         })
       ],
       resolve: {
-        extensions: ['.ts', '.js']
+        extensions: ['.ts', '.js'],
+        symlinks: true
       },
       externals: {
         sharp: 'commonjs sharp'
@@ -118,7 +122,8 @@ const MergeConfigurations = (name: string, path: string, config: CustomConfigura
         all: false,
         assets: true,
         errors: true,
-        warnings: true
+        warnings: true,
+        timings: true
       }
     },
     config

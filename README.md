@@ -40,14 +40,12 @@ Read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) document for rules and guide
 
 ### Experimental Content
 #### APIs
-1. MDS-Agency `/stops` [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/430)
-2. MDS-Audit [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
-3. MDS-Compliance [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
-4. MDS-Config
-5. MDS-Daily
-6. MDS-Metrics-Sheet
-7. MDS-Policy-Author
-8. MDS-Web-Sockets
+1. MDS-Audit [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
+2. MDS-Compliance [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
+3. MDS-Config
+4. MDS-Daily
+5. MDS-Metrics-Sheet
+6. MDS-Policy-Author
 
 ## Installation
 
@@ -55,7 +53,6 @@ Read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) document for rules and guide
 
 * PostgreSQL
 * Redis
-* [Yarn](https://yarnpkg.com/en/docs/install#mac-stable)
 * [NVM](https://github.com/nvm-sh/nvm#installation-and-update)
 
 #### Database config on macOS
@@ -86,17 +83,17 @@ Then add `export PG_NAME=mdstest` to your shell's environment file.  (The name i
 
 You should have NVM already installed from the link above.  The top level directory of the project has a `.nvmrc` file and you should be able to run `nvm install` to get the right version of Node.
 
-#### Package setup
-Install [Lerna](https://lerna.js.org/)
+#### Package manager setup
+Install [pnpm](https://pnpm.js.org/)
 
 ```sh
-yarn global add lerna
+npm install -g pnpm
 ```
 
-Install all packages.  Uses Yarn workspaces.
+Install all packages.  Uses pnpm workspaces.
 
 ```sh
-yarn install
+pnpm install
 ```
 
 #### Launching a local server for a package
@@ -104,50 +101,14 @@ Now you can work with each package
 
 ```sh
 cd packages/mds-audit
-yarn test
-yarn start
+pnpm test
+pnpm start
 ```
 
 #### Running the tests
 You can also run all tests from the project root with
 ```
-yarn test
-```
-
-### Package Management - Lerna
-
-This repository is a monorepo and uses Lerna for working with its packages.
-
-#### Example commands
-
-Run all test suites at once
-
-```sh
-lerna run test
-```
-
-Run all tests suites sequentially
-
-```sh
-lerna run test --concurrency 1
-```
-
-Run tests for a particular package
-
-```sh
-lerna run test --scope mds-audit
-```
-
-Clean all dependencies
-
-```sh
-lerna run clean
-```
-
-Format all files
-
-```sh
-lerna run prettier
+pnpm test
 ```
 
 ## Debugging with Visual Studio Code
@@ -248,11 +209,11 @@ helm install --name istio --namespace istio-system ./install/kubernetes/helm/ist
 This will run the build, and create the docker container images.
 
 ```sh
-yarn clean
-NODE_ENV=development yarn image
+pnpm clean
+NODE_ENV=development pnpm image
 ```
 
-note that setting `NODE_ENV=development` will enable images to be built with the `:latest` tag instead of a specific version-branch-commit tag.  If you choose not to use this, the images will be built with tags matching the format `:version-branch-commit`.  You can generate a manifest with these image tags by running `yarn values`.  This manifest can be included in a helm install with the switch `--values dist/values.yaml`.
+note that setting `NODE_ENV=development` will enable images to be built with the `:latest` tag instead of a specific version-branch-commit tag.  If you choose not to use this, the images will be built with tags matching the format `:version-branch-commit`.  You can generate a manifest with these image tags by running `pnpm values`.  This manifest can be included in a helm install with the switch `--values dist/values.yaml`.
 
 Verify:
 
@@ -289,9 +250,9 @@ curl https://get.okteto.com -sSfL | sh
 4. Run `> Okteto Up` from the VSCode command palette.
 * After the remote session opens, execute this in the new shell window:
 ```sh
-yarn
+pnpm install
 cd packages/${SERVICE_NAME}
-yarn start
+pnpm start
 ```
 5. This session is now safe to close, and you can reattach with the `okteto.${SERVICE_NAME}` ssh profile automatically added for you using the VSCode `Remote - SSH` package.
 6. When you're completely done with your session, run `> Okteto Down` from the VSCode command palette, or `okteto down` from terminal to revert the changes made by Okteto, and return your service to its previous deployment.

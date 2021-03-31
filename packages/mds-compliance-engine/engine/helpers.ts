@@ -8,7 +8,7 @@ import {
   TIME_FORMAT,
   DAYS_OF_WEEK,
   MicromobilityPolicy,
-  RULE_TYPE
+  MICROMOBILITY_RULE_TYPES
 } from '@mds-core/mds-types'
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
@@ -62,7 +62,7 @@ export function isPolicyActive(policy: MicromobilityPolicy, end_time: number = n
   return end_time >= policy.start_date && end_time <= policy.end_date
 }
 
-export function isRuleActive(rule: MicromobilityBaseRule<RULE_TYPE>): boolean {
+export function isRuleActive(rule: MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>): boolean {
   if (!env.TIMEZONE) {
     throw new RuntimeError('TIMEZONE environment variable must be declared!')
   }
@@ -83,7 +83,7 @@ export function isRuleActive(rule: MicromobilityBaseRule<RULE_TYPE>): boolean {
   return false
 }
 
-export function isInVehicleTypes(rule: MicromobilityBaseRule<RULE_TYPE>, device: Device): boolean {
+export function isInVehicleTypes(rule: MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>, device: Device): boolean {
   return !rule.vehicle_types || (rule.vehicle_types && rule.vehicle_types.includes(device.vehicle_type))
 }
 
@@ -137,7 +137,7 @@ export function createMatchedVehicleInformation(
   }
 }
 
-export function annotateVehicleMap<T extends MicromobilityBaseRule<RULE_TYPE>>(
+export function annotateVehicleMap<T extends MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>>(
   policy: MicromobilityPolicy,
   events: VehicleEventWithTelemetry[],
   geographies: Geography[],

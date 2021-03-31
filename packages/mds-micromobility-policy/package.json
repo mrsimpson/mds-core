@@ -1,19 +1,9 @@
 {
   "name": "@mds-core/mds-micromobility-policy",
+  "version": "0.1.0",
   "description": "MDS Policy API",
-  "version": "0.0.1",
-  "author": "City of Los Angeles",
   "license": "Apache-2.0",
-  "dependencies": {
-    "@mds-core/mds-policy": "0.0.27",
-    "@mds-core/mds-api-server": "0.1.26",
-    "@mds-core/mds-logger": "0.1.24",
-    "@mds-core/mds-schema-validators": "0.1.2",
-    "@mds-core/mds-types": "0.1.23",
-    "@mds-core/mds-utils": "0.1.26",
-    "@types/express": "4.17.8",
-    "express": "4.17.1"
-  },
+  "author": "City of Los Angeles",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -27,5 +17,14 @@
     "test:unit": "PATH_PREFIX=/micromobility-policy DOTENV_CONFIG_PATH=../../.env nyc ts-mocha --project ../../tsconfig.json",
     "ts-node": "yarn build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec yarn ts-node --"
+  },
+  "dependencies": {
+    "@mds-core/mds-api-server": "0.1.28",
+    "@mds-core/mds-logger": "0.2.2",
+    "@mds-core/mds-policy": "0.0.29",
+    "@mds-core/mds-schema-validators": "0.1.4",
+    "@mds-core/mds-types": "0.1.25",
+    "@types/express": "4.17.8",
+    "express": "4.17.1"
   }
 }

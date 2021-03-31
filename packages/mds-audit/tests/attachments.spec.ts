@@ -1,3 +1,19 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* eslint-disable promise/no-callback-in-promise */
 /* eslint-disable promise/no-nesting */
 /* eslint-disable promise/prefer-await-to-then */
@@ -5,21 +21,6 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable promise/catch-or-return */
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
- */
 
 import db from '@mds-core/mds-db'
 import { Attachment, AuditAttachment, Recorded } from '@mds-core/mds-types'
@@ -27,6 +28,7 @@ import { isUUID, NotFoundError, uuid } from '@mds-core/mds-utils'
 import assert from 'assert'
 import fs from 'fs'
 import Sinon from 'sinon'
+import { AttachmentServiceClient } from '@mds-core/mds-attachment-service'
 import { attachmentSummary, deleteAuditAttachment, readAttachments, writeAttachment } from '../attachments'
 import { getWriteableClient } from '../../mds-db/client'
 import schema from '../../mds-db/schema'
@@ -69,7 +71,7 @@ describe('Testing Attachments Service', () => {
   } as Express.Multer.File
 
   before('Initializing database', async () => {
-    await db.initialize()
+    await db.reinitialize()
   })
 
   beforeEach(async () => {
@@ -92,21 +94,14 @@ describe('Testing Attachments Service', () => {
   })
 
   it('verify writeAttachment', async () => {
-    const uploadStub = Sinon.stub(aws.S3.prototype, 'upload')
-    const writeAttachmentStub = Sinon.stub(db, 'writeAttachment')
+    const writeAttachmentStub = Sinon.stub(AttachmentServiceClient, 'writeAttachment')
     const writeAuditAttachmentStub = Sinon.stub(db, 'writeAuditAttachment')
-    uploadStub.returns({
-      promise: () => {
-        // Intentionally empty
-      }
-    })
+    writeAttachmentStub.resolves(attachment as any) // casting for the sake of test happiness
     const res: Attachment | null = await writeAttachment(attachmentFile, auditTripId)
     assert.equal(res && res.attachment_filename.includes('.png'), true)
     assert.equal(res && res.thumbnail_filename && res.thumbnail_filename.includes('.png'), true)
     assert.equal(res && isUUID(res.attachment_id), true)
     assert.equal(res && res.mimetype, mimetype)
-    assert.equal(res && res.thumbnail_mimetype, mimetype)
-    Sinon.assert.calledTwice(uploadStub) // For attachment and thumbnail
     Sinon.assert.calledOnce(writeAttachmentStub)
     Sinon.assert.calledOnce(writeAuditAttachmentStub)
   })
@@ -148,7 +143,7 @@ describe('Testing Attachments Service', () => {
   })
 
   after('Clearing and shutting down database', async () => {
-    await db.initialize()
+    await db.reinitialize()
     await db.shutdown()
   })
 })

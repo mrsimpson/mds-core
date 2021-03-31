@@ -1,3 +1,19 @@
+/**
+ * Copyright 2021 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* eslint-disable promise/prefer-await-to-then */
 /* eslint-disable promise/no-callback-in-promise */
 /* eslint-disable promise/no-nesting */
@@ -5,13 +21,7 @@
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import {
-  makeDevices,
-  makeEventsWithTelemetry,
-  veniceSpecOps,
-  makeTelemetryInArea,
-  LA_CITY_BOUNDARY
-} from '@mds-core/mds-test-data'
+import { makeDevices, makeEventsWithTelemetry, veniceSpecOps, makeTelemetryInArea } from '@mds-core/mds-test-data'
 import test from 'unit.js'
 import { FeatureCollection, Feature } from 'geojson'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
@@ -28,6 +38,7 @@ import {
 } from '@mds-core/mds-types'
 
 import MockDate from 'mockdate'
+import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { generateDeviceMap } from '../../engine/helpers'
 import {

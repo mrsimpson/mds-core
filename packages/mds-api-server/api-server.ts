@@ -1,5 +1,21 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import express from 'express'
-import * as Joi from 'joi'
+import HttpStatus from 'http-status-codes'
 import logger from '@mds-core/mds-logger'
 import { ProviderIdClaim, UserEmailClaim, JurisdictionsClaim } from '@mds-core/mds-api-authorizer'
 import { pathPrefix } from '@mds-core/mds-utils'
@@ -12,7 +28,6 @@ import { RequestLoggingMiddlewareOptions, RequestLoggingMiddleware } from './mid
 import { PrometheusMiddlewareOptions, PrometheusMiddleware } from './middleware/prometheus'
 import { serverVersion } from './utils'
 import { HealthRequestHandler } from './handlers/health'
-import { HttpContextMiddleware } from './middleware/http-context'
 
 export interface ApiServerOptions {
   authorization: AuthorizationMiddlewareOptions
@@ -55,18 +70,19 @@ export const ApiServer = <T extends {} = {}>(
     PrometheusMiddleware(options.prometheus),
     /** Request Logging Middleware
      * Placed after Prometheus middleware to avoid excessive logging
-     */
-    RequestLoggingMiddleware(options.requestLogging),
-    MaintenanceModeMiddleware(options.maintenanceMode),
-    /** HTTP Context Middleware
      * Placed after the other middleware to avoid causing collisions
      * see express-http-context's README for more information
      */
-    ...HttpContextMiddleware()
+    ...RequestLoggingMiddleware(
+      options.requestLogging ?? { filters: [{ path: /\/health$/, level: HttpStatus.BAD_REQUEST }] }
+    )
   )
 
   // Health Route
   app.get(pathPrefix('/health'), HealthRequestHandler)
+
+  // Everything except /health will return a 503 when in maintenance mode
+  app.use(MaintenanceModeMiddleware(options.maintenanceMode))
 
   return api<T>(app)
 }

@@ -1,3 +1,19 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // /////////////////////////////// SQL-related utilities /////////////////////////////
 import { Client as PostgresClient, types as PostgresTypes } from 'pg'
 import { csv } from '@mds-core/mds-utils'
@@ -61,11 +77,11 @@ export function configureClient(pg_info: PGInfo) {
 
   client.on('end', () => {
     client.setConnected(false)
-    logger.info('disconnected', client.client_type, 'client from postgres')
+    logger.info(`disconnected client from postgres`, { client_type: client.client_type })
   })
 
   client.on('error', async err => {
-    logger.error('pg client error event', err.stack)
+    logger.error('pg client error event', err)
   })
 
   client.on('notice', async msg => {
@@ -156,7 +172,7 @@ export async function logSql(sql: string, ...values: unknown[]): Promise<void> {
     out = values
   }
 
-  logger.info('sql>', sql, out)
+  logger.info('SQL', { sql, vals: out })
 }
 
 export class SqlVals {

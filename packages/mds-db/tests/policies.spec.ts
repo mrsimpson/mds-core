@@ -15,8 +15,8 @@ import {
   DELETEABLE_POLICY
 } from '@mds-core/mds-test-data'
 import { now, clone, NotFoundError, ConflictError, yesterday } from '@mds-core/mds-utils'
-import { setFreshDB, pg_info } from './helpers'
 import { LAGeography } from './fixtures'
+import { initializeDB, shutdownDB, pg_info } from './helpers'
 import MDSDBPostgres from '../index'
 
 const ACTIVE_POLICY_JSON = { ...POLICY_JSON, publish_date: yesterday(), start_date: yesterday() }
@@ -62,11 +62,11 @@ const SIMPLE_POLICY_JSON: SimplePolicy = {
 if (pg_info.database) {
   describe('spot check unit test policy functions with SimplePolicy', () => {
     beforeEach(async () => {
-      await setFreshDB()
+      await initializeDB()
     })
 
     after(async () => {
-      await MDSDBPostgres.shutdown()
+      await shutdownDB()
     })
 
     it('can CRUD a SimplePolicy', async () => {
@@ -99,11 +99,11 @@ if (pg_info.database) {
 
   describe('unit test policy functions with MDSPolicy', () => {
     before(async () => {
-      await setFreshDB()
+      await initializeDB()
     })
 
     after(async () => {
-      await MDSDBPostgres.shutdown()
+      await shutdownDB()
     })
 
     it('can delete an unpublished Policy', async () => {
@@ -228,11 +228,11 @@ if (pg_info.database) {
 
   describe('unit test PolicyMetadata functions', () => {
     before(async () => {
-      await setFreshDB()
+      await initializeDB()
     })
 
     after(async () => {
-      await MDSDBPostgres.shutdown()
+      await shutdownDB()
     })
 
     it('.readBulkPolicyMetadata', async () => {

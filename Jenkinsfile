@@ -15,18 +15,22 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        setBuildStatus('Build/Tests Pending... 🥱', 'PENDING')
-        nvm('version': 'v14.2.0') {
-          sh 'yarn clean'
-          sh 'yarn build'
+        nvm('version': 'v15.11.0') {
+          sh '''
+          pnpm clean
+          pnpm lint
+          pnpm build
+          '''
         }
       }
     }
-
     stage('Test') {
       steps {
-        nvm('version': 'v14.2.0') {
+        nvm('version': 'v15.11.0') {
           sh '''
+            set -eu
+            set -o pipefail
+
             randport() {
                 local port=$((($RANDOM%8000)+1024));
                 while nc -zv localhost $port > /dev/null 2>&1; do
@@ -37,14 +41,21 @@ pipeline {
 
             export PG_PORT=$(randport)
             export REDIS_PORT=$(randport)
+            export PORT=$(randport)
+            export RPC_PORT=$(randport)
+            source env.jenkins
 
-            PG_ID=$(docker run -d -e POSTGRES_HOST_AUTH_METHOD=trust -p $PG_PORT:5432 postgres:10-alpine)
-            REDIS_ID=$(docker run -d -p $REDIS_PORT:6379 redis:5-alpine)
+            export PG_ID=$(docker run -d -e POSTGRES_HOST_AUTH_METHOD=trust -p $PG_PORT:5432 postgres:11-alpine)
+            export REDIS_ID=$(docker run -d -p $REDIS_PORT:6379 redis:5-alpine)
 
-            PG_NAME=postgres PG_HOST=localhost PG_USER=postgres REDIS_HOST=localhost yarn test
+            function cleanup() {
+              docker stop $PG_ID && docker rm $PG_ID
+              docker stop $REDIS_ID && docker rm $REDIS_ID
+            }
+            trap cleanup EXIT
 
-            docker stop $PG_ID
-            docker stop $REDIS_ID
+            pnpm clean
+            PG_NAME=postgres PG_HOST=localhost PG_USER=postgres REDIS_HOST=localhost pnpm test
           '''
         }
       }

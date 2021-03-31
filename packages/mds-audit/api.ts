@@ -1,17 +1,17 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import db from '@mds-core/mds-db'
@@ -48,6 +48,7 @@ import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import { AUDIT_EVENT_TYPES, AuditEvent, Timestamp, Telemetry, TelemetryData } from '@mds-core/mds-types'
 import { parsePagingQueryParams, asJsonApiLinks, parseRequest } from '@mds-core/mds-api-helpers'
 import { checkAccess, AccessTokenScopeValidator } from '@mds-core/mds-api-server'
+import { isError } from '@mds-core/mds-service-helpers'
 import {
   AuditApiAuditEndRequest,
   AuditApiAuditNoteRequest,
@@ -93,7 +94,6 @@ import {
   deleteAuditAttachment,
   multipartFormUpload,
   readAttachments,
-  validateFile,
   writeAttachment
 } from './attachments'
 import { AuditApiVersionMiddleware } from './middleware'
@@ -140,7 +140,7 @@ function api(app: express.Express): express.Express {
           return next()
         }
       }
-      logger.warn('Missing subject_id', req.method, req.originalUrl)
+      logger.warn('Missing subject_id', { method: req.method, originalUrl: req.originalUrl })
       // 403 Forbidden
       return res.status(403).send({ error: new AuthorizationError('missing_subject_id') })
     }
@@ -530,7 +530,7 @@ function api(app: express.Express): express.Express {
             if (start_time && end_time) {
               const deviceEvents = await readEvents(device.device_id, start_time, end_time)
               const deviceTelemetry = await readTelemetry(device.device_id, start_time, end_time)
-              const providerEvent = await db.readEventsWithTelemetry({
+              const [providerEvent] = await db.readEventsWithTelemetry({
                 device_id: device.device_id,
                 provider_id: device.provider_id,
                 end_time: audit_start, // Last provider event before the audit started
@@ -541,10 +541,10 @@ function api(app: express.Express): express.Express {
                 version: res.locals.version,
                 ...audit,
                 provider_vehicle_id: device.vehicle_id,
-                provider_event_types: providerEvent[0]?.event_types,
-                provider_vehicle_state: providerEvent[0]?.vehicle_state,
-                provider_telemetry: providerEvent[0]?.telemetry,
-                provider_event_time: providerEvent[0]?.timestamp,
+                provider_event_types: providerEvent.event_types,
+                provider_vehicle_state: providerEvent.vehicle_state,
+                provider_telemetry: providerEvent.telemetry,
+                provider_event_time: providerEvent.timestamp,
                 events: auditEvents.map(withGpsProperty),
                 attachments: attachments.map(attachmentSummary),
                 provider: {
@@ -734,19 +734,9 @@ function api(app: express.Express): express.Express {
     multipartFormUpload,
     async (req, res: PostAuditAttachmentResponse) => {
       const { audit, audit_trip_id } = res.locals
-      if (!audit) {
-        return res.status(404).send({ error: new NotFoundError('audit not found', { audit_trip_id }) })
-      }
-      try {
-        validateFile(req.file)
-      } catch (err) {
-        if (err instanceof ValidationError) {
-          return res.status(400).send({ error: err })
-        }
-        if (err instanceof UnsupportedTypeError) {
-          return res.status(415).send({ error: err })
-        }
-      }
+
+      if (!audit) return res.status(404).send({ error: new NotFoundError('audit not found', { audit_trip_id }) })
+
       try {
         const attachment = await writeAttachment(req.file, audit_trip_id)
         res.status(200).send({
@@ -755,6 +745,10 @@ function api(app: express.Express): express.Express {
           audit_trip_id
         })
       } catch (err) {
+        if (isError(err, ValidationError)) return res.status(400).send({ error: err })
+
+        if (isError(err, UnsupportedTypeError)) return res.status(415).send({ error: err })
+
         logger.error('post attachment fail', err)
         return res.status(500).send({ error: new ServerError(err) })
       }

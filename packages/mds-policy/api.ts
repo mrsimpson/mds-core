@@ -1,17 +1,17 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import express, { NextFunction } from 'express'
@@ -65,9 +65,9 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
           return res.status(401).send({ error: 'Unauthorized' })
         }
       }
-    } catch (err) {
+    } catch (error) {
       /* istanbul ignore next */
-      logger.error(req.originalUrl, 'request validation fail:', err.stack)
+      logger.error('request validation fail', { error, originalUrl: req.originalUrl })
     }
     next()
   })
@@ -171,7 +171,12 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
   /* istanbul ignore next */
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   app.use(async (error: Error, req: ApiRequest, res: ApiResponse, next: NextFunction) => {
-    await logger.error(req.method, req.originalUrl, error)
+    const { method, originalUrl } = req
+    logger.error('Fatal MDS Policy Error (global error handling middleware)', {
+      method,
+      originalUrl,
+      error
+    })
     return res.status(500).send({ error })
   })
 

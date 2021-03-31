@@ -1,3 +1,19 @@
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import express from 'express'
 import { Query } from 'express-serve-static-core'
 
@@ -119,7 +135,7 @@ export async function getVehicles(
   const total = rows.length
   logger.info(`read ${total} deviceIds in /vehicles`)
 
-  const events = await cache.readEvents(rows.map(record => record.device_id))
+  const events = rows.length > 0 ? await cache.readEvents(rows.map(record => record.device_id)) : []
   const eventMap: { [s: string]: VehicleEvent } = {}
   events.map(event => {
     if (event) {
@@ -177,14 +193,10 @@ export async function getVehicles(
   }
 }
 
-const usBounds = {
-  latMax: 49.45,
-  latMin: 24.74,
-  lonMax: -66.94,
-  lonMin: -124.79
-}
-
 export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObject | null {
+  const [LATITUDE_LOWER_BOUND, LATITUDE_UPPER_BOUND] = [-90, 90]
+  const [LONGITUDE_LOWER_BOUND, LONGITUDE_UPPER_BOUND] = [-180, 180]
+
   if (!telemetry) {
     return {
       error: 'missing_param',
@@ -211,13 +223,25 @@ export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObje
       error_description: 'no device_id included in telemetry'
     }
   }
-  if (typeof lat !== 'number' || Number.isNaN(lat) || lat < usBounds.latMin || lat > usBounds.latMax) {
+  if (
+    typeof lat !== 'number' ||
+    Number.isNaN(lat) ||
+    lat < LATITUDE_LOWER_BOUND ||
+    lat > LATITUDE_UPPER_BOUND ||
+    lat === 0
+  ) {
     return {
       error: 'bad_param',
       error_description: `invalid lat ${lat}`
     }
   }
-  if (typeof lng !== 'number' || Number.isNaN(lng) || lng < usBounds.lonMin || lng > usBounds.lonMax) {
+  if (
+    typeof lng !== 'number' ||
+    Number.isNaN(lng) ||
+    lng < LONGITUDE_LOWER_BOUND ||
+    lng > LONGITUDE_UPPER_BOUND ||
+    lng === 0
+  ) {
     return {
       error: 'bad_param',
       error_description: `invalid lng ${lng}`
@@ -339,10 +363,13 @@ export async function badEvent(event: VehicleEvent) {
       ['trip_start', 'trip_end', 'trip_enter_jurisdiction', 'trip_leave_jurisdiction'],
       event.event_types
     )
-  )
+  ) {
     return badTelemetry(event.telemetry) || missingTripId()
+  }
 
-  if (event.event_types.includes('provider_drop_off')) return badTelemetry(event.telemetry)
+  if (event.event_types.includes('provider_drop_off')) {
+    return badTelemetry(event.telemetry)
+  }
 
   return null // we good
 }
@@ -372,13 +399,13 @@ export async function refresh(device_id: UUID, provider_id: UUID): Promise<strin
   try {
     const event = await db.readEvent(device_id)
     await cache.writeEvent(event)
-  } catch (err) {
-    logger.info('no events for', device_id, err)
+  } catch (error) {
+    logger.info('no events for', { device_id, error })
   }
   try {
     await db.readTelemetry(device_id)
-  } catch (err) {
-    logger.info('no telemetry for', device_id, err)
+  } catch (error) {
+    logger.info('no telemetry for', { device_id, error })
   }
   return 'done'
 }
@@ -391,7 +418,7 @@ export async function validateDeviceId(req: express.Request, res: express.Respon
 
   /* istanbul ignore if This is never called with no device_id parameter */
   if (!device_id) {
-    logger.warn('agency: missing device_id', req.originalUrl)
+    logger.warn('agency: missing device_id', { originalUrl: req.originalUrl })
     res.status(400).send({
       error: 'missing_param',
       error_description: 'missing device_id'
@@ -399,7 +426,7 @@ export async function validateDeviceId(req: express.Request, res: express.Respon
     return
   }
   if (device_id && !isUUID(device_id)) {
-    logger.warn('agency: bogus device_id', device_id, req.originalUrl)
+    logger.warn('agency: bogus device_id', { device_id, originalUrl: req.originalUrl })
     res.status(400).send({
       error: 'bad_param',
       error_description: `invalid device_id ${device_id} is not a UUID`

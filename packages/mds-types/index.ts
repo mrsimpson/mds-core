@@ -1,17 +1,17 @@
-/*
-    Copyright 2019 City of Los Angeles.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 import { FeatureCollection } from 'geojson'
 
@@ -29,8 +29,9 @@ export const VEHICLE_TYPES = Enum('car', 'bicycle', 'scooter', 'moped', 'other')
 export type VEHICLE_TYPE = keyof typeof VEHICLE_TYPES
 
 // TODO rate
-export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
+export const RULE_TYPES = Enum('count', 'speed', 'time', 'user', 'rate')
 export type RULE_TYPE = keyof typeof RULE_TYPES
+export type MICROMOBILITY_RULE_TYPES = 'count' | 'speed' | 'time'
 
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
@@ -162,6 +163,7 @@ export const TIME_FORMAT = 'HH:mm:ss'
 export type UUID = string
 
 export type Timestamp = number
+export type TimestampInSeconds = number
 export type Stringify<T> = { [P in keyof T]: string }
 export type Nullable<T> = T | null
 export type NullableProperties<T extends object> = {
@@ -173,6 +175,11 @@ export type NullableKeys<T> = {
 }[keyof T]
 export type Optional<T, P extends keyof T> = Omit<T, P> & Partial<Pick<T, P>>
 export type NonEmptyArray<T> = [T, ...T[]]
+export type RequiredKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? never : K }[keyof T]
+export type OptionalKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? K : never }[keyof T]
+export type PickRequired<T> = Pick<T, RequiredKeys<T>>
+export type PickOptional<T> = Pick<T, OptionalKeys<T>>
+export type NullableOptional<T> = PickRequired<T> & NullableProperties<PickOptional<T>>
 
 export interface CoreDevice {
   device_id: UUID
@@ -260,6 +267,7 @@ export interface Attachment {
   mimetype: string
   thumbnail_filename?: string | null
   thumbnail_mimetype?: string | null
+  attachment_list_id?: UUID | null
   recorded?: Timestamp | null
 }
 
@@ -348,7 +356,7 @@ export interface BaseRule<S extends string, E extends string, RuleType extends R
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface MicromobilityBaseRule<RuleType extends RULE_TYPE>
+export interface MicromobilityBaseRule<RuleType extends MICROMOBILITY_RULE_TYPES>
   extends BaseRule<VEHICLE_STATE, VEHICLE_EVENT, RuleType> {
   vehicle_types?: VEHICLE_TYPE[] | null
   states: MDSStatesToEvents | null
@@ -364,7 +372,7 @@ export interface SpeedRule extends MicromobilityBaseRule<'speed'> {
   rule_units: 'kph' | 'mph'
 }
 
-export type UserRule = MicromobilityBaseRule<'user'>
+export type UserRule = BaseRule<'', '', 'user'>
 
 export interface BasePolicy<
   S extends string,
@@ -387,7 +395,12 @@ export interface BasePolicy<
   [key: string]: any
 }
 
-export type MicromobilityPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, RULE_TYPE, MicromobilityBaseRule<RULE_TYPE>>
+export type MicromobilityPolicy = BasePolicy<
+  VEHICLE_STATE,
+  VEHICLE_EVENT,
+  RULE_TYPE,
+  MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>
+>
 
 export type PolicyTypeInfo<
   State extends string = VEHICLE_STATE,
@@ -401,13 +414,34 @@ export type MicromobilityPolicyTypeInfo = PolicyTypeInfo<
   VEHICLE_STATE,
   VEHICLE_EVENT,
   RULE_TYPE,
-  MicromobilityBaseRule<RULE_TYPE>,
+  MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>,
   MicromobilityPolicy
 >
 
 export type MDSCountPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'count', CountRule>
 export type MDSSpeedPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'speed', SpeedRule>
 export type MDSTimePolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'time', TimeRule>
+
+export const RATE_RECURRENCE_VALUES = ['once', 'each_time_unit', 'per_complete_time_unit'] as const
+export type RATE_RECURRENCE = typeof RATE_RECURRENCE_VALUES[number]
+
+/**
+ * A RateRule is a rule of any type that has a `rate_amount` property.
+ * @alpha Out-of-spec for MDS 0.4.1
+ */
+export type RateRule<S extends string, E extends string> = BaseRule<S, E, 'rate'> & {
+  rate_amount: number
+  rate_recurrence: RATE_RECURRENCE
+}
+
+/**
+ * A RatePolicy is a policy whose rules are RateRules.
+ * @alpha Out-of-spec for MDS 0.4.1
+ */
+export interface RatePolicy<S extends string, E extends string> extends BasePolicy<S, E, 'rate', RateRule<S, E>> {
+  currency: string
+  rules: RateRule<S, E>[]
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface PolicyMetadata<M extends {} = Record<string, any>> {
@@ -471,30 +505,6 @@ export interface Provider {
   url?: string
   mds_api_url?: string
   gbfs_api_url?: string
-}
-
-export interface Stop {
-  stop_id: UUID
-  stop_name: string
-  short_name?: string
-  platform_code?: string
-  geography_id?: UUID
-  lat: number
-  lng: number
-  zone_id?: UUID
-  address?: string
-  post_code?: string
-  rental_methods?: string // TOOD: enum?
-  capacity: Partial<{ [S in VEHICLE_TYPE]: number }>
-  location_type?: string // TODO: enum?
-  timezone?: string
-  cross_street?: string
-  num_vehicles_available: Partial<{ [S in VEHICLE_TYPE]: number }>
-  num_vehicles_disabled?: Partial<{ [S in VEHICLE_TYPE]: number }>
-  num_spots_available: Partial<{ [S in VEHICLE_TYPE]: number }>
-  num_spots_disabled?: Partial<{ [S in VEHICLE_TYPE]: number }>
-  wheelchair_boarding?: boolean
-  reservation_cost?: Partial<{ [S in VEHICLE_TYPE]: number }> // Cost to reserve a spot per vehicle_type
 }
 
 // eslint-reason recursive declarations require interfaces

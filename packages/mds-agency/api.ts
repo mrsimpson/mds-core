@@ -1,6 +1,17 @@
-/*
-    LICENSE
-    https://github.com/openmobilityfoundation/mobility-data-specification/blob/master/LICENSE
+/**
+ * Copyright 2019 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import express from 'express'
@@ -16,10 +27,7 @@ import {
   getVehiclesByProvider,
   updateVehicle,
   submitVehicleEvent,
-  submitVehicleTelemetry,
-  registerStop,
-  readStop,
-  readStops
+  submitVehicleTelemetry
 } from './request-handlers'
 import { readAllVehicleIds } from './agency-candidate-request-handlers'
 import { getCacheInfo, wipeDevice, refreshCache } from './sandbox-admin-request-handlers'
@@ -44,7 +52,7 @@ function api(app: express.Express): express.Express {
           const { provider_id } = res.locals.claims
 
           if (!isUUID(provider_id)) {
-            logger.warn(req.originalUrl, 'invalid provider_id is not a UUID', provider_id)
+            logger.warn('invalid provider_id is not a UUID', { provider_id, originalUrl: req.originalUrl })
             return res.status(400).send({
               error: 'authentication_error',
               error_description: `invalid provider_id ${provider_id} is not a UUID`
@@ -66,9 +74,9 @@ function api(app: express.Express): express.Express {
           return res.status(401).send({ error: 'authentication_error', error_description: 'Unauthorized' })
         }
       }
-    } catch (err) {
+    } catch (error) {
       /* istanbul ignore next */
-      logger.error(req.originalUrl, 'request validation fail:', err.stack)
+      logger.error('request validation fail:', { originalUrl: req.originalUrl, error })
     }
     next()
   })
@@ -138,16 +146,6 @@ function api(app: express.Express): express.Express {
     checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
     refreshCache
   )
-
-  app.post(
-    pathPrefix('/stops'),
-    checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
-    registerStop
-  )
-
-  app.get(pathPrefix('/stops/:stop_id'), readStop)
-
-  app.get(pathPrefix('/stops'), readStops)
 
   return app
 }
