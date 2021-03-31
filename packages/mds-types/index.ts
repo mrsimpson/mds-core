@@ -390,7 +390,7 @@ export interface BasePolicy<
   prev_policies: UUID[] | null
   rules: R[]
   publish_date?: Timestamp
-  // Needed to set the index signature
+  // Needed to set the index signature to reassure compiler all keys are strings
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
