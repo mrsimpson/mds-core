@@ -174,6 +174,14 @@ export const TAXI_TRIP_EXIT_EVENTS: TAXI_VEHICLE_EVENT[] = [
   'driver_cancellation'
 ]
 
+export const TNC_TRIP_EXIT_EVENTS: TNC_VEHICLE_EVENT[] = [
+  'trip_end',
+  'leave_jurisdiction',
+  'passenger_cancellation',
+  'provider_cancellation',
+  'driver_cancellation'
+]
+
 export const VEHICLE_EVENTS_v1_1_0 = [
   ...MICRO_MOBILITY_VEHICLE_EVENTS,
   ...TAXI_VEHICLE_EVENTS,
@@ -243,6 +251,28 @@ export const TAXI_EVENT_STATES_MAP: {
   trip_start: ['on_trip'],
   trip_stop: ['stopped'],
   unspecified: ['available', 'non_operational', 'removed']
+}
+
+export const TNC_EVENT_STATES_MAP: {
+  [P in TNC_VEHICLE_EVENT]: TNC_VEHICLE_STATE[]
+} = {
+  comms_lost: ['unknown'],
+  comms_restored: ['available', 'non_operational', 'reserved', 'on_trip', 'elsewhere'],
+  driver_cancellation: ['available', 'on_trip', 'reserved', 'stopped'],
+  enter_jurisdiction: ['available', 'reserved', 'on_trip', 'non_operational'],
+  leave_jurisdiction: ['elsewhere'],
+  maintenance: ['available', 'non_operational'],
+  passenger_cancellation: ['available', 'on_trip', 'reserved', 'stopped'],
+  provider_cancellation: ['available', 'on_trip', 'reserved', 'stopped'],
+  reservation_start: ['reserved'],
+  reservation_stop: ['stopped'],
+  service_end: ['non_operational'],
+  service_start: ['available'],
+  trip_end: ['available', 'on_trip', 'reserved', 'stopped'],
+  trip_resume: ['on_trip'],
+  trip_start: ['on_trip'],
+  trip_stop: ['stopped'],
+  unspecified: ['available', 'non_operational']
 }
 
 const MicroMobilityStatusEventMap = <

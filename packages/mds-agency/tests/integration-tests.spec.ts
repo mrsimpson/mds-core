@@ -41,7 +41,9 @@ import {
   TAXI_EVENT_STATES_MAP,
   MICRO_MOBILITY_EVENT_STATES_MAP,
   TripMetadata,
-  TRIP_STATE
+  TRIP_STATE,
+  TNC_VEHICLE_EVENT,
+  TNC_EVENT_STATES_MAP
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
@@ -115,6 +117,19 @@ const TEST_TAXI: Omit<Device, 'recorded'> = {
   year: 2018,
   mfgr: 'Schwinn',
   modality: 'taxi',
+  model: 'Mantaray'
+}
+
+const TEST_TNC: Omit<Device, 'recorded'> = {
+  accessibility_options: ['wheelchair_accessible'],
+  device_id: uuid(),
+  provider_id: TEST1_PROVIDER_ID,
+  vehicle_id: 'test-id-1',
+  vehicle_type: VEHICLE_TYPES.car,
+  propulsion_types: ['electric'],
+  year: 2018,
+  mfgr: 'Schwinn',
+  modality: 'tnc',
   model: 'Mantaray'
 }
 
@@ -1517,6 +1532,81 @@ describe('Tests for taxi modality', async () => {
     for (const vehicle_state of validStates) {
       it('verifies cannot send micromobility type event for a taxi', done => {
         const { device_id } = TEST_TAXI
+        request
+          .post(pathPrefix(`/vehicles/${device_id}/event`))
+          .set('Authorization', AUTH)
+          .send({
+            event_types: [microEvent],
+            vehicle_state,
+            telemetry: TEST_TELEMETRY,
+            timestamp: now()
+          })
+          .expect(400)
+          .end((err, result) => {
+            test.string(result.body.error).contains('bad_param')
+            test.string(result.body.error_description).contains('invalid event_type')
+            done(err)
+          })
+      })
+    }
+  }
+})
+
+describe('Tests for tnc modality', async () => {
+  before(async () => {
+    await Promise.all([db.reinitialize()])
+  })
+
+  it('verifies post tnc success', done => {
+    request
+      .post(pathPrefix('/vehicles'))
+      .set('Authorization', AUTH)
+      .send(TEST_TNC)
+      .expect(201)
+      .end((err, result) => {
+        done(err)
+      })
+  })
+
+  for (const tncEvent of TNC_VEHICLE_EVENT) {
+    const validStates = TNC_EVENT_STATES_MAP[tncEvent]
+    for (const vehicle_state of validStates) {
+      it(`verifies ${tncEvent} success`, done => {
+        const { device_id } = TEST_TNC
+        const body = {
+          event_types: [tncEvent],
+          vehicle_state,
+          telemetry: TEST_TELEMETRY,
+          timestamp: now(),
+          ...(tncEvent.startsWith('trip_')
+            ? { trip_id: '1f943d59-ccc9-4d91-b6e2-0c5e771cbc6b', trip_state: vehicle_state as TRIP_STATE }
+            : {})
+        }
+        request
+          .post(pathPrefix(`/vehicles/${device_id}/event`))
+          .set('Authorization', AUTH)
+          .send(body)
+          .expect(201)
+          .end((err, result) => {
+            // test.string(result.body.status).is(EVENT_STATUS_MAP[taxiEvent])
+            done(err)
+          })
+      })
+    }
+  }
+
+  /* We want to test for all micromobility events which
+   * are not included in the valid Taxi events.
+   */
+  const MICRO_MOBILITY_EVENTS_NOT_IN_TNC_EVENTS = MICRO_MOBILITY_VEHICLE_EVENTS.filter(
+    item => !TNC_VEHICLE_EVENT.includes(item as TNC_VEHICLE_EVENT)
+  )
+
+  for (const microEvent of MICRO_MOBILITY_EVENTS_NOT_IN_TNC_EVENTS) {
+    const validStates = MICRO_MOBILITY_EVENT_STATES_MAP[microEvent]
+    for (const vehicle_state of validStates) {
+      it('verifies cannot send micromobility type event for a tnc', done => {
+        const { device_id } = TEST_TNC
         request
           .post(pathPrefix(`/vehicles/${device_id}/event`))
           .set('Authorization', AUTH)
