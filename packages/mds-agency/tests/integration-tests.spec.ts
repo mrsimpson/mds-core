@@ -1596,7 +1596,7 @@ describe('Tests for tnc modality', async () => {
   }
 
   /* We want to test for all micromobility events which
-   * are not included in the valid Taxi events.
+   * are not included in the valid tnc events.
    */
   const MICRO_MOBILITY_EVENTS_NOT_IN_TNC_EVENTS = MICRO_MOBILITY_VEHICLE_EVENTS.filter(
     item => !TNC_VEHICLE_EVENT.includes(item as TNC_VEHICLE_EVENT)
