@@ -61,7 +61,22 @@ export const TAXI_VEHICLE_STATES = [
 ] as const
 export type TAXI_VEHICLE_STATE = typeof TAXI_VEHICLE_STATES[number]
 
-export const VEHICLE_STATES_v1_1_0 = [...MICRO_MOBILITY_VEHICLE_STATES_v1_1_0, ...TAXI_VEHICLE_STATES] as const
+export const TNC_VEHICLE_STATE = <const>[
+  'available',
+  'elsewhere',
+  'non_operational',
+  'on_trip',
+  'reserved',
+  'stopped',
+  'unknown'
+]
+export type TNC_VEHICLE_STATE = typeof TNC_VEHICLE_STATE[number]
+
+export const VEHICLE_STATES_v1_1_0 = [
+  ...MICRO_MOBILITY_VEHICLE_STATES_v1_1_0,
+  ...TAXI_VEHICLE_STATES,
+  ...TNC_VEHICLE_STATE
+] as const
 export type VEHICLE_STATE_v1_1_0 = typeof VEHICLE_STATES_v1_1_0[number]
 
 export const VEHICLE_STATES = VEHICLE_STATES_v1_1_0
@@ -130,6 +145,27 @@ export const TAXI_VEHICLE_EVENTS = [
 ] as const
 export type TAXI_VEHICLE_EVENT = typeof TAXI_VEHICLE_EVENTS[number]
 
+export const TNC_VEHICLE_EVENT = [
+  'comms_lost',
+  'comms_restored',
+  'driver_cancellation',
+  'enter_jurisdiction',
+  'leave_jurisdiction',
+  'maintenance',
+  'passenger_cancellation',
+  'provider_cancellation',
+  'reservation_start',
+  'reservation_stop',
+  'service_end',
+  'service_start',
+  'trip_end',
+  'trip_resume',
+  'trip_start',
+  'trip_stop',
+  'unspecified'
+] as const
+export type TNC_VEHICLE_EVENT = typeof TNC_VEHICLE_EVENT[number]
+
 export const TAXI_TRIP_EXIT_EVENTS: TAXI_VEHICLE_EVENT[] = [
   'trip_end',
   'leave_jurisdiction',
@@ -138,7 +174,11 @@ export const TAXI_TRIP_EXIT_EVENTS: TAXI_VEHICLE_EVENT[] = [
   'driver_cancellation'
 ]
 
-export const VEHICLE_EVENTS_v1_1_0 = [...MICRO_MOBILITY_VEHICLE_EVENTS, ...TAXI_VEHICLE_EVENTS] as const
+export const VEHICLE_EVENTS_v1_1_0 = [
+  ...MICRO_MOBILITY_VEHICLE_EVENTS,
+  ...TAXI_VEHICLE_EVENTS,
+  ...TNC_VEHICLE_EVENT
+] as const
 export type VEHICLE_EVENT_v1_1_0 = typeof VEHICLE_EVENTS[number]
 
 export const VEHICLE_EVENTS = VEHICLE_EVENTS_v1_1_0
@@ -213,6 +253,8 @@ const MicroMobilityStatusEventMap = <
 
 const TaxiStatusEventMap = <T extends { [S in TAXI_VEHICLE_STATE]: Partial<TAXI_VEHICLE_EVENT[]> }>(map: T) => map
 
+const TncStatusEventMap = <T extends { [S in TNC_VEHICLE_STATE]: Partial<TNC_VEHICLE_EVENT[]> }>(map: T) => map
+
 // Given a state, list the valid entry events
 export const MICRO_MOBILITY_STATE_EVENT_MAP = MicroMobilityStatusEventMap({
   available: [
@@ -262,6 +304,23 @@ export const TAXI_STATE_EVENT_MAP = TaxiStatusEventMap({
   stopped: ['trip_stop', 'reservation_stop']
 })
 
+export const TNC_STATE_EVENT_MAP = TncStatusEventMap({
+  available: [
+    'driver_cancellation',
+    'enter_jurisdiction',
+    'passenger_cancellation',
+    'provider_cancellation',
+    'service_start',
+    'trip_end'
+  ],
+  reserved: ['reservation_start', 'comms_restored', 'enter_jurisdiction'],
+  non_operational: ['enter_jurisdiction', 'maintenance', 'service_end'],
+  on_trip: ['trip_start', 'enter_jurisdiction', 'comms_restored', 'trip_resume'],
+  elsewhere: ['leave_jurisdiction', 'comms_restored'],
+  unknown: ['comms_lost'],
+  stopped: ['trip_stop', 'reservation_stop']
+})
+
 export const DAYS_OF_WEEK = Enum('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
 export type DAY_OF_WEEK = keyof typeof DAYS_OF_WEEK
 export const TIME_FORMAT = 'HH:mm:ss'
@@ -296,7 +355,7 @@ export type NullableOptional<T> = PickRequired<T> & NullableProperties<PickOptio
 export const ACCESSIBILITY_OPTIONS = ['wheelchair_accessible'] as const
 export type ACCESSIBILITY_OPTION = typeof ACCESSIBILITY_OPTIONS[number]
 
-export const MODALITIES = ['micromobility', 'taxi'] as const
+export const MODALITIES = ['micromobility', 'taxi', 'tnc'] as const
 export type MODALITY = typeof MODALITIES[number]
 
 // Represents a row in the "devices" table
@@ -351,6 +410,11 @@ export interface MicroMobilityVehicleEvent extends VehicleEvent {
 export interface TaxiVehicleEvent extends VehicleEvent {
   event_types: TAXI_VEHICLE_EVENT[]
   vehicle_state: TAXI_VEHICLE_STATE
+}
+
+export interface TNCVehicleEvent extends VehicleEvent {
+  event_types: TNC_VEHICLE_EVENT[]
+  vehicle_state: TNC_VEHICLE_STATE
 }
 
 // Standard telemetry columns (used in more than one table)
@@ -489,9 +553,15 @@ export interface PolicyMessage {
 export type MicroMobilityStatesToEvents = {
   [S in MICRO_MOBILITY_VEHICLE_STATE]: MICRO_MOBILITY_VEHICLE_EVENT[] | []
 }
+
 export type TaxiStatesToEvents = {
   [S in TAXI_VEHICLE_STATE]: TAXI_VEHICLE_EVENT[] | []
 }
+
+export type TNCStatesToEvents = {
+  [S in TNC_VEHICLE_STATE]: TNC_VEHICLE_EVENT[] | []
+}
+
 export type StatesToEvents = { [S in VEHICLE_STATE]: VEHICLE_EVENT[] | [] }
 
 interface BaseRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> {
@@ -523,9 +593,15 @@ interface TaxiRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> extends
   states: Partial<TaxiStatesToEvents> | null
 }
 
+interface TNCRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> extends BaseRule<RuleType> {
+  modality: 'tnc'
+  states: Partial<TNCStatesToEvents> | null
+}
+
 type ModalityRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> =
   | MicroMobilityRule<RuleType>
   | TaxiRule<RuleType>
+  | TNCRule<RuleType>
 
 export type CountRule = ModalityRule<'count'>
 
