@@ -374,12 +374,12 @@ export interface SpeedRule extends MicromobilityBaseRule<'speed'> {
 
 export type UserRule = BaseRule<'', '', 'user'>
 
-export interface BasePolicy<
+export type BasePolicy<
   S extends string,
   E extends string,
   RuleType extends RULE_TYPE,
   R extends BaseRule<S, E, RuleType>
-> {
+> = {
   name: string
   description: string
   provider_ids?: UUID[]
@@ -390,8 +390,6 @@ export interface BasePolicy<
   prev_policies: UUID[] | null
   rules: R[]
   publish_date?: Timestamp
-  // TODO fix
-  [key: string]: any
 }
 
 export type MicromobilityPolicy = BasePolicy<
