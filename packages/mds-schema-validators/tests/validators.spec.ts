@@ -35,7 +35,7 @@ import {
   isValidNumber,
   ValidationError,
   validateEvents,
-  validateMicromobilityPolicies,
+  validatePolicies,
   isValidEvent,
   validateGeographies
 } from '../validators'
@@ -204,7 +204,7 @@ describe('Tests validators', () => {
 
   it('verifies policy validator', done => {
     test.assert.doesNotThrow(() =>
-      validateMicromobilityPolicies([
+      validatePolicies([
         {
           name: 'LADOT Mobility Caps',
           description: 'Mobility caps as described in the One-Year Permit',
@@ -231,7 +231,7 @@ describe('Tests validators', () => {
 
     test.assert.throws(
       () =>
-        validateMicromobilityPolicies([
+        validatePolicies([
           {
             name: 'LADOT Mobility Caps',
             description: 'Mobility caps as described in the One-Year Permit',
@@ -259,7 +259,7 @@ describe('Tests validators', () => {
 
     test.assert.throws(
       () =>
-        validateMicromobilityPolicies([
+        validatePolicies([
           {
             name: 'LADOT Mobility Caps',
             description: 'Mobility caps as described in the One-Year Permit',

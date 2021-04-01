@@ -14,20 +14,11 @@
     limitations under the License.
  */
 
-import {
-  Device,
-  Geography,
-  VehicleEvent,
-  UUID,
-  CountRule,
-  Telemetry,
-  MicromobilityPolicy,
-  RULE_TYPES
-} from '@mds-core/mds-types'
+import { Device, Geography, Policy, VehicleEvent, UUID, CountRule, Telemetry } from '@mds-core/mds-types'
 
-import { pointInShape, getPolygon, isInStatesOrEvents, isDefined, UnsupportedTypeError } from '@mds-core/mds-utils'
+import { pointInShape, getPolygon, isInStatesOrEvents, isDefined } from '@mds-core/mds-utils'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../@types'
-import { annotateVehicleMap, getPolicyType, isInVehicleTypes, isRuleActive } from './helpers'
+import { annotateVehicleMap, isInVehicleTypes, isRuleActive } from './helpers'
 
 /**
  * @param event  We throw out events that have no telemetry, so events are guaranteed
@@ -63,14 +54,11 @@ export function isCountRuleMatch(
  * never matches for a subsequent rule, then it is considered in violation of the policy.
  */
 export function processCountPolicy(
-  policy: MicromobilityPolicy,
+  policy: Policy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
 ): ComplianceEngineResult | undefined {
-  if (getPolicyType(policy) !== RULE_TYPES.count) {
-    throw new UnsupportedTypeError(`${getPolicyType(policy)} submitted to count processor`)
-  }
   const matchedVehicles: { [d: string]: { device: Device; rule_applied: UUID; rules_matched?: UUID[] } } = {}
   const overflowedVehicles: { [d: string]: { device: Device; rules_matched: UUID[] } } = {}
   let countMinimumViolations = 0

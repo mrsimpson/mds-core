@@ -14,49 +14,44 @@
     limitations under the License.
  */
 
-import { Device, Geography, UUID, RULE_TYPES, VehicleEvent, MicromobilityPolicy } from '@mds-core/mds-types'
+import { Device, Geography, Policy, UUID, RULE_TYPES, VehicleEvent } from '@mds-core/mds-types'
 
 import { now, UnsupportedTypeError, uuid } from '@mds-core/mds-utils'
 import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
 import { VehicleEventWithTelemetry } from '../@types'
-import { getProviderIDs, getComplianceInputs, isPolicyActive, getPolicyType } from './helpers'
+import { getProviderIDs, getComplianceInputs, isPolicyActive } from './helpers'
 
 import { processCountPolicy } from './count_processors'
 import { processSpeedPolicy } from './speed_processors'
 import { processTimePolicy } from './time_processors'
 
-function computeComplianceSnapshot(
-  policy: MicromobilityPolicy,
-  filteredEvents: VehicleEventWithTelemetry[],
-  geographies: Geography[],
-  deviceMap: { [d: string]: Device }
-) {
-  const policy_type = getPolicyType(policy)
-  switch (policy_type) {
+function getProcessorType(rule_type: string) {
+  switch (rule_type) {
     case RULE_TYPES.count: {
-      return processCountPolicy(policy, filteredEvents, geographies, deviceMap)
+      return processCountPolicy
     }
     case RULE_TYPES.speed: {
-      return processSpeedPolicy(policy, filteredEvents, geographies, deviceMap)
+      return processSpeedPolicy
     }
     case RULE_TYPES.time: {
-      return processTimePolicy(policy, filteredEvents, geographies, deviceMap)
+      return processTimePolicy
     }
     default: {
-      throw new UnsupportedTypeError(`Policy type ${policy_type} unsupported by compliance engine`)
+      throw new UnsupportedTypeError(`Policy type ${rule_type} unsupported`)
     }
   }
 }
 
 export async function createComplianceSnapshot(
   provider_id: UUID,
-  policy: MicromobilityPolicy,
+  policy: Policy,
   geographies: Geography[],
   filteredEvents: VehicleEvent[],
   deviceMap: { [d: string]: Device }
 ): Promise<ComplianceSnapshotDomainModel | undefined> {
+  const processorFunction = getProcessorType(policy.rules[0].rule_type)
   const compliance_as_of = now()
-  const complianceResult = computeComplianceSnapshot(
+  const complianceResult = processorFunction(
     policy,
     filteredEvents as VehicleEventWithTelemetry[],
     geographies,
@@ -83,7 +78,7 @@ export async function createComplianceSnapshot(
  * The geographies should be the result of calling
  * `await readGeographies({ get_published: true })`
  */
-export async function processPolicy(policy: MicromobilityPolicy, geographies: Geography[]) {
+export async function processPolicy(policy: Policy, geographies: Geography[]) {
   if (isPolicyActive(policy)) {
     const provider_ids = getProviderIDs(policy.provider_ids)
     const ComplianceSnapshotPromises = provider_ids.map(async provider_id => {

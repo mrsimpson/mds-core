@@ -1,14 +1,7 @@
 import { Polygon } from 'geojson'
 import { veniceSpecOps, LA_CITY_BOUNDARY, restrictedAreas } from '@mds-core/mds-test-data'
 
-import {
-  Geography,
-  MDSCountPolicy,
-  MicromobilityPolicy,
-  MDSSpeedPolicy,
-  RULE_TYPES,
-  VEHICLE_TYPES
-} from '@mds-core/mds-types'
+import { Geography, Policy, RULE_TYPES, VEHICLE_TYPES } from '@mds-core/mds-types'
 import { days, now } from '@mds-core/mds-utils'
 
 export const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
@@ -24,7 +17,7 @@ export const RESTRICTED_GEOGRAPHY = {
 export const COUNT_POLICY_UUID = '72971a3d-876c-41ea-8e48-c9bb965bbbcc'
 export const COUNT_POLICY_UUID_2 = '37637f96-2580-475a-89e7-cfc5d2e70f84'
 export const COUNT_POLICY_UUID_3 = 'e8f9a720-6c12-41c8-a31c-715e76d65ea1'
-export const COUNT_POLICY_JSON: MDSCountPolicy = {
+export const COUNT_POLICY_JSON: Policy = {
   name: 'LADOT Mobility Caps',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: COUNT_POLICY_UUID,
@@ -47,7 +40,7 @@ export const COUNT_POLICY_JSON: MDSCountPolicy = {
   ]
 }
 
-export const COUNT_POLICY_JSON_2: MDSCountPolicy = {
+export const COUNT_POLICY_JSON_2: Policy = {
   name: 'Something Mobility Caps',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: COUNT_POLICY_UUID_2,
@@ -70,7 +63,7 @@ export const COUNT_POLICY_JSON_2: MDSCountPolicy = {
   ]
 }
 
-export const COUNT_POLICY_JSON_3: MDSCountPolicy = {
+export const COUNT_POLICY_JSON_3: Policy = {
   name: 'LADOT Mobility Caps',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: COUNT_POLICY_UUID_3,
@@ -92,7 +85,7 @@ export const COUNT_POLICY_JSON_3: MDSCountPolicy = {
   ]
 }
 
-export const COUNT_POLICY_JSON_5: MDSCountPolicy = {
+export const COUNT_POLICY_JSON_5: Policy = {
   name: 'Prohibited Dockless Zones',
   rules: [
     {
@@ -215,7 +208,7 @@ export const TANZANIA_GEO: Geography = {
   }
 }
 
-export const HIGH_COUNT_POLICY: MDSCountPolicy = {
+export const HIGH_COUNT_POLICY: Policy = {
   policy_id: '221975ef-569c-40a1-a9b0-646e6155c764',
   name: 'LADOT Pilot Caps',
   description: 'LADOT Pilot Caps (add description)',
@@ -239,7 +232,7 @@ export const HIGH_COUNT_POLICY: MDSCountPolicy = {
   ]
 }
 
-export const LOW_COUNT_POLICY: MDSCountPolicy = {
+export const LOW_COUNT_POLICY: Policy = {
   policy_id: '6d7a9c7e-853c-4ff7-a86f-e17c06d3bd80',
   name: 'Very Low Count Limit',
   description: 'Very low count limit',
@@ -261,7 +254,7 @@ export const LOW_COUNT_POLICY: MDSCountPolicy = {
   ]
 }
 
-export const EXPIRED_POLICY: MDSCountPolicy = {
+export const EXPIRED_POLICY: Policy = {
   policy_id: '6d7a9c7e-853c-4ff7-a86f-e17c06d3bd80',
   name: 'i expired',
   description: 'expired',
@@ -283,7 +276,7 @@ export const EXPIRED_POLICY: MDSCountPolicy = {
   ]
 }
 
-export const VENICE_OVERFLOW_POLICY: MDSCountPolicy = {
+export const VENICE_OVERFLOW_POLICY: Policy = {
   name: 'Venice Overflow Test',
   description: 'what it says on the can',
   policy_id: VENICE_POLICY_UUID,
@@ -314,7 +307,7 @@ export const VENICE_OVERFLOW_POLICY: MDSCountPolicy = {
   ]
 }
 
-export const VENICE_MIXED_VIOLATIONS_POLICY: MDSCountPolicy = {
+export const VENICE_MIXED_VIOLATIONS_POLICY: Policy = {
   name: 'Venice Overflow Test',
   description: 'what it says on the can',
   policy_id: VENICE_POLICY_UUID,
@@ -346,7 +339,7 @@ export const VENICE_MIXED_VIOLATIONS_POLICY: MDSCountPolicy = {
   ]
 }
 
-export const MANY_OVERFLOWS_POLICY: MDSCountPolicy = {
+export const MANY_OVERFLOWS_POLICY: Policy = {
   name: 'Many overflows',
   description: 'what it says on the can',
   policy_id: VENICE_POLICY_UUID,
@@ -391,7 +384,7 @@ export const TEST_ZONE_NO_VALID_DROP_OFF_POINTS: Polygon = {
   ]
 }
 
-export const OVERLAPPING_GEOS_SPEED_POLICY: MDSSpeedPolicy = {
+export const OVERLAPPING_GEOS_SPEED_POLICY: Policy = {
   policy_id: 'fc9b02f0-9c0d-4b0a-85d6-7684b8e9e769',
   name: 'Multiple Speed Limits',
   description: 'LADOT Pilot Speed Limit Limitations',
@@ -427,7 +420,7 @@ export const OVERLAPPING_GEOS_SPEED_POLICY: MDSSpeedPolicy = {
   ]
 }
 
-export const OVERLAPPING_GEOS_TIME_POLICY: MicromobilityPolicy = {
+export const OVERLAPPING_GEOS_TIME_POLICY: Policy = {
   policy_id: 'fc9b02f0-9c0d-4b0a-85d6-7684b8e9e769',
   name: 'Multiple Speed Limits',
   description: 'LADOT Pilot Speed Limit Limitations',

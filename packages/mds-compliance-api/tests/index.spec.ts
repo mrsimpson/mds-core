@@ -17,7 +17,7 @@
 import supertest from 'supertest'
 import HttpStatus from 'http-status-codes'
 import { ApiServer } from '@mds-core/mds-api-server'
-import { MicromobilityPolicy } from '@mds-core/mds-types'
+import { Policy } from '@mds-core/mds-types'
 import { ComplianceServiceClient } from '@mds-core/mds-compliance-service'
 import db from '@mds-core/mds-db'
 
@@ -55,7 +55,7 @@ describe('Test Compliances API', () => {
   beforeEach(() => {
     jest.spyOn(utils, 'now').mockImplementation(() => TIME + 500)
     jest.spyOn(db, 'readActivePolicies').mockImplementation(
-      async (): Promise<MicromobilityPolicy[]> => {
+      async (): Promise<Policy[]> => {
         return [POLICY1, POLICY2]
       }
     )

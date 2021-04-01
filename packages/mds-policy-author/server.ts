@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 City of Los Angeles
+ * Copyright 2019 City of Los Angeles
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,3 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
+import { api } from './api'
+
+HttpServer(ApiServer(api), { port: process.env.POLICY_AUTHOR_API_HTTP_PORT })

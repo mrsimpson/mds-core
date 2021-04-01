@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export { api, injectSchema } from './api'
+export { api } from './api'

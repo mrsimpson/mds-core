@@ -15,7 +15,6 @@
  */
 
 import express, { NextFunction } from 'express'
-import HttpStatus from 'http-status-codes'
 import {
   uuid,
   pathPrefix,
@@ -25,15 +24,15 @@ import {
   ValidationError,
   ServerError,
   isUUID,
-  ConflictError,
-  isDefined
+  ConflictError
 } from '@mds-core/mds-utils'
 import db from '@mds-core/mds-db'
 
+import { policyValidationDetails } from '@mds-core/mds-schema-validators'
 import logger from '@mds-core/mds-logger'
 
 import { checkAccess, AccessTokenScopeValidator, ApiRequest, ApiResponse } from '@mds-core/mds-api-server'
-import { PolicyMetadata, PolicyTypeInfo } from '@mds-core/mds-types'
+import { PolicyAuthorApiVersionMiddleware } from './middleware/policy-author-api-version'
 import {
   PolicyAuthorApiPostPolicyResponse,
   PolicyAuthorApiEditPolicyResponse,
@@ -55,32 +54,30 @@ import {
 const checkPolicyAuthorApiAccess = (validator: AccessTokenScopeValidator<PolicyAuthorApiAccessTokenScopes>) =>
   checkAccess(validator)
 
-function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Express {
+function api(app: express.Express): express.Express {
+  app.use(PolicyAuthorApiVersionMiddleware)
+
   app.post(
     pathPrefix('/policies'),
     checkPolicyAuthorApiAccess(scopes => scopes.includes('policies:write')),
     async (
-      req: PolicyAuthorApiPostPolicyRequest<PInfo>,
-      res: PolicyAuthorApiPostPolicyResponse<PInfo>,
+      req: PolicyAuthorApiPostPolicyRequest,
+      res: PolicyAuthorApiPostPolicyResponse,
       next: express.NextFunction
     ) => {
-      if (!isDefined(req.body.policy_id)) {
-        req.body.policy_id = uuid()
-      }
-      const policy = req.body
-      logger.info('posting policy', policy)
+      const policy = { policy_id: uuid(), ...req.body }
 
+      const details = policyValidationDetails(policy)
+
+      if (details !== null) {
+        return res.status(400).send({ error: new ValidationError(JSON.stringify(details)) })
+      }
       if (policy.publish_date) {
-        return next(
-          new ValidationError('publish_date cannot be set via policy creation endpoint', {
-            details:
-              'publish_date cannot be set via policy creation endpoint. publish_date can only be set via the publishing endpoint'
-          })
-        )
+        return res.status(400).send({ error: new ValidationError('publish_date must be set via publish endpoint') })
       }
 
       try {
-        await db.writePolicy(policy as PInfo['Policy'])
+        await db.writePolicy(policy)
         return res.status(201).send({ version: res.locals.version, data: { policy } })
       } catch (error) {
         if (error instanceof ConflictError) {
@@ -97,7 +94,7 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
     checkPolicyAuthorApiAccess(scopes => scopes.includes('policies:publish')),
     async (
       req: PolicyAuthorApiPublishPolicyRequest,
-      res: PolicyAuthorApiPublishPolicyResponse<PInfo>,
+      res: PolicyAuthorApiPublishPolicyResponse,
       next: express.NextFunction
     ) => {
       const { policy_id } = req.params
@@ -132,18 +129,15 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
     checkPolicyAuthorApiAccess(scopes => scopes.includes('policies:write')),
     async (
       req: PolicyAuthorApiEditPolicyRequest,
-      res: PolicyAuthorApiEditPolicyResponse<PInfo>,
+      res: PolicyAuthorApiEditPolicyResponse,
       next: express.NextFunction
     ) => {
       const policy = req.body
 
-      if (policy.publish_date) {
-        return next(
-          new ValidationError('publish_date cannot be set via policy editing endpoint', {
-            details:
-              'publish_date cannot be set via policy editing endpoint. publish_date can only be set via the publishing endpoint'
-          })
-        )
+      const details = policyValidationDetails(policy)
+
+      if (details !== null) {
+        return res.status(400).send({ error: new ValidationError(JSON.stringify(details)) })
       }
 
       if (policy.publish_date) {
@@ -269,7 +263,7 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
     ) => {
       const policy_metadata = req.body
       try {
-        await db.updatePolicyMetadata(policy_metadata as PolicyMetadata)
+        await db.updatePolicyMetadata(policy_metadata)
         return res.status(200).send({ version: res.locals.version, data: { policy_metadata } })
       } catch (updateErr) {
         if (updateErr instanceof NotFoundError) {
@@ -292,12 +286,11 @@ function api<PInfo extends PolicyTypeInfo>(app: express.Express): express.Expres
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   app.use(async (error: Error, req: ApiRequest, res: ApiResponse, next: NextFunction) => {
     const { method, originalUrl } = req
-    await logger.error('Fatal MDS Policy Author Error (global error handling middleware)', {
+    logger.error('Fatal MDS Policy Author Error (global error handling middleware)', {
       method,
       originalUrl,
       error
     })
-    if (error instanceof ValidationError && error.info) return res.status(HttpStatus.BAD_REQUEST).send({ error })
     return res.status(500).send({ error })
   })
 

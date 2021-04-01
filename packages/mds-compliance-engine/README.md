@@ -8,8 +8,6 @@ Clone https://github.com/openmobilityfoundation/mds-core. Run `yarn install` and
 
 ## Notes on business logic
 
-This compliance code only works for `MicromobilityPolicy`.
-
 A `Policy` should contain only one kind of rule. E.g. a policy can only have count rules, or only speed rules, but not a mixture of the two. While the spec was being developed, it was thought that it might be desirable to have policies that could combine rules. However, in practice, no such policies have ever been written and used, and to simplify this refactor, policies are assumed to contain only one kind of a rule at a time.
 
 Order matters for rule evaluation. A vehicle that matches the first rule will not match for subsequent rules. The following example illustrates this.

@@ -25,13 +25,11 @@ import {
   Telemetry,
   BoundingBox,
   Geography,
+  Rule,
   EVENT_STATES_MAP,
   VEHICLE_STATE,
   BBox,
-  SingleOrArray,
-  RULE_TYPE,
-  BaseRule,
-  VEHICLE_EVENT
+  SingleOrArray
 } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 import { MultiPolygon, Polygon, FeatureCollection, Geometry, Feature } from 'geojson'
@@ -530,7 +528,7 @@ function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
  * ```
  */
 function isInStatesOrEvents(
-  rule: Pick<BaseRule<VEHICLE_STATE, VEHICLE_EVENT, Exclude<RULE_TYPE, 'rate'>>, 'states'>,
+  rule: Pick<Rule, 'states'>,
   event: Pick<VehicleEvent, 'event_types' | 'vehicle_state'>
 ): boolean {
   const { states } = rule
