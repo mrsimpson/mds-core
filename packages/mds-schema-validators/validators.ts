@@ -17,7 +17,7 @@
 import { providers } from '@mds-core/mds-providers' // map of uuids -> obb
 import {
   Geography,
-  Policy,
+  MicromobilityPolicy,
   VehicleEvent,
   VEHICLE_TYPES,
   DAYS_OF_WEEK,
@@ -82,7 +82,7 @@ export const telemetrySchema = Joi.object().keys({
   recorded: timestampSchema.optional()
 })
 
-const ruleSchema = Joi.object().keys({
+const baseRuleSchema = Joi.object().keys({
   name: Joi.string().required(),
   rule_id: Joi.string().guid().required(),
   rule_type: Joi.string()
@@ -90,6 +90,17 @@ const ruleSchema = Joi.object().keys({
     .required(),
   rule_units: Joi.string().valid('seconds', 'minutes', 'hours', 'mph', 'kph'),
   geographies: Joi.array().items(uuidSchema),
+  states: Joi.object().pattern(Joi.string(), Joi.string()).allow(null),
+  maximum: Joi.number(),
+  minimum: Joi.number(),
+  start_time: Joi.string(),
+  end_time: Joi.string(),
+  days: Joi.array().items(Joi.string().valid(...Object.values(DAYS_OF_WEEK))),
+  messages: Joi.object(),
+  value_url: Joi.string().uri()
+})
+
+const micromobilityRuleSchema = baseRuleSchema.keys({
   states: Joi.object()
     .keys(
       VEHICLE_STATES.reduce(
@@ -98,32 +109,35 @@ const ruleSchema = Joi.object().keys({
       )
     )
     .allow(null),
-  vehicle_types: Joi.array().items(Joi.string().valid(...Object.values(VEHICLE_TYPES))),
-  maximum: Joi.number(),
-  minimum: Joi.number(),
-  start_time: Joi.string(),
-  end_time: Joi.string(),
-  days: Joi.array().items(Joi.string().valid(...Object.values(DAYS_OF_WEEK))),
-  messages: Joi.object(),
-  value_url: Joi.string().uri(),
-  rate_amount: Joi.number()
+  vehicle_types: Joi.array().items(Joi.string().valid(...Object.values(VEHICLE_TYPES)))
 })
 
-export const policySchema = Joi.object().keys({
+const rateRuleSchema = baseRuleSchema.keys({
+  rate_amount: Joi.number(),
+  rate_recurrence: Joi.string().valid(...RATE_RECURRENCE_VALUES)
+})
+
+export const basePolicySchema = Joi.object().keys({
   name: Joi.string().required(),
   description: Joi.string().required(),
-  policy_id: Joi.string().guid().required(),
+  policy_id: Joi.string().guid().allow(null),
   start_date: Joi.date().timestamp('javascript').required(),
   publish_date: Joi.date().timestamp('javascript').allow(null),
   end_date: Joi.date().timestamp('javascript').allow(null),
   prev_policies: Joi.array().items(Joi.string().guid()).allow(null),
-  provider_ids: Joi.array().items(Joi.string().guid()).allow(null),
-  rules: Joi.array().min(1).items(ruleSchema).required(),
-  rate_recurrence: Joi.string().valid(...RATE_RECURRENCE_VALUES),
+  provider_ids: Joi.array().items(Joi.string().guid()).allow(null)
+})
+
+export const micromobilityPolicySchema = basePolicySchema.keys({
+  rules: Joi.array().min(1).items(micromobilityRuleSchema).required()
+})
+
+export const ratePolicySchema = basePolicySchema.keys({
+  rules: Joi.array().min(1).items(rateRuleSchema).required(),
   currency: Joi.string()
 })
 
-const policiesSchema = Joi.array().items(policySchema)
+const micromobilityPoliciesSchema = Joi.array().items(micromobilityPolicySchema)
 
 const featureSchema = Joi.object()
   .keys({
@@ -294,8 +308,8 @@ export const isValidAuditNote = (value: unknown, options: Partial<ValidatorOptio
 export const HasPropertyAssertion = <T>(obj: unknown, ...props: (keyof T)[]): obj is T =>
   typeof obj === 'object' && obj !== null && props.every(prop => prop in obj)
 
-export function validatePolicies(policies: unknown): policies is Policy[] {
-  const { error } = policiesSchema.validate(policies)
+export function validateMicromobilityPolicies(policies: unknown): policies is MicromobilityPolicy[] {
+  const { error } = micromobilityPoliciesSchema.validate(policies)
   if (error) {
     throw new ValidationError('invalid_policies', {
       policies,
@@ -327,12 +341,14 @@ export function validateEvents(events: unknown): events is VehicleEvent[] {
   return true
 }
 
-export function policyValidationDetails(policy: Policy): Joi.ValidationErrorItem[] | null {
-  const { error } = policySchema.validate(policy, { allowUnknown: false })
+export function validateMicromobilityPolicy(policy: MicromobilityPolicy): policy is MicromobilityPolicy {
+  const { error } = micromobilityPolicySchema.validate(policy, { allowUnknown: false })
   if (error) {
-    return error.details
+    throw new ValidationError('invalid micromobility policy', {
+      details: error.details
+    })
   }
-  return null
+  return true
 }
 
 export function geographyValidationDetails(geography: Geography): Joi.ValidationErrorItem[] | null {
@@ -341,10 +357,6 @@ export function geographyValidationDetails(geography: Geography): Joi.Validation
     return error.details
   }
   return null
-}
-
-export function rawValidatePolicy(policy: Policy): Joi.ValidationResult {
-  return policySchema.validate(policy)
 }
 
 const validateTripEvent = (event: VehicleEvent) => ValidateSchema(event, tripEventSchema, {})
@@ -370,6 +382,6 @@ const validate_v1_0_0_Event = (event: unknown) => {
 
 export const validateEvent = validate_v1_0_0_Event
 
-export const policySchemaJson = joiToJson(policySchema)
+export const micromobilityPolicySchemaJson = joiToJson(micromobilityPolicySchema)
 
 export const SchemaBuilder = Joi

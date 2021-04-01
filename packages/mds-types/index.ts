@@ -29,8 +29,9 @@ export const VEHICLE_TYPES = Enum('car', 'bicycle', 'scooter', 'moped', 'other')
 export type VEHICLE_TYPE = keyof typeof VEHICLE_TYPES
 
 // TODO rate
-export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
+export const RULE_TYPES = Enum('count', 'speed', 'time', 'user', 'rate')
 export type RULE_TYPE = keyof typeof RULE_TYPES
+export type MICROMOBILITY_RULE_TYPES = 'count' | 'speed' | 'time'
 
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
@@ -180,11 +181,14 @@ export type PickRequired<T> = Pick<T, RequiredKeys<T>>
 export type PickOptional<T> = Pick<T, OptionalKeys<T>>
 export type NullableOptional<T> = PickRequired<T> & NullableProperties<PickOptional<T>>
 
-// Represents a row in the "devices" table
-export interface Device_v1_0_0 {
+export interface CoreDevice {
   device_id: UUID
   provider_id: UUID
   vehicle_id: string
+}
+
+// Represents a row in the "devices" table
+export interface Device_v1_0_0 extends CoreDevice {
   vehicle_type: VEHICLE_TYPE // changed name in 1.0
   propulsion_types: PROPULSION_TYPE[] // changed name in 1.0
   year?: number | null
@@ -200,21 +204,24 @@ export type Device = Device_v1_0_0
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
 
+export interface CoreEvent {
+  device_id: UUID
+  provider_id: UUID
+  timestamp: Timestamp
+  telemetry?: Telemetry | null
+}
+
 /**
  *  Represents a row in the "events" table
  * Named "VehicleEvent" to avoid confusion with the DOM's Event interface
  * Keeping 1_0_0 types in here and not in transformers/@types to avoid circular imports.
  * This alias must be updated if this type is updated.
  */
-export interface VehicleEvent_v1_0_0 {
-  device_id: UUID
-  provider_id: UUID
-  timestamp: Timestamp
+export interface VehicleEvent_v1_0_0 extends CoreEvent {
   timestamp_long?: string | null
   delta?: Timestamp | null
   event_types: VEHICLE_EVENT[]
   telemetry_timestamp?: Timestamp | null
-  telemetry?: Telemetry | null
   trip_id?: UUID | null
   vehicle_state: VEHICLE_STATE
   recorded: Timestamp
@@ -320,35 +327,23 @@ export interface PolicyMessage {
   [key: string]: string
 }
 
-// interface BaseRule<RuleType = 'count' | 'speed' | 'time'> {
-//   name: string
-//   rule_id: UUID
-//   geographies: UUID[]
-//   statuses: Partial<{ [S in VEHICLE_STATE]: (keyof typeof STATUS_EVENT_MAP[S])[] | [] }> | null
-//   rule_type: RuleType
-//   vehicle_types?: VEHICLE_TYPE[] | null
-//   maximum?: number | null
-//   minimum?: number | null
-//   start_time?: string | null
-//   end_time?: string | null
-//   days?: DAY_OF_WEEK[] | null
-//   /* eslint-reason TODO: message types haven't been defined well yet */
-//   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-//   messages?: PolicyMessage
-//   value_url?: URL | null
-// }
+export type GenericStatesToEvents<S extends string, E extends string> = {
+  [K in S]?: E[] | []
+}
 
 // This gets you a type where the keys must be VEHICLE_STATES, such as 'available',
 // and the values are an array of events.
-export type StatesToEvents = { [S in VEHICLE_STATE]: VEHICLE_EVENT[] | [] }
+export type MDSStatesToEvents = Partial<{ [S in VEHICLE_STATE]: VEHICLE_EVENT[] | [] }>
 
-interface BaseRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> {
+export interface BaseRule<S extends string, E extends string, RuleType extends RULE_TYPE = RULE_TYPE> {
+  // TODO 'rate'
   name: string
   rule_id: UUID
   geographies: UUID[]
-  states: Partial<StatesToEvents> | null
+  states: GenericStatesToEvents<S, E> | null
   rule_type: RuleType
-  vehicle_types?: VEHICLE_TYPE[] | null
+  rule_units?: string
+  vehicle_types?: string[] | null
   maximum?: number | null
   minimum?: number | null
   start_time?: string | null
@@ -360,21 +355,31 @@ interface BaseRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> {
   value_url?: URL | null
 }
 
-export type CountRule = BaseRule<'count'>
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface MicromobilityBaseRule<RuleType extends MICROMOBILITY_RULE_TYPES>
+  extends BaseRule<VEHICLE_STATE, VEHICLE_EVENT, RuleType> {
+  vehicle_types?: VEHICLE_TYPE[] | null
+  states: MDSStatesToEvents | null
+}
 
-export interface TimeRule extends BaseRule<'time'> {
+export type CountRule = MicromobilityBaseRule<'count'>
+
+export interface TimeRule extends MicromobilityBaseRule<'time'> {
   rule_units: 'minutes' | 'hours'
 }
 
-export interface SpeedRule extends BaseRule<'speed'> {
+export interface SpeedRule extends MicromobilityBaseRule<'speed'> {
   rule_units: 'kph' | 'mph'
 }
 
-export type UserRule = BaseRule<'user'>
+export type UserRule = BaseRule<'', '', 'user'>
 
-export type Rule = CountRule | TimeRule | SpeedRule | UserRule
-
-export interface BasePolicy {
+export interface BasePolicy<
+  S extends string,
+  E extends string,
+  RuleType extends RULE_TYPE,
+  R extends BaseRule<S, E, RuleType>
+> {
   name: string
   description: string
   provider_ids?: UUID[]
@@ -383,12 +388,36 @@ export interface BasePolicy {
   start_date: Timestamp
   end_date: Timestamp | null
   prev_policies: UUID[] | null
+  rules: R[]
   publish_date?: Timestamp
+  // TODO fix
+  [key: string]: any
 }
 
-export interface Policy extends BasePolicy {
-  rules: Rule[]
-}
+export type MicromobilityPolicy = BasePolicy<
+  VEHICLE_STATE,
+  VEHICLE_EVENT,
+  RULE_TYPE,
+  MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>
+>
+
+export type PolicyTypeInfo<
+  State extends string = VEHICLE_STATE,
+  Event extends string = VEHICLE_EVENT,
+  RuleType extends RULE_TYPE = RULE_TYPE,
+  Rule extends BaseRule<State, Event, RuleType> = BaseRule<State, Event, RuleType>
+> = { State: State; Event: Event; RuleType: RuleType; Rule: Rule; Policy: BasePolicy<State, Event, RuleType, Rule> }
+
+export type MicromobilityPolicyTypeInfo = PolicyTypeInfo<
+  VEHICLE_STATE,
+  VEHICLE_EVENT,
+  RULE_TYPE,
+  MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>
+>
+
+export type MDSCountPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'count', CountRule>
+export type MDSSpeedPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'speed', SpeedRule>
+export type MDSTimePolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'time', TimeRule>
 
 export const RATE_RECURRENCE_VALUES = ['once', 'each_time_unit', 'per_complete_time_unit'] as const
 export type RATE_RECURRENCE = typeof RATE_RECURRENCE_VALUES[number]
@@ -397,16 +426,18 @@ export type RATE_RECURRENCE = typeof RATE_RECURRENCE_VALUES[number]
  * A RateRule is a rule of any type that has a `rate_amount` property.
  * @alpha Out-of-spec for MDS 0.4.1
  */
-export type RateRule = Rule & { rate_amount: number }
+export type RateRule<S extends string, E extends string> = BaseRule<S, E, 'rate'> & {
+  rate_amount: number
+  rate_recurrence: RATE_RECURRENCE
+}
 
 /**
  * A RatePolicy is a policy whose rules are RateRules.
  * @alpha Out-of-spec for MDS 0.4.1
  */
-export interface RatePolicy extends BasePolicy {
-  rate_recurrence: RATE_RECURRENCE
+export interface RatePolicy<S extends string, E extends string> extends BasePolicy<S, E, 'rate', RateRule<S, E>> {
   currency: string
-  rules: RateRule[]
+  rules: RateRule<S, E>[]
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

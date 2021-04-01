@@ -1,13 +1,14 @@
 import {
-  Policy,
   Geography,
   UUID,
   Device,
   VehicleEvent,
-  Rule,
+  MicromobilityBaseRule,
   DAY_OF_WEEK,
   TIME_FORMAT,
-  DAYS_OF_WEEK
+  DAYS_OF_WEEK,
+  MicromobilityPolicy,
+  MICROMOBILITY_RULE_TYPES
 } from '@mds-core/mds-types'
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
@@ -21,13 +22,17 @@ const { env } = process
 
 const TWO_DAYS_IN_MS = 172800000
 
+export function getPolicyType(policy: MicromobilityPolicy) {
+  return policy.rules[0].rule_type
+}
+
 export function generateDeviceMap(devices: Device[]): { [d: string]: Device } {
   return [...devices].reduce((deviceMapAcc: { [d: string]: Device }, device: Device) => {
     return Object.assign(deviceMapAcc, { [device.device_id]: device })
   }, {})
 }
 
-export function isPolicyUniversal(policy: Policy) {
+export function isPolicyUniversal(policy: MicromobilityPolicy) {
   return !policy.provider_ids || policy.provider_ids.length === 0
 }
 
@@ -50,14 +55,14 @@ export async function getComplianceInputs(provider_id: string | undefined) {
   return { filteredEvents, deviceMap }
 }
 
-export function isPolicyActive(policy: Policy, end_time: number = now()): boolean {
+export function isPolicyActive(policy: MicromobilityPolicy, end_time: number = now()): boolean {
   if (policy.end_date === null) {
     return end_time >= policy.start_date
   }
   return end_time >= policy.start_date && end_time <= policy.end_date
 }
 
-export function isRuleActive(rule: Rule): boolean {
+export function isRuleActive(rule: MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>): boolean {
   if (!env.TIMEZONE) {
     throw new RuntimeError('TIMEZONE environment variable must be declared!')
   }
@@ -78,20 +83,20 @@ export function isRuleActive(rule: Rule): boolean {
   return false
 }
 
-export function isInVehicleTypes(rule: Rule, device: Device): boolean {
+export function isInVehicleTypes(rule: MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>, device: Device): boolean {
   return !rule.vehicle_types || (rule.vehicle_types && rule.vehicle_types.includes(device.vehicle_type))
 }
 
 // Take a list of policies, and eliminate all those that have been superseded. Returns
 // policies that have not been superseded.
-export function getSupersedingPolicies(policies: Policy[]): Policy[] {
-  const prev_policies: string[] = policies.reduce((prev_policies_acc: string[], policy: Policy) => {
+export function getSupersedingPolicies(policies: MicromobilityPolicy[]): MicromobilityPolicy[] {
+  const prev_policies: string[] = policies.reduce((prev_policies_acc: string[], policy: MicromobilityPolicy) => {
     if (policy.prev_policies) {
       prev_policies_acc.push(...policy.prev_policies)
     }
     return prev_policies_acc
   }, [])
-  return policies.filter((policy: Policy) => {
+  return policies.filter((policy: MicromobilityPolicy) => {
     return !prev_policies.includes(policy.policy_id)
   })
 }
@@ -132,8 +137,8 @@ export function createMatchedVehicleInformation(
   }
 }
 
-export function annotateVehicleMap<T extends Rule>(
-  policy: Policy,
+export function annotateVehicleMap<T extends MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>>(
+  policy: MicromobilityPolicy,
   events: VehicleEventWithTelemetry[],
   geographies: Geography[],
   vehicleMap: { [d: string]: { device: Device; speed?: number; rule_applied?: UUID; rules_matched?: UUID[] } },

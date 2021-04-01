@@ -27,7 +27,7 @@ import { FeatureCollection, Feature } from 'geojson'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
 import {
   Device,
-  Policy,
+  MicromobilityPolicy,
   Geography,
   VehicleEvent,
   UUID,
@@ -335,7 +335,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         }
       }) as unknown) as Geography[]
 
-      const VENICE_SPEC_OPS_POLICY: Policy = {
+      const VENICE_SPEC_OPS_POLICY: MicromobilityPolicy = {
         name: 'Venice Special Operations Zone',
         description: 'LADOT Venice Drop-off/no-fly zones',
         policy_id: VENICE_POLICY_UUID,

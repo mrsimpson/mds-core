@@ -200,19 +200,19 @@ importers:
     specifiers:
       '@mds-core/mds-jurisdiction-service': 0.1.2
       '@mds-core/mds-webpack-config': 0.1.2
-  container-images/mds-policy:
+  container-images/mds-micromobility-policy:
     dependencies:
-      '@mds-core/mds-policy': link:../../packages/mds-policy
+      '@mds-core/mds-micromobility-policy': link:../../packages/mds-micromobility-policy
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
     specifiers:
-      '@mds-core/mds-policy': 0.0.29
+      '@mds-core/mds-micromobility-policy': 0.1.0
       '@mds-core/mds-webpack-config': 0.1.2
-  container-images/mds-policy-author:
+  container-images/mds-micromobility-policy-author:
     dependencies:
-      '@mds-core/mds-policy-author': link:../../packages/mds-policy-author
+      '@mds-core/mds-micromobility-policy-author': link:../../packages/mds-micromobility-policy-author
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
     specifiers:
-      '@mds-core/mds-policy-author': 0.0.25
+      '@mds-core/mds-micromobility-policy-author': 0.1.0
       '@mds-core/mds-webpack-config': 0.1.2
   container-images/mds-policy-service:
     dependencies:
@@ -777,6 +777,40 @@ importers:
       express-http-context: 1.2.4
     specifiers:
       express-http-context: 1.2.4
+  packages/mds-micromobility-policy:
+    dependencies:
+      '@mds-core/mds-api-server': link:../mds-api-server
+      '@mds-core/mds-logger': link:../mds-logger
+      '@mds-core/mds-policy': link:../mds-policy
+      '@mds-core/mds-schema-validators': link:../mds-schema-validators
+      '@mds-core/mds-types': link:../mds-types
+      '@types/express': 4.17.8
+      express: 4.17.1
+    specifiers:
+      '@mds-core/mds-api-server': 0.1.28
+      '@mds-core/mds-logger': 0.2.2
+      '@mds-core/mds-policy': 0.0.29
+      '@mds-core/mds-schema-validators': 0.1.4
+      '@mds-core/mds-types': 0.1.25
+      '@types/express': 4.17.8
+      express: 4.17.1
+  packages/mds-micromobility-policy-author:
+    dependencies:
+      '@mds-core/mds-api-server': link:../mds-api-server
+      '@mds-core/mds-policy-author': link:../mds-policy-author
+      '@mds-core/mds-policy-author-middleware': link:../mds-policy-author-middleware
+      '@mds-core/mds-types': link:../mds-types
+      '@types/express': 4.17.8
+      express: 4.17.1
+      http-status-codes: 2.1.4
+    specifiers:
+      '@mds-core/mds-api-server': 0.1.28
+      '@mds-core/mds-policy-author': 0.0.25
+      '@mds-core/mds-policy-author-middleware': 0.1.0
+      '@mds-core/mds-types': 0.1.25
+      '@types/express': 4.17.8
+      express: 4.17.1
+      http-status-codes: 2.1.4
   packages/mds-policy:
     dependencies:
       '@mds-core/mds-api-helpers': link:../mds-api-helpers
@@ -809,12 +843,14 @@ importers:
       '@mds-core/mds-api-server': link:../mds-api-server
       '@mds-core/mds-db': link:../mds-db
       '@mds-core/mds-logger': link:../mds-logger
+      '@mds-core/mds-policy-author-middleware': link:../mds-policy-author-middleware
       '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
       '@types/express': 4.17.10
       express: 4.17.1
+      http-status-codes: 2.1.4
     devDependencies:
       '@mds-core/mds-test-data': link:../mds-test-data
     specifiers:
@@ -822,6 +858,7 @@ importers:
       '@mds-core/mds-api-server': 0.1.28
       '@mds-core/mds-db': 0.1.28
       '@mds-core/mds-logger': 0.2.2
+      '@mds-core/mds-policy-author-middleware': 0.1.0
       '@mds-core/mds-providers': 0.1.28
       '@mds-core/mds-schema-validators': 0.1.4
       '@mds-core/mds-test-data': 0.1.28
@@ -829,6 +866,24 @@ importers:
       '@mds-core/mds-utils': 0.1.28
       '@types/express': 4.17.10
       express: 4.17.1
+      http-status-codes: 2.1.4
+  packages/mds-policy-author-middleware:
+    dependencies:
+      '@mds-core/mds-api-server': link:../mds-api-server
+      '@mds-core/mds-schema-validators': link:../mds-schema-validators
+      '@mds-core/mds-types': link:../mds-types
+      '@mds-core/mds-utils': link:../mds-utils
+      '@types/express': 4.17.8
+      express: 4.17.1
+      http-status-codes: 2.1.4
+    specifiers:
+      '@mds-core/mds-api-server': 0.1.28
+      '@mds-core/mds-schema-validators': 0.1.4
+      '@mds-core/mds-types': 0.1.25
+      '@mds-core/mds-utils': 0.1.28
+      '@types/express': 4.17.8
+      express: 4.17.1
+      http-status-codes: 2.1.4
   packages/mds-policy-service:
     dependencies:
       '@mds-core/mds-repository': link:../mds-repository

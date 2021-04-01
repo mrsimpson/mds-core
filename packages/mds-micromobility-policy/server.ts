@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-import { ApiVersionMiddleware } from '@mds-core/mds-api-server'
-import { POLICY_AUTHOR_API_SUPPORTED_VERSIONS, POLICY_AUTHOR_API_DEFAULT_VERSION } from '../types'
+import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
+import { MicromobilityPolicyTypeInfo } from '@mds-core/mds-types'
+import { micromobilityPolicySchemaJson } from '@mds-core/mds-schema-validators'
+import { api, injectSchema } from '@mds-core/mds-policy'
 
-export const PolicyAuthorApiVersionMiddleware = ApiVersionMiddleware(
-  'application/vnd.mds.policy-author+json',
-  POLICY_AUTHOR_API_SUPPORTED_VERSIONS
-).withDefaultVersion(POLICY_AUTHOR_API_DEFAULT_VERSION)
+// TODO eliminate this file from this package and create mds-micromobility-policy package
+HttpServer(injectSchema(micromobilityPolicySchemaJson, ApiServer<MicromobilityPolicyTypeInfo>(api)), {
+  port: process.env.MICROMOBILITY_POLICY_API_HTTP_PORT
+})
