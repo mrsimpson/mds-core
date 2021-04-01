@@ -390,8 +390,7 @@ export interface BasePolicy<
   prev_policies: UUID[] | null
   rules: R[]
   publish_date?: Timestamp
-  // Needed to set the index signature to reassure compiler all keys are strings
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // TODO fix
   [key: string]: any
 }
 
@@ -406,16 +405,14 @@ export type PolicyTypeInfo<
   State extends string = VEHICLE_STATE,
   Event extends string = VEHICLE_EVENT,
   RuleType extends RULE_TYPE = RULE_TYPE,
-  Rule extends BaseRule<State, Event, RuleType> = BaseRule<State, Event, RuleType>,
-  Policy extends BasePolicy<State, Event, RuleType, Rule> = BasePolicy<State, Event, RuleType, Rule>
-> = { State: State; Event: Event; RuleType: RuleType; Rule: Rule; Policy: Policy }
+  Rule extends BaseRule<State, Event, RuleType> = BaseRule<State, Event, RuleType>
+> = { State: State; Event: Event; RuleType: RuleType; Rule: Rule; Policy: BasePolicy<State, Event, RuleType, Rule> }
 
 export type MicromobilityPolicyTypeInfo = PolicyTypeInfo<
   VEHICLE_STATE,
   VEHICLE_EVENT,
   RULE_TYPE,
-  MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>,
-  MicromobilityPolicy
+  MicromobilityBaseRule<MICROMOBILITY_RULE_TYPES>
 >
 
 export type MDSCountPolicy = BasePolicy<VEHICLE_STATE, VEHICLE_EVENT, 'count', CountRule>
