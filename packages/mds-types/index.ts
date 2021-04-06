@@ -140,8 +140,7 @@ export const TAXI_VEHICLE_EVENTS = [
   'trip_end',
   'trip_resume',
   'trip_start',
-  'trip_stop',
-  'unspecified'
+  'trip_stop'
 ] as const
 export type TAXI_VEHICLE_EVENT = typeof TAXI_VEHICLE_EVENTS[number]
 
@@ -249,8 +248,7 @@ export const TAXI_EVENT_STATES_MAP: {
   trip_end: ['available', 'on_trip', 'reserved', 'stopped'],
   trip_resume: ['on_trip'],
   trip_start: ['on_trip'],
-  trip_stop: ['stopped'],
-  unspecified: ['available', 'non_operational', 'removed']
+  trip_stop: ['stopped']
 }
 
 export const TNC_EVENT_STATES_MAP: {
@@ -281,10 +279,6 @@ const MicroMobilityStatusEventMap = <
   map: T
 ) => map
 
-const TaxiStatusEventMap = <T extends { [S in TAXI_VEHICLE_STATE]: Partial<TAXI_VEHICLE_EVENT[]> }>(map: T) => map
-
-const TncStatusEventMap = <T extends { [S in TNC_VEHICLE_STATE]: Partial<TNC_VEHICLE_EVENT[]> }>(map: T) => map
-
 // Given a state, list the valid entry events
 export const MICRO_MOBILITY_STATE_EVENT_MAP = MicroMobilityStatusEventMap({
   available: [
@@ -314,41 +308,6 @@ export const MICRO_MOBILITY_STATE_EVENT_MAP = MicroMobilityStatusEventMap({
     'unspecified'
   ],
   unknown: ['comms_lost', 'missing', 'located']
-})
-
-export const TAXI_STATE_EVENT_MAP = TaxiStatusEventMap({
-  available: [
-    'driver_cancellation',
-    'enter_jurisdiction',
-    'passenger_cancellation',
-    'provider_cancellation',
-    'service_start',
-    'trip_end'
-  ],
-  reserved: ['reservation_start', 'comms_restored', 'enter_jurisdiction'],
-  non_operational: ['enter_jurisdiction', 'maintenance', 'maintenance_end', 'recommissioned', 'service_end'],
-  on_trip: ['trip_start', 'enter_jurisdiction', 'comms_restored', 'trip_resume'],
-  elsewhere: ['leave_jurisdiction', 'comms_restored'],
-  removed: ['decommissioned', 'maintenance_start', 'maintenance'],
-  unknown: ['comms_lost'],
-  stopped: ['trip_stop', 'reservation_stop']
-})
-
-export const TNC_STATE_EVENT_MAP = TncStatusEventMap({
-  available: [
-    'driver_cancellation',
-    'enter_jurisdiction',
-    'passenger_cancellation',
-    'provider_cancellation',
-    'service_start',
-    'trip_end'
-  ],
-  reserved: ['reservation_start', 'comms_restored', 'enter_jurisdiction'],
-  non_operational: ['enter_jurisdiction', 'maintenance', 'service_end'],
-  on_trip: ['trip_start', 'enter_jurisdiction', 'comms_restored', 'trip_resume'],
-  elsewhere: ['leave_jurisdiction', 'comms_restored'],
-  unknown: ['comms_lost'],
-  stopped: ['trip_stop', 'reservation_stop']
 })
 
 export const DAYS_OF_WEEK = Enum('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
