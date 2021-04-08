@@ -24,7 +24,8 @@ import {
   Timestamp,
   Telemetry,
   VehicleEvent,
-  VEHICLE_STATE
+  VEHICLE_STATE,
+  MODALITY
 } from '@mds-core/mds-types'
 import { Geometry } from 'geojson'
 
@@ -46,6 +47,7 @@ import { serviceAreaMap, restrictedAreas, veniceSpecOps } from './test-areas/tes
 
 import {
   POLICY_JSON,
+  TAXI_POLICY,
   SUPERSEDING_POLICY_JSON,
   POLICY2_JSON,
   POLICY3_JSON,
@@ -83,6 +85,7 @@ const COMPLIANCE_AUTH =
 const BAD_PROVIDER_UUID = '5f7114d1-4091-46ee-b492-e55875f7de99'
 
 const JUMP_TEST_DEVICE_1: Device = {
+  accessibility_options: [],
   provider_id: JUMP_PROVIDER_ID,
   device_id: 'e9edbe74-f7be-48e0-a63a-92f4bc1af5ed',
   vehicle_id: '1230987',
@@ -90,9 +93,11 @@ const JUMP_TEST_DEVICE_1: Device = {
   propulsion_types: [PROPULSION_TYPES.electric],
   year: 2018,
   mfgr: 'Schwinn',
+  modality: 'micromobility',
   model: 'whoknows',
   recorded: now()
 }
+
 function makeTelemetry(devices: Device[], timestamp: Timestamp): Telemetry[] {
   let i = 0
   const serviceAreaKeys = Object.keys(serviceAreaMap)
@@ -236,6 +241,7 @@ function makeEvents(
       provider_id: device.provider_id,
       event_types,
       vehicle_state,
+      trip_state: null,
       timestamp,
       recorded: now()
     }
@@ -265,6 +271,7 @@ function makeEventsWithTelemetry(
       provider_id: device.provider_id,
       event_types,
       vehicle_state,
+      trip_state: null,
       telemetry: makeTelemetryInArea(device, timestamp, area, speed),
       timestamp,
       recorded: timestamp,
@@ -319,6 +326,7 @@ function makeDevices(count: number, timestamp: Timestamp, provider_id = TEST1_PR
         throw new Error(`unknown type: ${vehicle_type}`)
     }
     const device = {
+      accessibility_options: [],
       device_id,
       provider_id,
       vehicle_id: `test-vin-${Math.round(Math.random() * 1000000)}`,
@@ -326,6 +334,7 @@ function makeDevices(count: number, timestamp: Timestamp, provider_id = TEST1_PR
       propulsion_types,
       year,
       mfgr,
+      modality: 'micromobility' as MODALITY,
       model,
       timestamp,
       recorded: now()
@@ -379,5 +388,6 @@ export {
   SCOPED_AUTH,
   serviceAreaMap,
   restrictedAreas,
-  veniceSpecOps
+  veniceSpecOps,
+  TAXI_POLICY
 }

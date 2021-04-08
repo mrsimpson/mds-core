@@ -86,6 +86,7 @@ describe('Testing API', () => {
       device_id: provider_device_id,
       event_types: ['agency_drop_off'],
       vehicle_state: 'available',
+      trip_state: null,
       telemetry_timestamp: AUDIT_START,
       trip_id: uuid(),
       timestamp: AUDIT_START,
@@ -106,7 +107,9 @@ describe('Testing API', () => {
       }
     }
     db.writeDevice({
+      accessibility_options: [],
       device_id: provider_device_id,
+      modality: 'micromobility',
       provider_id,
       vehicle_id: provider_vehicle_id,
       propulsion_types: [PROPULSION_TYPES.electric],
@@ -698,7 +701,9 @@ describe('Testing API', () => {
       } as AuditAttachment
       Promise.all([db.reinitialize(), cache.reinitialize()]).then(async () => {
         await db.writeDevice({
+          accessibility_options: [],
           device_id: provider_device_id,
+          modality: 'micromobility',
           provider_id,
           vehicle_id: provider_vehicle_id,
           propulsion_types: [PROPULSION_TYPES.electric],

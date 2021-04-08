@@ -2,7 +2,7 @@ import assert from 'assert'
 /* eslint-reason extends object.prototype */
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import should from 'should'
-import { RULE_TYPE, BaseRule, BasePolicy, MicromobilityPolicyTypeInfo } from '@mds-core/mds-types'
+import { RULE_TYPE, BaseRule, BasePolicy, ModalityPolicyTypeInfo } from '@mds-core/mds-types'
 import {
   POLICY_JSON,
   POLICY2_JSON,
@@ -23,13 +23,9 @@ const ACTIVE_POLICY_JSON = { ...POLICY_JSON, publish_date: yesterday(), start_da
 
 type SimpleVehicleState = 'available' | 'unavailable'
 type SimpleVehicleEvent = 'trip_start' | 'trip_end'
+type SimpleMap = Partial<{ [S in SimpleVehicleState]: SimpleVehicleEvent[] | [] }>
 
-export type SimplePolicy = BasePolicy<
-  SimpleVehicleState,
-  SimpleVehicleEvent,
-  RULE_TYPE,
-  BaseRule<SimpleVehicleState, SimpleVehicleEvent, RULE_TYPE>
->
+export type SimplePolicy = BasePolicy<SimpleMap, RULE_TYPE, BaseRule<SimpleMap, RULE_TYPE>>
 
 const SIMPLE_POLICY_JSON: SimplePolicy = {
   // TODO guts
@@ -108,11 +104,11 @@ if (pg_info.database) {
 
     it('can delete an unpublished Policy', async () => {
       const { policy_id } = DELETEABLE_POLICY
-      await MDSDBPostgres.writePolicy<MicromobilityPolicyTypeInfo>(DELETEABLE_POLICY)
+      await MDSDBPostgres.writePolicy<ModalityPolicyTypeInfo>(DELETEABLE_POLICY)
 
       assert(!(await MDSDBPostgres.isPolicyPublished(policy_id)))
       await MDSDBPostgres.deletePolicy(policy_id)
-      const policy_result = await MDSDBPostgres.readPolicies<MicromobilityPolicyTypeInfo>({
+      const policy_result = await MDSDBPostgres.readPolicies<ModalityPolicyTypeInfo>({
         policy_id,
         get_published: null,
         get_unpublished: null
@@ -131,14 +127,14 @@ if (pg_info.database) {
       await MDSDBPostgres.writePolicy(POLICY3_JSON)
 
       // Read all policies, no matter whether published or not.
-      const policies = await MDSDBPostgres.readPolicies<MicromobilityPolicyTypeInfo>()
+      const policies = await MDSDBPostgres.readPolicies<ModalityPolicyTypeInfo>()
       assert.deepStrictEqual(policies.length, 3)
-      const unpublishedPolicies = await MDSDBPostgres.readPolicies<MicromobilityPolicyTypeInfo>({
+      const unpublishedPolicies = await MDSDBPostgres.readPolicies<ModalityPolicyTypeInfo>({
         get_unpublished: true,
         get_published: null
       })
       assert.deepStrictEqual(unpublishedPolicies.length, 2)
-      const publishedPolicies = await MDSDBPostgres.readPolicies<MicromobilityPolicyTypeInfo>({
+      const publishedPolicies = await MDSDBPostgres.readPolicies<ModalityPolicyTypeInfo>({
         get_published: true,
         get_unpublished: null
       })

@@ -5,7 +5,7 @@ import {
   TRANSFORMER_EVENT_TYPE_REASON,
   VehicleEvent_v0_4_1
 } from '../@types'
-import { VEHICLE_EVENT_v1_0_0, VEHICLE_STATE_v1_0_0, VehicleEvent_v1_0_0 } from '../../index'
+import { VEHICLE_EVENT_v1_0_0, VEHICLE_STATE_v1_0_0, VehicleEvent_v1_0_0 } from '../@types/1_0_0'
 
 export class UnsupportedEventTypeError extends Error {
   public constructor(public name: string, public reason?: string, public info?: unknown) {

@@ -16,12 +16,12 @@
 
 import {
   UUID,
-  MicromobilityPolicy,
   Timestamp,
   Recorded,
   PolicyMetadata,
   Nullable,
-  PolicyTypeInfo
+  PolicyTypeInfo,
+  ModalityPolicy
 } from '@mds-core/mds-types'
 import {
   now,
@@ -288,7 +288,7 @@ export async function publishPolicy(policy_id: UUID, publish_date = now()) {
      where policy_id='${policy_id}' RETURNING *`
     const {
       rows: [published_policy]
-    }: { rows: MicromobilityPolicy[] } = await client.query(publishPolicySQL).catch(err => {
+    }: { rows: ModalityPolicy[] } = await client.query(publishPolicySQL).catch(err => {
       throw err
     })
     return { ...published_policy }

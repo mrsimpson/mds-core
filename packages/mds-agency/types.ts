@@ -21,8 +21,9 @@ import {
   Telemetry,
   Timestamp,
   Recorded,
+  VEHICLE_STATE,
   VEHICLE_EVENT,
-  VEHICLE_STATE
+  TripMetadata
 } from '@mds-core/mds-types'
 import { MultiPolygon } from 'geojson'
 import {
@@ -46,7 +47,7 @@ export type AgencyApiGetVehiclesByProviderRequest = AgencyApiRequest
 export type AgencyApiUpdateVehicleRequest = AgencyApiRequest<Device> & ApiRequestParams<'device_id'>
 export type AgencyApiSubmitVehicleEventRequest = AgencyApiRequest<VehicleEvent> & ApiRequestParams<'device_id'>
 export type AgencyApiSubmitVehicleTelemetryRequest = AgencyApiRequest<{ data: Telemetry[] }>
-
+export type AgencyApiPostTripMetadataRequest = AgencyApiRequest<TripMetadata>
 export type AgencyApiAccessTokenScopes = 'admin:all' | 'vehicles:read'
 
 export type AgencyApiResponse<B = {}> = ApiResponse<B> &
@@ -70,6 +71,8 @@ export type AgencyApiSubmitVehicleTelemetryResponse = AgencyApiResponse<{
   unique: number
   failures: string[]
 }>
+
+export type AgencyApiPostTripMetadataResponse = AgencyApiResponse<TripMetadata>
 
 export interface ServiceArea {
   service_area_id: UUID

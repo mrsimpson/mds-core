@@ -21,7 +21,7 @@ import {
   UUID,
   CountRule,
   Telemetry,
-  MicromobilityPolicy,
+  ModalityPolicy,
   RULE_TYPES
 } from '@mds-core/mds-types'
 
@@ -41,7 +41,7 @@ export function isCountRuleMatch(
 ) {
   if (isRuleActive(rule)) {
     for (const geography of rule.geographies) {
-      if (isInStatesOrEvents(rule, event) && isInVehicleTypes(rule, device)) {
+      if (isInStatesOrEvents(rule, device, event) && isInVehicleTypes(rule, device)) {
         const poly = getPolygon(geographies, geography)
         if (poly && pointInShape(event.telemetry.gps, poly)) {
           return true
@@ -63,7 +63,7 @@ export function isCountRuleMatch(
  * never matches for a subsequent rule, then it is considered in violation of the policy.
  */
 export function processCountPolicy(
-  policy: MicromobilityPolicy,
+  policy: ModalityPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }

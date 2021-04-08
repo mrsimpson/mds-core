@@ -16,15 +16,7 @@
 
 import { DomainModelCreate } from '@mds-core/mds-repository'
 import { RpcServiceDefinition, RpcRoute } from '@mds-core/mds-rpc-common'
-import {
-  Nullable,
-  Timestamp,
-  UUID,
-  BaseRule,
-  MICROMOBILITY_RULE_TYPES,
-  VEHICLE_STATE,
-  VEHICLE_EVENT
-} from '@mds-core/mds-types'
+import { Nullable, Timestamp, UUID, BaseRule, RULE_TYPE, ModalityStatesToEvents } from '@mds-core/mds-types'
 
 export interface PolicyDomainModel {
   policy_id: UUID
@@ -34,7 +26,7 @@ export interface PolicyDomainModel {
   start_date: Timestamp
   end_date: Nullable<Timestamp>
   prev_policies: Nullable<UUID[]>
-  rules: BaseRule<VEHICLE_STATE, VEHICLE_EVENT, MICROMOBILITY_RULE_TYPES>[]
+  rules: BaseRule<ModalityStatesToEvents, Exclude<RULE_TYPE, 'rate'>>[]
   publish_date: Nullable<Timestamp>
 }
 

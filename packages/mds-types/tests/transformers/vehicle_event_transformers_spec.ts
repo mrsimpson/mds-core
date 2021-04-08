@@ -1,6 +1,6 @@
 import assert from 'assert'
-import { VehicleEvent_v0_4_1 } from '../../transformers/@types'
-import { VehicleEvent_v1_0_0 } from '../../index'
+import { VehicleEvent_v0_4_1, VehicleEvent_v1_0_0 } from '../../transformers/@types'
+
 import {
   convert_v1_0_0_vehicle_event_to_v0_4_1,
   convert_v0_4_1_vehicle_event_to_v1_0_0,

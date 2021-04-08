@@ -5,7 +5,7 @@ import {
   UUID,
   SpeedRule,
   Telemetry,
-  MicromobilityPolicy,
+  ModalityPolicy,
   RULE_TYPES
 } from '@mds-core/mds-types'
 
@@ -22,7 +22,7 @@ export function isSpeedRuleMatch(
   if (isRuleActive(rule)) {
     for (const geography of rule.geographies) {
       if (
-        isInStatesOrEvents(rule, event) &&
+        isInStatesOrEvents(rule, device, event) &&
         isInVehicleTypes(rule, device) &&
         event.telemetry.gps.speed &&
         pointInShape(event.telemetry.gps, getPolygon(geographies, geography)) &&
@@ -36,7 +36,7 @@ export function isSpeedRuleMatch(
 }
 
 export function processSpeedPolicy(
-  policy: MicromobilityPolicy,
+  policy: ModalityPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }

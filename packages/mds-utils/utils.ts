@@ -25,13 +25,22 @@ import {
   Telemetry,
   BoundingBox,
   Geography,
-  EVENT_STATES_MAP,
-  VEHICLE_STATE,
+  Rule,
+  MICRO_MOBILITY_EVENT_STATES_MAP,
+  MICRO_MOBILITY_VEHICLE_STATE,
   BBox,
   SingleOrArray,
-  RULE_TYPE,
-  BaseRule,
-  VEHICLE_EVENT
+  Device,
+  MicroMobilityVehicleEvent,
+  MICRO_MOBILITY_VEHICLE_EVENTS,
+  TAXI_VEHICLE_EVENTS,
+  TAXI_EVENT_STATES_MAP,
+  TAXI_VEHICLE_STATE,
+  TaxiVehicleEvent,
+  TNCVehicleEvent,
+  TNC_VEHICLE_EVENT,
+  TNC_VEHICLE_STATE,
+  TNC_EVENT_STATES_MAP
 } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 import { MultiPolygon, Polygon, FeatureCollection, Geometry, Feature } from 'geojson'
@@ -43,6 +52,29 @@ import { parseRelative, getCurrentDate } from './date-time-utils'
 const RADIUS = 30.48 // 100 feet, in meters
 const NUMBER_OF_EDGES = 32 // Number of edges to add, geojson doesn't support real circles
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
+
+/* Is `as` a subset of `bs`? */
+const isSubset = <T extends Array<string>, U extends Readonly<Array<string>>>(as: T, bs: U) => {
+  return as.every(a => bs.includes(a))
+}
+
+const isMicroMobilityEvent = (
+  { modality }: Pick<Device, 'modality'>,
+  event: VehicleEvent
+): event is MicroMobilityVehicleEvent => {
+  const { event_types } = event
+  return modality === 'micromobility' && isSubset(event_types, MICRO_MOBILITY_VEHICLE_EVENTS)
+}
+
+const isTaxiEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TaxiVehicleEvent => {
+  const { event_types } = event
+  return modality === 'taxi' && isSubset(event_types, TAXI_VEHICLE_EVENTS)
+}
+
+const isTncEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TNCVehicleEvent => {
+  const { event_types } = event
+  return modality === 'tnc' && isSubset(event_types, TNC_VEHICLE_EVENT)
+}
 
 function isUUID(s: unknown): s is UUID {
   if (typeof s !== 'string') {
@@ -426,6 +458,13 @@ function stripNulls<T extends {}>(obj: { [x: string]: unknown }): Partial<T> {
   }, obj) as Partial<T>
 }
 
+const setEmptyArraysToUndefined = <T extends {}>(obj: { [x: string]: unknown }): Partial<T> => {
+  return Object.entries(obj).reduce((acc, [key, val]) => {
+    if (Array.isArray(val) && val.length === 0) return Object.assign(acc, { [key]: undefined })
+    return Object.assign(acc, { [key]: val })
+  }, {}) as Partial<T>
+}
+
 function isFloat(n: unknown): boolean {
   return typeof n === 'number' || (typeof n === 'string' && !Number.isNaN(parseFloat(n)))
 }
@@ -504,6 +543,47 @@ function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
   return set.size !== arr1.length + arr2.length
 }
 
+const getPossibleStates = (device: Pick<Device, 'modality'>, event: VehicleEvent) => {
+  if (isMicroMobilityEvent(device, event)) {
+    const { event_types, vehicle_state } = event
+    // All event_types except the last (in most cases this will be an empty list)
+    const transientEventTypes = event_types.splice(0, -1)
+
+    return transientEventTypes.reduce(
+      (acc: MICRO_MOBILITY_VEHICLE_STATE[], event_type) => {
+        return acc.concat(MICRO_MOBILITY_EVENT_STATES_MAP[event_type])
+      },
+      [vehicle_state]
+    )
+  }
+  if (isTaxiEvent(device, event)) {
+    const { event_types, vehicle_state } = event
+    // All event_types except the last (in most cases this will be an empty list)
+    const transientEventTypes = event_types.splice(0, -1)
+
+    return transientEventTypes.reduce(
+      (acc: TAXI_VEHICLE_STATE[], event_type) => {
+        return acc.concat(TAXI_EVENT_STATES_MAP[event_type])
+      },
+      [vehicle_state]
+    )
+  }
+  if (isTncEvent(device, event)) {
+    const { event_types, vehicle_state } = event
+    // All event_types except the last (in most cases this will be an empty list)
+    const transientEventTypes = event_types.splice(0, -1)
+
+    return transientEventTypes.reduce(
+      (acc: TNC_VEHICLE_STATE[], event_type) => {
+        return acc.concat(TNC_EVENT_STATES_MAP[event_type])
+      },
+      [vehicle_state]
+    )
+  }
+
+  return [event.vehicle_state]
+}
+
 /**
  * The rule matches this event if a transient event_type and possible resultant states,
  * or the final event_type and explicitly encoded vehicle_state match with the rule's status definitions.
@@ -530,8 +610,9 @@ function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
  * ```
  */
 function isInStatesOrEvents(
-  rule: Pick<BaseRule<VEHICLE_STATE, VEHICLE_EVENT, Exclude<RULE_TYPE, 'rate'>>, 'states'>,
-  event: Pick<VehicleEvent, 'event_types' | 'vehicle_state'>
+  rule: Pick<Rule, 'states'>,
+  device: Pick<Device, 'modality'>,
+  event: VehicleEvent
 ): boolean {
   const { states } = rule
   // If no states are specified, then the rule applies to all VehicleStates.
@@ -539,25 +620,15 @@ function isInStatesOrEvents(
     return true
   }
 
-  const { event_types, vehicle_state } = event
-
-  // All event_types except the last (in most cases this will be an empty list)
-  const transientEventTypes = event_types.splice(0, -1)
-
   /**
    * State encoded in the event payload (default acc in the reducer) + states that it is
    * possible to transition into with any transient event_types
    */
-  const possibleStates: VEHICLE_STATE[] = transientEventTypes.reduce(
-    (acc: VEHICLE_STATE[], event_type) => {
-      return acc.concat(EVENT_STATES_MAP[event_type])
-    },
-    [vehicle_state]
-  )
+  const possibleStates = getPossibleStates(device, event)
 
   return possibleStates.some(state => {
     // Explicit events encoded in rule for that state (if any)
-    const matchableEvents: string[] | undefined = states[state as VEHICLE_STATE]
+    const matchableEvents: string[] | undefined = state in states ? (states as any)[state] : undefined //FIXME should not have to use an any cast here
 
     /**
      * If event_types not encoded in rule, assume state match.
@@ -701,5 +772,8 @@ export {
   asArray,
   pluralize,
   filterDefined,
-  areThereCommonElements
+  areThereCommonElements,
+  isMicroMobilityEvent,
+  isTaxiEvent,
+  setEmptyArraysToUndefined
 }

@@ -29,14 +29,29 @@
 
 import supertest from 'supertest'
 import test from 'unit.js'
-import { VEHICLE_TYPES, PROPULSION_TYPES, Timestamp, Device, VehicleEvent } from '@mds-core/mds-types'
+import {
+  VEHICLE_TYPES,
+  PROPULSION_TYPES,
+  Timestamp,
+  Device,
+  VehicleEvent,
+  TAXI_VEHICLE_EVENTS,
+  TAXI_VEHICLE_EVENT,
+  MICRO_MOBILITY_VEHICLE_EVENTS,
+  TAXI_EVENT_STATES_MAP,
+  MICRO_MOBILITY_EVENT_STATES_MAP,
+  TripMetadata,
+  TRIP_STATE,
+  TNC_VEHICLE_EVENT,
+  TNC_EVENT_STATES_MAP
+} from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
 import { makeDevices, makeEvents, JUMP_TEST_DEVICE_1 } from '@mds-core/mds-test-data'
 import { ApiServer } from '@mds-core/mds-api-server'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
-import { pathPrefix } from '@mds-core/mds-utils'
+import { pathPrefix, uuid } from '@mds-core/mds-utils'
 import { api } from '../api'
 
 /* eslint-disable-next-line no-console */
@@ -80,7 +95,7 @@ const TEST_TELEMETRY2 = {
   timestamp: now() + 1000
 }
 
-const TEST_VEHICLE: Omit<Device, 'recorded'> = {
+const TEST_BICYCLE: Omit<Device, 'recorded' | 'accessibility_options'> = {
   device_id: DEVICE_UUID,
   provider_id: TEST1_PROVIDER_ID,
   vehicle_id: 'test-id-1',
@@ -88,6 +103,33 @@ const TEST_VEHICLE: Omit<Device, 'recorded'> = {
   propulsion_types: [PROPULSION_TYPES.human],
   year: 2018,
   mfgr: 'Schwinn',
+  modality: 'micromobility',
+  model: 'Mantaray'
+}
+
+const TEST_TAXI: Omit<Device, 'recorded'> = {
+  accessibility_options: ['wheelchair_accessible'],
+  device_id: uuid(),
+  provider_id: TEST1_PROVIDER_ID,
+  vehicle_id: 'test-id-1',
+  vehicle_type: VEHICLE_TYPES.car,
+  propulsion_types: ['electric'],
+  year: 2018,
+  mfgr: 'Schwinn',
+  modality: 'taxi',
+  model: 'Mantaray'
+}
+
+const TEST_TNC: Omit<Device, 'recorded'> = {
+  accessibility_options: ['wheelchair_accessible'],
+  device_id: uuid(),
+  provider_id: TEST1_PROVIDER_ID,
+  vehicle_id: 'test-id-1',
+  vehicle_type: VEHICLE_TYPES.car,
+  propulsion_types: ['electric'],
+  year: 2018,
+  mfgr: 'Schwinn',
+  modality: 'tnc',
   model: 'Mantaray'
 }
 
@@ -97,6 +139,7 @@ const test_event: Omit<VehicleEvent, 'recorded' | 'provider_id'> = {
   device_id: DEVICE_UUID,
   event_types: ['decommissioned'],
   vehicle_state: 'removed',
+  trip_state: null,
   timestamp: testTimestamp
 }
 
@@ -169,7 +212,7 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device bad device id', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     badVehicle.device_id = 'bad'
     request
       .post(pathPrefix('/vehicles'))
@@ -197,7 +240,7 @@ describe('Tests API', () => {
   //         })
   // })
   it('verifies post device missing propulsion_types', done => {
-    const { propulsion_types, ...badVehicle } = deepCopy(TEST_VEHICLE)
+    const { propulsion_types, ...badVehicle } = deepCopy(TEST_BICYCLE)
 
     request
       .post(pathPrefix('/vehicles'))
@@ -213,7 +256,7 @@ describe('Tests API', () => {
   })
 
   it('verifies post device bad propulsion', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     // @ts-ignore: Spoofing garbage data
     badVehicle.propulsion_types = ['hamster']
     request
@@ -243,7 +286,7 @@ describe('Tests API', () => {
   //         })
   // })
   it('verifies post device bad year', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     // @ts-ignore: Spoofing garbage data
     badVehicle.year = 'hamster'
     request
@@ -260,7 +303,7 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device out-of-range year', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     badVehicle.year = 3000
     request
       .post(pathPrefix('/vehicles'))
@@ -276,7 +319,7 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device missing vehicle_type', done => {
-    const { vehicle_type, ...badVehicle } = deepCopy(TEST_VEHICLE)
+    const { vehicle_type, ...badVehicle } = deepCopy(TEST_BICYCLE)
 
     request
       .post(pathPrefix('/vehicles'))
@@ -291,7 +334,7 @@ describe('Tests API', () => {
       })
   })
   it('verifies post device bad vehicle_type', done => {
-    const badVehicle = deepCopy(TEST_VEHICLE)
+    const badVehicle = deepCopy(TEST_BICYCLE)
     // @ts-ignore: Spoofing garbage data
     badVehicle.vehicle_type = 'hamster'
     request
@@ -312,7 +355,7 @@ describe('Tests API', () => {
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)
-      .send(TEST_VEHICLE)
+      .send(TEST_BICYCLE)
       .expect(201)
       .end((err, result) => {
         log('err', err, 'body', result.body)
@@ -389,7 +432,7 @@ describe('Tests API', () => {
     request
       .post(pathPrefix('/vehicles'))
       .set('Authorization', AUTH)
-      .send(TEST_VEHICLE)
+      .send(TEST_BICYCLE)
       .expect(409)
       .end((err, result) => {
         log('err', err, 'body', result.body)
@@ -401,7 +444,7 @@ describe('Tests API', () => {
   const NEW_VEHICLE_ID = 'new-vehicle-id'
   it('verifies put update success', done => {
     request
-      .put(pathPrefix(`/vehicles/${TEST_VEHICLE.device_id}`))
+      .put(pathPrefix(`/vehicles/${TEST_BICYCLE.device_id}`))
       .set('Authorization', AUTH)
       .send({
         vehicle_id: NEW_VEHICLE_ID
@@ -416,7 +459,7 @@ describe('Tests API', () => {
   })
   it('verifies put update failure (provider mismatch)', done => {
     request
-      .put(pathPrefix(`/vehicles/${TEST_VEHICLE.device_id}`))
+      .put(pathPrefix(`/vehicles/${TEST_BICYCLE.device_id}`))
       .set('Authorization', AUTH2)
       .send({
         vehicle_id: NEW_VEHICLE_ID
@@ -577,6 +620,7 @@ describe('Tests API', () => {
       .set('Authorization', AUTH)
       .send({
         event_types: ['BOGUS'],
+        vehicle_state: 'foo',
         telemetry: TEST_TELEMETRY,
         timestamp: testTimestamp++
       })
@@ -1336,7 +1380,7 @@ describe('Tests API', () => {
   })
   it('wipes a vehicle via admin', done => {
     request
-      .get(pathPrefix(`/admin/wipe/${TEST_VEHICLE.device_id}`))
+      .get(pathPrefix(`/admin/wipe/${TEST_BICYCLE.device_id}`))
       .set('Authorization', AUTH)
       .expect(200)
       .end((err, result) => {
@@ -1346,7 +1390,7 @@ describe('Tests API', () => {
   })
   it('wipes a vehicle via admin that has already been wiped', done => {
     request
-      .get(pathPrefix(`/admin/wipe/${TEST_VEHICLE.device_id}`))
+      .get(pathPrefix(`/admin/wipe/${TEST_BICYCLE.device_id}`))
       .set('Authorization', AUTH)
       .expect(404)
       .end((err, result) => {
@@ -1431,4 +1475,201 @@ describe('Tests pagination', async () => {
         done(err)
       })
   })
+})
+
+describe('Tests for taxi modality', async () => {
+  before(async () => {
+    await Promise.all([db.reinitialize()])
+  })
+
+  it('verifies post taxi success', done => {
+    request
+      .post(pathPrefix('/vehicles'))
+      .set('Authorization', AUTH)
+      .send(TEST_TAXI)
+      .expect(201)
+      .end((err, result) => {
+        done(err)
+      })
+  })
+
+  for (const taxiEvent of TAXI_VEHICLE_EVENTS) {
+    const validStates = TAXI_EVENT_STATES_MAP[taxiEvent]
+    for (const vehicle_state of validStates) {
+      it(`verifies ${taxiEvent} success`, done => {
+        const { device_id } = TEST_TAXI
+        const body = {
+          event_types: [taxiEvent],
+          vehicle_state,
+          telemetry: TEST_TELEMETRY,
+          timestamp: now(),
+          ...(taxiEvent.startsWith('trip_')
+            ? { trip_id: '1f943d59-ccc9-4d91-b6e2-0c5e771cbc6b', trip_state: vehicle_state as TRIP_STATE }
+            : {})
+        }
+        request
+          .post(pathPrefix(`/vehicles/${device_id}/event`))
+          .set('Authorization', AUTH)
+          .send(body)
+          .expect(201)
+          .end((err, result) => {
+            // test.string(result.body.status).is(EVENT_STATUS_MAP[taxiEvent])
+            done(err)
+          })
+      })
+    }
+  }
+
+  /* We want to test for all micromobility events which
+   * are not included in the valid Taxi events.
+   */
+  const MICRO_MOBILITY_EVENTS_NOT_IN_TAXI_EVENTS = MICRO_MOBILITY_VEHICLE_EVENTS.filter(
+    item => !TAXI_VEHICLE_EVENTS.includes(item as TAXI_VEHICLE_EVENT)
+  )
+
+  for (const microEvent of MICRO_MOBILITY_EVENTS_NOT_IN_TAXI_EVENTS) {
+    const validStates = MICRO_MOBILITY_EVENT_STATES_MAP[microEvent]
+    for (const vehicle_state of validStates) {
+      it('verifies cannot send micromobility type event for a taxi', done => {
+        const { device_id } = TEST_TAXI
+        request
+          .post(pathPrefix(`/vehicles/${device_id}/event`))
+          .set('Authorization', AUTH)
+          .send({
+            event_types: [microEvent],
+            vehicle_state,
+            telemetry: TEST_TELEMETRY,
+            timestamp: now()
+          })
+          .expect(400)
+          .end((err, result) => {
+            test.string(result.body.error).contains('bad_param')
+            test.string(result.body.error_description).contains('invalid event_type')
+            done(err)
+          })
+      })
+    }
+  }
+})
+
+describe('Tests for tnc modality', async () => {
+  before(async () => {
+    await Promise.all([db.reinitialize()])
+  })
+
+  it('verifies post tnc success', done => {
+    request
+      .post(pathPrefix('/vehicles'))
+      .set('Authorization', AUTH)
+      .send(TEST_TNC)
+      .expect(201)
+      .end((err, result) => {
+        done(err)
+      })
+  })
+
+  for (const tncEvent of TNC_VEHICLE_EVENT) {
+    const validStates = TNC_EVENT_STATES_MAP[tncEvent]
+    for (const vehicle_state of validStates) {
+      it(`verifies ${tncEvent} success`, done => {
+        const { device_id } = TEST_TNC
+        const body = {
+          event_types: [tncEvent],
+          vehicle_state,
+          telemetry: TEST_TELEMETRY,
+          timestamp: now(),
+          ...(tncEvent.startsWith('trip_')
+            ? { trip_id: '1f943d59-ccc9-4d91-b6e2-0c5e771cbc6b', trip_state: vehicle_state as TRIP_STATE }
+            : {})
+        }
+        request
+          .post(pathPrefix(`/vehicles/${device_id}/event`))
+          .set('Authorization', AUTH)
+          .send(body)
+          .expect(201)
+          .end((err, result) => {
+            // test.string(result.body.status).is(EVENT_STATUS_MAP[taxiEvent])
+            done(err)
+          })
+      })
+    }
+  }
+
+  /* We want to test for all micromobility events which
+   * are not included in the valid tnc events.
+   */
+  const MICRO_MOBILITY_EVENTS_NOT_IN_TNC_EVENTS = MICRO_MOBILITY_VEHICLE_EVENTS.filter(
+    item => !TNC_VEHICLE_EVENT.includes(item as TNC_VEHICLE_EVENT)
+  )
+
+  for (const microEvent of MICRO_MOBILITY_EVENTS_NOT_IN_TNC_EVENTS) {
+    const validStates = MICRO_MOBILITY_EVENT_STATES_MAP[microEvent]
+    for (const vehicle_state of validStates) {
+      it('verifies cannot send micromobility type event for a tnc', done => {
+        const { device_id } = TEST_TNC
+        request
+          .post(pathPrefix(`/vehicles/${device_id}/event`))
+          .set('Authorization', AUTH)
+          .send({
+            event_types: [microEvent],
+            vehicle_state,
+            telemetry: TEST_TELEMETRY,
+            timestamp: now()
+          })
+          .expect(400)
+          .end((err, result) => {
+            test.string(result.body.error).contains('bad_param')
+            test.string(result.body.error_description).contains('invalid event_type')
+            done(err)
+          })
+      })
+    }
+  }
+})
+
+describe('Tests TripMetadata', async () => {
+  const metadata: Required<Omit<TripMetadata, 'provider_id'>> = {
+    trip_id: uuid(),
+    requested_trip_start_location: { lat: 34.0522, lng: -118.2437 },
+    reservation_time: now(),
+    quoted_trip_start_time: now(),
+    dispatch_time: now(),
+    trip_start_time: now(),
+    trip_end_time: now(),
+    cancellation_reason: 'test',
+    distance: 100,
+    accessibility_options: [],
+    fare: {
+      quoted_cost: 2000,
+      actual_cost: 2500,
+      components: {},
+      currency: 'USD',
+      payment_methods: ['cash', 'card', 'equity_program']
+    },
+    reservation_type: 'on_demand',
+    reservation_method: 'app'
+  }
+
+  it('Tests valid payload returns success code', async () => {
+    await request.post(pathPrefix('/trips')).set('Authorization', AUTH).send(metadata).expect(201)
+  })
+
+  for (const key of ['trip_id', 'reservation_time', 'reservation_type', 'reservation_method'] as (keyof Omit<
+    TripMetadata,
+    'provider_id'
+  >)[]) {
+    it(`Tests invalid TripMetadata payload without ${key}`, async () => {
+      const { [key]: foo, ...subsetMetadata } = metadata
+
+      // eslint-disable-next-line no-await-in-loop
+      const result = await request
+        .post(pathPrefix('/trips'))
+        .set('Authorization', AUTH)
+        .send(subsetMetadata)
+        .expect(400)
+
+      test.string(result.body.error.reason).is('invalid_value')
+      test.string(result.body.error.info.details).contains(`value.${key} is required`)
+    })
+  }
 })

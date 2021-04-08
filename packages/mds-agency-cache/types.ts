@@ -31,6 +31,7 @@ export type StringifiedTelemetry = Stringify<Omit<Telemetry, 'gps'>> & {
 export type StringifiedEventWithTelemetry = StringifiedEvent & { telemetry?: StringifiedTelemetry }
 
 export type StringifiedCacheReadDeviceResult = Stringify<CacheReadDeviceResult & { timestamp?: Timestamp }> & {
+  accessibility_options: string[] // FIXME enum
   propulsion_types: PROPULSION_TYPE[]
 }
 export type CacheReadDeviceResult = Device & { updated?: Timestamp | null; telemetry?: Telemetry | null }

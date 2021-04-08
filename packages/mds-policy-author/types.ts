@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MicromobilityPolicy, UUID, PolicyMetadata, PolicyTypeInfo } from '@mds-core/mds-types'
+import { ModalityPolicy, UUID, PolicyMetadata, PolicyTypeInfo } from '@mds-core/mds-types'
 import {
   ApiRequest,
   ApiVersionedResponse,
@@ -31,7 +31,7 @@ export type PolicyAuthorApiRequest<B = {}> = ApiRequest<B>
 
 export type PolicyAuthorApiPostPolicyRequest<PInfo extends PolicyTypeInfo> = PolicyAuthorApiRequest<PInfo['Policy']>
 export type PolicyAuthorApiPublishPolicyRequest = PolicyAuthorApiRequest & ApiRequestParams<'policy_id'>
-export type PolicyAuthorApiEditPolicyRequest = PolicyAuthorApiRequest<MicromobilityPolicy>
+export type PolicyAuthorApiEditPolicyRequest = PolicyAuthorApiRequest<ModalityPolicy>
 export type PolicyAuthorApiDeletePolicyRequest = PolicyAuthorApiRequest & ApiRequestParams<'policy_id'>
 export type PolicyAuthorApiGetPolicyMetadataRequest = PolicyAuthorApiRequest &
   ApiRequestQuery<'get_published' | 'get_unpublished'>

@@ -17,9 +17,17 @@
 import logger from '@mds-core/mds-logger'
 
 import flatten, { unflatten } from 'flat'
-import { NotFoundError, nullKeys, stripNulls, now, isInsideBoundingBox, routeDistance, tail } from '@mds-core/mds-utils'
-import { UUID, Timestamp, Device, VehicleEvent, Telemetry, BoundingBox } from '@mds-core/mds-types'
-
+import {
+  NotFoundError,
+  nullKeys,
+  stripNulls,
+  now,
+  isInsideBoundingBox,
+  routeDistance,
+  tail,
+  setEmptyArraysToUndefined
+} from '@mds-core/mds-utils'
+import { UUID, Timestamp, Device, VehicleEvent, Telemetry, BoundingBox, TripMetadata } from '@mds-core/mds-types'
 import { RedisCache } from '@mds-core/mds-cache'
 
 import { parseTelemetry, parseEvent, parseDevice, parseCachedItem } from './unflatteners'
@@ -133,7 +141,7 @@ async function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | 
   }
   const { device_id } = item
   const key = decorateKey(`device:${device_id}:${suffix}`)
-  const flat: { [key: string]: unknown } = flatten(item)
+  const flat: { [key: string]: unknown } = setEmptyArraysToUndefined(flatten(item))
   const nulls = nullKeys(flat)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hmap = stripNulls(flat) as { [key: string]: any; device_id?: UUID }
@@ -151,11 +159,18 @@ async function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | 
   return updateVehicleList(device_id)
 }
 
+const writeTripMetadata = async (metadata: TripMetadata) => {
+  const { trip_id } = metadata
+
+  return client.set(decorateKey(`trip:${trip_id}:metadata`), JSON.stringify(metadata))
+}
+
 // put basics of device in the cache
 async function writeDevice(device: Device) {
   if (!device) {
     throw new Error('null device not legal to write')
   }
+
   return hwrite('device', device)
 }
 
@@ -532,5 +547,6 @@ export default {
   readKeys,
   wipeDevice,
   updateVehicleList,
-  cleanup
+  cleanup,
+  writeTripMetadata
 }

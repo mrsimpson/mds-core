@@ -15,7 +15,7 @@
  */
 
 import { now, days, uuid, minutes } from '@mds-core/mds-utils'
-import { MicromobilityPolicy, VEHICLE_TYPES } from '@mds-core/mds-types'
+import { ModalityPolicy, VEHICLE_TYPES } from '@mds-core/mds-types'
 import { ComplianceSnapshotDomainModel } from '../@types'
 
 export const TIME = 1605821758034
@@ -309,7 +309,7 @@ export const COMPLIANCE_SNAPSHOTS = [
 })
 
 const GEOGRAPHY_UUID = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
-export const POLICY1: MicromobilityPolicy = {
+export const POLICY1: ModalityPolicy = {
   name: 'Policy 1',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: POLICY_ID_1,
@@ -332,7 +332,7 @@ export const POLICY1: MicromobilityPolicy = {
   ]
 }
 
-export const POLICY2: MicromobilityPolicy = {
+export const POLICY2: ModalityPolicy = {
   name: 'Policy 2',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: POLICY_ID_2,

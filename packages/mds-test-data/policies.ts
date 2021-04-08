@@ -1,5 +1,5 @@
 import { days, now, uuid } from '@mds-core/mds-utils'
-import { MicromobilityPolicy, VEHICLE_TYPES } from '@mds-core/mds-types'
+import { ModalityPolicy, VEHICLE_TYPES } from '@mds-core/mds-types'
 
 export const GEOGRAPHY_UUID = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 export const GEOGRAPHY2_UUID = '722b99ca-65c2-4ed6-9be1-056c394fadbf'
@@ -18,7 +18,7 @@ export const START_NOW = now()
 export const START_TOMORROW = now() + (now() % days(1))
 export const START_ONE_MONTH_FROM_NOW = now() - (now() % days(1)) + days(30)
 
-export const POLICY_JSON: MicromobilityPolicy = {
+export const POLICY_JSON: ModalityPolicy = {
   // TODO guts
   name: 'MDSPolicy 1',
   description: 'Mobility caps as described in the One-Year Permit',
@@ -42,7 +42,7 @@ export const POLICY_JSON: MicromobilityPolicy = {
   ]
 }
 
-export const SUPERSEDING_POLICY_JSON: MicromobilityPolicy = {
+export const SUPERSEDING_POLICY_JSON: ModalityPolicy = {
   // TODO guts
   name: 'Supersedes MDSPolicy 1',
   description: 'Mobility caps as described in the One-Year Permit',
@@ -66,7 +66,7 @@ export const SUPERSEDING_POLICY_JSON: MicromobilityPolicy = {
 }
 
 // in the past
-export const POLICY2_JSON: MicromobilityPolicy = {
+export const POLICY2_JSON: ModalityPolicy = {
   // TODO guts
   name: 'MDSPolicy 2',
   description: 'LADOT Idle Time Limitations',
@@ -100,7 +100,7 @@ export const POLICY2_JSON: MicromobilityPolicy = {
 }
 
 // in the future
-export const POLICY3_JSON: MicromobilityPolicy = {
+export const POLICY3_JSON: ModalityPolicy = {
   // TODO guts
   policy_id: POLICY3_UUID,
   name: 'MDSPolicy 3',
@@ -140,7 +140,7 @@ export const POLICY3_JSON: MicromobilityPolicy = {
   ]
 }
 
-export const POLICY4_JSON: MicromobilityPolicy = {
+export const POLICY4_JSON: ModalityPolicy = {
   // TODO guts
   policy_id: POLICY4_UUID,
   name: 'MDSPolicy 4',
@@ -163,7 +163,7 @@ export const POLICY4_JSON: MicromobilityPolicy = {
   ]
 }
 
-export const POLICY5_JSON: MicromobilityPolicy = {
+export const POLICY5_JSON: ModalityPolicy = {
   policy_id: uuid(),
   name: 'MDSPolicy 5',
   description: 'just here to enable testing for policies by start date',
@@ -185,7 +185,7 @@ export const POLICY5_JSON: MicromobilityPolicy = {
   ]
 }
 
-export const PUBLISH_DATE_VALIDATION_JSON: MicromobilityPolicy = {
+export const PUBLISH_DATE_VALIDATION_JSON: ModalityPolicy = {
   policy_id: '682ab342-0127-4eed-8c26-fb674c25af74',
   name: 'Future MDSPolicy',
   description: 'just here to help show that publish_date must be before start_date',
@@ -228,7 +228,7 @@ export const POLICY_JSON_MISSING_POLICY_ID = {
   ]
 }
 
-export const POLICY_WITH_DUPE_RULE: MicromobilityPolicy = {
+export const POLICY_WITH_DUPE_RULE: ModalityPolicy = {
   policy_id: 'ddb4fbc7-0f3d-49cf-869d-f9c1d0b5471f',
   name: 'I am a no good copycat',
   description: 'LADOT Pilot Speed Limit Limitations',
@@ -250,7 +250,7 @@ export const POLICY_WITH_DUPE_RULE: MicromobilityPolicy = {
   ]
 }
 
-export const PUBLISHED_POLICY: MicromobilityPolicy = {
+export const PUBLISHED_POLICY: ModalityPolicy = {
   policy_id: 'a337afd5-f8a9-4291-b176-11f965bc9f3d',
   name: 'I am published but do not do much',
   description: 'LADOT Pilot Speed Limit Limitations',
@@ -273,7 +273,7 @@ export const PUBLISHED_POLICY: MicromobilityPolicy = {
   ]
 }
 
-export const DELETEABLE_POLICY: MicromobilityPolicy = {
+export const DELETEABLE_POLICY: ModalityPolicy = {
   policy_id: '55396abd-e32b-4370-ac02-7f3294eef49e',
   name: 'I am published but do not do much',
   description: 'LADOT Pilot Speed Limit Limitations',
@@ -291,6 +291,30 @@ export const DELETEABLE_POLICY: MicromobilityPolicy = {
       states: { on_trip: [] },
       vehicle_types: [VEHICLE_TYPES.bicycle, VEHICLE_TYPES.scooter],
       maximum: 25
+    }
+  ]
+}
+
+export const TAXI_POLICY: ModalityPolicy = {
+  name: 'Policy 1',
+  description: 'Mobility caps as described in the One-Year Permit',
+  policy_id: uuid(),
+  start_date: START_TOMORROW,
+  end_date: null,
+  publish_date: START_NOW,
+  prev_policies: null,
+  provider_ids: [],
+  rules: [
+    {
+      rule_type: 'count',
+      rule_id: uuid(),
+      name: 'Greater LA',
+      geographies: [GEOGRAPHY_UUID],
+      modality: 'taxi',
+      states: { available: [], removed: [], reserved: [], on_trip: [] },
+      vehicle_types: [VEHICLE_TYPES.car],
+      maximum: 3000,
+      minimum: 500
     }
   ]
 }

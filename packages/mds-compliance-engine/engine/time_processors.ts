@@ -21,7 +21,7 @@ import {
   UUID,
   TimeRule,
   Telemetry,
-  MicromobilityPolicy,
+  ModalityPolicy,
   RULE_TYPES
 } from '@mds-core/mds-types'
 
@@ -46,7 +46,7 @@ export function isTimeRuleMatch(
   if (isRuleActive(rule)) {
     for (const geography of rule.geographies) {
       if (
-        isInStatesOrEvents(rule, event) &&
+        isInStatesOrEvents(rule, device, event) &&
         isInVehicleTypes(rule, device) &&
         (!rule.maximum || (now() - event.timestamp) / RULE_UNIT_MAP[rule.rule_units] >= rule.maximum)
       ) {
@@ -61,7 +61,7 @@ export function isTimeRuleMatch(
 }
 
 export function processTimePolicy(
-  policy: MicromobilityPolicy,
+  policy: ModalityPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
