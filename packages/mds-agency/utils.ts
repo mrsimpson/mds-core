@@ -42,7 +42,10 @@ import {
   TAXI_VEHICLE_STATE,
   TRIP_STATES,
   TRIP_STATE,
-  TAXI_TRIP_EXIT_EVENTS
+  TAXI_TRIP_EXIT_EVENTS,
+  TNC_VEHICLE_EVENT,
+  TNC_VEHICLE_STATE,
+  TNC_TRIP_EXIT_EVENTS
 } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
@@ -379,6 +382,29 @@ export async function badEvent({ modality }: Pick<Device, 'modality'>, event: Ve
       event.trip_id &&
       TRIP_STATES.includes(event.vehicle_state as TRIP_STATE) &&
       !areThereCommonElements(TAXI_TRIP_EXIT_EVENTS, event.event_types)
+    ) {
+      if (!event.trip_state) {
+        return { error: 'missing_param', error_description: `missing enum field "trip_state" required on trip events` }
+      }
+
+      if (event.trip_state && !TRIP_STATES.includes(event.trip_state)) {
+        return { error: 'bad_param', error_description: `invalid trip_state ${event.trip_state}` }
+      }
+    }
+  } else if (modality === 'tnc') {
+    for (const event_type of event.event_types) {
+      if (!TNC_VEHICLE_EVENT.includes(event_type as TNC_VEHICLE_EVENT))
+        return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }
+    }
+
+    if (!TNC_VEHICLE_STATE.includes(event.vehicle_state as TNC_VEHICLE_STATE)) {
+      return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
+    }
+
+    if (
+      event.trip_id &&
+      TRIP_STATES.includes(event.vehicle_state as TRIP_STATE) &&
+      !areThereCommonElements(TNC_TRIP_EXIT_EVENTS, event.event_types)
     ) {
       if (!event.trip_state) {
         return { error: 'missing_param', error_description: `missing enum field "trip_state" required on trip events` }

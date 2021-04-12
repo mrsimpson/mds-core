@@ -36,7 +36,11 @@ import {
   TAXI_VEHICLE_EVENTS,
   TAXI_EVENT_STATES_MAP,
   TAXI_VEHICLE_STATE,
-  TaxiVehicleEvent
+  TaxiVehicleEvent,
+  TNCVehicleEvent,
+  TNC_VEHICLE_EVENT,
+  TNC_VEHICLE_STATE,
+  TNC_EVENT_STATES_MAP
 } from '@mds-core/mds-types'
 import logger from '@mds-core/mds-logger'
 import { MultiPolygon, Polygon, FeatureCollection, Geometry, Feature } from 'geojson'
@@ -65,6 +69,11 @@ const isMicroMobilityEvent = (
 const isTaxiEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TaxiVehicleEvent => {
   const { event_types } = event
   return modality === 'taxi' && isSubset(event_types, TAXI_VEHICLE_EVENTS)
+}
+
+const isTncEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TNCVehicleEvent => {
+  const { event_types } = event
+  return modality === 'tnc' && isSubset(event_types, TNC_VEHICLE_EVENT)
 }
 
 function isUUID(s: unknown): s is UUID {
@@ -559,6 +568,18 @@ const getPossibleStates = (device: Pick<Device, 'modality'>, event: VehicleEvent
       [vehicle_state]
     )
   }
+  if (isTncEvent(device, event)) {
+    const { event_types, vehicle_state } = event
+    // All event_types except the last (in most cases this will be an empty list)
+    const transientEventTypes = event_types.splice(0, -1)
+
+    return transientEventTypes.reduce(
+      (acc: TNC_VEHICLE_STATE[], event_type) => {
+        return acc.concat(TNC_EVENT_STATES_MAP[event_type])
+      },
+      [vehicle_state]
+    )
+  }
 
   return [event.vehicle_state]
 }
@@ -607,7 +628,7 @@ function isInStatesOrEvents(
 
   return possibleStates.some(state => {
     // Explicit events encoded in rule for that state (if any)
-    const matchableEvents: string[] | undefined = states[state as MICRO_MOBILITY_VEHICLE_STATE] // FIXME
+    const matchableEvents: string[] | undefined = state in states ? (states as any)[state] : undefined //FIXME should not have to use an any cast here
 
     /**
      * If event_types not encoded in rule, assume state match.

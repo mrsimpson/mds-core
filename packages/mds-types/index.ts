@@ -29,8 +29,9 @@ export const VEHICLE_TYPES = Enum('car', 'bicycle', 'scooter', 'moped', 'other')
 export type VEHICLE_TYPE = keyof typeof VEHICLE_TYPES
 
 // TODO rate
-export const RULE_TYPES = Enum('count', 'speed', 'time', 'user')
+export const RULE_TYPES = Enum('count', 'speed', 'time', 'user', 'rate')
 export type RULE_TYPE = keyof typeof RULE_TYPES
+export type MICROMOBILITY_RULE_TYPES = 'count' | 'speed' | 'time'
 
 export const PROPULSION_TYPES = Enum('human', 'electric', 'electric_assist', 'hybrid', 'combustion')
 export type PROPULSION_TYPE = keyof typeof PROPULSION_TYPES
@@ -61,7 +62,22 @@ export const TAXI_VEHICLE_STATES = [
 ] as const
 export type TAXI_VEHICLE_STATE = typeof TAXI_VEHICLE_STATES[number]
 
-export const VEHICLE_STATES_v1_1_0 = [...MICRO_MOBILITY_VEHICLE_STATES_v1_1_0, ...TAXI_VEHICLE_STATES] as const
+export const TNC_VEHICLE_STATE = <const>[
+  'available',
+  'elsewhere',
+  'non_operational',
+  'on_trip',
+  'reserved',
+  'stopped',
+  'unknown'
+]
+export type TNC_VEHICLE_STATE = typeof TNC_VEHICLE_STATE[number]
+
+export const VEHICLE_STATES_v1_1_0 = [
+  ...MICRO_MOBILITY_VEHICLE_STATES_v1_1_0,
+  ...TAXI_VEHICLE_STATES,
+  ...TNC_VEHICLE_STATE
+] as const
 export type VEHICLE_STATE_v1_1_0 = typeof VEHICLE_STATES_v1_1_0[number]
 
 export const VEHICLE_STATES = VEHICLE_STATES_v1_1_0
@@ -129,6 +145,27 @@ export const TAXI_VEHICLE_EVENTS = [
 ] as const
 export type TAXI_VEHICLE_EVENT = typeof TAXI_VEHICLE_EVENTS[number]
 
+export const TNC_VEHICLE_EVENT = [
+  'comms_lost',
+  'comms_restored',
+  'driver_cancellation',
+  'enter_jurisdiction',
+  'leave_jurisdiction',
+  'maintenance',
+  'passenger_cancellation',
+  'provider_cancellation',
+  'reservation_start',
+  'reservation_stop',
+  'service_end',
+  'service_start',
+  'trip_end',
+  'trip_resume',
+  'trip_start',
+  'trip_stop',
+  'unspecified'
+] as const
+export type TNC_VEHICLE_EVENT = typeof TNC_VEHICLE_EVENT[number]
+
 export const TAXI_TRIP_EXIT_EVENTS: TAXI_VEHICLE_EVENT[] = [
   'trip_end',
   'leave_jurisdiction',
@@ -137,7 +174,19 @@ export const TAXI_TRIP_EXIT_EVENTS: TAXI_VEHICLE_EVENT[] = [
   'driver_cancellation'
 ]
 
-export const VEHICLE_EVENTS_v1_1_0 = [...MICRO_MOBILITY_VEHICLE_EVENTS, ...TAXI_VEHICLE_EVENTS] as const
+export const TNC_TRIP_EXIT_EVENTS: TNC_VEHICLE_EVENT[] = [
+  'trip_end',
+  'leave_jurisdiction',
+  'passenger_cancellation',
+  'provider_cancellation',
+  'driver_cancellation'
+]
+
+export const VEHICLE_EVENTS_v1_1_0 = [
+  ...MICRO_MOBILITY_VEHICLE_EVENTS,
+  ...TAXI_VEHICLE_EVENTS,
+  ...TNC_VEHICLE_EVENT
+] as const
 export type VEHICLE_EVENT_v1_1_0 = typeof VEHICLE_EVENTS[number]
 
 export const VEHICLE_EVENTS = VEHICLE_EVENTS_v1_1_0
@@ -201,6 +250,28 @@ export const TAXI_EVENT_STATES_MAP: {
   trip_resume: ['on_trip'],
   trip_start: ['on_trip'],
   trip_stop: ['stopped']
+}
+
+export const TNC_EVENT_STATES_MAP: {
+  [P in TNC_VEHICLE_EVENT]: TNC_VEHICLE_STATE[]
+} = {
+  comms_lost: ['unknown'],
+  comms_restored: ['available', 'non_operational', 'reserved', 'on_trip', 'elsewhere'],
+  driver_cancellation: ['available', 'on_trip', 'reserved', 'stopped'],
+  enter_jurisdiction: ['available', 'reserved', 'on_trip', 'non_operational'],
+  leave_jurisdiction: ['elsewhere'],
+  maintenance: ['available', 'non_operational'],
+  passenger_cancellation: ['available', 'on_trip', 'reserved', 'stopped'],
+  provider_cancellation: ['available', 'on_trip', 'reserved', 'stopped'],
+  reservation_start: ['reserved'],
+  reservation_stop: ['stopped'],
+  service_end: ['non_operational'],
+  service_start: ['available'],
+  trip_end: ['available', 'on_trip', 'reserved', 'stopped'],
+  trip_resume: ['on_trip'],
+  trip_start: ['on_trip'],
+  trip_stop: ['stopped'],
+  unspecified: ['available', 'non_operational']
 }
 
 const MicroMobilityStatusEventMap = <
@@ -274,16 +345,20 @@ export type NullableOptional<T> = PickRequired<T> & NullableProperties<PickOptio
 export const ACCESSIBILITY_OPTIONS = ['wheelchair_accessible'] as const
 export type ACCESSIBILITY_OPTION = typeof ACCESSIBILITY_OPTIONS[number]
 
-export const MODALITIES = ['micromobility', 'taxi'] as const
+export const MODALITIES = ['micromobility', 'taxi', 'tnc'] as const
 export type MODALITY = typeof MODALITIES[number]
 
 // Represents a row in the "devices" table
-export interface Device_v1_1_0 {
-  accessibility_options?: ACCESSIBILITY_OPTION[]
+export interface CoreDevice {
   device_id: UUID
   provider_id: UUID
   vehicle_id: string
+}
+
+// Represents a row in the "devices" table
+export interface Device_v1_1_0 extends CoreDevice {
   vehicle_type: VEHICLE_TYPE // changed name in 1.0
+  accessibility_options?: ACCESSIBILITY_OPTION[]
   propulsion_types: PROPULSION_TYPE[] // changed name in 1.0
   year?: number | null
   mfgr?: string | null
@@ -299,21 +374,24 @@ export type Device = Device_v1_1_0
 
 export type DeviceID = Pick<Device, 'provider_id' | 'device_id'>
 
+export interface CoreEvent {
+  device_id: UUID
+  provider_id: UUID
+  timestamp: Timestamp
+  telemetry?: Telemetry | null
+}
+
 /**
  *  Represents a row in the "events" table
  * Named "VehicleEvent" to avoid confusion with the DOM's Event interface
  * Keeping 1_0_0 types in here and not in transformers/@types to avoid circular imports.
  * This alias must be updated if this type is updated.
  */
-export interface VehicleEvent_v1_1_0 {
-  device_id: UUID
-  provider_id: UUID
-  timestamp: Timestamp
+export interface VehicleEvent_v1_1_0 extends CoreEvent {
   timestamp_long?: string | null
   delta?: Timestamp | null
   event_types: VEHICLE_EVENT[]
   telemetry_timestamp?: Timestamp | null
-  telemetry?: Telemetry | null
   trip_id?: UUID | null
   vehicle_state: VEHICLE_STATE
   trip_state: Nullable<TRIP_STATE>
@@ -329,6 +407,11 @@ export interface MicroMobilityVehicleEvent extends VehicleEvent {
 export interface TaxiVehicleEvent extends VehicleEvent {
   event_types: TAXI_VEHICLE_EVENT[]
   vehicle_state: TAXI_VEHICLE_STATE
+}
+
+export interface TNCVehicleEvent extends VehicleEvent {
+  event_types: TNC_VEHICLE_EVENT[]
+  vehicle_state: TNC_VEHICLE_STATE
 }
 
 // Standard telemetry columns (used in more than one table)
@@ -462,48 +545,62 @@ export interface PolicyMessage {
   [key: string]: string
 }
 
-// This gets you a type where the keys must be VEHICLE_STATES, such as 'available',
-// and the values are an array of events.
+export type GenericStatesToEvents<S extends string = string, E extends string = string> = {
+  [K in S]?: E[] | []
+}
+
 export type MicroMobilityStatesToEvents = {
   [S in MICRO_MOBILITY_VEHICLE_STATE]: MICRO_MOBILITY_VEHICLE_EVENT[] | []
 }
+
 export type TaxiStatesToEvents = {
   [S in TAXI_VEHICLE_STATE]: TAXI_VEHICLE_EVENT[] | []
 }
-export type StatesToEvents = { [S in VEHICLE_STATE]: VEHICLE_EVENT[] | [] }
 
-interface BaseRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> {
-  name: string
-  rule_id: UUID
-  geographies: UUID[]
-  rule_type: RuleType
-  vehicle_types?: VEHICLE_TYPE[] | null
+export type TNCStatesToEvents = {
+  [S in TNC_VEHICLE_STATE]: TNC_VEHICLE_EVENT[] | []
+}
+
+export interface BaseRule<StatesToEventsMap extends GenericStatesToEvents, RuleType extends RULE_TYPE = RULE_TYPE> {
   accessibility_options?: ACCESSIBILITY_OPTION[] | null
-  modality?: MODALITY
-  maximum?: number | null
-  minimum?: number | null
-  start_time?: string | null
-  end_time?: string | null
   days?: DAY_OF_WEEK[] | null
+  end_time?: string | null
+  geographies: UUID[]
+  maximum?: number | null
   /* eslint-reason TODO: message types haven't been defined well yet */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   messages?: PolicyMessage
+  minimum?: number | null
+  modality?: MODALITY
+  name: string
+  rule_id: UUID
+  rule_type: RuleType
+  rule_units?: string
+  start_time?: string | null
+  states: StatesToEventsMap | null
   value_url?: URL | null
+  vehicle_types?: string[] | null
 }
 
-interface MicroMobilityRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> extends BaseRule<RuleType> {
+export interface MicroMobilityRule<RuleType extends 'count' | 'speed' | 'time' | 'user'>
+  extends BaseRule<Partial<MicroMobilityStatesToEvents>, RuleType> {
   modality?: 'micromobility'
-  states: Partial<MicroMobilityStatesToEvents> | null
 }
 
-interface TaxiRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> extends BaseRule<RuleType> {
+export interface TaxiRule<RuleType extends 'count' | 'speed' | 'time' | 'user'>
+  extends BaseRule<Partial<TaxiStatesToEvents>, RuleType> {
   modality: 'taxi'
-  states: Partial<TaxiStatesToEvents> | null
 }
 
-type ModalityRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> =
+export interface TNCRule<RuleType extends 'count' | 'speed' | 'time' | 'user'>
+  extends BaseRule<Partial<TNCStatesToEvents>, RuleType> {
+  modality: 'tnc'
+}
+
+export type ModalityRule<RuleType extends 'count' | 'speed' | 'time' | 'user'> =
   | MicroMobilityRule<RuleType>
   | TaxiRule<RuleType>
+  | TNCRule<RuleType>
 
 export type CountRule = ModalityRule<'count'>
 
@@ -519,7 +616,11 @@ export type UserRule = ModalityRule<'user'>
 
 export type Rule = CountRule | TimeRule | SpeedRule | UserRule
 
-export interface BasePolicy {
+export type BasePolicy<
+  StatesToEventsMap extends GenericStatesToEvents,
+  RuleType extends RULE_TYPE,
+  R extends BaseRule<StatesToEventsMap, RuleType>
+> = {
   name: string
   description: string
   provider_ids?: UUID[]
@@ -528,12 +629,37 @@ export interface BasePolicy {
   start_date: Timestamp
   end_date: Timestamp | null
   prev_policies: UUID[] | null
+  rules: R[]
   publish_date?: Timestamp
 }
 
-export interface Policy extends BasePolicy {
-  rules: Rule[]
+export type ModalityStatesToEvents =
+  | Partial<MicroMobilityStatesToEvents>
+  | Partial<TNCStatesToEvents>
+  | Partial<TaxiStatesToEvents>
+
+export type ModalityPolicy = BasePolicy<ModalityStatesToEvents, RULE_TYPE, ModalityRule<Exclude<RULE_TYPE, 'rate'>>>
+
+export type PolicyTypeInfo<
+  StatesToEventsMap extends GenericStatesToEvents = GenericStatesToEvents,
+  RuleType extends RULE_TYPE = RULE_TYPE,
+  Rule extends BaseRule<StatesToEventsMap, RuleType> = BaseRule<StatesToEventsMap, RuleType>
+> = {
+  StatesToEventMap: StatesToEventsMap
+  RuleType: RuleType
+  Rule: Rule
+  Policy: BasePolicy<StatesToEventsMap, RuleType, Rule>
 }
+
+export type ModalityPolicyTypeInfo = PolicyTypeInfo<
+  ModalityStatesToEvents,
+  Exclude<RULE_TYPE, 'rate'>,
+  ModalityRule<Exclude<RULE_TYPE, 'rate'>>
+>
+
+export type ModalityCountPolicy = BasePolicy<ModalityStatesToEvents, 'count', CountRule>
+export type ModalitySpeedPolicy = BasePolicy<ModalityStatesToEvents, 'speed', SpeedRule>
+export type ModalityTimePolicy = BasePolicy<ModalityStatesToEvents, 'time', TimeRule>
 
 export const RATE_RECURRENCE_VALUES = ['once', 'each_time_unit', 'per_complete_time_unit'] as const
 export type RATE_RECURRENCE = typeof RATE_RECURRENCE_VALUES[number]
@@ -542,16 +668,19 @@ export type RATE_RECURRENCE = typeof RATE_RECURRENCE_VALUES[number]
  * A RateRule is a rule of any type that has a `rate_amount` property.
  * @alpha Out-of-spec for MDS 0.4.1
  */
-export type RateRule = Rule & { rate_amount: number }
+export type RateRule<StatesToEventMap extends GenericStatesToEvents> = BaseRule<StatesToEventMap, 'rate'> & {
+  rate_amount: number
+  rate_recurrence: RATE_RECURRENCE
+}
 
 /**
  * A RatePolicy is a policy whose rules are RateRules.
  * @alpha Out-of-spec for MDS 0.4.1
  */
-export interface RatePolicy extends BasePolicy {
-  rate_recurrence: RATE_RECURRENCE
+export interface RatePolicy<StatesToEventMap extends GenericStatesToEvents>
+  extends BasePolicy<StatesToEventMap, 'rate', RateRule<StatesToEventMap>> {
   currency: string
-  rules: RateRule[]
+  rules: RateRule<StatesToEventMap>[]
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
