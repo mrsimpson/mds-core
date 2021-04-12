@@ -1,6 +1,5 @@
 import assert from 'assert'
-import { Device_v0_4_1 } from '../../transformers/@types'
-import { Device_v1_0_0 } from '../../index'
+import { Device_v0_4_1, Device_v1_0_0 } from '../../transformers/@types'
 import { convert_v0_4_1_device_to_1_0_0, convert_v1_0_0_device_to_0_4_1 } from '../../transformers'
 
 const TIME = Date.now()

@@ -1,8 +1,17 @@
-import { Device, Geography, Policy, VehicleEvent, UUID, SpeedRule, Telemetry } from '@mds-core/mds-types'
+import {
+  Device,
+  Geography,
+  VehicleEvent,
+  UUID,
+  SpeedRule,
+  Telemetry,
+  ModalityPolicy,
+  RULE_TYPES
+} from '@mds-core/mds-types'
 
-import { pointInShape, getPolygon, isInStatesOrEvents } from '@mds-core/mds-utils'
+import { pointInShape, getPolygon, isInStatesOrEvents, UnsupportedTypeError } from '@mds-core/mds-utils'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../@types'
-import { annotateVehicleMap, isInVehicleTypes, isRuleActive } from './helpers'
+import { annotateVehicleMap, getPolicyType, isInVehicleTypes, isRuleActive } from './helpers'
 
 export function isSpeedRuleMatch(
   rule: SpeedRule,
@@ -13,7 +22,7 @@ export function isSpeedRuleMatch(
   if (isRuleActive(rule)) {
     for (const geography of rule.geographies) {
       if (
-        isInStatesOrEvents(rule, event) &&
+        isInStatesOrEvents(rule, device, event) &&
         isInVehicleTypes(rule, device) &&
         event.telemetry.gps.speed &&
         pointInShape(event.telemetry.gps, getPolygon(geographies, geography)) &&
@@ -27,11 +36,14 @@ export function isSpeedRuleMatch(
 }
 
 export function processSpeedPolicy(
-  policy: Policy,
+  policy: ModalityPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devicesToCheck: { [d: string]: Device }
 ): ComplianceEngineResult | undefined {
+  if (getPolicyType(policy) !== RULE_TYPES.speed) {
+    throw new UnsupportedTypeError(`${getPolicyType(policy)} with id ${policy.policy_id} submitted to speed processor`)
+  }
   const matchedVehicles: {
     [d: string]: { device: Device; speed?: number; rule_applied: UUID; rules_matched: UUID[] }
   } = {}

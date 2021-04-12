@@ -27,6 +27,8 @@ export interface DeviceEntityModel extends IdentityColumn, RecordedColumn {
   year: DeviceDomainModel['year']
   mfgr: DeviceDomainModel['mfgr']
   model: DeviceDomainModel['model']
+  accessibility_options: DeviceDomainModel['accessibility_options']
+  modality: DeviceDomainModel['modality']
 }
 
 @Entity('devices')
@@ -54,4 +56,20 @@ export class DeviceEntity extends IdentityColumn(RecordedColumn(class {})) imple
 
   @Column('varchar', { length: 127, nullable: true })
   model: DeviceEntityModel['model']
+
+  @Column('varchar', { array: true, length: 255 })
+  accessibility_options: DeviceEntityModel['accessibility_options']
+
+  @Column('varchar', { length: 255 })
+  modality: DeviceEntityModel['modality']
 }
+
+/*
+ await exec(`ALTER TABLE ${schema.TABLE.devices} ADD COLUMN ${schema.COLUMN.accessibility_options} varchar(255)[]`)
+  await exec(`UPDATE ${schema.TABLE.devices} SET ${schema.COLUMN.accessibility_options} = {}`)
+  await exec(`ALTER TABLE ${schema.TABLE.devices} ALTER COLUMN ${schema.COLUMN.accessibility_options} SET NOT NULL`)
+
+  await exec(`ALTER TABLE ${schema.TABLE.devices} ADD COLUMN ${schema.COLUMN.modality} varchar(255)`)
+  await exec(`UPDATE ${schema.TABLE.devices} SET ${schema.COLUMN.modality} = 'micro_mobility'`)
+  await exec(`ALTER TABLE ${schema.TABLE.devices} ALTER COLUMN ${schema.COLUMN.modality} SET NOT NULL`)
+  */

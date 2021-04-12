@@ -16,11 +16,14 @@
 
 import { DomainModelCreate, RecordedColumn } from '@mds-core/mds-repository'
 import {
+  ACCESSIBILITY_OPTION,
+  MODALITY,
   Nullable,
   NullableOptional,
   PROPULSION_TYPE,
   TelemetryData,
   Timestamp,
+  TRIP_STATE,
   UUID,
   VEHICLE_EVENT,
   VEHICLE_STATE,
@@ -38,6 +41,8 @@ export interface DeviceDomainModel extends RecordedColumn {
   year: Nullable<number>
   mfgr: Nullable<string>
   model: Nullable<string>
+  accessibility_options: Nullable<ACCESSIBILITY_OPTION[]>
+  modality: MODALITY
 }
 
 export type DeviceDomainCreateModel = DomainModelCreate<Omit<DeviceDomainModel, keyof RecordedColumn>>
@@ -64,6 +69,7 @@ export interface EventDomainModel extends RecordedColumn {
   timestamp: Timestamp
   event_types: VEHICLE_EVENT[]
   vehicle_state: VEHICLE_STATE
+  trip_state: TRIP_STATE
 
   telemetry_timestamp: Nullable<Timestamp>
   telemetry: Nullable<TelemetryDomainModel>

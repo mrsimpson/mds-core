@@ -15,8 +15,8 @@
  */
 
 import logger from '@mds-core/mds-logger'
-import { isUUID, now, normalizeToArray } from '@mds-core/mds-utils'
-import { isValidDevice, validateEvent, isValidTelemetry } from '@mds-core/mds-schema-validators'
+import { isUUID, now, ValidationError, normalizeToArray, ServerError } from '@mds-core/mds-utils'
+import { isValidDevice, validateEvent, isValidTelemetry, validateTripMetadata } from '@mds-core/mds-schema-validators'
 import db from '@mds-core/mds-db'
 import cache from '@mds-core/mds-agency-cache'
 import stream from '@mds-core/mds-stream'
@@ -29,7 +29,8 @@ import {
   DeviceID,
   VEHICLE_EVENT,
   UUID,
-  VEHICLE_STATE
+  VEHICLE_STATE,
+  TRIP_STATE
 } from '@mds-core/mds-types'
 import urls from 'url'
 import { parseRequest } from '@mds-core/mds-api-helpers'
@@ -46,6 +47,8 @@ import {
   AgencyApiUpdateVehicleRequest,
   AgencyApiSubmitVehicleEventRequest,
   AgencyApiSubmitVehicleTelemetryRequest,
+  AgencyApiPostTripMetadataRequest,
+  AgencyApiPostTripMetadataResponse,
   AgencyApiRegisterVehicleRequest
 } from './types'
 import {
@@ -70,12 +73,23 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   if (!version || version === '0.4.1') {
     // TODO: Transform 0.4.1 -> 1.0.0
   }
-
-  const { device_id, vehicle_id, vehicle_type, propulsion_types, year, mfgr, model } = body
+  // const { device_id, vehicle_id, type, propulsion, year, mfgr, model } = body
+  const {
+    accessibility_options = [],
+    device_id,
+    vehicle_id,
+    vehicle_type,
+    propulsion_types,
+    year,
+    mfgr,
+    modality = 'micromobility',
+    model
+  } = body
 
   const status: VEHICLE_STATE = 'removed'
 
   const device = {
+    accessibility_options,
     provider_id,
     device_id,
     vehicle_id,
@@ -83,6 +97,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     propulsion_types,
     year,
     mfgr,
+    modality,
     model,
     recorded,
     status
@@ -242,6 +257,7 @@ export const submitVehicleEvent = async (
         ? (req.body.event_types.map(lower) as VEHICLE_EVENT[])
         : req.body.event_types, // FIXME: this is super not the best way of doing things. Need to use better validation.
     vehicle_state: req.body.vehicle_state as VEHICLE_STATE,
+    trip_state: req.body.trip_state ? (req.body.trip_state as TRIP_STATE) : null,
     telemetry: req.body.telemetry ? { ...req.body.telemetry, provider_id: res.locals.provider_id } : null,
     timestamp: req.body.timestamp,
     trip_id: req.body.trip_id,
@@ -313,7 +329,7 @@ export const submitVehicleEvent = async (
     if (event.telemetry) {
       event.telemetry.device_id = event.device_id
     }
-    const failure = (await badEvent(event)) || (event.telemetry ? badTelemetry(event.telemetry) : null)
+    const failure = (await badEvent(device, event)) || (event.telemetry ? badTelemetry(event.telemetry) : null)
     // TODO unify with fail() above
     if (failure) {
       logger.info('event failure', { name, failure, event })
@@ -455,5 +471,23 @@ export const submitVehicleTelemetry = async (
       error_description: 'None of the provided data was valid',
       error_details: [`device_id ${data[0].device_id}: not found`]
     })
+  }
+}
+
+/* Experimental Handler */
+export const writeTripMetadata = async (
+  req: AgencyApiPostTripMetadataRequest,
+  res: AgencyApiPostTripMetadataResponse
+) => {
+  try {
+    const { provider_id } = res.locals
+    /* TODO Add better validation once trip metadata proposal is solidified */
+    const tripMetadata = validateTripMetadata({ ...req.body, provider_id })
+    await Promise.all([cache.writeTripMetadata(tripMetadata), stream.writeTripMetadata(tripMetadata)])
+
+    return res.status(201).send(tripMetadata)
+  } catch (error) {
+    if (error instanceof ValidationError) return res.status(400).send({ error })
+    return res.status(500).send({ error: new ServerError() })
   }
 }

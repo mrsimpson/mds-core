@@ -35,6 +35,8 @@ const TABLES = Object.keys(TABLE) as TABLE_NAME[]
 
 const COLUMN = Enum(
   'accuracy',
+  'accessibility_options',
+  'address',
   'altitude',
   'attachment_filename',
   'attachment_id',
@@ -63,6 +65,7 @@ const COLUMN = Enum(
   'lng',
   'mfgr',
   'mimetype',
+  'modality',
   'model',
   'name',
   'note',
@@ -86,6 +89,7 @@ const COLUMN = Enum(
   'thumbnail_mimetype',
   'timestamp',
   'trip_id',
+  'trip_state', // new for Taxi
   'type', // deprecated 1.0 for vehicle_type
   'vehicle_state', // new in 1.0
   'vehicle_type', // new in 1.0
@@ -140,6 +144,7 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
   ],
   [TABLE.devices]: [
     COLUMN.id,
+    COLUMN.accessibility_options,
     COLUMN.device_id,
     COLUMN.provider_id,
     COLUMN.vehicle_id,
@@ -149,6 +154,7 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
     COLUMN.propulsion_types, // added 1.0
     COLUMN.year,
     COLUMN.mfgr,
+    COLUMN.modality,
     COLUMN.model,
     COLUMN.recorded
   ],
@@ -163,6 +169,7 @@ const TABLE_COLUMNS: { [T in TABLE_NAME]: Readonly<COLUMN_NAME[]> } = {
     COLUMN.vehicle_state, // added 1.0
     COLUMN.telemetry_timestamp,
     COLUMN.trip_id,
+    COLUMN.trip_state,
     COLUMN.service_area_id,
     COLUMN.recorded
   ],

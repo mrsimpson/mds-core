@@ -24,6 +24,7 @@ export interface EventEntityModel extends IdentityColumn, RecordedColumn {
   timestamp: EventDomainModel['timestamp']
   event_types: EventDomainModel['event_types']
   vehicle_state: EventDomainModel['vehicle_state']
+  trip_state: EventDomainModel['trip_state']
   telemetry_timestamp: EventDomainModel['telemetry_timestamp']
   trip_id: EventDomainModel['trip_id']
   service_area_id: EventDomainModel['service_area_id']
@@ -45,6 +46,9 @@ export class EventEntity extends IdentityColumn(RecordedColumn(class {})) implem
 
   @Column('varchar', { length: 31 })
   vehicle_state: EventEntityModel['vehicle_state']
+
+  @Column('varchar', { length: 31, nullable: true })
+  trip_state: EventEntityModel['trip_state']
 
   @Column('bigint', { transformer: BigintTransformer, nullable: true })
   telemetry_timestamp: EventEntityModel['telemetry_timestamp']

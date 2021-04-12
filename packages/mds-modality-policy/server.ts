@@ -14,4 +14,12 @@
  * limitations under the License.
  */
 
-export * from './policy-author-api-version'
+import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
+import { ModalityPolicyTypeInfo } from '@mds-core/mds-types'
+import { modalityPolicySchemaJson } from '@mds-core/mds-schema-validators'
+import { api, injectSchema } from '@mds-core/mds-policy'
+
+// TODO eliminate this file from this package and create mds-micromobility-policy package
+HttpServer(injectSchema(modalityPolicySchemaJson, ApiServer<ModalityPolicyTypeInfo>(api)), {
+  port: process.env.POLICY_API_HTTP_PORT
+})

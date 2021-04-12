@@ -17,7 +17,7 @@
 import test from 'unit.js'
 
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { Device, Geography, Policy, VehicleEvent } from '@mds-core/mds-types'
+import { Device, Geography, ModalityPolicy, VehicleEvent } from '@mds-core/mds-types'
 import cache from '@mds-core/mds-agency-cache'
 
 import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
@@ -32,7 +32,7 @@ import { processPolicy } from '../../engine/mds-compliance-engine'
 import { getSupersedingPolicies, filterEvents } from '../../engine/helpers'
 import { readJson } from './helpers'
 
-let policies: Policy[] = []
+let policies: ModalityPolicy[] = []
 
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 

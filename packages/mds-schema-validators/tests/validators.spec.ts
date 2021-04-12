@@ -35,7 +35,7 @@ import {
   ValidationError,
   validateEvent,
   validateEvents,
-  validatePolicies,
+  validateModalityPolicies,
   isValidEvent,
   validateGeographies
 } from '../validators'
@@ -309,7 +309,7 @@ describe('Tests validators', () => {
 
   it('verifies policy validator', async () => {
     expect(
-      validatePolicies([
+      validateModalityPolicies([
         {
           name: 'LADOT Mobility Caps',
           description: 'Mobility caps as described in the One-Year Permit',
@@ -335,7 +335,7 @@ describe('Tests validators', () => {
     ).toBe(true)
 
     await expect(async () =>
-      validatePolicies([
+      validateModalityPolicies([
         {
           name: 'LADOT Mobility Caps',
           description: 'Mobility caps as described in the One-Year Permit',
@@ -361,7 +361,7 @@ describe('Tests validators', () => {
     ).rejects.toThrow(ValidationError)
 
     await expect(async () =>
-      validatePolicies([
+      validateModalityPolicies([
         {
           name: 'LADOT Mobility Caps',
           description: 'Mobility caps as described in the One-Year Permit',

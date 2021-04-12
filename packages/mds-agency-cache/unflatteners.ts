@@ -21,7 +21,10 @@ import {
   PROPULSION_TYPE,
   Device,
   Telemetry,
-  VehicleEvent
+  VehicleEvent,
+  ACCESSIBILITY_OPTION,
+  MODALITY,
+  TRIP_STATE
 } from '@mds-core/mds-types'
 
 import { ParseError } from '@mds-core/mds-utils'
@@ -74,7 +77,8 @@ function parseEvent(
       telemetry: event.telemetry ? parseTelemetry(event.telemetry) : null,
       trip_id: event.trip_id ? event.trip_id : null,
       recorded: Number(event.recorded),
-      vehicle_state: event.vehicle_state as VEHICLE_STATE
+      vehicle_state: event.vehicle_state as VEHICLE_STATE,
+      trip_state: event.trip_state ? (event.trip_state as TRIP_STATE) : null
     }
   }
   return event
@@ -83,6 +87,9 @@ function parseEvent(
 function parseDevice(device: StringifiedCacheReadDeviceResult): Device {
   if (device) {
     return {
+      accessibility_options: device.accessibility_options
+        ? (device.accessibility_options as ACCESSIBILITY_OPTION[])
+        : [],
       device_id: device.device_id,
       provider_id: device.provider_id,
       vehicle_id: device.vehicle_id,
@@ -90,6 +97,7 @@ function parseDevice(device: StringifiedCacheReadDeviceResult): Device {
       propulsion_types: device.propulsion_types as PROPULSION_TYPE[],
       year: device.year ? Number(device.year) : null,
       mfgr: device.mfgr ? device.mfgr : null,
+      modality: device.modality as MODALITY,
       model: device.model ? device.model : null,
       recorded: Number(device.recorded),
       state: device.state ? (device.state as VEHICLE_STATE) : null
