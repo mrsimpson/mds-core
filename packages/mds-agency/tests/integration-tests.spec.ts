@@ -74,7 +74,10 @@ const TEST_TELEMETRY = {
     lng: -121.8863,
     speed: 0,
     hdop: 1,
-    heading: 180
+    heading: 180,
+    accuracy: null,
+    altitude: null,
+    charge: null
   },
   charge: 0.5,
   timestamp: now()
@@ -1125,8 +1128,24 @@ describe('Tests API', () => {
       .end((err, result) => {
         if (err) {
           log('telemetry err', err)
+          log('telemetry res', result)
         } else {
           // log('telemetry result', result)
+        }
+        done(err)
+      })
+  })
+  it('verifies post telemetry handling of empty data payload', done => {
+    request
+      .post(pathPrefix('/vehicles/telemetry'))
+      .set('Authorization', AUTH)
+      .send({})
+      .expect(400)
+      .end((err, result) => {
+        if (err) {
+          log('telemetry err', err)
+        } else {
+          test.string(result.body.error_description).contains('Missing data from post-body')
         }
         done(err)
       })
@@ -1342,6 +1361,15 @@ describe('Tests API', () => {
       .expect(200)
     test.assert(result.body.state === 'removed')
     test.assert(JSON.stringify(result.body.prev_events) === JSON.stringify(['decommissioned']))
+  })
+
+  it('verifies can make request for foreign provider_id', async () => {
+    const provider_id = uuid()
+    const AUTH = `basic ${Buffer.from(`${provider_id}|${PROVIDER_SCOPES}`).toString('base64')}`
+
+    const [device] = makeDevices(1, now(), provider_id)
+
+    await request.post(pathPrefix('/vehicles')).set('Authorization', AUTH).send(device).expect(201)
   })
 
   it('get multiple devices endpoint has vehicle status default to `inactive` if event is missing for a device', async () => {
