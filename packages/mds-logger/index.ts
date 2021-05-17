@@ -38,6 +38,7 @@ const redact = (arg: string | Record<string, unknown> | Error | undefined) => {
 const log = (level: LogLevel) => (
   message: string,
   data?: Record<string, unknown> | Error
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): { log_message?: string; log_data?: any } => {
   if (process.env.QUIET === 'true') {
     return {}
@@ -48,14 +49,16 @@ const log = (level: LogLevel) => (
   const log_ISO_timestamp = new Date(log_timestamp).toISOString()
   const log_requestId = httpContext.get('x-request-id')
 
-  logger[level]({
-    log_level: level.toUpperCase(),
-    log_ISO_timestamp,
-    log_timestamp,
-    ...(log_requestId ? { log_requestId } : {}),
-    log_message,
-    log_data
-  })
+  logger[level](
+    JSON.stringify({
+      log_level: level.toUpperCase(),
+      log_ISO_timestamp,
+      log_timestamp,
+      ...(log_requestId ? { log_requestId } : {}),
+      log_message,
+      log_data
+    })
+  )
 
   return { log_message, log_data }
 }
