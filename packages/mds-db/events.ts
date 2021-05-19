@@ -23,7 +23,8 @@ import {
   VEHICLE_TYPE,
   PROPULSION_TYPE,
   VEHICLE_STATUS,
-  VEHICLE_EVENT
+  VEHICLE_EVENT,
+  STATUS_EVENT_MAP
 } from '@mds-core/mds-types'
 import { now, isUUID, isTimestamp, seconds, yesterday } from '@mds-core/mds-utils'
 import logger from '@mds-core/mds-logger'
@@ -495,11 +496,11 @@ export async function getMostRecentEventByProvider(): Promise<{ provider_id: UUI
 }
 
 // for CMM
-type TimeRange = {
+export type TimeRange = {
   start: Timestamp
   end: Timestamp
 }
-interface GetVehicleEventsFilterParams {
+export interface GetVehicleEventsFilterParams {
   vehicle_types?: VEHICLE_TYPE[]
   propulsion_types?: PROPULSION_TYPE[]
   provider_ids?: UUID[]
@@ -528,37 +529,52 @@ export async function getLatestEventPerVehicle({
 
   const { start: start_time, end: end_time } = time_range
 
-  const event_conditions: string[] = []
-  const device_conditions: string[] = []
+  const conditions: string[] = []
+  const time_range_conditions: string[] = []
 
-  if (vehicle_types) {
-    device_conditions.push(`d.vehicle_type = ANY (${vals.add(vehicle_types)})`)
+  if (!isTimestamp(start_time)) {
+    throw new Error(`invalid start_time ${start_time}`)
+  } else {
+    time_range_conditions.push(`e.timestamp >= ${vals.add(start_time)}`)
   }
 
-  // TODO: do we need to cast the arg as VARCHAR?
+  if (!isTimestamp(end_time)) {
+    throw new Error(`invalid end_time ${end_time}`)
+  } else {
+    time_range_conditions.push(`e.timestamp <= ${vals.add(end_time)}`)
+  }
+
+  if (vehicle_types) {
+    conditions.push(`d.type = ANY (${vals.add(vehicle_types)})`)
+  }
+
   if (propulsion_types) {
-    device_conditions.push(`d.propulsion && (${vals.add(propulsion_types)})`)
+    conditions.push(`d.propulsion && (${vals.add(propulsion_types)})`)
+  }
+
+  // you can't use non-UUID values to compare to ::UUID types in the database.
+  if (device_or_vehicle_id) {
+    if (isUUID(device_or_vehicle_id)) {
+      conditions.push(`(d.device_id = ${vals.add(device_or_vehicle_id)})`)
+    } else {
+      conditions.push(`(d.vehicle_id = ${vals.add(device_or_vehicle_id)})`)
+    }
   }
 
   if (vehicle_statuses) {
-    device_conditions.push(`d.vehicle_status = ANY (${vals.add(vehicle_statuses)})`)
-  }
-
-  if (device_or_vehicle_id) {
-    device_conditions.push(
-      `(d.device_id = ${vals.add(device_or_vehicle_id)}) OR (d.vehicle_id = ${vals.add(device_or_vehicle_id)})`
-    )
+    const vehicle_event_types = vehicle_statuses.map(s => Object.values(STATUS_EVENT_MAP[s])).flat()
+    conditions.push(`e.event_type = ANY (${vals.add(vehicle_event_types)})`)
   }
 
   if (event_types) {
-    event_conditions.push(`e.event_type = ANY (${vals.add(event_types)})`)
+    conditions.push(`e.event_type = ANY (${vals.add(event_types)})`)
   }
 
   if (provider_ids) {
     if (!provider_ids.every(isUUID)) {
       throw new Error(`invalid provider_ids: ${provider_ids}`)
     } else {
-      event_conditions.push(`e.provider_id = ANY (${vals.add(provider_ids)})`)
+      conditions.push(`e.provider_id = ANY (${vals.add(provider_ids)})`)
     }
   }
 
@@ -566,55 +582,42 @@ export async function getLatestEventPerVehicle({
     if (!device_ids.every(isUUID)) {
       throw new Error(`invalid device_ids ${device_ids}`)
     } else {
-      event_conditions.push(`e.device_id = ANY ${vals.add(device_ids)}`)
+      conditions.push(`e.device_id = ANY (${vals.add(device_ids)})`)
     }
   }
 
-  if (!isTimestamp(start_time)) {
-    throw new Error(`invalid start_time ${start_time}`)
-  } else {
-    event_conditions.push(`e.timestamp >= ${vals.add(start_time)}`)
-  }
-
-  if (!isTimestamp(end_time)) {
-    throw new Error(`invalid end_time ${end_time}`)
-  } else {
-    event_conditions.push(`e.timestamp <= ${vals.add(end_time)}`)
-  }
-
   // we can only select based on event criteria
-  const event_where = event_conditions.length ? ` WHERE ${event_conditions.join(' AND ')}` : ''
-  const device_join = device_conditions.length ? ` ${device_conditions.join(' AND ')}` : ' 1=1 '
+  const time_range_where = ` WHERE ${time_range_conditions.join(' AND ')}`
+  const and_where = conditions.length ? ` AND ${conditions.join(' AND ')}` : ''
 
   const { rows } = await exec(
-    `SELECT e.*, row_to_json(t.*) as telemetry
+    `SELECT e.*,  row_to_json(t.*) as telemetry
       FROM events e
       JOIN (
-        SELECT device_id, MAX(timestamp) max_time
+        SELECT device_id, MAX(timestamp) as max_time
         FROM events
-        ${event_where}
+        ${time_range_where.replace(/e\./g, '')}
         GROUP BY device_id
       ) last_device_event ON last_device_event.device_id = e.device_id AND last_device_event.max_time = e.timestamp
-    JOIN devices ON e.device_id = devices.device_id AND ${device_join}
+    JOIN devices d ON e.device_id = d.device_id
     LEFT JOIN telemetry t ON e.device_id = t.device_id AND e.telemetry_timestamp = t.timestamp
-    ${event_where}
+    ${time_range_where} ${and_where}
     ORDER BY e.timestamp`,
     vals.values()
   )
 
-  return rows.map(
-    ({
-      telemetry: { lat, lng, speed, heading, accuracy, altitude, ...body_telemetry },
-      telemetry_timestamp,
-      ...event
-    }) => ({
-      ...event,
-      telemetry: telemetry_timestamp
-        ? {
-            gps: { lat: lat, lng, speed, heading, accuracy, altitude },
-            ...body_telemetry
-          }
-        : null
-    })
-  )
+  return rows.map(({ telemetry, ...event }) => {
+    if (telemetry) {
+      const { lat, lng, speed, heading, accuracy, altitude, ...body_telemetry } = telemetry
+
+      return {
+        ...event,
+        telemetry: {
+          gps: { lat, lng, speed, heading, accuracy, altitude },
+          ...body_telemetry
+        }
+      }
+    }
+    return { ...event, telemetry: null }
+  })
 }
