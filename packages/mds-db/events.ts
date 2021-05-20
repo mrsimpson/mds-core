@@ -587,21 +587,24 @@ export async function getLatestEventPerVehicle({
   }
 
   // we can only select based on event criteria
-  const time_range_where = ` WHERE ${time_range_conditions.join(' AND ')}`
-  const and_where = conditions.length ? ` AND ${conditions.join(' AND ')}` : ''
+  const time_range_where = ` ${time_range_conditions.join(' AND ')}`
+  const where = conditions.length ? ` WHERE ${conditions.join(' AND ')}` : ''
 
   const { rows } = await exec(
     `SELECT e.*,  row_to_json(t.*) as telemetry
       FROM events e
       JOIN (
-        SELECT device_id, MAX(timestamp) as max_time
+        SELECT device_id,
+        id as event_id,
+        RANK() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rownum
         FROM events
-        ${time_range_where.replace(/e\./g, '')}
-        GROUP BY device_id
-      ) last_device_event ON last_device_event.device_id = e.device_id AND last_device_event.max_time = e.timestamp
+        WHERE ${time_range_where.replace(/e\./g, '')}
+      ) last_device_event ON
+        last_device_event.event_id = e.id
+        AND last_device_event.rownum = 1
     JOIN devices d ON e.device_id = d.device_id
     LEFT JOIN telemetry t ON e.device_id = t.device_id AND e.telemetry_timestamp = t.timestamp
-    ${time_range_where} ${and_where}
+    ${where}
     ORDER BY e.timestamp`,
     vals.values()
   )
