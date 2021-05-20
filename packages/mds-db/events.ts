@@ -590,6 +590,7 @@ export async function getLatestEventPerVehicle({
   const time_range_where = ` ${time_range_conditions.join(' AND ')}`
   const where = conditions.length ? ` WHERE ${conditions.join(' AND ')}` : ''
 
+  // this query is better.
   const { rows } = await exec(
     `SELECT e.*,  row_to_json(t.*) as telemetry
       FROM events e
