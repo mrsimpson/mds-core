@@ -627,6 +627,7 @@ importers:
       '@mds-core/mds-ingest-service': 0.1.2
       '@mds-core/mds-logger': 0.2.2
       '@mds-core/mds-policy-service': 0.1.2
+      '@mds-core/mds-providers': 0.1.28
       '@mds-core/mds-test-data': 0.1.28
       '@mds-core/mds-types': 0.1.25
       '@mds-core/mds-utils': 0.1.28
@@ -640,6 +641,7 @@ importers:
       '@mds-core/mds-ingest-service': link:../mds-ingest-service
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-policy-service': link:../mds-policy-service
+      '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
       '@types/pg': 7.14.7
