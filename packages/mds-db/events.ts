@@ -24,7 +24,8 @@ import {
   PROPULSION_TYPE,
   VEHICLE_STATUS,
   VEHICLE_EVENT,
-  STATUS_EVENT_MAP
+  STATUS_EVENT_MAP,
+  Enum
 } from '@mds-core/mds-types'
 import { now, isUUID, isTimestamp, seconds, yesterday } from '@mds-core/mds-utils'
 import logger from '@mds-core/mds-logger'
@@ -500,12 +501,17 @@ export type TimeRange = {
   start: Timestamp
   end: Timestamp
 }
+
+const GROUPING_TYPES = Enum('latest_per_vehicle', 'latest_per_trip', 'all_events')
+export type GROUPING_TYPE = keyof typeof GROUPING_TYPES
+
 export interface GetVehicleEventsFilterParams {
   vehicle_types?: VEHICLE_TYPE[]
   propulsion_types?: PROPULSION_TYPE[]
   provider_ids?: UUID[]
   vehicle_statuses?: VEHICLE_STATUS[]
   time_range: TimeRange
+  grouping_type: GROUPING_TYPE
   device_or_vehicle_id?: string // Match on device_id or vehicle_id
   device_ids?: UUID[]
   event_types?: VEHICLE_EVENT[]
@@ -521,6 +527,7 @@ export async function getLatestEventPerVehicle({
   device_or_vehicle_id,
   device_ids,
   event_types,
+  grouping_type,
   geography_ids
 }: GetVehicleEventsFilterParams): Promise<Recorded<VehicleEvent & Pick<Device, 'vehicle_id'>>[]> {
   const client = await getReadOnlyClient()
@@ -586,27 +593,45 @@ export async function getLatestEventPerVehicle({
     }
   }
 
+  if (grouping_type === 'all_events') {
+    conditions.push(time_range_conditions[0])
+    conditions.push(time_range_conditions[1])
+  }
+
   // we can only select based on event criteria
   const time_range_where = ` ${time_range_conditions.join(' AND ')}`
   const where = conditions.length ? ` WHERE ${conditions.join(' AND ')}` : ''
 
-  // this query is better.
+  const grouping_query = {
+    latest_per_vehicle: `JOIN (
+      SELECT device_id,
+      id as event_id,
+      RANK() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rownum
+      FROM events
+      WHERE ${time_range_where.replace(/e\./g, '')}
+    ) last_device_event ON
+      last_device_event.event_id = e.id
+      AND last_device_event.rownum = 1`,
+    latest_per_trip: `JOIN (
+      SELECT trip_id,
+      id as event_id,
+      RANK() OVER (PARTITION BY trip_id ORDER BY timestamp DESC) AS rownum
+      FROM events
+      WHERE ${time_range_where.replace(/e\./g, '')}
+    ) last_device_event ON
+      last_device_event.event_id = e.id
+      AND last_device_event.rownum = 1`,
+    all_events: ''
+  }
+
   const { rows } = await exec(
-    `SELECT e.*,  row_to_json(t.*) as telemetry
+    ` SELECT e.*,  row_to_json(t.*) as telemetry
       FROM events e
-      JOIN (
-        SELECT device_id,
-        id as event_id,
-        RANK() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rownum
-        FROM events
-        WHERE ${time_range_where.replace(/e\./g, '')}
-      ) last_device_event ON
-        last_device_event.event_id = e.id
-        AND last_device_event.rownum = 1
-    JOIN devices d ON e.device_id = d.device_id
-    LEFT JOIN telemetry t ON e.device_id = t.device_id AND e.telemetry_timestamp = t.timestamp
-    ${where}
-    ORDER BY e.timestamp`,
+      ${grouping_query[grouping_type]}
+      JOIN devices d ON e.device_id = d.device_id
+      LEFT JOIN telemetry t ON e.device_id = t.device_id AND e.telemetry_timestamp = t.timestamp
+      ${where}
+      ORDER BY e.timestamp`,
     vals.values()
   )
 
