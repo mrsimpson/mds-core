@@ -102,9 +102,7 @@ export async function readDeviceList(device_ids: UUID[]): Promise<Recorded<Devic
   }
   const client = await getReadOnlyClient()
   const vals = new SqlVals()
-  const sql = `SELECT * FROM ${schema.TABLE.devices} WHERE device_id IN (${device_ids.map(device_id =>
-    vals.add(device_id)
-  )})`
+  const sql = `SELECT * FROM ${schema.TABLE.devices} WHERE device_id = ANY (${vals.add(device_ids)})`
   const values = vals.values()
   await logSql(sql, values)
   const result = await client.query(sql, values)
