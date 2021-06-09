@@ -530,6 +530,8 @@ export async function getLatestEventPerVehicle({
   grouping_type,
   geography_ids
 }: GetVehicleEventsFilterParams): Promise<Recorded<VehicleEvent & Pick<Device, 'vehicle_id'>>[]> {
+  const init_start = Date.now()
+
   const client = await getReadOnlyClient()
   const vals = new SqlVals()
   const exec = SqlExecuter(client)
@@ -624,6 +626,16 @@ export async function getLatestEventPerVehicle({
     all_events: ''
   }
 
+  const init_end = Date.now()
+
+  logger.info('db connection init for getLatestEventPerVehicle took', {
+    start: init_start,
+    end: init_end,
+    duration_ms: init_end - init_start,
+    duration_s: (init_end - init_start) / 1000
+  })
+
+  const db_start = Date.now()
   const { rows } = await exec(
     ` SELECT e.*,  row_to_json(t.*) as telemetry
       FROM events e
@@ -634,8 +646,18 @@ export async function getLatestEventPerVehicle({
       ORDER BY e.timestamp`,
     vals.values()
   )
+  const db_end = Date.now()
 
-  return rows.map(({ telemetry, ...event }) => {
+  logger.info('db exec for getLatestEventPerVehicle took', {
+    start: db_start,
+    end: db_end,
+    duration_ms: db_end - db_start,
+    duration_s: (db_end - db_start) / 1000,
+    num_rows: rows.length
+  })
+
+  const transform_start = Date.now()
+  const transformedRows = rows.map(({ telemetry, ...event }) => {
     if (telemetry) {
       const { lat, lng, speed, heading, accuracy, altitude, ...body_telemetry } = telemetry
 
@@ -649,4 +671,15 @@ export async function getLatestEventPerVehicle({
     }
     return { ...event, telemetry: null }
   })
+  const transform_end = Date.now()
+
+  logger.info('post-query transform for getLatestEventPerVehicle took', {
+    start: transform_start,
+    end: transform_end,
+    duration_ms: transform_end - transform_start,
+    duration_s: (transform_end - transform_start) / 1000,
+    num_rows: transformedRows.length
+  })
+
+  return transformedRows
 }
