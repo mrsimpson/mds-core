@@ -506,7 +506,7 @@ if (pg_info.database) {
               vehicle_statuses,
               time_range: { start, end }
             })
-            assert.deepStrictEqual(resultSome.length, 2)
+            assert.deepStrictEqual(resultSome.length, 0)
           })
           it('reads events, filters on device_or_vehicle_id', async () => {
             const start = startTime
