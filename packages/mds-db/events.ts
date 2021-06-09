@@ -624,6 +624,7 @@ export async function getLatestEventPerVehicle({
     all_events: ''
   }
 
+  const db_start = Date.now()
   const { rows } = await exec(
     ` SELECT e.*,  row_to_json(t.*) as telemetry
       FROM events e
@@ -634,8 +635,17 @@ export async function getLatestEventPerVehicle({
       ORDER BY e.timestamp`,
     vals.values()
   )
+  const db_end = Date.now()
 
-  return rows.map(({ telemetry, ...event }) => {
+  logger.info('db exec for getLatestEventPerVehicle took', {
+    start: db_start,
+    end: db_end,
+    duration_ms: db_end - db_start,
+    duration_s: (db_end - db_start) / 1000
+  })
+
+  const transform_start = Date.now()
+  const transformedRows = rows.map(({ telemetry, ...event }) => {
     if (telemetry) {
       const { lat, lng, speed, heading, accuracy, altitude, ...body_telemetry } = telemetry
 
@@ -649,4 +659,14 @@ export async function getLatestEventPerVehicle({
     }
     return { ...event, telemetry: null }
   })
+  const transform_end = Date.now()
+
+  logger.info('post-query transform for getLatestEventPerVehicle took', {
+    start: transform_start,
+    end: transform_end,
+    duration_ms: transform_end - transform_start,
+    duration_s: (transform_end - transform_start) / 1000
+  })
+
+  return transformedRows
 }
