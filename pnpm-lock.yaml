@@ -46,8 +46,7 @@ importers:
       ts-mocha: 8.0.0
       ts-node: 10.0.0
       tsconfig-paths: 3.9.0
-      typedoc: 0.20.36
-      typedoc-plugin-lerna-packages: 0.3.1
+      typedoc: 0.21.0
       typescript: 4.2.4
       unit.js: 2.1.1
       webpack: 5.38.1
@@ -97,8 +96,7 @@ importers:
       ts-mocha: 8.0.0_mocha@9.0.0
       ts-node: 10.0.0_0cedf87f87c3860e4dbaba407f9afb24
       tsconfig-paths: 3.9.0
-      typedoc: 0.20.36_typescript@4.2.4
-      typedoc-plugin-lerna-packages: 0.3.1_typedoc@0.20.36
+      typedoc: 0.21.0_typescript@4.2.4
       typescript: 4.2.4
       unit.js: 2.1.1
       webpack: 5.38.1_webpack-cli@4.7.2
@@ -4307,11 +4305,6 @@ packages:
     resolution: {integrity: sha512-MKGMzyfeuutC/ZJ1cba9NqcNpfeqMUcYmyF1ZFY6/Cn7CNSAKx6a+s48sqLqyAiZuaP2TcqMhoo+dlwFnVxT9w==}
     dev: true
 
-  /colors/1.4.0:
-    resolution: {integrity: sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==}
-    engines: {node: '>=0.1.90'}
-    dev: true
-
   /columnify/1.5.4:
     resolution: {integrity: sha1-Rzfd8ce2mop8NAVweC6UfuyOeLs=}
     dependencies:
@@ -6028,7 +6021,7 @@ packages:
     peerDependencies:
       webpack: ^5.0.0
     dependencies:
-      webpack: 5.38.1
+      webpack: 5.38.1_webpack-cli@4.7.2
 
   /git-semver-tags/4.1.1:
     resolution: {integrity: sha512-OWyMt5zBe7xFs8vglMmhM9lRQzCWL3WjHtxNNfJTMngGym7pC1kh8sP6jevfydJ6LP3ZvGxfb6ABYgPUM0mtsA==}
@@ -8020,9 +8013,9 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /marked/2.0.7:
-    resolution: {integrity: sha512-BJXxkuIfJchcXOJWTT2DOL+yFWifFv2yGYOUzvXg8Qz610QKw+sHCvTMYwA+qWGhlA2uivBezChZ/pBy1tWdkQ==}
-    engines: {node: '>= 8.16.2'}
+  /marked/2.1.1:
+    resolution: {integrity: sha512-5XFS69o9CzDpQDSpUYC+AN2xvq8yl1EGa5SG/GI1hP78/uTeo3PDfiDNmsUyiahpyhToDDJhQk7fNtJsga+KVw==}
+    engines: {node: '>= 12'}
     hasBin: true
     dev: true
 
@@ -10990,7 +10983,7 @@ packages:
       serialize-javascript: 5.0.1
       source-map: 0.6.1
       terser: 5.7.0
-      webpack: 5.38.1
+      webpack: 5.38.1_webpack-cli@4.7.2
     dev: true
 
   /terser/5.7.0:
@@ -11335,30 +11328,20 @@ packages:
     engines: {node: '>= 8'}
     dev: true
 
-  /typedoc-plugin-lerna-packages/0.3.1_typedoc@0.20.36:
-    resolution: {integrity: sha512-azeP5DVv4Me+C32RoGbMAzXo7JeYmeEstMAx4mdtVGHLtrXjitlaf0pS562vogofwyIcyVnjL6BlZWvbPQ3hmw==}
-    peerDependencies:
-      typedoc: ^0.17.0
-    dependencies:
-      typedoc: 0.20.36_typescript@4.2.4
-    dev: true
-
-  /typedoc/0.20.36_typescript@4.2.4:
-    resolution: {integrity: sha512-qFU+DWMV/hifQ9ZAlTjdFO9wbUIHuUBpNXzv68ZyURAP9pInjZiO4+jCPeAzHVcaBCHER9WL/+YzzTt6ZlN/Nw==}
-    engines: {node: '>= 10.8.0'}
+  /typedoc/0.21.0_typescript@4.2.4:
+    resolution: {integrity: sha512-InmPBVlpOXptIkg/WnsQhbGYhv9cuDh/cRACUSautQ0QwcJPLAK2kHcfP0Pld6z/NiDvHc159fMq2qS+b/ALUw==}
+    engines: {node: '>= 12.20.0'}
     hasBin: true
     peerDependencies:
-      typescript: 3.9.x || 4.0.x || 4.1.x || 4.2.x
+      typescript: 4.0.x || 4.1.x || 4.2.x || 4.3.x
     dependencies:
-      colors: 1.4.0
-      fs-extra: 9.1.0
+      glob: 7.1.7
       handlebars: 4.7.7
       lodash: 4.17.21
       lunr: 2.3.9
-      marked: 2.0.7
+      marked: 2.1.1
       minimatch: 3.0.4
       progress: 2.0.3
-      shelljs: 0.8.4
       shiki: 0.9.3
       typedoc-default-themes: 0.12.10
       typescript: 4.2.4
