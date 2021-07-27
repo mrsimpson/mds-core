@@ -15,9 +15,9 @@
  */
 
 import {
-  JurisdictionServiceClient,
   CreateJurisdictionDomainModel,
-  JurisdictionDomainModel
+  JurisdictionDomainModel,
+  JurisdictionServiceClient
 } from '@mds-core/mds-jurisdiction-service'
 import { isServiceError } from '@mds-core/mds-service-helpers'
 import { JurisdictionApiRequest, JurisdictionApiResponse } from '../@types'
@@ -34,7 +34,8 @@ export type JurisdictionApiCreateJurisdictionResponseBody =
       jurisdictions: JurisdictionDomainModel[]
     }
 
-export type JurisdictionApiCreateJurisdictionResponse = JurisdictionApiResponse<JurisdictionApiCreateJurisdictionResponseBody>
+export type JurisdictionApiCreateJurisdictionResponse =
+  JurisdictionApiResponse<JurisdictionApiCreateJurisdictionResponseBody>
 
 export const CreateJurisdictionHandler = async (
   req: JurisdictionApiCreateJurisdictionRequest,

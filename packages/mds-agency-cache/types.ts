@@ -15,22 +15,24 @@
  */
 import {
   Device,
-  VehicleEvent,
-  Timestamp,
-  Telemetry,
+  PROPULSION_TYPE,
   Stringify,
+  Telemetry,
   TelemetryData,
-  PROPULSION_TYPE
+  Timestamp,
+  VehicleEvent
 } from '@mds-core/mds-types'
 
-export type StringifiedEvent = Stringify<Omit<VehicleEvent, 'telemetry'>>
+export type StringifiedEvent = Stringify<Omit<VehicleEvent, 'telemetry' | 'event_types'>> &
+  Pick<VehicleEvent, 'event_types'>
 export type StringifiedTelemetry = Stringify<Omit<Telemetry, 'gps'>> & {
   gps: Stringify<Omit<TelemetryData, 'charge'>>
 }
 export type StringifiedEventWithTelemetry = StringifiedEvent & { telemetry?: StringifiedTelemetry }
 
 export type StringifiedCacheReadDeviceResult = Stringify<CacheReadDeviceResult & { timestamp?: Timestamp }> & {
-  propulsion: PROPULSION_TYPE[]
+  accessibility_options: string[] // FIXME enum
+  propulsion_types: PROPULSION_TYPE[]
 }
 export type CacheReadDeviceResult = Device & { updated?: Timestamp | null; telemetry?: Telemetry | null }
 export type CachedItem = StringifiedCacheReadDeviceResult | StringifiedTelemetry | StringifiedEvent

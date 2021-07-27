@@ -14,19 +14,30 @@
  * limitations under the License.
  */
 
-import { UUID, Device, VehicleEvent, Telemetry, Timestamp, Recorded, VEHICLE_STATUS } from '@mds-core/mds-types'
-import { MultiPolygon } from 'geojson'
 import {
   ApiRequest,
+  ApiRequestParams,
   ApiResponse,
   ApiResponseLocals,
-  ApiRequestParams,
-  ApiResponseLocalsClaims
+  ApiResponseLocalsClaims,
+  ApiResponseLocalsVersion
 } from '@mds-core/mds-api-server'
+import {
+  Device,
+  Recorded,
+  Telemetry,
+  Timestamp,
+  TripMetadata,
+  UUID,
+  VehicleEvent,
+  VEHICLE_EVENT,
+  VEHICLE_STATE
+} from '@mds-core/mds-types'
+import { MultiPolygon } from 'geojson'
 
-export const AGENCY_API_SUPPORTED_VERSIONS = ['0.4.1'] as const
+export const AGENCY_API_SUPPORTED_VERSIONS = ['0.4.1', '1.0.0'] as const
 export type AGENCY_API_SUPPORTED_VERSION = typeof AGENCY_API_SUPPORTED_VERSIONS[number]
-export const [AGENCY_API_DEFAULT_VERSION] = AGENCY_API_SUPPORTED_VERSIONS
+export const [AGENCY_API_DEFAULT_VERSION] = AGENCY_API_SUPPORTED_VERSIONS // default has to be oldest, because we didn't used to require a version
 
 export type AgencyApiRequest<B = {}> = ApiRequest<B>
 
@@ -35,13 +46,14 @@ export type AgencyApiGetVehicleByIdRequest = AgencyApiRequest & ApiRequestParams
 export type AgencyApiGetVehiclesByProviderRequest = AgencyApiRequest
 export type AgencyApiUpdateVehicleRequest = AgencyApiRequest<Device> & ApiRequestParams<'device_id'>
 export type AgencyApiSubmitVehicleEventRequest = AgencyApiRequest<VehicleEvent> & ApiRequestParams<'device_id'>
-export type AgencyApiSubmitVehicleTelemetryRequest = AgencyApiRequest<{ data: Telemetry[] }>
-
+export type AgencyApiSubmitVehicleTelemetryRequest = AgencyApiRequest<{ data?: Telemetry[] }>
+export type AgencyApiPostTripMetadataRequest = AgencyApiRequest<TripMetadata>
 export type AgencyApiAccessTokenScopes = 'admin:all' | 'vehicles:read'
 
 export type AgencyApiResponse<B = {}> = ApiResponse<B> &
   ApiResponseLocalsClaims<AgencyApiAccessTokenScopes> &
-  ApiResponseLocals<'provider_id', UUID>
+  ApiResponseLocals<'provider_id', UUID> &
+  ApiResponseLocalsVersion<AGENCY_API_SUPPORTED_VERSION>
 
 export type AgencyApiRegisterVehicleResponse = AgencyApiResponse
 
@@ -50,15 +62,16 @@ export type AgencyApiGetVehiclesByProviderResponse = AgencyApiResponse<Paginated
 export type AgencyApiUpdateVehicleResponse = AgencyApiResponse
 export type AgencyApiSubmitVehicleEventResponse = AgencyApiResponse<{
   device_id: UUID
-  status: VEHICLE_STATUS
+  state: VEHICLE_STATE
 }>
 
 export type AgencyApiSubmitVehicleTelemetryResponse = AgencyApiResponse<{
-  result: string
-  recorded: Timestamp
-  unique: number
-  failures: string[]
+  success: number
+  total: number
+  failures: Object[]
 }>
+
+export type AgencyApiPostTripMetadataResponse = AgencyApiResponse<TripMetadata>
 
 export interface ServiceArea {
   service_area_id: UUID
@@ -88,11 +101,23 @@ export type TelemetryResult =
     >[]
 
 export type CompositeVehicle = Partial<
-  Device & { prev_event?: string; updated?: Timestamp; gps?: Recorded<Telemetry>['gps'] }
+  Device & { prev_events?: VEHICLE_EVENT[]; updated?: Timestamp; gps?: Recorded<Telemetry>['gps'] }
 >
 
 export type PaginatedVehiclesList = {
   total: number
   links: { first: string; last: string; prev: string | null; next: string | null }
   vehicles: (Device & { updated?: number | null; telemetry?: Telemetry | null })[]
+}
+
+/**
+ * Fatal agency server error (status 500)
+ */
+export const AgencyServerError = <const>{ error: 'server_error', error_description: 'Unknown server error' }
+export type AgencyServerError = typeof AgencyServerError
+
+export type AgencyApiError = {
+  error: 'bad_param' | 'missing_param'
+  error_description: 'A validation error occurred.' | 'A required parameter is missing.'
+  error_details: any
 }

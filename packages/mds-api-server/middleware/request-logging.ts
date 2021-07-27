@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+import logger from '@mds-core/mds-logger'
 import express from 'express'
-import morgan from 'morgan'
 import httpContext from 'express-http-context'
 import HttpStatus from 'http-status-codes'
-import logger from '@mds-core/mds-logger'
+import morgan from 'morgan'
 import { ApiRequest, ApiResponse, ApiResponseLocalsClaims } from '../@types'
 
 const { REQUEST_LOGGING_LEVEL = HttpStatus.OK } = process.env
@@ -61,6 +61,18 @@ export const RequestLoggingMiddleware = ({
     if (xRequestId) {
       httpContext.set('x-request-id', xRequestId)
     }
+    return next()
+  },
+  (req: ApiRequest, res: ApiResponse, next: express.NextFunction) => {
+    const { REQUEST_DEBUG } = process.env
+
+    if (REQUEST_DEBUG === 'true') {
+      const { body, params, query } = req
+      logger.debug('REQUEST_DEBUG::BODY', { body })
+      logger.debug('REQUEST_DEBUG::PARAMS', { params })
+      logger.debug('REQUEST_DEBUG::QUERY', { query })
+    }
+
     return next()
   }
 ]

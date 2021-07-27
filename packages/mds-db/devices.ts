@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-import { QueryResult } from 'pg'
-import { UUID, Device, Recorded, DeviceID } from '@mds-core/mds-types'
-import { now, yesterday, isUUID, csv, NotFoundError } from '@mds-core/mds-utils'
 import logger from '@mds-core/mds-logger'
-
-import schema from './schema'
-
-import { vals_sql, cols_sql, vals_list, logSql, SqlVals, MDSPostgresClient } from './sql-utils'
-
+import { Device, DeviceID, Recorded, UUID } from '@mds-core/mds-types'
+import { csv, isUUID, NotFoundError, now } from '@mds-core/mds-utils'
+import { QueryResult } from 'pg'
 import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
+import schema from './schema'
+import { cols_sql, logSql, MDSPostgresClient, SqlVals, vals_list, vals_sql } from './sql-utils'
 
 export async function readDevicesByVehicleId(
   provider_id: UUID,
@@ -93,7 +90,7 @@ export async function readDevice(
     return res.rows[0]
   }
   logger.info(`readDevice db failed for ${device_id}: rows=${res.rows.length}`)
-  throw new Error(`device_id ${device_id} not found`)
+  throw new NotFoundError(`device_id ${device_id} not found`)
 }
 
 export async function readDeviceList(device_ids: UUID[]): Promise<Recorded<Device>[]> {
@@ -156,15 +153,4 @@ export async function wipeDevice(device_id: UUID): Promise<QueryResult> {
 export async function getVehicleCountsPerProvider(): Promise<{ provider_id: UUID; count: number }[]> {
   const sql = `select provider_id, count(provider_id) from ${schema.TABLE.devices} group by provider_id`
   return makeReadOnlyQuery(sql)
-}
-
-export async function getNumVehiclesRegisteredLast24HoursByProvider(
-  start = yesterday(),
-  stop = now()
-): Promise<{ provider_id: UUID; count: number }[]> {
-  const vals = new SqlVals()
-  const sql = `select provider_id, count(device_id) from ${schema.TABLE.devices} where recorded > ${vals.add(
-    start
-  )} and recorded < ${vals.add(stop)} group by provider_id`
-  return makeReadOnlyQuery(sql, vals)
 }

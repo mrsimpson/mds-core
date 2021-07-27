@@ -14,32 +14,29 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
-
-import flatten, { unflatten } from 'flat'
-import { NotFoundError, nullKeys, stripNulls, now, isInsideBoundingBox, routeDistance } from '@mds-core/mds-utils'
-import {
-  UUID,
-  Timestamp,
-  Device,
-  VehicleEvent,
-  Telemetry,
-  BoundingBox,
-  EVENT_STATUS_MAP,
-  VEHICLE_STATUSES
-} from '@mds-core/mds-types'
-
 import { RedisCache } from '@mds-core/mds-cache'
-
-import { parseTelemetry, parseEvent, parseDevice, parseCachedItem } from './unflatteners'
+import logger from '@mds-core/mds-logger'
+import { BoundingBox, Device, Telemetry, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
 import {
-  CacheReadDeviceResult,
+  isInsideBoundingBox,
+  NotFoundError,
+  now,
+  nullKeys,
+  routeDistance,
+  setEmptyArraysToUndefined,
+  stripNulls,
+  tail
+} from '@mds-core/mds-utils'
+import flatten, { unflatten } from 'flat'
+import {
   CachedItem,
+  CacheReadDeviceResult,
   StringifiedCacheReadDeviceResult,
+  StringifiedEvent,
   StringifiedEventWithTelemetry,
-  StringifiedTelemetry,
-  StringifiedEvent
+  StringifiedTelemetry
 } from './types'
+import { parseCachedItem, parseDevice, parseEvent, parseTelemetry } from './unflatteners'
 
 const { env } = process
 
@@ -142,7 +139,7 @@ async function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | 
   }
   const { device_id } = item
   const key = decorateKey(`device:${device_id}:${suffix}`)
-  const flat: { [key: string]: unknown } = flatten(item)
+  const flat: { [key: string]: unknown } = setEmptyArraysToUndefined(flatten(item))
   const nulls = nullKeys(flat)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hmap = stripNulls(flat) as { [key: string]: any; device_id?: UUID }
@@ -162,26 +159,20 @@ async function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | 
 
 // put basics of device in the cache
 async function writeDevice(device: Device) {
-  if (!device) {
-    throw new Error('null device not legal to write')
+  try {
+    if (!device) {
+      throw new Error('null device not legal to write')
+    }
+
+    return hwrite('device', device)
+  } catch (err) {
+    logger.error('Failed to write device to cache', err)
+    throw err
   }
-  return hwrite('device', device)
 }
 
 async function readKeys(pattern: string) {
   return client.keys(decorateKey(pattern))
-}
-
-async function getMostRecentEventByProvider(): Promise<{ provider_id: string; max: number }[]> {
-  const provider_ids = (await readKeys('provider:*:latest_event')).map(key => {
-    const [, provider_id] = key.split(':')
-    return provider_id
-  })
-  const result = await hreads(['latest_event'], provider_ids, 'provider')
-  return result.map(elem => {
-    const max = parseInt(elem.timestamp || '0')
-    return { provider_id: elem.provider_id, max }
-  })
 }
 
 async function wipeDevice(device_id: UUID) {
@@ -202,7 +193,7 @@ async function writeEvent(event: VehicleEvent) {
   // FIXME cope with out-of-order -- check timestamp
   // logger.info('redis write event', event.device_id)
   try {
-    if (event.event_type === 'deregister') {
+    if (tail(event.event_types) === 'decommissioned') {
       return await wipeDevice(event.device_id)
     }
     const prev_event = parseEvent((await hread('event', event.device_id)) as StringifiedEventWithTelemetry)
@@ -349,7 +340,7 @@ async function readDevicesStatus(query: {
       try {
         const parsedItem = parseEvent(item)
         if (
-          EVENT_STATUS_MAP[parsedItem.event_type] === VEHICLE_STATUSES.removed ||
+          parsedItem.vehicle_state === 'removed' ||
           !parsedItem.telemetry ||
           (strictChecking && !isInsideBoundingBox(parsedItem.telemetry, query.bbox))
         )
@@ -430,7 +421,12 @@ async function writeOneTelemetry(telemetry: Telemetry) {
 }
 
 async function writeTelemetry(telemetries: Telemetry[]) {
-  await Promise.all(telemetries.map(telemetry => writeOneTelemetry(telemetry)))
+  try {
+    await Promise.all(telemetries.map(telemetry => writeOneTelemetry(telemetry)))
+  } catch (err) {
+    logger.error('Failed to write telemetry to cache', err)
+    throw err
+  }
 }
 
 async function readAllTelemetry() {
@@ -553,6 +549,5 @@ export default {
   readKeys,
   wipeDevice,
   updateVehicleList,
-  cleanup,
-  getMostRecentEventByProvider
+  cleanup
 }

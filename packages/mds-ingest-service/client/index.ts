@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { RpcClient, RpcRequest } from '@mds-core/mds-rpc-common'
+import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { IngestService, IngestServiceDefinition } from '../@types'
 
 const IngestServiceRpcClient = RpcClient(IngestServiceDefinition, {
@@ -25,5 +25,9 @@ const IngestServiceRpcClient = RpcClient(IngestServiceDefinition, {
 
 // What the API layer, and any other clients, will invoke.
 export const IngestServiceClient: ServiceClient<IngestService> = {
-  name: (...args) => RpcRequest(IngestServiceRpcClient.name, args)
+  name: (...args) => RpcRequest(IngestServiceRpcClient.name, args),
+  getEventsUsingOptions: (...args) => RpcRequest(IngestServiceRpcClient.getEventsUsingOptions, args),
+  getEventsUsingCursor: (...args) => RpcRequest(IngestServiceRpcClient.getEventsUsingCursor, args),
+  getDevices: (...args) => RpcRequest(IngestServiceRpcClient.getDevices, args),
+  writeEventAnnotations: (...args) => RpcRequest(IngestServiceRpcClient.writeEventAnnotations, args)
 }

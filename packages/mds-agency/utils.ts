@@ -14,107 +14,95 @@
  * limitations under the License.
  */
 
-import express from 'express'
-import { Query } from 'express-serve-static-core'
-
-import { isUUID, isPct, isTimestamp, isFloat, isInsideBoundingBox } from '@mds-core/mds-utils'
-import stream from '@mds-core/mds-stream'
-import {
-  UUID,
-  Device,
-  VehicleEvent,
-  Telemetry,
-  ErrorObject,
-  isEnum,
-  VEHICLE_EVENTS,
-  VEHICLE_TYPES,
-  VEHICLE_STATUSES,
-  VEHICLE_REASONS,
-  PROPULSION_TYPES,
-  EVENT_STATUS_MAP,
-  BoundingBox,
-  VEHICLE_STATUS,
-  VEHICLE_EVENT
-} from '@mds-core/mds-types'
+import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
-import cache from '@mds-core/mds-agency-cache'
-import { isArray } from 'util'
-import { VehiclePayload, TelemetryResult, CompositeVehicle, PaginatedVehiclesList } from './types'
+import stream from '@mds-core/mds-stream'
+import {
+  BoundingBox,
+  Device,
+  MICRO_MOBILITY_VEHICLE_EVENT,
+  MICRO_MOBILITY_VEHICLE_EVENTS,
+  MICRO_MOBILITY_VEHICLE_STATE,
+  MICRO_MOBILITY_VEHICLE_STATES,
+  TAXI_TRIP_EXIT_EVENTS,
+  TAXI_VEHICLE_EVENT,
+  TAXI_VEHICLE_EVENTS,
+  TAXI_VEHICLE_STATE,
+  TAXI_VEHICLE_STATES,
+  Telemetry,
+  TNC_TRIP_EXIT_EVENTS,
+  TNC_VEHICLE_EVENT,
+  TNC_VEHICLE_STATE,
+  TRIP_STATE,
+  TRIP_STATES,
+  UUID,
+  VehicleEvent,
+  VEHICLE_STATE
+} from '@mds-core/mds-types'
+import { areThereCommonElements, isInsideBoundingBox, isUUID, ValidationError } from '@mds-core/mds-utils'
+import { DefinedError } from 'ajv'
+import express from 'express'
+import { Query } from 'express-serve-static-core'
+import { AgencyApiError, CompositeVehicle, PaginatedVehiclesList, TelemetryResult, VehiclePayload } from './types'
 
-export function badDevice(device: Device): { error: string; error_description: string } | null {
-  if (!device.device_id) {
-    return {
-      error: 'missing_param',
-      error_description: 'missing device_id'
-    }
+/**
+ *
+ * @param error ValidationError to parse
+ * @returns Error formatted in accordance with the [MDS-Agency spec](https://github.com/openmobilityfoundation/mobility-data-specification/tree/main/agency#vehicle---register)
+ *
+ * Note: It is assumed that these errors are typically emitted from AJV, and they are parsed accordingly. All non-AJV based validation errors will result in loose error emission.
+ */
+export const agencyValidationErrorParser = (error: ValidationError): AgencyApiError => {
+  // Not the best typeguard in the world, but ¯\_(ツ)_/¯
+  const isAjvErrors = (x: unknown): x is DefinedError[] => {
+    return Array.isArray(x)
   }
-  if (!isUUID(device.device_id)) {
-    return {
-      error: 'bad_param',
-      error_description: `device_id ${device.device_id} is not a UUID`
+
+  const { info } = error
+
+  if (isAjvErrors(info)) {
+    const [{ keyword }] = info
+
+    /**
+     * If the first error we see is a missing property, then only report missing property errors.
+     */
+    if (keyword === 'required') {
+      // See MDS-Agency spec
+      const error = 'missing_param'
+      const error_description = 'A required parameter is missing.'
+
+      // Report all missing properties, ignore other errors
+      const error_details = info.reduce<string[]>((acc, subErr) => {
+        const { params } = subErr
+
+        if ('missingProperty' in params) {
+          const { missingProperty } = params
+          return [...acc, missingProperty]
+        }
+
+        return acc
+      }, [])
+
+      return { error, error_description, error_details }
     }
+
+    // If the error is something other than a missing param error...
+    const error = 'bad_param'
+    const error_description = 'A validation error occurred.'
+    const error_details = info.reduce<{ property: string; message: string | undefined }[]>((acc, subErr) => {
+      const { instancePath, message } = subErr
+
+      const property = instancePath.replace(/\W|[0-9]/g, '')
+
+      return [...acc, { property, message }]
+    }, [])
+
+    return { error, error_description, error_details }
   }
-  // propulsion is a list
-  if (!Array.isArray(device.propulsion)) {
-    return {
-      error: 'missing_param',
-      error_description: 'missing propulsion types'
-    }
-  }
-  for (const prop of device.propulsion) {
-    if (!isEnum(PROPULSION_TYPES, prop)) {
-      return {
-        error: 'bad_param',
-        error_description: `invalid propulsion type ${prop}`
-      }
-    }
-  }
-  // if (device.year === undefined) {
-  //     return {
-  //         error: 'missing_param',
-  //         error_description: 'missing integer field "year"'
-  //     }
-  // }
-  if (device.year !== null && device.year !== undefined) {
-    if (!Number.isInteger(device.year)) {
-      return {
-        error: 'bad_param',
-        error_description: `invalid device year ${device.year} is not an integer`
-      }
-    }
-    if (device.year < 1980 || device.year > 2020) {
-      return {
-        error: 'bad_param',
-        error_description: `invalid device year ${device.year} is out of range`
-      }
-    }
-  }
-  if (device.type === undefined) {
-    return {
-      error: 'missing_param',
-      error_description: 'missing enum field "type"'
-    }
-  }
-  if (!isEnum(VEHICLE_TYPES, device.type)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid device type ${device.type}`
-    }
-  }
-  // if (device.mfgr === undefined) {
-  //     return {
-  //         error: 'missing_param',
-  //         error_description: 'missing string field "mfgr"'
-  //     }
-  // }
-  // if (device.model === undefined) {
-  //     return {
-  //         error: 'missing_param',
-  //         error_description: 'missing string field "model"'
-  //     }
-  // }
-  return null
+
+  logger.error('agencyErrorParser unmatched error', error)
+  return { error: 'bad_param', error_description: 'A validation error occurred.', error_details: { error } }
 }
 
 export async function getVehicles(
@@ -158,10 +146,10 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
-    const status = event ? EVENT_STATUS_MAP[event.event_type] : VEHICLE_STATUSES.inactive
+    const state: VEHICLE_STATE = event ? event.vehicle_state : 'removed'
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
-    return [...acc, { ...device, status, telemetry, updated }]
+    return [...acc, { ...device, state, telemetry, updated }]
   }, [])
 
   const noNext = skip + take >= deviceIdSuperset.length
@@ -196,190 +184,88 @@ export async function getVehicles(
   }
 }
 
-export function badTelemetry(telemetry: Telemetry | null | undefined): ErrorObject | null {
-  const [LATITUDE_LOWER_BOUND, LATITUDE_UPPER_BOUND] = [-90, 90]
-  const [LONGITUDE_LOWER_BOUND, LONGITUDE_UPPER_BOUND] = [-180, 180]
-
-  if (!telemetry) {
-    return {
-      error: 'missing_param',
-      error_description: 'invalid missing telemetry'
-    }
-  }
-
-  const { device_id, timestamp, gps, charge } = telemetry
-
-  if (typeof gps !== 'object') {
-    return {
-      error: 'missing_param',
-      error_description: 'invalid missing gps'
-    }
-  }
-
-  const { altitude, accuracy, speed, satellites } = gps
-  const { lat, lng } = gps
-
-  // validate all parameters
-  if (!isUUID(device_id)) {
-    return {
-      error: 'missing_param',
-      error_description: 'no device_id included in telemetry'
-    }
-  }
-  if (
-    typeof lat !== 'number' ||
-    Number.isNaN(lat) ||
-    lat < LATITUDE_LOWER_BOUND ||
-    lat > LATITUDE_UPPER_BOUND ||
-    lat === 0
-  ) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid lat ${lat}`
-    }
-  }
-  if (
-    typeof lng !== 'number' ||
-    Number.isNaN(lng) ||
-    lng < LONGITUDE_LOWER_BOUND ||
-    lng > LONGITUDE_UPPER_BOUND ||
-    lng === 0
-  ) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid lng ${lng}`
-    }
-  }
-  if (altitude !== undefined && !isFloat(altitude)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid altitude ${altitude}`
-    }
-  }
-  if (accuracy !== undefined && !isFloat(accuracy)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid accuracy ${accuracy}`
-    }
-  }
-  if (speed !== undefined && !isFloat(speed)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid speed ${speed}`
-    }
-  }
-  if (satellites !== undefined && satellites !== null && !Number.isInteger(satellites)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid satellites ${satellites}`
-    }
-  }
-  if (charge !== undefined && !isPct(charge)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid charge ${charge}`
-    }
-  }
-  if (!isTimestamp(timestamp)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid timestamp ${timestamp} (note: should be in milliseconds)`
-    }
-  }
-  return null
-}
-
-// TODO Joi
-export async function badEvent(event: VehicleEvent) {
-  if (event.timestamp === undefined) {
-    return {
-      error: 'missing_param',
-      error_description: 'missing enum field "timestamp"'
-    }
-  }
-  if (!isTimestamp(event.timestamp)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid timestamp ${event.timestamp}`
-    }
-  }
-  if (event.event_type === undefined) {
-    return {
-      error: 'missing_param',
-      error_description: 'missing enum field "event_type"'
-    }
-  }
-
-  if (!isEnum(VEHICLE_EVENTS, event.event_type)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid event_type ${event.event_type}`
-    }
-  }
-
-  if (event.event_type_reason && !isEnum(VEHICLE_REASONS, event.event_type_reason)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid event_type_reason ${event.event_type_reason}`
-    }
-  }
-
-  if (event.trip_id === '') {
-    /* eslint-reason TODO remove eventually -- Lime is spraying empty-string values */
-    /* eslint-disable-next-line no-param-reassign */
-    event.trip_id = null
-  }
-
-  const { trip_id } = event
-  if (trip_id !== null && trip_id !== undefined && !isUUID(event.trip_id)) {
-    return {
-      error: 'bad_param',
-      error_description: `invalid trip_id ${event.trip_id} is not a UUID`
-    }
-  }
-
-  function missingTripId(): ErrorObject | null {
-    if (!trip_id) {
-      return {
-        error: 'missing_param',
-        error_description: 'missing trip_id'
+/**
+ *
+ * @param param0 Some object containing a modality (e.g. `Device`)
+ * @param event MDS Event
+ * @returns Error if applicable, null otherwise.
+ */
+export function eventValidForMode({ modality }: Pick<Device, 'modality'>, event: VehicleEvent) {
+  switch (modality) {
+    case 'micromobility': {
+      for (const event_type of event.event_types) {
+        if (!MICRO_MOBILITY_VEHICLE_EVENTS.includes(event_type as MICRO_MOBILITY_VEHICLE_EVENT))
+          return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }
       }
-    }
-    return null
-  }
 
-  // event-specific checking goes last
-  switch (event.event_type) {
-    case VEHICLE_EVENTS.trip_start:
-      return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_end:
-      return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_enter:
-      return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.trip_leave:
-      return badTelemetry(event.telemetry) || missingTripId()
-    case VEHICLE_EVENTS.service_start:
-    case VEHICLE_EVENTS.service_end:
-    case VEHICLE_EVENTS.provider_pick_up:
-    case VEHICLE_EVENTS.provider_drop_off:
-      return badTelemetry(event.telemetry)
-    case VEHICLE_EVENTS.register:
-    case VEHICLE_EVENTS.deregister:
-    case VEHICLE_EVENTS.reserve:
-    case VEHICLE_EVENTS.cancel_reservation:
-      return null
-    default:
-      logger.warn(`unsure how to validate mystery event_type ${event.event_type}`)
+      if (!MICRO_MOBILITY_VEHICLE_STATES.includes(event.vehicle_state as MICRO_MOBILITY_VEHICLE_STATE)) {
+        return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
+      }
+
+      break
+    }
+    case 'taxi': {
+      for (const event_type of event.event_types) {
+        if (!TAXI_VEHICLE_EVENTS.includes(event_type as TAXI_VEHICLE_EVENT))
+          return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }
+      }
+
+      if (!TAXI_VEHICLE_STATES.includes(event.vehicle_state as TAXI_VEHICLE_STATE)) {
+        return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
+      }
+
+      if (
+        event.trip_id &&
+        TRIP_STATES.includes(event.vehicle_state as TRIP_STATE) &&
+        !areThereCommonElements(TAXI_TRIP_EXIT_EVENTS, event.event_types)
+      ) {
+        if (!event.trip_state) {
+          return {
+            error: 'missing_param',
+            error_description: `missing enum field "trip_state" required on trip events`
+          }
+        }
+
+        if (event.trip_state && !TRIP_STATES.includes(event.trip_state)) {
+          return { error: 'bad_param', error_description: `invalid trip_state ${event.trip_state}` }
+        }
+      }
+
+      break
+    }
+    case 'tnc':
+      {
+        for (const event_type of event.event_types) {
+          if (!TNC_VEHICLE_EVENT.includes(event_type as TNC_VEHICLE_EVENT))
+            return { error: 'bad_param', error_description: `invalid event_type in event_types ${event_type}` }
+        }
+
+        if (!TNC_VEHICLE_STATE.includes(event.vehicle_state as TNC_VEHICLE_STATE)) {
+          return { error: 'bad_param', error_description: `invalid vehicle_state ${event.vehicle_state}` }
+        }
+
+        if (
+          event.trip_id &&
+          TRIP_STATES.includes(event.vehicle_state as TRIP_STATE) &&
+          !areThereCommonElements(TNC_TRIP_EXIT_EVENTS, event.event_types)
+        ) {
+          if (!event.trip_state) {
+            return {
+              error: 'missing_param',
+              error_description: `missing enum field "trip_state" required on trip events`
+            }
+          }
+
+          if (event.trip_state && !TRIP_STATES.includes(event.trip_state)) {
+            return { error: 'bad_param', error_description: `invalid trip_state ${event.trip_state}` }
+          }
+        }
+      }
+
       break
   }
-  return null // we good
-}
 
-export function lower(s: string): string {
-  if (typeof s === 'string') {
-    return s.toLowerCase()
-  }
-  return s
+  return null
 }
 
 export async function writeTelemetry(telemetry: Telemetry | Telemetry[]) {
@@ -427,41 +313,14 @@ export async function validateDeviceId(req: express.Request, res: express.Respon
     return
   }
   if (device_id && !isUUID(device_id)) {
-    logger.warn('agency: bogus device_id', { device_id, originalUrl: req.originalUrl })
     res.status(400).send({
       error: 'bad_param',
-      error_description: `invalid device_id ${device_id} is not a UUID`
+      error_description: 'A validation error occurred.',
+      error_details: [{ property: 'device_id', reason: 'Must be a UUID' }]
     })
     return
   }
   next()
-}
-
-export async function writeRegisterEvent(device: Device, recorded: number) {
-  const event: VehicleEvent = {
-    device_id: device.device_id,
-    provider_id: device.provider_id,
-    event_type: VEHICLE_EVENTS.register,
-    event_type_reason: null,
-    telemetry: null,
-    timestamp: recorded,
-    trip_id: null,
-    recorded,
-    telemetry_timestamp: undefined,
-    service_area_id: null
-  }
-  try {
-    const recorded_event = await db.writeEvent(event)
-    try {
-      // writing to cache and stream is not fatal
-      await Promise.all([cache.writeEvent(recorded_event), stream.writeEvent(recorded_event)])
-    } catch (err) {
-      logger.warn('/event exception cache/stream', err)
-    }
-  } catch (err) {
-    logger.error('writeRegisterEvent failure', err)
-    throw new Error('writeEvent exception db')
-  }
 }
 
 export function computeCompositeVehicleData(payload: VehiclePayload) {
@@ -472,12 +331,12 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
   }
 
   if (event) {
-    composite.prev_event = event.event_type
+    composite.prev_events = event.event_types
     composite.updated = event.timestamp
-    composite.status = (EVENT_STATUS_MAP[event.event_type as VEHICLE_EVENT] || 'unknown') as VEHICLE_STATUS
+    composite.state = event.vehicle_state
   } else {
-    composite.status = VEHICLE_STATUSES.inactive
-    composite.prev_event = VEHICLE_EVENTS.deregister
+    composite.state = 'removed'
+    composite.prev_events = ['decommissioned']
   }
   if (telemetry) {
     if (telemetry.gps) {
@@ -488,7 +347,7 @@ export function computeCompositeVehicleData(payload: VehiclePayload) {
 }
 
 const normalizeTelemetry = (telemetry: TelemetryResult) => {
-  if (isArray(telemetry)) {
+  if (Array.isArray(telemetry)) {
     return telemetry[0]
   }
   return telemetry

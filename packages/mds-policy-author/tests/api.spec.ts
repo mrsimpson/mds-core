@@ -22,33 +22,49 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
 
 /* eslint-reason extends object.prototype */
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import should from 'should'
-import supertest from 'supertest'
-import test from 'unit.js'
-import db from '@mds-core/mds-db'
-import { clone, isUUID, uuid, pathPrefix } from '@mds-core/mds-utils'
-import { Policy } from '@mds-core/mds-types'
+/* eslint-enable prettier/prettier */
+/* eslint-enable @typescript-eslint/no-unused-vars */
 import { ApiServer } from '@mds-core/mds-api-server'
+import db from '@mds-core/mds-db'
 import {
-  POLICY_JSON,
-  POLICY2_JSON,
-  POLICY3_JSON,
-  POLICY_JSON_MISSING_POLICY_ID,
-  POLICY_UUID,
-  POLICY2_UUID,
   GEOGRAPHY_UUID,
   LA_CITY_BOUNDARY,
+  POLICY2_JSON,
+  POLICY2_UUID,
+  POLICY3_JSON,
+  POLICY_JSON,
+  POLICY_JSON_MISSING_POLICY_ID,
+  POLICY_UUID,
+  PUBLISHED_POLICY,
   SCOPED_AUTH,
-  PUBLISHED_POLICY
+  TAXI_POLICY
 } from '@mds-core/mds-test-data'
+import { ModalityPolicy, ModalityPolicyTypeInfo } from '@mds-core/mds-types'
+import { clone, isUUID, pathPrefix, uuid } from '@mds-core/mds-utils'
+import express from 'express'
+import supertest from 'supertest'
+import test from 'unit.js'
 import { api } from '../api'
+import { injectModalityValidator, injectVersionMiddleware } from '../middleware'
 import { POLICY_AUTHOR_API_DEFAULT_VERSION } from '../types'
 
 /* eslint-disable-next-line no-console */
 const log = console.log.bind(console)
 
-const request = supertest(ApiServer(api))
+const request = supertest(
+  api<ModalityPolicyTypeInfo>(
+    injectModalityValidator(
+      injectVersionMiddleware(
+        ApiServer((app: express.Express) => {
+          return app
+        })
+      )
+    )
+  )
+)
 
 const APP_JSON = 'application/vnd.mds.policy-author+json; charset=utf-8; version=0.4'
 const EMPTY_SCOPE = SCOPED_AUTH([], '')
@@ -95,7 +111,7 @@ describe('Tests app', () => {
     })
 
     it('tries to post invalid policy', done => {
-      const bad_policy_json: Policy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
+      const bad_policy_json: ModalityPolicy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
 
       /* eslint-reason test intentionally does things that the compiler dissuades,
          as it's testing an invalid data case.
@@ -112,7 +128,8 @@ describe('Tests app', () => {
         .expect(400)
         .end((err, result) => {
           const body = result.body
-          test.value(body.error.reason).contains('rule_type')
+          log('zazzy', body)
+          test.value(body.error.info.details[0].message).contains('rule_type')
           test.value(result).hasHeader('content-type', APP_JSON)
           done(err)
         })
@@ -180,6 +197,20 @@ describe('Tests app', () => {
         })
     })
 
+    it('creates one Taxi policy', done => {
+      const { publish_date, ...policy } = TAXI_POLICY
+      request
+        .post(pathPrefix(`/policies`))
+        .set('Authorization', POLICIES_WRITE_SCOPE)
+        .send(policy)
+        .expect(201)
+        .end((err, result) => {
+          test.value(result).hasHeader('content-type', APP_JSON)
+          test.value(result.body.version).is(POLICY_AUTHOR_API_DEFAULT_VERSION)
+          done(err)
+        })
+    })
+
     it('verifies cannot POST duplicate policy', done => {
       const policy = POLICY_JSON_WITHOUT_PUBLISH_DATE
       request
@@ -194,7 +225,7 @@ describe('Tests app', () => {
     })
 
     it('verifies cannot PUT invalid policy', async () => {
-      const bad_policy_json: Policy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
+      const bad_policy_json: ModalityPolicy = clone(POLICY_JSON_WITHOUT_PUBLISH_DATE)
 
       /* eslint-reason test intentionally does things that the compiler dissuades,
          as it's testing an invalid data case.
@@ -572,32 +603,26 @@ describe('Tests app', () => {
         })
     })
 
-    it('Cannot PUT a policy with publish_date set', done => {
-      request
+    it('Cannot PUT a policy with publish_date set', async () => {
+      const result = await request
         .put(pathPrefix(`/policies/${PUBLISHED_POLICY.policy_id}`))
         .set('Authorization', POLICIES_WRITE_SCOPE)
         .send(PUBLISHED_POLICY)
         .expect(400)
-        .end((err, result) => {
-          test.assert(result.body.error.name === `ValidationError`)
-          test.assert(result.body.error.reason.includes('publish_date'))
-          test.value(result).hasHeader('content-type', APP_JSON)
-          done(err)
-        })
+      test.assert(result.body.error.name === `ValidationError`)
+      test.assert(result.body.error.reason.includes('publish_date'))
+      test.value(result).hasHeader('content-type', APP_JSON)
     })
 
-    it('Cannot POST a policy with publish_date set', done => {
-      request
+    it('Cannot POST a policy with publish_date set', async () => {
+      const result = await request
         .post(pathPrefix(`/policies`))
         .set('Authorization', POLICIES_WRITE_SCOPE)
         .send(PUBLISHED_POLICY)
         .expect(400)
-        .end((err, result) => {
-          test.assert(result.body.error.name === `ValidationError`)
-          test.assert(result.body.error.reason.includes('publish_date'))
-          test.value(result).hasHeader('content-type', APP_JSON)
-          done(err)
-        })
+      test.assert(result.body.error.name === `ValidationError`)
+      test.assert(result.body.error.reason.includes('publish_date'))
+      test.value(result).hasHeader('content-type', APP_JSON)
     })
   })
 })

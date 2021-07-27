@@ -1,13 +1,18 @@
 import { UUID } from '@mds-core/mds-types'
 import { uuid } from '@mds-core/mds-utils'
 import {
+  FEE_TYPE,
   TransactionDomainModel,
-  TransactionStatusDomainModel,
   TransactionOperationDomainCreateModel,
-  FEE_TYPE
+  TransactionStatusDomainModel
 } from '../@types'
 
-const receipt = { receipt_id: uuid(), timestamp: Date.now(), receipt_details: {}, origin_url: '' }
+const receipt = {
+  receipt_id: uuid(),
+  timestamp: Date.now(),
+  receipt_details: {},
+  origin_url: 'https://mds.coruscant.com/compliance/snapshot/c78280ff-4e58-4e30-afa9-d72673037799'
+}
 
 /**
  * Generator for Transactions.

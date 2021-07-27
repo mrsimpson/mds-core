@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import { ApiRequestParams } from '@mds-core/mds-api-server'
 import {
-  UpdateJurisdictionDomainModel,
+  JurisdictionDomainModel,
   JurisdictionServiceClient,
-  JurisdictionDomainModel
+  UpdateJurisdictionDomainModel
 } from '@mds-core/mds-jurisdiction-service'
 import { isServiceError } from '@mds-core/mds-service-helpers'
-import { ApiRequestParams } from '@mds-core/mds-api-server'
 import { JurisdictionApiRequest, JurisdictionApiResponse } from '../@types'
 
 export type JurisdictionApiUpdateJurisdictionRequest = JurisdictionApiRequest<UpdateJurisdictionDomainModel> &
@@ -30,7 +30,8 @@ export type JurisdictionApiUpdateJurisdictionResponseBody = {
   jurisdiction: JurisdictionDomainModel
 }
 
-export type JurisdictionApiUpdateJurisdictionResponse = JurisdictionApiResponse<JurisdictionApiUpdateJurisdictionResponseBody>
+export type JurisdictionApiUpdateJurisdictionResponse =
+  JurisdictionApiResponse<JurisdictionApiUpdateJurisdictionResponseBody>
 
 export const UpdateJurisdictionHandler = async (
   req: JurisdictionApiUpdateJurisdictionRequest,

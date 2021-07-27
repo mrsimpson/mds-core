@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Entity, Column } from 'typeorm'
 import { IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
+import { Column, Entity } from 'typeorm'
 import { AuditAttachmentDomainModel } from '../../@types'
 
 export interface AuditAttachmentEntityModel extends IdentityColumn, RecordedColumn {
@@ -26,7 +26,8 @@ export interface AuditAttachmentEntityModel extends IdentityColumn, RecordedColu
 @Entity('audit_attachments')
 export class AuditAttachmentEntity
   extends IdentityColumn(RecordedColumn(class {}))
-  implements AuditAttachmentEntityModel {
+  implements AuditAttachmentEntityModel
+{
   @Column('uuid', { primary: true })
   audit_trip_id: AuditAttachmentEntityModel['audit_trip_id']
 

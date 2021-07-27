@@ -17,4 +17,5 @@
 export * from './@types'
 export * from './client'
 export * from './repository'
+export { schemas } from './service/validators'
 export * from './test-fixtures'

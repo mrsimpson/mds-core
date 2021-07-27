@@ -15,14 +15,14 @@
  */
 
 import {
-  Recorded,
-  UUID,
-  Timestamp,
-  VehicleEvent,
-  TelemetryData,
-  VEHICLE_TYPE,
+  Nullable,
   PROPULSION_TYPE,
-  Nullable
+  Recorded,
+  TelemetryData,
+  Timestamp,
+  UUID,
+  VehicleEvent,
+  VEHICLE_TYPE
 } from '@mds-core/mds-types'
 import { FeatureCollection } from 'geojson'
 
@@ -37,7 +37,7 @@ export interface Trip {
   device_id: UUID
   vehicle_id: string
   vehicle_type: VEHICLE_TYPE
-  propulsion_type: PROPULSION_TYPE[]
+  propulsion_types: PROPULSION_TYPE[]
   provider_trip_id: UUID
   trip_start?: Timestamp | null
   first_trip_enter?: Timestamp | null

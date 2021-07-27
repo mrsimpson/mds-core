@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import { JurisdictionServiceClient, JurisdictionDomainModel } from '@mds-core/mds-jurisdiction-service'
-import { isServiceError } from '@mds-core/mds-service-helpers'
 import { ApiRequestParams } from '@mds-core/mds-api-server'
+import { JurisdictionDomainModel, JurisdictionServiceClient } from '@mds-core/mds-jurisdiction-service'
+import { isServiceError } from '@mds-core/mds-service-helpers'
 import { JurisdictionApiRequest, JurisdictionApiResponse } from '../@types'
 
 export type JurisdictionApiDeleteJurisdictionRequest = JurisdictionApiRequest & ApiRequestParams<'jurisdiction_id'>
 
 export type JurisdictionApiDeleteJurisdictionResponseBody = Pick<JurisdictionDomainModel, 'jurisdiction_id'>
 
-export type JurisdictionApiDeleteJurisdictionResponse = JurisdictionApiResponse<JurisdictionApiDeleteJurisdictionResponseBody>
+export type JurisdictionApiDeleteJurisdictionResponse =
+  JurisdictionApiResponse<JurisdictionApiDeleteJurisdictionResponseBody>
 
 export const DeleteJurisdictionHandler = async (
   req: JurisdictionApiDeleteJurisdictionRequest,

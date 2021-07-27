@@ -14,75 +14,47 @@
  * limitations under the License.
  */
 
+import { asJsonApiLinks, parsePagingQueryParams, parseRequest } from '@mds-core/mds-api-helpers'
+import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import express from 'express'
-import {
-  uuid,
-  pathPrefix,
-  seconds,
-  AuthorizationError,
-  ConflictError,
-  NotFoundError,
-  ServerError,
-  UnsupportedTypeError
-} from '@mds-core/mds-utils'
 import logger from '@mds-core/mds-logger'
-import urls from 'url'
-
+import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import {
   isValidAuditDeviceId,
   isValidAuditEventId,
   isValidAuditEventType,
+  isValidAuditIssueCode,
+  isValidAuditNote,
   isValidAuditTripId,
   isValidProviderId,
   isValidProviderVehicleId,
   isValidTelemetry,
   isValidTimestamp,
   isValidVehicleEventType,
-  isValidAuditIssueCode,
-  isValidAuditNote,
   ValidationError
 } from '@mds-core/mds-schema-validators'
-
-import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
-import {
-  AUDIT_EVENT_TYPES,
-  AuditEvent,
-  EVENT_STATUS_MAP,
-  Timestamp,
-  Telemetry,
-  TelemetryData,
-  VEHICLE_EVENT
-} from '@mds-core/mds-types'
-import { parsePagingQueryParams, asJsonApiLinks, parseRequest } from '@mds-core/mds-api-helpers'
-import { checkAccess, AccessTokenScopeValidator } from '@mds-core/mds-api-server'
 import { isError } from '@mds-core/mds-service-helpers'
+import { AuditEvent, AUDIT_EVENT_TYPES, Telemetry, TelemetryData, Timestamp } from '@mds-core/mds-types'
 import {
-  AuditApiAuditEndRequest,
-  AuditApiAuditNoteRequest,
-  AuditApiAuditStartRequest,
-  AuditApiGetTripRequest,
-  AuditApiGetTripsRequest,
-  AuditApiGetVehicleRequest,
-  AuditApiRequest,
-  AuditApiResponse,
-  AuditApiTripRequest,
-  AuditApiVehicleEventRequest,
-  AuditApiVehicleTelemetryRequest,
-  AuditApiAccessTokenScopes,
-  PostAuditTripStartResponse,
-  PostAuditTripVehicleEventResponse,
-  PostAuditTripTelemetryResponse,
-  PostAuditTripNoteResponse,
-  PostAuditTripEndResponse,
-  GetAuditTripDetailsResponse,
-  PostAuditTripEventResponse,
-  DeleteAuditTripResponse,
-  GetAuditVehiclesResponse,
-  GetVehicleByVinResponse,
-  PostAuditAttachmentResponse,
-  GetAuditTripsDetailsResponse
-} from './types'
+  AuthorizationError,
+  ConflictError,
+  NotFoundError,
+  pathPrefix,
+  seconds,
+  ServerError,
+  UnsupportedTypeError,
+  uuid
+} from '@mds-core/mds-utils'
+import express from 'express'
+import urls from 'url'
+import {
+  attachmentSummary,
+  deleteAuditAttachment,
+  multipartFormUpload,
+  readAttachments,
+  writeAttachment
+} from './attachments'
+import { AuditApiVersionMiddleware } from './middleware'
 import {
   deleteAudit,
   getVehicle,
@@ -98,13 +70,31 @@ import {
   writeAuditEvent
 } from './service'
 import {
-  attachmentSummary,
-  deleteAuditAttachment,
-  multipartFormUpload,
-  readAttachments,
-  writeAttachment
-} from './attachments'
-import { AuditApiVersionMiddleware } from './middleware'
+  AuditApiAccessTokenScopes,
+  AuditApiAuditEndRequest,
+  AuditApiAuditNoteRequest,
+  AuditApiAuditStartRequest,
+  AuditApiGetTripRequest,
+  AuditApiGetTripsRequest,
+  AuditApiGetVehicleRequest,
+  AuditApiRequest,
+  AuditApiResponse,
+  AuditApiTripRequest,
+  AuditApiVehicleEventRequest,
+  AuditApiVehicleTelemetryRequest,
+  DeleteAuditTripResponse,
+  GetAuditTripDetailsResponse,
+  GetAuditTripsDetailsResponse,
+  GetAuditVehiclesResponse,
+  GetVehicleByVinResponse,
+  PostAuditAttachmentResponse,
+  PostAuditTripEndResponse,
+  PostAuditTripEventResponse,
+  PostAuditTripNoteResponse,
+  PostAuditTripStartResponse,
+  PostAuditTripTelemetryResponse,
+  PostAuditTripVehicleEventResponse
+} from './types'
 
 // TODO lib
 function flattenTelemetry(telemetry?: Telemetry): TelemetryData {
@@ -538,7 +528,7 @@ function api(app: express.Express): express.Express {
             if (start_time && end_time) {
               const deviceEvents = await readEvents(device.device_id, start_time, end_time)
               const deviceTelemetry = await readTelemetry(device.device_id, start_time, end_time)
-              const providerEvent = await db.readEventsWithTelemetry({
+              const [providerEvent] = await db.readEventsWithTelemetry({
                 device_id: device.device_id,
                 provider_id: device.provider_id,
                 end_time: audit_start, // Last provider event before the audit started
@@ -549,11 +539,10 @@ function api(app: express.Express): express.Express {
                 version: res.locals.version,
                 ...audit,
                 provider_vehicle_id: device.vehicle_id,
-                provider_event_type: providerEvent[0]?.event_type,
-                provider_event_type_reason: providerEvent[0]?.event_type_reason,
-                provider_status: EVENT_STATUS_MAP[providerEvent[0]?.event_type as VEHICLE_EVENT],
-                provider_telemetry: providerEvent[0]?.telemetry,
-                provider_event_time: providerEvent[0]?.timestamp,
+                provider_event_types: providerEvent.event_types,
+                provider_vehicle_state: providerEvent.vehicle_state,
+                provider_telemetry: providerEvent.telemetry,
+                provider_event_time: providerEvent.timestamp,
                 events: auditEvents.map(withGpsProperty),
                 attachments: attachments.map(attachmentSummary),
                 provider: {
@@ -630,9 +619,11 @@ function api(app: express.Express): express.Express {
         const { scopes } = res.locals
         const { skip, take } = parsePagingQueryParams(req)
 
-        const { provider_id: queried_provider_id, provider_vehicle_id, audit_subject_id } = parseRequest(req)
-          .single()
-          .query('provider_id', 'provider_vehicle_id', 'audit_subject_id')
+        const {
+          provider_id: queried_provider_id,
+          provider_vehicle_id,
+          audit_subject_id
+        } = parseRequest(req).single().query('provider_id', 'provider_vehicle_id', 'audit_subject_id')
 
         const provider_id = scopes.includes('audits:read') ? queried_provider_id : res.locals.claims?.provider_id
 
@@ -689,7 +680,11 @@ function api(app: express.Express): express.Express {
     checkAuditApiAccess(scopes => scopes.includes('audits:vehicles:read')),
     async (req: AuditApiGetVehicleRequest, res: GetAuditVehiclesResponse) => {
       const { skip, take } = { skip: 0, take: 10000 }
-      const { strict = true, bbox, provider_id } = {
+      const {
+        strict = true,
+        bbox,
+        provider_id
+      } = {
         ...parseRequest(req).single({ parser: JSON.parse }).query('strict', 'bbox'),
         ...parseRequest(req).single().query('provider_id')
       }
@@ -747,6 +742,9 @@ function api(app: express.Express): express.Express {
       if (!audit) return res.status(404).send({ error: new NotFoundError('audit not found', { audit_trip_id }) })
 
       try {
+        if (!req.file) {
+          throw new ServerError('Request contains no file property')
+        }
         const attachment = await writeAttachment(req.file, audit_trip_id)
         res.status(200).send({
           version: res.locals.version,

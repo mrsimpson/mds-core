@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { VehicleEvent, Telemetry, Device } from '@mds-core/mds-types'
+import { Device, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
 import { getEnvVar } from '@mds-core/mds-utils'
 import { AgencyStreamInterface } from '../agency-stream-interface'
+import { safeWrite } from '../helpers'
 import { NatsStreamProducer } from './stream-producer'
 
 const { TENANT_ID } = getEnvVar({
@@ -24,16 +25,32 @@ const { TENANT_ID } = getEnvVar({
 })
 const deviceProducer = NatsStreamProducer<Device>(`${TENANT_ID}.device`)
 const eventProducer = NatsStreamProducer<VehicleEvent>(`${TENANT_ID}.event`)
+const eventErrorProducer = NatsStreamProducer<Partial<VehicleEvent>>(`${TENANT_ID}.event.error`)
 const telemetryProducer = NatsStreamProducer<Telemetry>(`${TENANT_ID}.telemetry`)
+const tripMetadataProducer = NatsStreamProducer<TripMetadata>(`${TENANT_ID}.trip_metadata`)
 
 export const AgencyStreamNats: AgencyStreamInterface = {
   initialize: async () => {
-    await Promise.all([deviceProducer.initialize(), eventProducer.initialize(), telemetryProducer.initialize()])
+    await Promise.all([
+      deviceProducer.initialize(),
+      eventProducer.initialize(),
+      eventErrorProducer.initialize(),
+      telemetryProducer.initialize(),
+      tripMetadataProducer.initialize()
+    ])
   },
-  writeEvent: eventProducer.write,
-  writeTelemetry: telemetryProducer.write,
-  writeDevice: deviceProducer.write,
+  writeEventError: async msg => await safeWrite(eventErrorProducer, msg),
+  writeEvent: async msg => await safeWrite(eventProducer, msg),
+  writeTelemetry: async msg => await safeWrite(telemetryProducer, msg),
+  writeDevice: async msg => await safeWrite(deviceProducer, msg),
+  writeTripMetadata: async msg => await safeWrite(tripMetadataProducer, msg),
   shutdown: async () => {
-    await Promise.all([deviceProducer.shutdown(), eventProducer.shutdown(), telemetryProducer.shutdown()])
+    await Promise.all([
+      deviceProducer.shutdown(),
+      eventProducer.shutdown(),
+      eventErrorProducer.shutdown(),
+      telemetryProducer.shutdown(),
+      tripMetadataProducer.shutdown()
+    ])
   }
 }

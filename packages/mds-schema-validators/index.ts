@@ -14,10 +14,49 @@
  * limitations under the License.
  */
 
-import Joi from 'joi'
 import { ValidationError } from '@mds-core/mds-utils'
+import Ajv, { JSONSchemaType, Options, SchemaObject, ValidateFunction } from 'ajv'
+import withFormats from 'ajv-formats'
+import Joi from 'joi'
+export type { SchemaObject } from 'ajv'
+export * from './generators'
+// Export an example schema for testing purposes
+export * from './tests/test.schema'
+export * from './trip-metadata-validators'
+export * from './v0_4_1'
+export * from './validators'
 
-export const schemaValidator = <T>(schema: Joi.Schema, options?: Joi.ValidationOptions) => ({
+export type Schema<T> = SchemaObject | JSONSchemaType<T>
+
+export type SchemaValidator<T> = {
+  validate: (input: unknown) => T
+  isValid: (input: unknown) => input is T
+  $schema: Schema<T> & { $schema: string }
+}
+
+export const SchemaValidator = <T>(schema: Schema<T>, options: Options = { allErrors: true }): SchemaValidator<T> => {
+  const $schema = Object.assign({ $schema: 'http://json-schema.org/draft-07/schema#' }, schema)
+  const validator: ValidateFunction<T> = withFormats(new Ajv(options)).compile($schema)
+  return {
+    validate: (input: unknown) => {
+      if (!validator(input)) {
+        const [{ instancePath, message } = { instancePath: 'Data', message: 'is invalid' }] = validator.errors ?? []
+        throw new ValidationError(`${instancePath} ${message}`, validator.errors)
+      }
+      return input
+    },
+    isValid: (input: unknown): input is T => validator(input),
+    $schema
+  }
+}
+
+/**
+ * @deprecated JSON Schema based validation is preferable to Joi. Please use the SchemaValidator instead.
+ */
+export const schemaValidator = <T>(
+  schema: Joi.Schema,
+  options?: Joi.ValidationOptions
+): Omit<SchemaValidator<T>, '$schema'> => ({
   validate: (input: unknown): T => {
     const { error, value } = schema.validate(input, options)
     if (error) {
@@ -27,5 +66,3 @@ export const schemaValidator = <T>(schema: Joi.Schema, options?: Joi.ValidationO
   },
   isValid: (input: unknown): input is T => !schema.validate(input, options).error
 })
-
-export * from './validators'

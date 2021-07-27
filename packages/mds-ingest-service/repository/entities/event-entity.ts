@@ -14,45 +14,43 @@
  * limitations under the License.
  */
 
-import { Entity, Column, Index } from 'typeorm'
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
-import { EventDomainModel } from '../../@types'
-
-export interface EventEntityModel extends IdentityColumn, RecordedColumn {
-  device_id: EventDomainModel['device_id']
-  provider_id: EventDomainModel['provider_id']
-  timestamp: EventDomainModel['timestamp']
-  event_type: EventDomainModel['event_type']
-  event_type_reason: EventDomainModel['event_type_reason']
-  telemetry_timestamp: EventDomainModel['telemetry_timestamp']
-  trip_id: EventDomainModel['trip_id']
-  service_area_id: EventDomainModel['service_area_id']
-}
+import { Nullable, Timestamp, TRIP_STATE, UUID, VEHICLE_EVENT, VEHICLE_STATE } from '@mds-core/mds-types'
+import { Column, Entity, Index } from 'typeorm'
+import { MigratedEntity } from '../mixins/migrated-entity'
+import { TelemetryEntityModel } from './telemetry-entity'
 
 @Entity('events')
-export class EventEntity extends IdentityColumn(RecordedColumn(class {})) implements EventEntityModel {
+@Index('idx_trip_id_timestamp_events', ['trip_id', 'timestamp'])
+export class EventEntity extends MigratedEntity(IdentityColumn(RecordedColumn(class {}))) {
   @Column('uuid', { primary: true })
-  device_id: EventEntityModel['device_id']
+  device_id: UUID
 
   @Column('uuid')
-  provider_id: EventEntityModel['provider_id']
+  provider_id: UUID
 
   @Column('bigint', { transformer: BigintTransformer, primary: true })
-  timestamp: EventEntityModel['timestamp']
+  timestamp: Timestamp
+
+  @Column('varchar', { array: true, length: 31 })
+  event_types: VEHICLE_EVENT[]
 
   @Column('varchar', { length: 31 })
-  event_type: EventEntityModel['event_type']
+  vehicle_state: VEHICLE_STATE
 
   @Column('varchar', { length: 31, nullable: true })
-  event_type_reason: EventEntityModel['event_type_reason']
+  trip_state: TRIP_STATE
 
   @Column('bigint', { transformer: BigintTransformer, nullable: true })
-  telemetry_timestamp: EventEntityModel['telemetry_timestamp']
-
-  @Index()
-  @Column('uuid', { nullable: true })
-  trip_id: EventEntityModel['trip_id']
+  telemetry_timestamp: Nullable<Timestamp>
 
   @Column('uuid', { nullable: true })
-  service_area_id: EventEntityModel['service_area_id']
+  trip_id: Nullable<UUID>
+
+  @Column('uuid', { nullable: true })
+  service_area_id: Nullable<UUID>
+
+  telemetry?: TelemetryEntityModel
 }
+
+export type EventEntityModel = EventEntity

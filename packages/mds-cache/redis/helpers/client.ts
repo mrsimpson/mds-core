@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import Redis from 'ioredis'
-import { cleanEnv, host, num } from 'envalid'
 import logger from '@mds-core/mds-logger'
+import { cleanEnv, host, num, str } from 'envalid'
+import Redis from 'ioredis'
 
 const { REDIS_PORT, REDIS_HOST, REDIS_PASS } = cleanEnv(process.env, {
   REDIS_PORT: num({ default: 6379 }),
-  REDIS_HOST: host({ default: 'localhost' })
+  REDIS_HOST: host({ default: 'localhost' }),
+  REDIS_PASS: str({ default: '' })
 })
 
 export const initClient = async () => {

@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-import express from 'express'
-
+import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
 import logger from '@mds-core/mds-logger'
-import { isProviderId } from '@mds-core/mds-providers'
 import { isUUID, pathPrefix } from '@mds-core/mds-utils'
-import { checkAccess, AccessTokenScopeValidator } from '@mds-core/mds-api-server'
-import { AgencyApiRequest, AgencyApiResponse, AgencyApiAccessTokenScopes } from './types'
+import express from 'express'
+import { readAllVehicleIds } from './agency-candidate-request-handlers'
+import { createEventHandler } from './handlers/create-event'
+import { createTelemetryHandler } from './handlers/create-telemetry'
+import { AgencyApiVersionMiddleware } from './middleware/agency-api-version'
 import {
-  registerVehicle,
   getVehicleById,
   getVehiclesByProvider,
+  registerVehicle,
   updateVehicle,
-  submitVehicleEvent,
-  submitVehicleTelemetry
+  writeTripMetadata
 } from './request-handlers'
-import { readAllVehicleIds } from './agency-candidate-request-handlers'
-import { getCacheInfo, wipeDevice, refreshCache } from './sandbox-admin-request-handlers'
+import { getCacheInfo, refreshCache, wipeDevice } from './sandbox-admin-request-handlers'
+import { AgencyApiAccessTokenScopes, AgencyApiRequest, AgencyApiResponse } from './types'
 import { validateDeviceId } from './utils'
-
-import { AgencyApiVersionMiddleware } from './middleware/agency-api-version'
 
 const checkAgencyApiAccess = (validator: AccessTokenScopeValidator<AgencyApiAccessTokenScopes>) =>
   checkAccess(validator)
@@ -56,13 +54,6 @@ function api(app: express.Express): express.Express {
             return res.status(400).send({
               error: 'authentication_error',
               error_description: `invalid provider_id ${provider_id} is not a UUID`
-            })
-          }
-
-          if (!isProviderId(provider_id)) {
-            return res.status(400).send({
-              error: 'authentication_error',
-              error_description: `invalid provider_id ${provider_id} is not a known provider`
             })
           }
 
@@ -106,13 +97,13 @@ function api(app: express.Express): express.Express {
    * Endpoint to submit vehicle events
    * See {@link https://github.com/openmobilityfoundation/mobility-data-specification/tree/dev/agency#vehicle---event Events}
    */
-  app.post(pathPrefix('/vehicles/:device_id/event'), validateDeviceId, submitVehicleEvent)
+  app.post(pathPrefix('/vehicles/:device_id/event'), validateDeviceId, createEventHandler)
 
   /**
    * Endpoint to submit telemetry
    * See {@link https://github.com/openmobilityfoundation/mobility-data-specification/tree/dev/agency#vehicles---update-telemetry Telemetry}
    */
-  app.post(pathPrefix('/vehicles/telemetry'), submitVehicleTelemetry)
+  app.post(pathPrefix('/vehicles/telemetry'), createTelemetryHandler)
 
   // ///////////////////// begin Agency candidate endpoints ///////////////////////
 
@@ -147,6 +138,9 @@ function api(app: express.Express): express.Express {
     refreshCache
   )
 
+  /* Experimental Endpoint */
+  app.post(pathPrefix('/trips'), writeTripMetadata)
+  app.patch(pathPrefix('/trips'), writeTripMetadata)
   return app
 }
 

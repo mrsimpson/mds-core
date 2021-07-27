@@ -14,52 +14,50 @@
  * limitations under the License.
  */
 
-import { Entity, Column } from 'typeorm'
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
-import { TelemetryDomainModel } from '../../@types'
-
-export interface TelemetryEntityModel extends IdentityColumn, RecordedColumn {
-  device_id: TelemetryDomainModel['device_id']
-  provider_id: TelemetryDomainModel['provider_id']
-  timestamp: TelemetryDomainModel['timestamp']
-  lat: TelemetryDomainModel['gps']['lat']
-  lng: TelemetryDomainModel['gps']['lng']
-  speed: TelemetryDomainModel['gps']['speed']
-  heading: TelemetryDomainModel['gps']['heading']
-  accuracy: TelemetryDomainModel['gps']['accuracy']
-  altitude: TelemetryDomainModel['gps']['altitude']
-  charge: TelemetryDomainModel['charge']
-}
-
+import { Nullable, Timestamp, UUID } from '@mds-core/mds-types'
+import { Column, Entity } from 'typeorm'
+import { MigratedEntity } from '../mixins/migrated-entity'
 @Entity('telemetry')
-export class TelemetryEntity extends IdentityColumn(RecordedColumn(class {})) implements TelemetryEntityModel {
+export class TelemetryEntity extends MigratedEntity(IdentityColumn(RecordedColumn(class {}))) {
   @Column('uuid', { primary: true })
-  device_id: TelemetryEntityModel['device_id']
+  device_id: UUID
 
   @Column('uuid')
-  provider_id: TelemetryEntityModel['provider_id']
+  provider_id: UUID
 
   @Column('bigint', { transformer: BigintTransformer, primary: true })
-  timestamp: TelemetryEntityModel['timestamp']
+  timestamp: Timestamp
 
   @Column('double precision')
-  lat: TelemetryEntityModel['lat']
+  lat: number
 
   @Column('double precision')
-  lng: TelemetryEntityModel['lng']
+  lng: number
 
   @Column('real', { nullable: true })
-  speed: TelemetryEntityModel['speed']
+  altitude: Nullable<number>
 
   @Column('real', { nullable: true })
-  heading: TelemetryEntityModel['heading']
+  speed: Nullable<number>
 
   @Column('real', { nullable: true })
-  accuracy: TelemetryEntityModel['accuracy']
+  heading: Nullable<number>
 
   @Column('real', { nullable: true })
-  altitude: TelemetryEntityModel['altitude']
+  accuracy: Nullable<number>
 
   @Column('real', { nullable: true })
-  charge: TelemetryEntityModel['charge']
+  hdop: Nullable<number>
+
+  @Column('real', { nullable: true })
+  satellites: Nullable<number>
+
+  @Column('real', { nullable: true })
+  charge: Nullable<number>
+
+  @Column('uuid', { nullable: true })
+  stop_id: Nullable<UUID>
 }
+
+export type TelemetryEntityModel = TelemetryEntity

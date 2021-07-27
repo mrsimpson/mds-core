@@ -15,9 +15,9 @@
  */
 
 // /////////////////////////////// SQL-related utilities /////////////////////////////
-import { Client as PostgresClient, types as PostgresTypes } from 'pg'
-import { csv } from '@mds-core/mds-utils'
 import logger from '@mds-core/mds-logger'
+import { csv } from '@mds-core/mds-utils'
+import { Client as PostgresClient, types as PostgresTypes } from 'pg'
 import schema from './schema'
 
 export interface PGInfo {
@@ -85,7 +85,7 @@ export function configureClient(pg_info: PGInfo) {
   })
 
   client.on('notice', async msg => {
-    logger.warn('notice:', msg)
+    logger.warn('notice:', { msg })
   })
 
   if (!client) {
@@ -197,10 +197,12 @@ export class SqlVals {
   }
 }
 
-export const SqlExecuter = (client: MDSPostgresClient) => async (command: string, values: (string | number)[] = []) => {
-  await logSql(command, values)
-  return client.query(command, values)
-}
+export const SqlExecuter =
+  (client: MDSPostgresClient) =>
+  async (command: string, values: (string | number)[] = []) => {
+    await logSql(command, values)
+    return client.query(command, values)
+  }
 
 export type SqlExecuterFunction = ReturnType<typeof SqlExecuter>
 

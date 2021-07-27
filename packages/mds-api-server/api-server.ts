@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
+import { JurisdictionsClaim, ProviderIdClaim, UserEmailClaim } from '@mds-core/mds-api-authorizer'
+import logger from '@mds-core/mds-logger'
+import { pathPrefix } from '@mds-core/mds-utils'
 import express from 'express'
 import HttpStatus from 'http-status-codes'
-import logger from '@mds-core/mds-logger'
-import { ProviderIdClaim, UserEmailClaim, JurisdictionsClaim } from '@mds-core/mds-api-authorizer'
-import { pathPrefix } from '@mds-core/mds-utils'
-import { AuthorizationMiddlewareOptions, AuthorizationMiddleware } from './middleware/authorization'
-import { CompressionMiddlewareOptions, CompressionMiddleware } from './middleware/compression'
-import { CorsMiddlewareOptions, CorsMiddleware } from './middleware/cors'
-import { JsonBodyParserMiddlewareOptions, JsonBodyParserMiddleware } from './middleware/json-body-parser'
-import { MaintenanceModeMiddlewareOptions, MaintenanceModeMiddleware } from './middleware/maintenance-mode'
-import { RequestLoggingMiddlewareOptions, RequestLoggingMiddleware } from './middleware/request-logging'
-import { PrometheusMiddlewareOptions, PrometheusMiddleware } from './middleware/prometheus'
-import { serverVersion } from './utils'
 import { HealthRequestHandler } from './handlers/health'
+import { AuthorizationMiddleware, AuthorizationMiddlewareOptions } from './middleware/authorization'
+import { CompressionMiddleware, CompressionMiddlewareOptions } from './middleware/compression'
+import { CorsMiddleware, CorsMiddlewareOptions } from './middleware/cors'
+import { JsonBodyParserMiddleware, JsonBodyParserMiddlewareOptions } from './middleware/json-body-parser'
+import { MaintenanceModeMiddleware, MaintenanceModeMiddlewareOptions } from './middleware/maintenance-mode'
+import { PrometheusMiddleware, PrometheusMiddlewareOptions } from './middleware/prometheus'
+import { RequestLoggingMiddleware, RequestLoggingMiddlewareOptions } from './middleware/request-logging'
+import { serverVersion } from './utils'
 
 export interface ApiServerOptions {
   authorization: AuthorizationMiddlewareOptions
@@ -39,8 +39,10 @@ export interface ApiServerOptions {
   prometheus: PrometheusMiddlewareOptions
 }
 
-export const ApiServer = (
-  api: (server: express.Express) => express.Express,
+export const ApiServer = <T extends {} = {}>(
+  // The linter does not realize that the type variable is used.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  api: <G = T>(server: express.Express) => express.Express,
   options: Partial<ApiServerOptions> = {},
   app: express.Express = express()
 ): express.Express => {
@@ -82,5 +84,5 @@ export const ApiServer = (
   // Everything except /health will return a 503 when in maintenance mode
   app.use(MaintenanceModeMiddleware(options.maintenanceMode))
 
-  return api(app)
+  return api<T>(app)
 }

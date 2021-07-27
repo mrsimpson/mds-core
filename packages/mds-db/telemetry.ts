@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-import { UUID, Recorded, Telemetry, Timestamp } from '@mds-core/mds-types'
-import { now, csv, days, yesterday } from '@mds-core/mds-utils'
 import logger from '@mds-core/mds-logger'
-import { TelemetryRecord } from './types'
-
-import schema from './schema'
-
-import { cols_sql, vals_list, SqlVals, logSql, to_sql } from './sql-utils'
-
+import { Recorded, Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
+import { csv, now } from '@mds-core/mds-utils'
 import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
+import schema from './schema'
+import { cols_sql, logSql, SqlVals, to_sql, vals_list } from './sql-utils'
+import { TelemetryRecord } from './types'
 
 export function convertTelemetryToTelemetryRecord(telemetry: Telemetry): TelemetryRecord {
   const {
@@ -126,20 +123,6 @@ export async function readTelemetry(
     logger.error('read telemetry error', err)
     throw err
   }
-}
-
-export async function getTelemetryCountsPerProviderSince(
-  start = yesterday(),
-  stop = now()
-): Promise<{ provider_id: UUID; count: number; slacount: number }[]> {
-  const one_day = days(1)
-  const vals = new SqlVals()
-  const sql = `select provider_id, count(*), count(case when ((recorded-timestamp) > ${vals.add(
-    one_day
-  )}) then 1 else null end) as slacount from telemetry where recorded > ${vals.add(start)} and recorded < ${vals.add(
-    stop
-  )} group by provider_id`
-  return makeReadOnlyQuery(sql, vals)
 }
 
 // TODO way too slow to be useful -- move into mds-agency-cache

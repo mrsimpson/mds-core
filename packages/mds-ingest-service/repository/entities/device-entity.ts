@@ -14,44 +14,42 @@
  * limitations under the License.
  */
 
-import { Entity, Column } from 'typeorm'
 import { IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
-import { DeviceDomainModel } from '../../@types'
-
-export interface DeviceEntityModel extends IdentityColumn, RecordedColumn {
-  device_id: DeviceDomainModel['device_id']
-  provider_id: DeviceDomainModel['provider_id']
-  vehicle_id: DeviceDomainModel['vehicle_id']
-  type: DeviceDomainModel['type']
-  propulsion: DeviceDomainModel['propulsion']
-  year: DeviceDomainModel['year']
-  mfgr: DeviceDomainModel['mfgr']
-  model: DeviceDomainModel['model']
-}
+import { ACCESSIBILITY_OPTION, MODALITY, Nullable, PROPULSION_TYPE, UUID, VEHICLE_TYPE } from '@mds-core/mds-types'
+import { Column, Entity } from 'typeorm'
+import { MigratedEntity } from '../mixins/migrated-entity'
 
 @Entity('devices')
-export class DeviceEntity extends IdentityColumn(RecordedColumn(class {})) implements DeviceEntityModel {
+export class DeviceEntity extends MigratedEntity(IdentityColumn(RecordedColumn(class {}))) {
   @Column('uuid', { primary: true })
-  device_id: DeviceEntityModel['device_id']
+  device_id: UUID
 
   @Column('uuid')
-  provider_id: DeviceEntityModel['provider_id']
+  provider_id: UUID
 
   @Column('varchar', { length: 255 })
-  vehicle_id: DeviceEntityModel['vehicle_id']
+  vehicle_id: string
 
   @Column('varchar', { length: 31 })
-  type: DeviceEntityModel['type']
+  vehicle_type: VEHICLE_TYPE
 
   @Column('varchar', { array: true, length: 31 })
-  propulsion: DeviceEntityModel['propulsion']
+  propulsion_types: PROPULSION_TYPE[]
 
   @Column('smallint', { nullable: true })
-  year: DeviceEntityModel['year']
+  year: Nullable<number>
 
   @Column('varchar', { length: 127, nullable: true })
-  mfgr: DeviceEntityModel['mfgr']
+  mfgr: Nullable<string>
 
   @Column('varchar', { length: 127, nullable: true })
-  model: DeviceEntityModel['model']
+  model: Nullable<string>
+
+  @Column('varchar', { array: true, length: 255 })
+  accessibility_options: Nullable<ACCESSIBILITY_OPTION[]>
+
+  @Column('varchar', { length: 255 })
+  modality: MODALITY
 }
+
+export type DeviceEntityModel = DeviceEntity

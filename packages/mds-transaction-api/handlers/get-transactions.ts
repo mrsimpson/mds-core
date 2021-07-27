@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
+import { parseRequest } from '@mds-core/mds-api-helpers'
+import { ApiRequestParams } from '@mds-core/mds-api-server'
 import {
-  TransactionServiceClient,
-  TransactionDomainModel,
   PaginationLinks,
   SORTABLE_COLUMN,
   SORT_DIRECTION,
-  TransactionSearchParams
+  TransactionDomainModel,
+  TransactionSearchParams,
+  TransactionServiceClient
 } from '@mds-core/mds-transaction-service'
-import { ApiRequestParams } from '@mds-core/mds-api-server'
-import { parseRequest } from '@mds-core/mds-api-helpers'
 import { ValidationError } from '@mds-core/mds-utils'
 import express from 'express'
 import { TransactionApiRequest, TransactionApiResponse } from '../@types'
@@ -121,17 +121,21 @@ export const GetTransactionsHandler = async (
     const { scopes } = res.locals
 
     const order = getOrderOption(req)
-    const { provider_id: queried_provider_id, before, after } = parseRequest(req)
-      .single({ parser: String })
-      .query('provider_id', 'before', 'after')
+    const {
+      provider_id: queried_provider_id,
+      before,
+      after
+    } = parseRequest(req).single({ parser: String }).query('provider_id', 'before', 'after')
 
     // eslint-reason checkAccess middleware has previously verified that local.claims.provider_id is a UUID
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const provider_id = scopes.includes('transactions:read') ? queried_provider_id : res.locals.claims!.provider_id!
 
-    const { start_timestamp, end_timestamp, limit = 10 } = parseRequest(req)
-      .single({ parser: Number })
-      .query('start_timestamp', 'end_timestamp', 'limit')
+    const {
+      start_timestamp,
+      end_timestamp,
+      limit = 10
+    } = parseRequest(req).single({ parser: Number }).query('start_timestamp', 'end_timestamp', 'limit')
 
     const { transactions, cursor } = await TransactionServiceClient.getTransactions({
       provider_id,
