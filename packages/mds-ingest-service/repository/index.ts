@@ -174,7 +174,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
           'events.annotation',
           EventAnnotationEntity,
           'annotation',
-          'annotation.timestamp = events.timestamp AND annotation.device_id = events.device_id'
+          'annotation.events_row_id = events.id'
         )
         .leftJoinAndMapOne(
           'events.telemetry',
