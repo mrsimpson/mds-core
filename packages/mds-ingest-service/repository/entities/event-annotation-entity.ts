@@ -53,7 +53,7 @@ export class EventAnnotationEntity extends IdentityColumn(RecordedColumn(class {
   @JoinColumn({ name: 'events_row_id' })
   event?: EventEntityModel
 
-  @Column()
+  @Column('bigint')
   events_row_id?: number
 }
 

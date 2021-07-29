@@ -327,7 +327,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     const results: {
       event: EventEntity
       telemetry: TelemetryEntity
-      annotation: Omit<EventAnnotationEntity, 'events_row_id'>
+      annotation: EventAnnotationEntity
     }[] = await pagedQuery.getRawMany()
     const entities = results.map(({ event, telemetry, annotation }) => ({ ...event, telemetry, annotation }))
     const hasMore = entities.length > (limit || 100)
