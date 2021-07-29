@@ -16,7 +16,8 @@
 
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import { PROPULSION_TYPE, Timestamp, UUID, VEHICLE_TYPE } from '@mds-core/mds-types'
-import { Column, Entity, Index } from 'typeorm'
+import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm'
+import { EventEntity, EventEntityModel } from './event-entity'
 
 @Entity('event_annotations')
 export class EventAnnotationEntity extends IdentityColumn(RecordedColumn(class {})) {
@@ -47,6 +48,13 @@ export class EventAnnotationEntity extends IdentityColumn(RecordedColumn(class {
 
   @Column('bigint', { transformer: BigintTransformer })
   latency_ms: Timestamp
+
+  @OneToOne(type => EventEntity, event => event.annotation, { nullable: true })
+  @JoinColumn({ name: 'events_row_id' })
+  event?: EventEntityModel
+
+  @Column()
+  events_row_id?: number
 }
 
 export type EventAnnotationEntityModel = EventAnnotationEntity

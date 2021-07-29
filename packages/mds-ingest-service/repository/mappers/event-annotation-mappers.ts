@@ -26,7 +26,7 @@ export const EventAnnotationEntityToDomain = ModelMapper<
   EventAnnotationDomainModel,
   EventAnnotationEntityToDomainOptions
 >((entity, options) => {
-  const { id, ...domain } = entity
+  const { id, events_row_id, ...domain } = entity
   return { ...domain }
 })
 

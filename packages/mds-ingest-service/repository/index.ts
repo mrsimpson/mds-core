@@ -171,6 +171,12 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .createQueryBuilder('events')
         .innerJoin(qb => qb.from(DeviceEntity, 'd'), 'devices', 'devices.device_id = events.device_id')
         .leftJoinAndMapOne(
+          'events.annotation',
+          EventAnnotationEntity,
+          'annotation',
+          'annotation.events_row_id = events.id'
+        )
+        .leftJoinAndMapOne(
           'events.telemetry',
           TelemetryEntity,
           'telemetry',
@@ -315,9 +321,15 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     /**
      * results are selected as JSON, so that we can skip the TypeORM entity builder.
      */
-    pagedQuery.select('row_to_json(events.*) as event, row_to_json(telemetry.*) as telemetry')
-    const results: { event: EventEntity; telemetry: TelemetryEntity }[] = await pagedQuery.getRawMany()
-    const entities = results.map(({ event, telemetry }) => ({ ...event, telemetry }))
+    pagedQuery.select(
+      'row_to_json(events.*) as event, row_to_json(telemetry.*) as telemetry, row_to_json(annotation.*) as annotation'
+    )
+    const results: {
+      event: EventEntity
+      telemetry: TelemetryEntity
+      annotation: Omit<EventAnnotationEntity, 'events_row_id'>
+    }[] = await pagedQuery.getRawMany()
+    const entities = results.map(({ event, telemetry, annotation }) => ({ ...event, telemetry, annotation }))
     const hasMore = entities.length > (limit || 100)
     if (hasMore) {
       entities.splice(entities.length - 1, 1)
