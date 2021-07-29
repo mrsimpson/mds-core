@@ -170,12 +170,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .getRepository(EventEntity)
         .createQueryBuilder('events')
         .innerJoin(qb => qb.from(DeviceEntity, 'd'), 'devices', 'devices.device_id = events.device_id')
-        .leftJoinAndMapOne(
-          'events.annotation',
-          EventAnnotationEntity,
-          'annotation',
-          'annotation.events_row_id = events.id'
-        )
+        .leftJoinAndSelect('events.annotation', 'annotation')
         .leftJoinAndMapOne(
           'events.telemetry',
           TelemetryEntity,
