@@ -16,7 +16,7 @@
  */
 
 import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
-import { Device } from '@mds-core/mds-types'
+import { Device, PROPULSION_TYPE, VEHICLE_TYPE } from '@mds-core/mds-types'
 import { now, uuid } from '@mds-core/mds-utils'
 import { EventAnnotationDomainCreateModel, EventDomainCreateModel, TelemetryDomainCreateModel } from '../@types'
 import { IngestServiceClient } from '../client'
@@ -186,6 +186,30 @@ const TEST_EVENT_ANNOTATION_B: EventAnnotationDomainCreateModel = {
   vehicle_id: 'test-id-2',
   vehicle_type: 'scooter',
   propulsion_types: ['electric'],
+  geography_ids: [uuid(), uuid()],
+  geography_types: [null, 'spot'],
+  latency_ms: 150
+}
+
+const TEST_EVENT_ANNOTATION_C = {
+  events_row_id: 1,
+  device_id: DEVICE_UUID_A,
+  timestamp: testTimestamp,
+  vehicle_id: 'test-id-1',
+  vehicle_type: 'scooter' as VEHICLE_TYPE,
+  propulsion_types: ['electric'] as PROPULSION_TYPE[],
+  geography_ids: [uuid(), uuid()],
+  geography_types: ['jurisdiction', null],
+  latency_ms: 100
+}
+
+const TEST_EVENT_ANNOTATION_D = {
+  events_row_id: 2,
+  device_id: DEVICE_UUID_B,
+  timestamp: testTimestamp,
+  vehicle_id: 'test-id-2',
+  vehicle_type: 'scooter' as VEHICLE_TYPE,
+  propulsion_types: ['electric'] as PROPULSION_TYPE[],
   geography_ids: [uuid(), uuid()],
   geography_types: [null, 'spot'],
   latency_ms: 150
@@ -555,7 +579,7 @@ describe('Ingest Service Tests', () => {
       await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B])
       await IngestRepository.createEvents([TEST_EVENT_A1, TEST_EVENT_B1])
       await IngestRepository.createEvents([TEST_EVENT_A2, TEST_EVENT_B2])
-      await IngestServiceClient.writeEventAnnotations([TEST_EVENT_ANNOTATION_A, TEST_EVENT_ANNOTATION_B])
+      await IngestServiceClient.writeEventAnnotations([TEST_EVENT_ANNOTATION_C, TEST_EVENT_ANNOTATION_D])
       const { events } = await IngestServiceClient.getEventsUsingOptions({
         time_range: { start: testTimestamp, end: testTimestamp + 2000 },
         grouping_type: 'all_events'
