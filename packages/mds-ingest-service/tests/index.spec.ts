@@ -550,6 +550,18 @@ describe('Ingest Service Tests', () => {
         type: 'ConflictError'
       })
     })
+
+    it('gets events with 2 annotations', async () => {
+      await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B])
+      await IngestRepository.createEvents([TEST_EVENT_A1, TEST_EVENT_B1])
+      await IngestRepository.createEvents([TEST_EVENT_A2, TEST_EVENT_B2])
+      await IngestServiceClient.writeEventAnnotations([TEST_EVENT_ANNOTATION_A, TEST_EVENT_ANNOTATION_B])
+      const { events } = await IngestServiceClient.getEventsUsingOptions({
+        time_range: { start: testTimestamp, end: testTimestamp + 2000 },
+        grouping_type: 'all_events'
+      })
+      expect(events.filter(e => e.annotation).length).toEqual(2)
+    })
   })
 
   afterAll(async () => {
