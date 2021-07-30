@@ -54,7 +54,7 @@ export class EventAnnotationEntity extends IdentityColumn(RecordedColumn(class {
   event: EventEntityModel
 
   @Column('bigint', { transformer: BigintTransformer })
-  events_row_id: Number
+  events_row_id: number
 }
 
 export type EventAnnotationEntityModel = EventAnnotationEntity

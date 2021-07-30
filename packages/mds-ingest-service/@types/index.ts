@@ -168,6 +168,7 @@ export interface TelemetryLabel {
  * also join by events_row_id.
  */
 export interface EventAnnotationDomainModel extends DeviceLabel, FlatGeographiesLabel, LatencyLabel, RecordedColumn {
+  events_row_id: number
   device_id: UUID
   timestamp: Timestamp
 }
