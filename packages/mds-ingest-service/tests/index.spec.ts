@@ -16,7 +16,7 @@
  */
 
 import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
-import { Device, PROPULSION_TYPE, VEHICLE_TYPE } from '@mds-core/mds-types'
+import { Device } from '@mds-core/mds-types'
 import { now, uuid } from '@mds-core/mds-utils'
 import { EventAnnotationDomainCreateModel, EventDomainCreateModel, TelemetryDomainCreateModel } from '../@types'
 import { IngestServiceClient } from '../client'
@@ -192,27 +192,13 @@ const TEST_EVENT_ANNOTATION_B: EventAnnotationDomainCreateModel = {
 }
 
 const TEST_EVENT_ANNOTATION_C = {
-  events_row_id: 1,
-  device_id: DEVICE_UUID_A,
-  timestamp: testTimestamp,
-  vehicle_id: 'test-id-1',
-  vehicle_type: 'scooter' as VEHICLE_TYPE,
-  propulsion_types: ['electric'] as PROPULSION_TYPE[],
-  geography_ids: [uuid(), uuid()],
-  geography_types: ['jurisdiction', null],
-  latency_ms: 100
+  ...TEST_EVENT_ANNOTATION_A,
+  events_row_id: 1
 }
 
 const TEST_EVENT_ANNOTATION_D = {
-  events_row_id: 2,
-  device_id: DEVICE_UUID_B,
-  timestamp: testTimestamp,
-  vehicle_id: 'test-id-2',
-  vehicle_type: 'scooter' as VEHICLE_TYPE,
-  propulsion_types: ['electric'] as PROPULSION_TYPE[],
-  geography_ids: [uuid(), uuid()],
-  geography_types: [null, 'spot'],
-  latency_ms: 150
+  ...TEST_EVENT_ANNOTATION_B,
+  events_row_id: 2
 }
 
 describe('Ingest Repository Tests', () => {
