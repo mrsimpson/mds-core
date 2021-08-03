@@ -1106,10 +1106,10 @@ import { VEHICLE_EVENT_v0_4_1 } from './packages/mds-types/transformers/@types'
 type INGESTABLE_VEHICLE_EVENT = Exclude<VEHICLE_EVENT_v0_4_1, 'register'>
 import { VehicleEvent_v1_0_0, VEHICLE_EVENT_v1_0_0, VEHICLE_STATE_v1_0_0 } from './packages/mds-types/transformers/@types/1_0_0'
 
-const active_policies = policies.filter(p => ids.includes(p.policy_id)) 
+const active_policies = policies.filter(p => ids.includes(p.policy_id))
 
 
-export const STATES_MAPPING: { [key:string]: string } = { 
+export const STATES_MAPPING: { [key:string]: string } = {
     available: 'available',
     elsewhere: 'elsewhere',
     reserved: 'reserved',
@@ -1117,7 +1117,7 @@ export const STATES_MAPPING: { [key:string]: string } = {
     trip: 'on_trip',
     inactive: 'unknown',
     unavailable: 'non_operational',
-    
+
 }
 
 interface Rule {
@@ -1138,7 +1138,7 @@ interface Rule {
                 return new_event_type
                     })
             if (!!STATES_MAPPING[status] && STATES_MAPPING[status] !== 'unknown') {
-                const state = STATES_MAPPING[status] 
+                const state = STATES_MAPPING[status]
                 states[state] = new_event_types
                 } else {
 
@@ -1150,12 +1150,12 @@ interface Rule {
 
  function transform(policy: any) {
      policy.rules.forEach((rule: any) => {
-        
+
         const states = transform_rule_statuses(rule)
         delete rule.statuses
         rule.states = states
              })
-    
+
     return policy
  }
 
