@@ -20,7 +20,7 @@ import stream from '@mds-core/mds-stream'
 import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
 import { api } from './api'
 
-Promise.all([cache.startup(), stream.startup()])
+Promise.all([cache.startup(), stream.initialize()])
   .then(() => {
     return HttpServer(ApiServer(api), { port: process.env.AGENCY_API_HTTP_PORT })
   })
