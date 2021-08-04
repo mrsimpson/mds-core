@@ -19,6 +19,7 @@ export const BOLT_PROVIDER_ID = '3291c288-c9c8-42f1-bc3e-8502b077cd7f'
 export const CLEVR_PROVIDER_ID = 'daecbe87-a9f2-4a5a-b5df-8e3e14180513'
 export const SHERPA_LA_PROVIDER_ID = '3c95765d-4da6-41c6-b61e-1954472ec6c9'
 export const OJO_ELECTRIC_PROVIDER_ID = '8d293326-8464-4256-8312-617ebcd0efad'
+export const SUPERPEDESTRIAN_PROVIDER_ID = '420e6e94-55a6-4946-b6b3-4398fe22e912'
 
 // Additional provider IDs in use (should be registered)
 export const LADOT_PROVIDER_ID = '33bbcec3-f91b-4461-bc41-61711afb9460'
@@ -52,6 +53,7 @@ const PROVIDER_IDS = [
   CLEVR_PROVIDER_ID,
   SHERPA_LA_PROVIDER_ID,
   OJO_ELECTRIC_PROVIDER_ID,
+  SUPERPEDESTRIAN_PROVIDER_ID,
   BLUE_SYSTEMS_PROVIDER_ID,
   LADOT_PROVIDER_ID,
   TEST1_PROVIDER_ID,
@@ -171,6 +173,12 @@ export const providers: Readonly<{ [P in PROVIDER_ID]: Readonly<Provider> }> = O
     url: 'https://www.ojoelectric.com',
     mds_api_url: 'https://api.ojoelectric.com/api/mds',
     gbfs_api_url: 'https://api.ojoelectric.com/api/mds/gbfs.json'
+  }),
+  [SUPERPEDESTRIAN_PROVIDER_ID]: Object.freeze({
+    provider_id: SUPERPEDESTRIAN_PROVIDER_ID,
+    provider_name: 'Superpedestrian',
+    url: 'https://www.superpedestrian.com',
+    mds_api_url: 'https://wrangler-mds-production.herokuapp.com/mds',
   }),
   [LADOT_PROVIDER_ID]: Object.freeze({
     provider_id: LADOT_PROVIDER_ID,
