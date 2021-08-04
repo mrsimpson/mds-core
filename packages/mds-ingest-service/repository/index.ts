@@ -16,7 +16,7 @@
 
 import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import { UUID } from '@mds-core/mds-types'
-import { isUUID, ValidationError } from '@mds-core/mds-utils'
+import { isUUID, testEnvSafeguard, ValidationError } from '@mds-core/mds-utils'
 import { Any, SelectQueryBuilder } from 'typeorm'
 import { buildPaginator, Cursor, PagingResult } from 'typeorm-cursor-pagination'
 import {
@@ -52,14 +52,6 @@ import { MigratedEntityModel } from './mixins/migrated-entity'
 
 type VehicleEventsQueryParams = GetVehicleEventsFilterParams & Cursor
 
-/**
- * Aborts execution if not running under a test environment.
- */
-const testEnvSafeguard = () => {
-  if (process.env.NODE_ENV !== 'test') {
-    throw new Error(`This method is only supported when executing tests`)
-  }
-}
 class IngestReadWriteRepository extends ReadWriteRepository {
   constructor() {
     super('ingest', { entities, migrations })
@@ -173,6 +165,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .getRepository(EventEntity)
         .createQueryBuilder('events')
         .innerJoin(qb => qb.from(DeviceEntity, 'd'), 'devices', 'devices.device_id = events.device_id')
+        .leftJoinAndSelect('events.annotation', 'annotation')
         .leftJoinAndMapOne(
           'events.telemetry',
           TelemetryEntity,
@@ -313,14 +306,20 @@ class IngestReadWriteRepository extends ReadWriteRepository {
 
     /* you have to manually declare a limit, since we're skipping the .take() call that normally happens in .getMany() */
     query.limit(limit + 1)
-    const pagedQuery: SelectQueryBuilder<{ event: EventEntity; telemetry: TelemetryEntity }> =
-      pager['appendPagingQuery'](query)
+    const pagedQuery: SelectQueryBuilder<{
+      event: EventEntity
+      telemetry: TelemetryEntity
+      annotation: EventAnnotationEntity
+    }> = pager['appendPagingQuery'](query)
     /**
      * results are selected as JSON, so that we can skip the TypeORM entity builder.
      */
-    pagedQuery.select('row_to_json(events.*) as event, row_to_json(telemetry.*) as telemetry')
-    const results: { event: EventEntity; telemetry: TelemetryEntity }[] = await pagedQuery.getRawMany()
-    const entities = results.map(({ event, telemetry }) => ({ ...event, telemetry }))
+    pagedQuery.select(
+      'row_to_json(events.*) as event, row_to_json(telemetry.*) as telemetry, row_to_json(annotation.*) as annotation'
+    )
+    const results: { event: EventEntity; telemetry: TelemetryEntity; annotation: EventAnnotationEntity }[] =
+      await pagedQuery.getRawMany()
+    const entities = results.map(({ event, telemetry, annotation }) => ({ ...event, telemetry, annotation }))
     const hasMore = entities.length > (limit || 100)
     if (hasMore) {
       entities.splice(entities.length - 1, 1)
@@ -414,7 +413,9 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     testEnvSafeguard()
     try {
       const connection = await this.connect('rw')
-      await connection.getRepository(EventEntity).query('TRUNCATE events, devices, telemetry RESTART IDENTITY')
+      await connection
+        .getRepository(EventEntity)
+        .query('TRUNCATE events, devices, telemetry, event_annotations RESTART IDENTITY')
     } catch (error) {
       throw RepositoryError(error)
     }

@@ -16,9 +16,15 @@
 
 import { IdentityColumn, ModelMapper, RecordedColumn } from '@mds-core/mds-repository'
 import { Nullable, Timestamp } from '@mds-core/mds-types'
-import { EventDomainCreateModel, EventDomainModel, TelemetryDomainModel } from '../../@types'
+import {
+  EventAnnotationDomainModel,
+  EventDomainCreateModel,
+  EventDomainModel,
+  TelemetryDomainModel
+} from '../../@types'
 import { EventEntityModel } from '../entities/event-entity'
 import { MigratedEntityModel } from '../mixins/migrated-entity'
+import { EventAnnotationEntityToDomain } from './event-annotation-mappers'
 import { TelemetryEntityToDomain } from './telemetry-mappers'
 
 type EventEntityToDomainOptions = Partial<{}>
@@ -28,6 +34,7 @@ export const EventEntityToDomain = ModelMapper<EventEntityModel, EventDomainMode
     const {
       id,
       telemetry: telemetry_entity,
+      annotation: annotation_entity,
       migrated_from_source,
       migrated_from_version,
       migrated_from_id,
@@ -36,7 +43,10 @@ export const EventEntityToDomain = ModelMapper<EventEntityModel, EventDomainMode
     const telemetry: Nullable<TelemetryDomainModel> = telemetry_entity
       ? TelemetryEntityToDomain.map(telemetry_entity)
       : null
-    return { telemetry, ...domain }
+    const annotation: Nullable<EventAnnotationDomainModel> = annotation_entity
+      ? EventAnnotationEntityToDomain.map(annotation_entity)
+      : null
+    return { telemetry, annotation, ...domain }
   }
 )
 
@@ -46,26 +56,20 @@ type EventEntityCreateOptions = Partial<{
 
 export type EventEntityCreateModel = Omit<
   EventEntityModel,
-  keyof IdentityColumn | keyof RecordedColumn | keyof MigratedEntityModel | 'telemetry'
+  keyof IdentityColumn | keyof RecordedColumn | keyof MigratedEntityModel | 'telemetry' | 'annotation'
 >
 
 export const EventDomainToEntityCreate = ModelMapper<
   EventDomainCreateModel,
   EventEntityCreateModel,
   EventEntityCreateOptions
->(
-  (
-    { telemetry, telemetry_timestamp = null, trip_id = null, service_area_id = null, trip_state = null, ...domain },
-    options
-  ) => {
-    const { recorded } = options ?? {}
-    return {
-      telemetry_timestamp,
-      trip_id,
-      service_area_id,
-      trip_state,
-      recorded,
-      ...domain
-    }
+>(({ telemetry, telemetry_timestamp = null, trip_id = null, trip_state = null, ...domain }, options) => {
+  const { recorded } = options ?? {}
+  return {
+    telemetry_timestamp,
+    trip_id,
+    trip_state,
+    recorded,
+    ...domain
   }
-)
+})

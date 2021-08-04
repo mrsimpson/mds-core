@@ -116,8 +116,8 @@ export interface EventDomainModel extends RecordedColumn {
 
   telemetry_timestamp: Nullable<Timestamp>
   telemetry: Nullable<TelemetryDomainModel>
+  annotation: Nullable<EventAnnotationDomainModel>
   trip_id: Nullable<UUID>
-  service_area_id: Nullable<UUID>
 }
 
 export type EventDomainCreateModel = DomainModelCreate<Omit<EventDomainModel, keyof RecordedColumn | 'telemetry'>> & {
@@ -164,14 +164,17 @@ export interface TelemetryLabel {
 
 /**
  * An object to persist the above (non-telemetry) event labels,
- * joinable to EventDomainModels by device_id + timestamp.
+ * joinable to EventDomainModels by device_id + timestamp. Can
+ * also join by events_row_id.
  */
 export interface EventAnnotationDomainModel extends DeviceLabel, FlatGeographiesLabel, LatencyLabel, RecordedColumn {
   device_id: UUID
   timestamp: Timestamp
 }
 
-export type EventAnnotationDomainCreateModel = DomainModelCreate<Omit<EventAnnotationDomainModel, keyof RecordedColumn>>
+export type EventAnnotationDomainCreateModel = DomainModelCreate<
+  Omit<EventAnnotationDomainModel, keyof RecordedColumn>
+> & { events_row_id: number }
 
 export interface GetLastMigratedEntityOptions {
   migrated_from_source: string
