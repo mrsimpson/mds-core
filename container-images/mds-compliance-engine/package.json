@@ -1,14 +1,15 @@
 {
-  "name": "@container-images/mds-compliance-service",
-  "version": "0.0.5",
+  "name": "@container-images/mds-compliance-engine",
+  "version": "0.0.1",
   "private": true,
-  "description": "MDS Compliance Service",
+  "description": "MDS Compliance Engine",
   "keywords": [
-    "mds"
+    "mds",
+    "compliance"
   ],
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
-  "main": "dist/index.js",
+  "main": "dist/batch_process.js",
   "files": [
     "dist/"
   ],
@@ -17,11 +18,11 @@
     "bundle:development": "webpack --mode=development --env npm_package_name=${npm_package_name} --env npm_package_version=${npm_package_version}",
     "bundle:production": "webpack --mode=production --env npm_package_name=${npm_package_name} --env npm_package_version=${npm_package_version}",
     "image": "pnpm image:production",
-    "image:development": "pnpm bundle:development && ../../bin/build-helper buildImage mds-compliance-service:latest",
-    "image:production": "pnpm bundle:production && ../../bin/build-helper buildImage mds-compliance-service:${npm_package_version}"
+    "image:development": "pnpm bundle:development && ../../bin/build-helper buildImage mds-compliance-engine:latest",
+    "image:production": "pnpm bundle:production && ../../bin/build-helper buildImage mds-compliance-engine:${npm_package_version}"
   },
   "dependencies": {
-    "@mds-core/mds-compliance-service": "0.1.4",
+    "@mds-core/mds-compliance-engine": "0.1.31",
     "@mds-core/mds-webpack-config": "0.1.3"
   }
 }
