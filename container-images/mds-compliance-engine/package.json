@@ -9,7 +9,7 @@
   ],
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
-  "main": "dist/batch_process.js",
+  "main": "dist/batch_process/index.js",
   "files": [
     "dist/"
   ],

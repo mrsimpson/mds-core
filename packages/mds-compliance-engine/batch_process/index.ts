@@ -21,8 +21,7 @@ import logger from '@mds-core/mds-logger'
 import { ProcessManager, SerializedBuffers } from '@mds-core/mds-service-helpers'
 import { ModalityPolicy, ModalityPolicyTypeInfo } from '@mds-core/mds-types'
 import { minutes, now } from '@mds-core/mds-utils'
-import { processPolicy } from './engine'
-import { getAllInputs, getSupersedingPolicies } from './engine/helpers'
+import { getAllInputs, getSupersedingPolicies, processPolicy } from '../engine'
 
 const BATCH_SIZE = Number(process.env.BATCH_SIZE) || 5
 
