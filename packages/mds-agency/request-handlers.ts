@@ -84,9 +84,9 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
   // writing to the DB is the crucial part.  other failures should be noted as bugs but tolerated
   // and fixed later.
   try {
-    await db.writeDevice(device)
+    const recordedDevice = await db.writeDevice(device)
     try {
-      await Promise.all([cache.writeDevice(device), stream.writeDevice(device)])
+      await Promise.all([cache.writeDevice(recordedDevice), stream.writeDevice(recordedDevice)])
     } catch (err) {
       logger.error('failed to write device stream/cache', err)
     }
@@ -306,9 +306,8 @@ export const submitVehicleEvent = async (
     }
 
     const { telemetry } = event
-    if (telemetry) {
-      await db.writeTelemetry(normalizeToArray(telemetry))
-    }
+
+    const recordedTelemetry = telemetry ? await db.writeTelemetry(normalizeToArray(telemetry)) : null
 
     // database write is crucial; failures of cache/stream should be noted and repaired
     const recorded_event = await db.writeEvent(event)
@@ -316,9 +315,8 @@ export const submitVehicleEvent = async (
     try {
       await Promise.all([cache.writeEvent(recorded_event), stream.writeEvent(recorded_event)])
 
-      if (telemetry) {
-        telemetry.recorded = recorded
-        await Promise.all([cache.writeTelemetry([telemetry]), stream.writeTelemetry([telemetry])])
+      if (recordedTelemetry) {
+        await Promise.all([cache.writeTelemetry(recordedTelemetry), stream.writeTelemetry(recordedTelemetry)])
       }
 
       await success()
