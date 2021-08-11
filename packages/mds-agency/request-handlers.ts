@@ -226,7 +226,7 @@ export const submitVehicleEvent = async (
     provider_id: res.locals.provider_id,
     event_type: lower(req.body.event_type) as VEHICLE_EVENT,
     event_type_reason: req.body.event_type_reason ? (lower(req.body.event_type_reason) as VEHICLE_REASON) : undefined,
-    telemetry: req.body.telemetry ? { ...req.body.telemetry, provider_id: res.locals.provider_id } : null,
+    telemetry: req.body.telemetry ? { ...req.body.telemetry, provider_id: res.locals.provider_id, recorded } : null,
     timestamp: req.body.timestamp,
     trip_id: req.body.trip_id,
     recorded,
