@@ -8,14 +8,35 @@ BASE_DIR=$(dirname $0)/..
 NODE_ENV=${NODE_ENV:-""}
 REGISTRY=${REGISTRY:=""}
 
+createImagesFileIfNotExists() {
+  if [[ ! -d $BASE_DIR/dist ]]; then
+    mkdir -p $BASE_DIR/dist
+  fi
+  if [[ ! -f $BASE_DIR/dist/images.txt ]]; then
+    touch $BASE_DIR/dist/images.txt
+  fi
+}
+
 buildImage() {
   local image=$1
-  if [[ "$NODE_ENV" == "development" ]]; then
-    image_name=$(echo $image | cut -f1 -d":")
-    docker build -t ${REGISTRY}${image_name}:latest .
-  else
-    docker build -t ${REGISTRY}${image}$(getBranchSuffix)$(getCommitHash) .
+  createImagesFileIfNotExists
+  local tag=$(echo $image | cut -f2 -d":")
+  if [[ "$tag" != "latest" ]]; then
+    image=${REGISTRY}${image}$(getBranchSuffix)$(getCommitHash)
   fi
+  docker build -t ${REGISTRY}${image} .
+  echo ${REGISTRY}${image} >> $BASE_DIR/dist/images.txt
+}
+
+pushImages() {
+  createImagesFileIfNotExists
+  cat /dev/null > $BASE_DIR/dist/images.txt
+  if [[ "$REGISTRY" =~ amazonaws.com$ ]]; then
+    eval $(aws ecr get-login --no-include-email)
+  fi
+  for image in $(cat $BASE_DIR/dist/images.txt); do
+    docker push $image
+  done
 }
 
 getBranchSuffix() {
@@ -28,12 +49,13 @@ getCommitHash() {
 }
 
 images() {
-  for d in $BASE_DIR/container-images/*; do
-    basename $d
+  for d in $BASE_DIR/container-images/*/package.json; do
+    basename $(dirname $d)
   done
 }
 
 templateValues() {
+  createImagesFileIfNotExists
   suffix="$(getBranchSuffix)$(getCommitHash)"
   for image in $(images); do
     version=$(jq -r '.version' < $BASE_DIR/container-images/$image/package.json)
@@ -41,7 +63,7 @@ templateValues() {
     export $varname=${version}${suffix}
   done
   mkdir -p dist
-  envsubst < $BASE_DIR/helm/mds/values.yaml.tpl > $BASE_DIR/dist/values.yaml
+  envsubst < $BASE_DIR/values.yaml.tpl > $BASE_DIR/dist/values-mds.yaml
   echo "Wrote dist/values.yaml"
 }
 
