@@ -321,3 +321,6 @@ To commit code, you will need the pre-commit tool, which can be installed via `b
 #### Using multiple services/APIs within one test suite
 
 In order to use multiple APIs/services within one test suite, it is important to ensure that random ports are assigned to each API/Service to avoid collision. To do this, we utilize Jest's setupFiles configuration in conjunction with a port randomization function. See [`.jest/configurePorts.ts`](.jest/configurePorts.ts) and `setupFiles` in [`.jest/jest.config.js`](.jest/jest.config.js). Ensure that whenever new APIs/services are added, there is a corresponding entry in `configurePorts.ts`.
+
+
+# testing jenkins PR build/test with new github credentials
