@@ -25,6 +25,7 @@ import { IngestServiceManager } from '../service/manager'
 
 const DEVICE_UUID_A = uuid()
 const DEVICE_UUID_B = uuid()
+const DEVICE_UUID_C = uuid()
 const TRIP_UUID_A = uuid()
 const TRIP_UUID_B = uuid()
 const testTimestamp = now()
@@ -113,6 +114,19 @@ const TEST_TNC_B: Omit<Device, 'recorded'> = {
   device_id: DEVICE_UUID_B,
   provider_id: TEST1_PROVIDER_ID,
   vehicle_id: 'test-id-2',
+  vehicle_type: 'car',
+  propulsion_types: ['electric'],
+  year: 2018,
+  mfgr: 'Schwinn',
+  modality: 'tnc',
+  model: 'Mantaray'
+}
+
+const TEST_TNC_C: Omit<Device, 'recorded'> = {
+  accessibility_options: ['wheelchair_accessible'],
+  device_id: DEVICE_UUID_C,
+  provider_id: TEST1_PROVIDER_ID,
+  vehicle_id: 'test-id-3',
   vehicle_type: 'car',
   propulsion_types: ['electric'],
   year: 2018,
@@ -233,9 +247,13 @@ describe('Ingest Service Tests', () => {
 
   describe('getDevices', () => {
     beforeEach(async () => {
-      await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B])
+      await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B, TEST_TNC_C])
     })
     describe('all_devices', () => {
+      it('gets all devices', async () => {
+        const devices = await IngestServiceClient.getDevices()
+        expect(devices.length).toEqual(3)
+      })
       it('gets 2 devices', async () => {
         const devices = await IngestServiceClient.getDevices([DEVICE_UUID_A, DEVICE_UUID_B])
         expect(devices.length).toEqual(2)
@@ -596,6 +614,35 @@ describe('Ingest Service Tests', () => {
         grouping_type: 'all_events'
       })
       expect(events.filter(e => e.annotation).length).toEqual(2)
+    })
+  })
+
+  describe('writes migrated data', () => {
+    it('writes migrated device', async () => {
+      expect(
+        await IngestServiceClient.writeMigratedDevice(
+          { recorded: 0, ...TEST_TNC_A },
+          { migrated_from_source: 'mds.device', migrated_from_version: '0.0', migrated_from_id: 1 }
+        )
+      ).toMatchObject(TEST_TNC_A)
+    })
+
+    it('writes migrated event', async () => {
+      expect(
+        await IngestServiceClient.writeMigratedVehicleEvent(
+          { trip_state: null, recorded: 0, ...TEST_EVENT_A1 },
+          { migrated_from_source: 'mds.event', migrated_from_version: '0.0', migrated_from_id: 1 }
+        )
+      ).toMatchObject(TEST_EVENT_A1)
+    })
+
+    it('writes migrated telemetry', async () => {
+      expect(
+        await IngestServiceClient.writeMigratedTelemetry(
+          { recorded: 0, ...TEST_TELEMETRY_A1 },
+          { migrated_from_source: 'mds.telemetry', migrated_from_version: '0.0', migrated_from_id: 1 }
+        )
+      ).toMatchObject(TEST_TELEMETRY_A1)
     })
   })
 

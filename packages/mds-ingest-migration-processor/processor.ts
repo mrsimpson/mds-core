@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { IngestServiceClient, MigratedEntityModel } from '@mds-core/mds-ingest-service'
+import cache from '@mds-core/mds-agency-cache'
+import { EventDomainModel, IngestServiceClient, MigratedEntityModel } from '@mds-core/mds-ingest-service'
 import logger from '@mds-core/mds-logger'
 import { IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import {
@@ -83,10 +84,7 @@ const IngestServiceMigratedDeviceSink = (): StreamSink<MigratedDevice> => () => 
     write: async message => {
       try {
         const [{ device, migrated_from }] = asArray(message)
-        const migrated = await IngestServiceClient.writeMigratedDevice(device, migrated_from)
-        if (migrated) {
-          logger.info(`Migrated device ${migrated.device_id}`)
-        }
+        await IngestServiceClient.writeMigratedDevice(device, migrated_from)
       } catch (error) {
         logger.error(`Error migrating device`, { topic, message })
         throw error
@@ -118,10 +116,7 @@ const IngestServiceMigratedVehicleEventSink = (): StreamSink<MigratedVehicleEven
     write: async message => {
       try {
         const [{ event, migrated_from }] = asArray(message)
-        const migrated = await IngestServiceClient.writeMigratedVehicleEvent(event, migrated_from)
-        if (migrated) {
-          logger.info(`Migrated event ${migrated.device_id}/${migrated.timestamp}`)
-        }
+        await IngestServiceClient.writeMigratedVehicleEvent(event, migrated_from)
       } catch (error) {
         logger.error(`Error migrating event`, { topic, message })
         throw error
@@ -136,10 +131,13 @@ const EventsMigrationProcessor = StreamProcessor<
   MigratedVehicleEvent
 >(
   MigrationDataSource('event'),
-  async ({ id, service_area_id, ...event }) => ({
-    event: convert_v1_0_0_vehicle_event_to_v1_1_0(convert_v0_4_1_vehicle_event_to_v1_0_0(event)),
-    migrated_from: MigratedFrom('event', id)
-  }),
+  async ({ id, service_area_id, ...event }) =>
+    event.event_type === 'register'
+      ? null
+      : {
+          event: convert_v1_0_0_vehicle_event_to_v1_1_0(convert_v0_4_1_vehicle_event_to_v1_0_0(event)),
+          migrated_from: MigratedFrom('event', id)
+        },
   [IngestServiceMigratedVehicleEventSink()],
   [MigrationErrorSink('event')]
 )
@@ -156,10 +154,7 @@ const IngestServiceMigratedTelemetrySink = (): StreamSink<MigratedTelemetry> => 
     write: async message => {
       try {
         const [{ telemetry, migrated_from }] = asArray(message)
-        const migrated = await IngestServiceClient.writeMigratedTelemetry(telemetry, migrated_from)
-        if (migrated) {
-          logger.info(`Migrated telemetry ${migrated.device_id}/${migrated.timestamp}`)
-        }
+        await IngestServiceClient.writeMigratedTelemetry(telemetry, migrated_from)
       } catch (error) {
         logger.error(`Error migrating telemetry`, { topic, message })
         throw error
@@ -183,10 +178,65 @@ const TelemetryMigrationProcessor = StreamProcessor<
   [MigrationErrorSink('telemetry')]
 )
 
+const cacheDevices = async () => {
+  const devices = await IngestServiceClient.getDevices()
+  await Promise.all(devices.map(cache.writeDevice))
+  return { devices: devices.length }
+}
+
+const cacheLatestEventsAndTelemetry = async (events: EventDomainModel[]) => {
+  const telemetry = await IngestServiceClient.getLatestTelemetryForDevices(events.map(event => event.device_id))
+  await Promise.all([cache.writeTelemetry(telemetry), Promise.all(events.map(cache.writeEvent))])
+  return { events: events.length, telemetry: telemetry.length }
+}
+
+const cacheEventsAndTelemetry = async () => {
+  const {
+    events,
+    cursor: { next }
+  } = await IngestServiceClient.getEventsUsingOptions({
+    grouping_type: 'latest_per_vehicle',
+    limit: 250
+  })
+
+  const totals = await cacheLatestEventsAndTelemetry(events)
+
+  let cursor = next
+
+  while (cursor !== null) {
+    logger.info('Initialize event and telemetry cache', totals)
+    const {
+      events,
+      cursor: { next }
+    } = await IngestServiceClient.getEventsUsingCursor(cursor)
+    const updates = await cacheLatestEventsAndTelemetry(events)
+    totals.events += updates.events
+    totals.telemetry += updates.telemetry
+    cursor = next
+  }
+  return totals
+}
+
+const initializeCacheForMigration = async () => {
+  logger.info('Cache initialization commencing')
+
+  try {
+    await cache.startup()
+    logger.info('Initialized device cache', await cacheDevices())
+    logger.info('Initialized event and telemetry cache', await cacheEventsAndTelemetry())
+  } catch (error) {
+    logger.error('Cache initialization failed', { error })
+    throw error
+  } finally {
+    await cache.shutdown()
+  }
+}
+
 export const IngestMigrationProcessor = (): StreamProcessorController => {
   const processors = [DevicesMigrationProcessor, EventsMigrationProcessor, TelemetryMigrationProcessor]
   return {
     start: async () => {
+      await initializeCacheForMigration()
       await Promise.all(processors.map(processor => processor.start()))
     },
     stop: async () => {

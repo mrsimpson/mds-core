@@ -71,7 +71,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .values(events.map(EventDomainToEntityCreate.mapper()))
         .returning('*')
         .execute()
-      return entities.map(EventEntityToDomain.map)
+      return entities.map(EventEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
@@ -88,7 +88,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .values(events.map(TelemetryDomainToEntityCreate.mapper()))
         .returning('*')
         .execute()
-      return entities.map(TelemetryEntityToDomain.map)
+      return entities.map(TelemetryEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
@@ -105,7 +105,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .values(events.map(DeviceDomainToEntityCreate.mapper()))
         .returning('*')
         .execute()
-      return entities.map(DeviceEntityToDomain.map)
+      return entities.map(DeviceEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
@@ -124,17 +124,19 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .values(eventAnnotations.map(EventAnnotationDomainToEntityCreate.mapper()))
         .returning('*')
         .execute()
-      return entities.map(EventAnnotationEntityToDomain.map)
+      return entities.map(EventAnnotationEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
-  public getDevices = async (ids: UUID[]): Promise<DeviceDomainModel[]> => {
+  public getDevices = async (device_ids?: UUID[]): Promise<DeviceDomainModel[]> => {
     try {
       const connection = await this.connect('ro')
-      const entities = await connection.getRepository(DeviceEntity).find({ where: { device_id: Any(ids) } })
-      return entities.map(DeviceEntityToDomain.map)
+      const entities = await connection
+        .getRepository(DeviceEntity)
+        .find(device_ids ? { where: { device_id: Any(device_ids) } } : {})
+      return entities.map(DeviceEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
@@ -158,8 +160,6 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       afterCursor,
       order
     } = params
-
-    const { start, end } = time_range
 
     try {
       const connection = await connect('ro')
@@ -186,12 +186,12 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       if (grouping_type === 'latest_per_vehicle') {
         query.innerJoin(
           qb => {
-            return qb
+            const subquery = qb
               .select(
                 'device_id, id as event_id, RANK() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rownum'
               )
               .from(EventEntity, 'e')
-              .where('timestamp >= :start AND timestamp <= :end', { start, end })
+            return time_range ? subquery.where('timestamp >= :start AND timestamp <= :end', time_range) : subquery
           },
           'last_device_event',
           'last_device_event.event_id = events.id AND last_device_event.rownum = 1'
@@ -201,18 +201,18 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       if (grouping_type === 'latest_per_trip') {
         query.innerJoin(
           qb => {
-            return qb
+            const subquery = qb
               .select('trip_id, id as event_id, RANK() OVER (PARTITION BY trip_id ORDER BY timestamp DESC) AS rownum')
               .from(EventEntity, 'e')
-              .where('timestamp >= :start AND timestamp <= :end', { start, end })
+            return time_range ? subquery.where('timestamp >= :start AND timestamp <= :end', time_range) : subquery
           },
           'last_trip_event',
           'last_trip_event.event_id = events.id AND last_trip_event.rownum = 1'
         )
       }
 
-      if (grouping_type === 'all_events') {
-        query.andWhere('events.timestamp >= :start AND events.timestamp <= :end', { start, end })
+      if (grouping_type === 'all_events' && time_range) {
+        query.andWhere('events.timestamp >= :start AND events.timestamp <= :end', time_range)
       }
 
       if (event_types) {
@@ -264,7 +264,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       }
 
       return {
-        events: data.map(EventEntityToDomain.map),
+        events: data.map(EventEntityToDomain.mapper()),
         cursor: {
           next: nextAfterCursor && this.buildCursor({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor }),
           prev: nextBeforeCursor && this.buildCursor({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null })
@@ -355,6 +355,27 @@ class IngestReadWriteRepository extends ReadWriteRepository {
   public getEventsUsingCursor = async (cursor: string): Promise<GetVehicleEventsResponse> =>
     this.getEvents(this.parseCursor(cursor))
 
+  public getLatestTelemetryForDevices = async (device_ids: UUID[]): Promise<TelemetryDomainModel[]> => {
+    try {
+      const connection = await this.connect('ro')
+      const entities = await connection
+        .createQueryBuilder(TelemetryEntity, 'telemetry')
+        .innerJoin(
+          subquery =>
+            subquery
+              .select('id, RANK() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rownum')
+              .where('device_id = ANY(:device_ids)', { device_ids })
+              .from(TelemetryEntity, 't'),
+          'last_device_telemetry',
+          'last_device_telemetry.id = telemetry.id AND last_device_telemetry.rownum = 1'
+        )
+        .getMany()
+      return entities.map(TelemetryEntityToDomain.mapper())
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
   public writeMigratedDevice = async (
     devices: Array<Device & Required<RecordedColumn>>,
     migrated_from: MigratedEntityModel
@@ -368,7 +389,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .values(devices.map(MigratedDeviceToEntityCreate.mapper({ migrated_from })))
         /* DO UPDATE to support PUT vehicle_id */
         .onConflict(
-          '("device_id") DO UPDATE SET "vehicle_id" = EXCLUDED."vehicle_id" WHERE "vehicle_id" <> EXCLUDED."vehicle_id"'
+          '("device_id") DO UPDATE SET "vehicle_id" = EXCLUDED."vehicle_id" WHERE "devices"."vehicle_id" <> EXCLUDED."vehicle_id"'
         )
         .returning('*')
         .execute()
@@ -378,7 +399,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     }
   }
 
-  public writeMigratedEvent = async (
+  public writeMigratedVehicleEvent = async (
     events: Array<VehicleEvent & Required<RecordedColumn>>,
     migrated_from: MigratedEntityModel
   ): Promise<EventDomainModel[]> => {
