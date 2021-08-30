@@ -21,18 +21,14 @@
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { makeDevices, makeEventsWithTelemetry, makeTelemetryInArea, veniceSpecOps } from '@mds-core/mds-test-data'
-import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
 import {
-  CountRule,
-  Device,
-  Geography,
-  ModalityPolicy,
-  RULE_TYPES,
-  Telemetry,
-  UUID,
-  VehicleEvent
-} from '@mds-core/mds-types'
+  LA_CITY_BOUNDARY,
+  makeDevices,
+  makeEventsWithTelemetry,
+  makeTelemetryInArea,
+  veniceSpecOps
+} from '@mds-core/mds-test-data'
+import { CountRule, Device, Geography, Policy, RULE_TYPES, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
 import { Feature, FeatureCollection } from 'geojson'
 import MockDate from 'mockdate'
@@ -333,7 +329,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         }
       }) as unknown as Geography[]
 
-      const VENICE_SPEC_OPS_POLICY: ModalityPolicy = {
+      const VENICE_SPEC_OPS_POLICY: Policy = {
         name: 'Venice Special Operations Zone',
         description: 'LADOT Venice Drop-off/no-fly zones',
         policy_id: VENICE_POLICY_UUID,
