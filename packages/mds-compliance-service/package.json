@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-service",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Compliance Service",
   "keywords": [
     "mds",
@@ -17,13 +17,13 @@
     "build": "tsc --build tsconfig.build.json",
     "start": "pnpm watch server",
     "pretest": "pnpm typeorm -- schema:drop",
-    "test": "DOTENV_CONFIG_PATH=../../.env jest",
+    "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand",
     "ts-node": "DOTENV_CONFIG_PATH=../../.env node --experimental-repl-await -r ts-node/register -r dotenv/config",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js",
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-db": "0.3.0",
+    "@mds-core/mds-db": "0.3.1",
     "@mds-core/mds-logger": "0.2.3",
     "@mds-core/mds-providers": "0.1.34",
     "@mds-core/mds-repository": "0.1.9",

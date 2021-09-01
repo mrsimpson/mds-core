@@ -26,9 +26,12 @@ import {
   EventAnnotationDomainModel,
   EventDomainCreateModel,
   EventDomainModel,
+  GetDevicesOptions,
+  GetDevicesResponse,
   GetVehicleEventsFilterParams,
   GetVehicleEventsOrderOption,
   GetVehicleEventsResponse,
+  ReadTripEventsQueryParams,
   TelemetryDomainCreateModel,
   TelemetryDomainModel
 } from '../@types'
@@ -53,6 +56,7 @@ import {
 import migrations from './migrations'
 import { MigratedEntityModel } from './mixins/migrated-entity'
 
+type GetDeviceQueryParams = GetDevicesOptions & Cursor
 type VehicleEventsQueryParams = GetVehicleEventsFilterParams & Cursor
 
 class IngestReadWriteRepository extends ReadWriteRepository {
@@ -130,7 +134,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     }
   }
 
-  public getDevices = async (device_ids?: UUID[]): Promise<DeviceDomainModel[]> => {
+  public getDevices = async (device_ids: UUID[]): Promise<DeviceDomainModel[]> => {
     try {
       const connection = await this.connect('ro')
       const entities = await connection
@@ -141,6 +145,65 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       throw RepositoryError(error)
     }
   }
+
+  private buildGetDevicesCursor = (params: GetDeviceQueryParams) =>
+    Buffer.from(JSON.stringify(params), 'utf-8').toString('base64')
+
+  private parseGetDevicesCursor = (cursor: string): GetDeviceQueryParams => {
+    try {
+      return JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'))
+    } catch (error) {
+      throw new ValidationError('Invalid cursor', error)
+    }
+  }
+
+  private getDevicesQuery = async ({
+    limit = 100,
+    beforeCursor,
+    afterCursor
+  }: GetDeviceQueryParams): Promise<GetDevicesResponse> => {
+    try {
+      const connection = await this.connect('ro')
+      const query = connection.createQueryBuilder(DeviceEntity, 'device')
+      const pager = buildPaginator({
+        entity: DeviceEntity,
+        alias: 'device',
+        paginationKeys: ['recorded', 'id'],
+        query: {
+          limit,
+          beforeCursor: beforeCursor ?? undefined,
+          afterCursor: afterCursor ?? undefined
+        }
+      })
+
+      const {
+        data,
+        cursor: { beforeCursor: nextBeforeCursor, afterCursor: nextAfterCursor }
+      } = await pager.paginate(query)
+
+      const cursor = { limit }
+
+      return {
+        devices: data.map(DeviceEntityToDomain.mapper()),
+        cursor: {
+          next:
+            nextAfterCursor &&
+            this.buildGetDevicesCursor({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor }),
+          prev:
+            nextBeforeCursor &&
+            this.buildGetDevicesCursor({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null })
+        }
+      }
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public getDevicesUsingOptions = async (options: GetDevicesOptions): Promise<GetDevicesResponse> =>
+    this.getDevicesQuery({ ...options, beforeCursor: null, afterCursor: null })
+
+  public getDevicesUsingCursor = async (cursor: string): Promise<GetDevicesResponse> =>
+    this.getDevicesQuery(this.parseGetDevicesCursor(cursor))
 
   private getEvents = async (params: VehicleEventsQueryParams): Promise<GetVehicleEventsResponse> => {
     const { connect } = this
@@ -354,6 +417,51 @@ class IngestReadWriteRepository extends ReadWriteRepository {
 
   public getEventsUsingCursor = async (cursor: string): Promise<GetVehicleEventsResponse> =>
     this.getEvents(this.parseCursor(cursor))
+
+  public getTripEvents = async (params: ReadTripEventsQueryParams) => {
+    const { skip, take = 100, start_time, end_time, provider_id } = params
+    try {
+      const connection = await this.connect('rw')
+      const tripIdQuery = connection
+        .getRepository(EventEntity)
+        .createQueryBuilder()
+        .select('distinct trip_id')
+        .limit(take)
+
+      if (start_time) tripIdQuery.where('timestamp >= :start_time', { start_time })
+      if (end_time) tripIdQuery.andWhere('timestamp <= :end_time', { end_time })
+      if (provider_id) tripIdQuery.andWhere('provider_id = :provider_id', { provider_id })
+      if (skip) tripIdQuery.andWhere('trip_id > :skip', { skip })
+
+      const bigQuery = connection
+        .createQueryBuilder()
+        .select('et.trip_id, array_agg(row_to_json(et.*) ORDER BY et.timestamp) AS events')
+        .from(
+          qb =>
+            qb
+              .select('e.*, to_json(t.*) AS telemetry')
+              .from('events', 'e')
+              .innerJoin(
+                'telemetry',
+                't',
+                `e.device_id = t.device_id AND e.telemetry_timestamp = t.timestamp AND e.trip_id IN (${tripIdQuery.getQuery()})`
+              ),
+          'et'
+        )
+        .setParameters(tripIdQuery.getParameters())
+        .groupBy('et.trip_id')
+        .orderBy('et.trip_id')
+
+      const entities: { trip_id: UUID; events: EventEntity[] }[] = await bigQuery.execute()
+
+      return entities.reduce<Record<UUID, EventDomainModel[]>>((acc, { trip_id, events }) => {
+        const mappedEvents = events.map(EventEntityToDomain.map)
+        return Object.assign(acc, { [trip_id]: mappedEvents })
+      }, {})
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
 
   public getLatestTelemetryForDevices = async (device_ids: UUID[]): Promise<TelemetryDomainModel[]> => {
     try {

@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-policy",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "MDS Policy API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -14,14 +14,14 @@
     "generate": "pnpm generate:schema",
     "generate:schema": "ts-node ./generate-schemas.ts && git add schema-gen",
     "start": "PATH_PREFIX=/policy pnpm watch server",
-    "test": "PATH_PREFIX=/policy DOTENV_CONFIG_PATH=../../.env jest",
+    "test": "PATH_PREFIX=/policy DOTENV_CONFIG_PATH=../../.env jest --runInBand",
     "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-helpers": "0.1.37",
+    "@mds-core/mds-api-helpers": "0.1.38",
     "@mds-core/mds-api-server": "0.3.0",
-    "@mds-core/mds-db": "0.3.0",
+    "@mds-core/mds-db": "0.3.1",
     "@mds-core/mds-logger": "0.2.3",
     "@mds-core/mds-policy-service": "0.4.0",
     "@mds-core/mds-providers": "0.1.34",
