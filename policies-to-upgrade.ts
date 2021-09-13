@@ -3001,6 +3001,7 @@ const policies_sandbox = [
 import { VEHICLE_EVENT_v0_4_1 } from './packages/mds-types/transformers/@types'
 type INGESTABLE_VEHICLE_EVENT = Exclude<VEHICLE_EVENT_v0_4_1, 'register'>
 import { VehicleEvent_v1_0_0, VEHICLE_EVENT_v1_0_0, VEHICLE_STATE_v1_0_0 } from './packages/mds-types/transformers/@types/1_0_0'
+import { uuid } from '@mds-core/mds-utils'
 
 // const active_policies = policies.filter(p => ids.includes(p.policy_id))
 
@@ -3047,6 +3048,7 @@ interface Rule {
  function transform(policy: any) {
      policy.rules.forEach((rule: any) => {
 
+      // new uuids for everything!
         const states = transform_rule_statuses(rule)
         delete rule.statuses
         rule.states = states
