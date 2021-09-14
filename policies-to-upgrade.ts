@@ -3001,7 +3001,7 @@ const policies_sandbox = [
 import { VEHICLE_EVENT_v0_4_1 } from './packages/mds-types/transformers/@types'
 type INGESTABLE_VEHICLE_EVENT = Exclude<VEHICLE_EVENT_v0_4_1, 'register'>
 import { VehicleEvent_v1_0_0, VEHICLE_EVENT_v1_0_0, VEHICLE_STATE_v1_0_0 } from './packages/mds-types/transformers/@types/1_0_0'
-import { uuid } from '@mds-core/mds-utils'
+import { uuid } from './packages/mds-utils'
 
 // const active_policies = policies.filter(p => ids.includes(p.policy_id))
 
@@ -3052,8 +3052,9 @@ interface Rule {
         const states = transform_rule_statuses(rule)
         delete rule.statuses
         rule.states = states
+        rule.rule_id = uuid()
              })
-
+    policy.policy_id = uuid()
     return policy
  }
 
@@ -3063,7 +3064,7 @@ function process(policies: any) {
         const policy = transform(p)
         console.dir(policy, { depth: null })
         console.log(',')
-        return [p, policy]
+        return policy
             })
 }
 
@@ -3073,7 +3074,7 @@ function process(policies: any) {
 ///*
 const fs = require('fs')
 console.log('logging')
-fs.writeFileSync('/Users/jane/work/mds-core/all-policies-sandbox', JSON.stringify(process(policies_sandbox)), (err: any) => {
+fs.writeFileSync('/Users/jane/work/mds-core/all-policies-sandbox-output', JSON.stringify(process(policies_sandbox)), (err: any) => {
     console.log(err)
         })
 //*/
