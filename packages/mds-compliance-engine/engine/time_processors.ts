@@ -14,18 +14,11 @@
     limitations under the License.
  */
 
-import { Device, Geography, Policy, RULE_TYPES, Telemetry, TimeRule, UUID, VehicleEvent } from '@mds-core/mds-types'
-import {
-  clone,
-  getPolygon,
-  isInStatesOrEvents,
-  now,
-  pointInShape,
-  RULE_UNIT_MAP,
-  UnsupportedTypeError
-} from '@mds-core/mds-utils'
+import { TimePolicy, TimeRule } from '@mds-core/mds-policy-service'
+import { Device, Geography, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { clone, getPolygon, now, pointInShape, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import { ComplianceEngineResult } from '../@types'
-import { annotateVehicleMap, getPolicyType, isInVehicleTypes, isRuleActive } from './helpers'
+import { annotateVehicleMap, isInStatesOrEvents, isInVehicleTypes, isRuleActive } from './helpers'
 
 export function isTimeRuleMatch(
   rule: TimeRule,
@@ -52,14 +45,11 @@ export function isTimeRuleMatch(
 }
 
 export function processTimePolicy(
-  policy: Policy,
+  policy: TimePolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: Geography[],
   devices: { [d: string]: Device }
 ): ComplianceEngineResult | undefined {
-  if (getPolicyType(policy) !== RULE_TYPES.time) {
-    throw new UnsupportedTypeError(`${getPolicyType(policy)} submitted to time processor`)
-  }
   const matchedVehicles: {
     [d: string]: { device: Device; rule_applied: UUID; rules_matched: UUID[] }
   } = {}

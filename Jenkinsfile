@@ -8,9 +8,17 @@ void setBuildStatus(String message, String state) {
   ]);
 }
 
+def buildNumber = env.BUILD_NUMBER as int
+if (buildNumber > 1) milestone(buildNumber - 1)
+milestone(buildNumber)
+
 pipeline {
 
   agent any
+
+  options {
+    timeout(time: 1, unit: 'HOURS') // If build hangs for an hour, kill it with a 🔫
+  }
 
   stages {
     stage('Build') {
