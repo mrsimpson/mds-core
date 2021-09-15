@@ -3095,6 +3095,7 @@ const isPolicyActive = (supersededIDs: string[])  =>
         delete rule.statuses
         rule.states = states
         rule.rule_id = uuid()
+        rule.modality = 'micromobility'
              })
     const old_uuid = policy.policy_id
     policy.policy_id = uuid()
