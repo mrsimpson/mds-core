@@ -1,0 +1,24 @@
+events
+            "on_hours",
+            "provider_drop_off"
+
+
+            "trip_end"
+
+policies in sandbox 1.0 now
+
+099b82ef-1ad7-44ff-a083-c2a5133980f7
+55934af4-9ffe-4b5e-8b1a-4115ee26d8a3
+cc146a51-9902-49b8-bcd2-28de8907e322
+
+3ef96855-9c48-4ed8-ac6e-3006d8bf1d95
+49d4b0dd-7bee-4915-8cb9-0daf54a61576
+861176de-6295-470a-b1d0-a99d0ff58f56
+
+
+removed "trip_end" from "reserved" because that was the original--no trip events for reserved, so we don't care how we get there, we just want the final state
+1e148ef9-977a-4b70-8a5d-b1554cbb71ee
+
+
+has all the event types per state
+3e306035-5b41-47d4-8f11-0d8a0682e249

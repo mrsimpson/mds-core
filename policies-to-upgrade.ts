@@ -2999,9 +2999,10 @@ const policies_sandbox = [
 
  import { FULL_STATE_MAPPING_v0_4_1_to_v1_0_0 } from './packages/mds-types/transformers/0_4_1_to_1_0_0'
 import { VEHICLE_EVENT_v0_4_1 } from './packages/mds-types/transformers/@types'
+import {MICRO_MOBILITY_VEHICLE_STATES_v1_1_0 } from './packages/mds-types'
 type INGESTABLE_VEHICLE_EVENT = Exclude<VEHICLE_EVENT_v0_4_1, 'register'>
 import { VehicleEvent_v1_0_0, VEHICLE_EVENT_v1_0_0, VEHICLE_STATE_v1_0_0 } from './packages/mds-types/transformers/@types/1_0_0'
-import { uuid } from './packages/mds-utils'
+import { uuid, now } from './packages/mds-utils'
 
 // const active_policies = policies.filter(p => ids.includes(p.policy_id))
 
@@ -3023,7 +3024,9 @@ interface Rule {
 }
 
  function transform_rule_statuses(rule: Rule) {
-    const states: { [key: string]: any } = {}
+    const translated_states: { [key: string]: any } = {}
+    const states: { [key: string]: string[] } = {}
+    const event_types: string[] = []
     Object.keys(rule.statuses).forEach(status => {
             let candidate_state = 'unknown'
             const new_event_types: VEHICLE_EVENT_v1_0_0[] = (rule.statuses[status]).map((event_type) => {
@@ -3034,15 +3037,54 @@ interface Rule {
                 }
                 return new_event_type
                     })
+            event_types.push(...new_event_types)
             if (!!STATES_MAPPING[status] && STATES_MAPPING[status] !== 'unknown') {
                 const state = STATES_MAPPING[status]
-                states[state] = new_event_types
+                translated_states[state] = new_event_types
                 } else {
 
-                    states[candidate_state] = new_event_types
+                    translated_states[candidate_state] = new_event_types
                 }
             })
-    return states
+    if (event_types.length > 0) {
+      MICRO_MOBILITY_VEHICLE_STATES_v1_1_0.forEach(state => {
+        states[state] = event_types
+      })
+      return states
+    }
+    return translated_states
+ }
+
+ function getSupersededPolicies(policies: any[]) {
+   const supersededIDs: any[] = []
+   policies.forEach((policy: any) => {
+    if (policy.prev_policies) {
+      supersededIDs.push(policy.prev_policies)
+    }
+   })
+   return supersededIDs.flat()
+ }
+
+const isPolicyActive = (supersededIDs: string[])  =>
+    (policy: any) => {
+      const { policy_id } = policy
+   // superseded
+   if (supersededIDs.includes(policy.policy_id)) {
+     console.log(`superseded ${policy.policy_id} found`)
+     return false
+   }
+   // unpublished
+   if (!policy.publish_date) {
+     console.log(`unpublished ${policy_id}`)
+     return false
+   }
+   // expired
+   if (policy.end_date && policy.end_date < now()) {
+     console.log(`expired ${policy_id}`)
+     return false
+   }
+   console.log(`active policy: ${policy_id}`)
+   return true
  }
 
  function transform(policy: any) {
@@ -3054,27 +3096,80 @@ interface Rule {
         rule.states = states
         rule.rule_id = uuid()
              })
+    const old_uuid = policy.policy_id
     policy.policy_id = uuid()
+    policy.description = `Migrated from 0.4 ${old_uuid}`
+    policy.prev_policies = null
+    policy.publish_date = undefined
+    console.log(policy.prev_policies)
     return policy
  }
 
-function process(policies: any) {
+function mapTransform(policies: any) {
   return policies.map((p: any) => {
     //    console.dir(p, { depth:  null })
         const policy = transform(p)
         console.dir(policy, { depth: null })
-        console.log(',')
+//        console.log([p, policy])
         return policy
             })
 }
 
 
-
+const problemPolicy = [{
+  "name": "TEsting",
+  "rules": [
+    {
+      "name": "Fleet cap in downtown",
+      "maximum": 1000,
+      "rule_id": "f5abf2a4-2141-4ceb-868c-08f588b2ce15",
+      "statuses": {
+        "reserved": [],
+        "available": [
+          "trip_end"
+        ]
+      },
+      "rule_type": "count",
+      "geographies": [
+        "2ace74a5-2233-48b2-a194-0b52f9283336",
+        "33cb3bf8-92ab-4a2f-978f-89f21fd770dc",
+        "dbceb236-36c0-469d-a6eb-c27d878e5453",
+        "aad206a0-f32e-4442-a459-6b73f5cd94bb",
+        "2484bca1-965a-48b0-8279-f20a9940e786"
+      ],
+      "vehicle_types": [
+        "scooter",
+        "bicycle"
+      ]
+    }
+  ],
+  "end_date": null,
+  "policy_id": "74688464-37f8-4e97-a624-1e8473f4a843",
+  "start_date": 1627974000000,
+  "description": "Testing Policey creation in test",
+  "provider_ids": [
+    "c20e08cf-8488-46a6-a66c-5d8fb827f7e0",
+    "63f13c48-34ff-49d2-aca7-cf6a5b6171c3",
+    "e714f168-ce56-4b41-81b7-0b6a4bd26128",
+    "b79f8687-526d-4ae6-80bf-89b4c44dc071"
+  ],
+  "publish_date": 1627949244547,
+  "prev_policies": null
+}]
 
 ///*
 const fs = require('fs')
 console.log('logging')
-fs.writeFileSync('/Users/jane/work/mds-core/all-policies-sandbox-output', JSON.stringify(process(policies_sandbox)), (err: any) => {
+function processPolicies(policies: any[], outputFile: string) {
+  const superseded = getSupersededPolicies(policies)
+  const activePolicies = policies.filter(isPolicyActive(superseded))
+//  /*
+  fs.writeFileSync(`/Users/jane/work/mds-core/${outputFile}`,
+    JSON.stringify(mapTransform(activePolicies)), (err: any) => {
     console.log(err)
-        })
+  })
+//  */
+}
+
+processPolicies(problemPolicy, 'problemPolicy')
 //*/
