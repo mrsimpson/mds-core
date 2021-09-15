@@ -21,4 +21,7 @@ removed "trip_end" from "reserved" because that was the original--no trip events
 
 
 has all the event types per state
+added "modality" to rule
 3e306035-5b41-47d4-8f11-0d8a0682e249
+
+
