@@ -6,8 +6,11 @@ events
             "trip_end"
 
 policies in sandbox 1.0 now
+all published
+start_date had to change because publish_date must >= start_date
 
 099b82ef-1ad7-44ff-a083-c2a5133980f7
+099b82ef-1ad7-44ff-a083-c2a5133980f7/publish
 55934af4-9ffe-4b5e-8b1a-4115ee26d8a3
 cc146a51-9902-49b8-bcd2-28de8907e322
 
