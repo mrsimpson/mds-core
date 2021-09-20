@@ -65,7 +65,7 @@ ACTIVE_POLICY_JSON.start_date = yesterday()
 
 const ACTIVE_MONTH_OLD_POLICY_JSON = clone(POLICY2_JSON)
 ACTIVE_MONTH_OLD_POLICY_JSON.publish_date = START_ONE_MONTH_FROM_NOW
-const APP_JSON = 'application/vnd.mds.policy+json; charset=utf-8; version=0.4'
+const APP_JSON = 'application/vnd.mds.policy+json; charset=utf-8; version=1.0'
 
 const AUTH = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}|${PROVIDER_SCOPES}`).toString('base64')}`
 const POLICIES_READ_SCOPE = SCOPED_AUTH(['policies:read'])
@@ -124,7 +124,7 @@ describe('Tests app', () => {
     const body = result.body
     expect(body.version).toStrictEqual(POLICY_API_DEFAULT_VERSION)
     expect(result.header['content-type']).toStrictEqual(APP_JSON)
-    expect(result.body.data.policy.policy_id).toStrictEqual(policy.policy_id)
+    expect(result.body.data.policies[0].policy_id).toStrictEqual(policy.policy_id)
   })
 
   it('reads back all active policies', async () => {

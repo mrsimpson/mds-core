@@ -43,7 +43,7 @@ import { GEOGRAPHY_API_DEFAULT_VERSION } from '../types'
 
 const request = supertest(ApiServer(api))
 
-const APP_JSON = 'application/vnd.mds-geography+json; charset=utf-8; version=0.4'
+const APP_JSON = 'application/vnd.mds-geography+json; charset=utf-8; version=1.0'
 const EMPTY_SCOPE = SCOPED_AUTH([], '')
 const EVENTS_READ_SCOPE = SCOPED_AUTH(['events:read'])
 const GEOGRAPHIES_READ_PUBLISHED_SCOPE = SCOPED_AUTH(['geographies:read:published'])
@@ -67,7 +67,7 @@ describe('Tests app', () => {
         .get(pathPrefix(`/geographies/${GEOGRAPHY_UUID}`))
         .set('Authorization', GEOGRAPHIES_READ_UNPUBLISHED_SCOPE)
         .expect(200)
-      test.assert(result.body.data.geography.geography_id === GEOGRAPHY_UUID)
+      test.assert(result.body.data.geographies[0].geography_id === GEOGRAPHY_UUID)
       test.assert(result.body.version === GEOGRAPHY_API_DEFAULT_VERSION)
       test.value(result).hasHeader('content-type', APP_JSON)
     })
@@ -156,7 +156,7 @@ describe('Tests app', () => {
         .set('Authorization', GEOGRAPHIES_READ_UNPUBLISHED_SCOPE)
         .expect(200)
         .end((err, result) => {
-          test.assert(result.body.data.geography.geography_id === GEOGRAPHY_UUID)
+          test.assert(result.body.data.geographies[0].geography_id === GEOGRAPHY_UUID)
           test.value(result).hasHeader('content-type', APP_JSON)
           done(err)
         })

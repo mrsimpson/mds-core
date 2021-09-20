@@ -1,36 +1,27 @@
 import cache from '@mds-core/mds-agency-cache'
 import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service'
 import db from '@mds-core/mds-db'
-import { CountPolicy, PolicyDomainModel, Rule, RULE_TYPE, SpeedPolicy, TimePolicy } from '@mds-core/mds-policy-service'
-import { providers } from '@mds-core/mds-providers'
 import {
-  DAYS_OF_WEEK,
-  DAY_OF_WEEK,
-  Device,
-  Geography,
-  MicroMobilityVehicleEvent,
-  MICRO_MOBILITY_EVENT_STATES_MAP,
-  MICRO_MOBILITY_VEHICLE_EVENTS,
-  MICRO_MOBILITY_VEHICLE_STATE,
-  TaxiVehicleEvent,
-  TAXI_EVENT_STATES_MAP,
-  TAXI_VEHICLE_EVENTS,
-  TAXI_VEHICLE_STATE,
-  TIME_FORMAT,
-  TNCVehicleEvent,
-  TNC_EVENT_STATES_MAP,
-  TNC_VEHICLE_EVENT,
-  TNC_VEHICLE_STATE,
-  UUID,
-  VehicleEvent
-} from '@mds-core/mds-types'
+  CountPolicy,
+  PolicyDomainModel,
+  Rule,
+  RULE_TYPE,
+  SpeedPolicy,
+  TimePolicy,
+  TIME_FORMAT
+} from '@mds-core/mds-policy-service'
+import { providers } from '@mds-core/mds-providers'
+import { Device, Geography, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { areThereCommonElements, isDefined, now, RuntimeError } from '@mds-core/mds-utils'
+import { DateTime } from 'luxon'
 import moment from 'moment-timezone'
 import { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
 
 const { env } = process
 
 const TWO_DAYS_IN_MS = 172800000
+
+const isOfTimeFormat = (timeString: string): timeString is TIME_FORMAT => /^\d{2}:\d{2}:\d{2}$/.test(timeString)
 
 export function getPolicyType(policy: PolicyDomainModel) {
   return policy.rules[0].rule_type
@@ -74,7 +65,7 @@ export async function getProviderInputs(provider_id: string) {
     return device ? Object.assign(map, { [device.device_id]: device }) : map
   }, {})
 
-  /*  We do not evaluate violations for vehicles that have not sent events within the last 48 hours.
+  /* We do not evaluate violations for vehicles that have not sent events within the last 48 hours.
    * So we throw old events out and do not consider them.
    * We also don't consider events that have no associated telemetry.
    */
@@ -89,7 +80,66 @@ export function isPolicyActive(policy: PolicyDomainModel, end_time: number = now
   return end_time >= policy.start_date && end_time <= policy.end_date
 }
 
-export function isRuleActive(rule: Rule<Exclude<RULE_TYPE, 'rate'>>): boolean {
+/**
+ * Luxon has a helper method for this `weekdayShort`, but it doesn't typecheck :^)
+ */
+const numericalWeekdayToLocale = (weekdayNum: number) => {
+  if (weekdayNum < 1 || weekdayNum > 7) {
+    throw new Error(`Invalid weekday number: ${weekdayNum}`)
+  }
+
+  const weekdayList = <const>['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
+  return weekdayList[weekdayNum - 1] // subtract 1 cause arrays are 0 indexed, but luxon provides weekdays in 1 | 2 | 3 | 4 | 5 | 6 | 7 form. (1 = monday) (7 = sunday)
+}
+
+/**
+ *
+ * @param param0 Object which contains a list of days
+ * @returns If the current day is in the list of valid days
+ */
+const isCurrentDayInDays = ({ days }: Pick<Rule, 'days'>) => {
+  const { TIMEZONE } = env
+
+  if (!days || days.length === 0) return true
+
+  const currentTime = DateTime.now().setZone(TIMEZONE)
+
+  return days.includes(numericalWeekdayToLocale(currentTime.weekday))
+}
+
+/**
+ *
+ * @param start_time Time in HH:mm:ss format
+ * @param end_time Time in HH:mm:ss format
+ * @returns If the current local time is within the specified time range.
+ *
+ * Note: We can just do string comparison here for times, because the format should consistently be HH:mm:ss for all strings.
+ */
+const isCurrentTimeInInterval = ({ start_time, end_time }: Pick<Rule, 'start_time' | 'end_time'>) => {
+  const { TIMEZONE } = env
+
+  const currentTime = DateTime.now().setZone(TIMEZONE)
+  const formattedCurrentTime = currentTime.toFormat(TIME_FORMAT)
+  if (!isOfTimeFormat(formattedCurrentTime))
+    throw new Error(`Current time is in invalid time format: ${formattedCurrentTime}`)
+
+  if (start_time && end_time) {
+    // The overnight use-case, e.g. if a rule starts at 7pm and ends at 5am.
+    if (start_time >= end_time) return formattedCurrentTime >= start_time || formattedCurrentTime <= end_time
+
+    // Daytime use-case, e.g. if a rule starts at 8am and ends at 5pm.
+    return formattedCurrentTime >= start_time && formattedCurrentTime <= end_time
+  }
+
+  if (start_time) return formattedCurrentTime >= start_time // we'll assume that if there's no end time, the rule is active from the start_time until the end of the day
+
+  if (end_time) return formattedCurrentTime <= end_time // we'll assume that if there's no start time, the rule is active from the beginning of the day until the end time
+
+  return true
+}
+
+export function isRuleActive({ start_time, end_time, days }: Pick<Rule, 'start_time' | 'end_time' | 'days'>): boolean {
   if (!env.TIMEZONE) {
     throw new RuntimeError('TIMEZONE environment variable must be declared!')
   }
@@ -98,20 +148,15 @@ export function isRuleActive(rule: Rule<Exclude<RULE_TYPE, 'rate'>>): boolean {
     throw new RuntimeError(`TIMEZONE environment variable ${env.TIMEZONE} is not a valid timezone!`)
   }
 
-  const local_time = moment().tz(env.TIMEZONE)
-
-  if (!rule.days || rule.days.includes(Object.values(DAYS_OF_WEEK)[local_time.day()] as DAY_OF_WEEK)) {
-    if (!rule.start_time || local_time.isAfter(moment(rule.start_time, TIME_FORMAT))) {
-      if (!rule.end_time || local_time.isBefore(moment(rule.end_time, TIME_FORMAT))) {
-        return true
-      }
-    }
-  }
-  return false
+  return isCurrentDayInDays({ days }) && isCurrentTimeInInterval({ start_time, end_time })
 }
 
 export function isInVehicleTypes(rule: Rule<Exclude<RULE_TYPE, 'rate'>>, device: Device): boolean {
-  return !rule.vehicle_types || (rule.vehicle_types && rule.vehicle_types.includes(device.vehicle_type))
+  return (
+    !rule.vehicle_types ||
+    rule.vehicle_types.length === 0 ||
+    (rule.vehicle_types && rule.vehicle_types.includes(device.vehicle_type))
+  )
 }
 
 // Take a list of policies, and eliminate all those that have been superseded. Returns
@@ -214,29 +259,16 @@ export function getProviderIDs(provider_ids: UUID[] | undefined | null) {
 }
 
 /**
- * The rule matches this event if a transient event_type and possible resultant states,
- * or the final event_type and explicitly encoded vehicle_state match with the rule's status definitions.
- * e.g. if the rule states are { reserved: [] } and there's an event with event_types
- *      [trip_end, reservation_start, trip_start], there's an implication
- *      that the vehicle entered the reserved state after reservation_start,
- *      even if the final state of the event is on_trip, and the rule will match.
+ * Suppose we have an event with event_types `["trip_end", "battery_low"]`, and a
+ * `vehicle_state` of `non_operational`, and a rule on a policy
+ * where the `states` are `{ "non_operational": ["trip_end"] }`. That should be a match.
  *
- * @example Matching transient `event_type`
- * ```typescript
- * isInStatesOrEvents({ states: { reserved: [] } }, { event_types: ['trip_end', 'reservation_start', 'trip_start'], vehicle_state: 'on_trip' }) => true
- * ```
- * @example State matching for transient `event_type` 'off_hours', but `event_type` not matched with explicit `event_type` in rule
- * ```typescript
- * isInStatesOrEvents({ states: { non_operational: ['maintenance'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' }) => false
- * ```
- * @example Match for last `event_type` and encoded `vehicle_state`, with explicit `event_type` in rule
- * ```typescript
- * isInStatesOrEvents({ states: { available: ['on_hours'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' }) => true
- * ```
- * @example Match for last `event_type` and encoded `vehicle_state`, with catch-all in rule
- * ```typescript
- * isInStatesOrEvents({ states: { available: [] } }, { event_types: ['on_hours'], vehicle_state: 'available' }) => true
- * ```
+ * The original solution to handling multiple `event_types` on an event was to
+ * match on transient states, e.g. `["trip_end", "reservation_start"] would have
+ * matched `states: { available: []}` because `trip_end` transitions to `available`
+ * and only `available`, but this doesn't work if you have an event with
+ * `["unspecified", "unspecified"]`. It's impossible to narrow the state down since
+ * every state is valid in between those event types.
  */
 export function isInStatesOrEvents(
   rule: Pick<Rule, 'states'>,
@@ -245,93 +277,14 @@ export function isInStatesOrEvents(
 ): boolean {
   const { states } = rule
   // If no states are specified, then the rule applies to all VehicleStates.
-  if (states === null || states === undefined) {
-    return true
-  }
+  if (states === null || states === undefined) return true
 
-  /**
-   * State encoded in the event payload (default acc in the reducer) + states that it is
-   * possible to transition into with any transient event_types
-   */
-  const possibleStates = getPossibleStates(device, event)
-
-  return possibleStates.some(state => {
-    // Explicit events encoded in rule for that state (if any)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const matchableEvents: string[] | undefined = state in states ? (states as any)[state] : undefined //FIXME should not have to use an any cast here
-
-    /**
-     * If event_types not encoded in rule, assume state match.
-     * If event_types encoded in rule, see if event.event_types contains a match.
-     */
-    if (
-      matchableEvents !== undefined &&
-      (matchableEvents.length === 0 || areThereCommonElements(matchableEvents, event.event_types))
-    ) {
-      return true
-    }
-    return false
-  })
-}
-
-export const getPossibleStates = (device: Pick<Device, 'modality'>, event: VehicleEvent) => {
-  if (isMicroMobilityEvent(device, event)) {
-    const { event_types, vehicle_state } = event
-    // All event_types except the last (in most cases this will be an empty list)
-    const transientEventTypes = event_types.slice(0, -1)
-
-    return transientEventTypes.reduce(
-      (acc: MICRO_MOBILITY_VEHICLE_STATE[], event_type) => {
-        return acc.concat(MICRO_MOBILITY_EVENT_STATES_MAP[event_type])
-      },
-      [vehicle_state]
-    )
-  }
-  if (isTaxiEvent(device, event)) {
-    const { event_types, vehicle_state } = event
-    // All event_types except the last (in most cases this will be an empty list)
-    const transientEventTypes = event_types.slice(0, -1)
-
-    return transientEventTypes.reduce(
-      (acc: TAXI_VEHICLE_STATE[], event_type) => {
-        return acc.concat(TAXI_EVENT_STATES_MAP[event_type])
-      },
-      [vehicle_state]
-    )
-  }
-  if (isTncEvent(device, event)) {
-    const { event_types, vehicle_state } = event
-    // All event_types except the last (in most cases this will be an empty list)
-    const transientEventTypes = event_types.slice(0, -1)
-
-    return transientEventTypes.reduce(
-      (acc: TNC_VEHICLE_STATE[], event_type) => {
-        return acc.concat(TNC_EVENT_STATES_MAP[event_type])
-      },
-      [vehicle_state]
-    )
-  }
-
-  return [event.vehicle_state]
-}
-export const isSubset = <T extends Array<string>, U extends Readonly<Array<string>>>(as: T, bs: U) => {
-  return as.every(a => bs.includes(a))
-}
-
-const isMicroMobilityEvent = (
-  { modality }: Pick<Device, 'modality'>,
-  event: VehicleEvent
-): event is MicroMobilityVehicleEvent => {
-  const { event_types } = event
-  return modality === 'micromobility' && isSubset(event_types, MICRO_MOBILITY_VEHICLE_EVENTS)
-}
-
-const isTaxiEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TaxiVehicleEvent => {
-  const { event_types } = event
-  return modality === 'taxi' && isSubset(event_types, TAXI_VEHICLE_EVENTS)
-}
-
-const isTncEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TNCVehicleEvent => {
-  const { event_types } = event
-  return modality === 'tnc' && isSubset(event_types, TNC_VEHICLE_EVENT)
+  const { vehicle_state } = event
+  // FIXME It might be possible to avoid this `any` cast...
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ruleEventTypes = (states as any)[vehicle_state]
+  if (!ruleEventTypes) return false
+  if (ruleEventTypes.length === 0) return true
+  if (areThereCommonElements(event.event_types, ruleEventTypes)) return true
+  return false
 }
