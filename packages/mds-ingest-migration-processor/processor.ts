@@ -58,7 +58,7 @@ const MigrationSourceTopic = (entityType: MigrationEntityType) => `${SOURCE_TENA
 const MigrationDataSource: <MigrationSourceEntity>(entity: MigrationEntityType) => StreamSource<MigrationSourceEntity> =
   entity => {
     const topic = MigrationSourceTopic(entity)
-    return KafkaSource(topic, { groupId: `${topic}.ingest-migration-processor` })
+    return KafkaSource(topic, { groupId: `${topic}.mds-ingest-migration-processor`, fromBeginning: true })
   }
 
 const MigrationErrorTopic = (entityType: MigrationEntityType) => `${TENANT_ID}.${entityType}.error`
@@ -68,7 +68,7 @@ const MigrationErrorSink: <MigrationSourceEntity>(
 ) => DeadLetterSink<MigrationSourceEntity> = entity => {
   const topic = MigrationErrorTopic(entity)
   return KafkaSink(topic, {
-    clientId: `${topic}.ingest-migration-processor`
+    clientId: `${topic}.mds-ingest-migration-processor`
   })
 }
 

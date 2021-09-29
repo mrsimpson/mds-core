@@ -24,12 +24,13 @@ import { getKafkaBrokers } from './helpers'
 export interface KafkaStreamConsumerOptions {
   clientId: string
   groupId: string
+  fromBeginning: boolean
 }
 
 const createStreamConsumer = async (
   topics: SingleOrArray<string>,
   eachMessage: (payload: EachMessagePayload) => Promise<void>,
-  { clientId = 'client', groupId = 'group' }: Partial<KafkaStreamConsumerOptions> = {}
+  { clientId = 'client', groupId = 'group', fromBeginning = false }: Partial<KafkaStreamConsumerOptions> = {}
 ) => {
   try {
     const brokers = getKafkaBrokers()
@@ -41,7 +42,7 @@ const createStreamConsumer = async (
     const kafka = new Kafka({ clientId, brokers })
     const consumer = kafka.consumer({ groupId })
     await consumer.connect()
-    await Promise.all(asArray(topics).map(topic => consumer.subscribe({ topic })))
+    await Promise.all(asArray(topics).map(topic => consumer.subscribe({ topic, fromBeginning })))
     await consumer.run({ eachMessage })
     return consumer
   } catch (err) {
