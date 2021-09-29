@@ -4,7 +4,7 @@ import { validateEventDomainModel } from '@mds-core/mds-ingest-service'
 import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers'
 import stream from '@mds-core/mds-stream'
-import { Device, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { DeepPartial, Device, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { normalizeToArray, now, ValidationError } from '@mds-core/mds-utils'
 import { AgencyApiSubmitVehicleEventRequest, AgencyApiSubmitVehicleEventResponse, AgencyServerError } from '../types'
 import { agencyValidationErrorParser, eventValidForMode } from '../utils'
@@ -14,7 +14,7 @@ const handleDbError = async (
   res: AgencyApiSubmitVehicleEventResponse,
   err: Error | Partial<{ message: string }>,
   provider_id: UUID,
-  event: Partial<VehicleEvent>
+  event: DeepPartial<VehicleEvent>
 ): Promise<void> => {
   const name = providerName(provider_id || 'unknown')
 
@@ -111,6 +111,7 @@ export const createEventHandler = async (
     ...req.body,
     device_id,
     provider_id,
+    telemetry: { ...req.body.telemetry, provider_id },
     recorded
   }
 

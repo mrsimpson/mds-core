@@ -127,7 +127,7 @@ export async function getVehicles(
   logger.info(`read ${total} deviceIds in /vehicles`)
 
   const events = rows.length > 0 ? await cache.readEvents(rows.map(record => record.device_id)) : []
-  const eventMap: { [s: string]: VehicleEvent } = {}
+  const eventMap: { [s: string]: VehicleEvent | undefined } = {}
   events.map(event => {
     if (event) {
       eventMap[event.device_id] = event
@@ -136,7 +136,8 @@ export async function getVehicles(
 
   const deviceIdSuperset = bbox
     ? rows.filter(record => {
-        return eventMap[record.device_id] ? isInsideBoundingBox(eventMap[record.device_id].telemetry, bbox) : true
+        const event = eventMap[record.device_id]
+        return event ? isInsideBoundingBox(event.telemetry, bbox) : true
       })
     : rows
 
@@ -146,10 +147,11 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
+    const prev_events = event ? event.event_types : ['decommissioned']
     const state: VEHICLE_STATE = event ? event.vehicle_state : 'removed'
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
-    return [...acc, { ...device, state, telemetry, updated }]
+    return [...acc, { ...device, state, prev_events, telemetry, updated }]
   }, [])
 
   const noNext = skip + take >= deviceIdSuperset.length

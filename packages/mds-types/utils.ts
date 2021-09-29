@@ -43,7 +43,9 @@ export type OptionalKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } 
 export type PickRequired<T> = Pick<T, RequiredKeys<T>>
 export type PickOptional<T> = Pick<T, OptionalKeys<T>>
 export type NullableOptional<T> = PickRequired<T> & NullableProperties<PickOptional<T>>
-
+export type DeepPartial<T> = {
+  [P in keyof T]?: DeepPartial<T[P]>
+}
 // eslint-reason recursive declarations require interfaces
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface JsonArray extends Array<Json> {}
