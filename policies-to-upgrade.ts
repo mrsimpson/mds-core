@@ -3779,7 +3779,7 @@ const isPolicyActive = (supersededIDs: string[])  =>
              })
     const old_uuid = policy.policy_id
     policy.policy_id = uuid()
-    policy.description = `Migrated from 0.4 ${old_uuid}`
+    policy.description = `${policy.description} - Migrated from 0.4 ${old_uuid}`
     policy.prev_policies = null
     policy.publish_date = undefined
     console.log(policy.prev_policies)
