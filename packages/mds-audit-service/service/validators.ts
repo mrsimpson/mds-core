@@ -14,62 +14,82 @@
  * limitations under the License.
  */
 
-import { schemaValidator } from '@mds-core/mds-schema-validators'
+import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import { AUDIT_EVENT_TYPES, VEHICLE_EVENTS } from '@mds-core/mds-types'
-import Joi from 'joi'
 import { AuditAttachmentDomainModel, AuditDomainModel, AuditEventDomainModel } from '../@types'
 
+const uuidSchema = { type: 'string', format: 'uuid' }
+const enumSchema = <T>(enumType: T[]) => ({ type: 'string', enum: enumType })
+
 export const { validate: validateAuditDomainModel, isValid: isValidAuditDomainModel } =
-  schemaValidator<AuditDomainModel>(
-    Joi.object<AuditDomainModel>()
-      .keys({
-        audit_trip_id: Joi.string().uuid().required(),
-        audit_device_id: Joi.string().uuid().required(),
-        audit_subject_id: Joi.string().required(),
-        provider_id: Joi.string().uuid().required(),
-        provider_name: Joi.string().required(),
-        provider_vehicle_id: Joi.string().required(),
-        provider_device_id: Joi.string().uuid().allow(null)
-      })
-      .unknown(false)
-  )
+  SchemaValidator<AuditDomainModel>({
+    $id: 'Audit',
+    type: 'object',
+    properties: {
+      audit_trip_id: uuidSchema,
+      audit_device_id: uuidSchema,
+      audit_subject_id: { type: 'string' },
+      provider_id: uuidSchema,
+      provider_name: { type: 'string' },
+      provider_vehicle_id: { type: 'string' },
+      provider_device_id: { ...uuidSchema, nullable: true, default: null }
+    },
+    required: [
+      'audit_trip_id',
+      'audit_device_id',
+      'audit_subject_id',
+      'provider_id',
+      'provider_name',
+      'provider_vehicle_id',
+      'audit_device_id'
+    ]
+  })
 
 export const { validate: validateAuditEventDomainModel, isValid: isValidAuditEventDomainModel } =
-  schemaValidator<AuditEventDomainModel>(
-    Joi.object<AuditEventDomainModel>()
-      .keys({
-        audit_trip_id: Joi.string().uuid().required(),
-        timestamp: Joi.number().integer().required(),
-        audit_event_id: Joi.string().uuid().required(),
-        audit_event_type: Joi.string().valid(...Object.keys(AUDIT_EVENT_TYPES).concat(Object.keys(VEHICLE_EVENTS))),
-        audit_issue_code: Joi.string().allow(null),
-        audit_subject_id: Joi.string().required(),
-        note: Joi.string().allow(null),
-        telemetry: Joi.object()
-          .keys({
-            charge: Joi.number().allow(null),
-            gps: Joi.object()
-              .keys({
-                lat: Joi.number().required(),
-                lng: Joi.number().required(),
-                speed: Joi.number().allow(null),
-                heading: Joi.number().allow(null),
-                accuracy: Joi.number().allow(null),
-                altitude: Joi.number().allow(null)
-              })
-              .required()
-          })
-          .allow(null)
-      })
-      .unknown(false)
-  )
+  SchemaValidator<AuditEventDomainModel>({
+    $id: 'AuditEvent',
+    type: 'object',
+    properties: {
+      audit_trip_id: uuidSchema,
+      timestamp: { type: 'integer' },
+      audit_event_id: uuidSchema,
+      audit_event_type: enumSchema(Object.keys(AUDIT_EVENT_TYPES).concat(Object.keys(VEHICLE_EVENTS))),
+      audit_issue_code: { type: 'string', nullable: true, default: null },
+      audit_subject_id: { type: 'string' },
+      note: { type: 'string', nullable: true, default: null },
+      telemetry: {
+        $id: 'Telemetry',
+        type: 'object',
+        nullable: true,
+        default: null,
+        properties: {
+          charge: { type: 'number', nullable: true, default: null },
+          gps: {
+            type: 'object',
+            properties: {
+              lat: { type: 'number' },
+              lng: { type: 'number' },
+              speed: { type: 'number', nullable: true, default: null },
+              heading: { type: 'number', nullable: true, default: null },
+              accuracy: { type: 'number', nullable: true, default: null },
+              altitude: { type: 'number', nullable: true, default: null }
+            },
+            required: ['lat', 'lng']
+          }
+        },
+        required: ['gps']
+      }
+    },
+    required: ['audit_trip_id', 'timestamp', 'audit_event_id', 'audit_event_type', 'audit_subject_id']
+  })
 
 export const { validate: validateAuditAttachmentDomainModel, isValid: isValidAuditAttachmentDomainModel } =
-  schemaValidator<AuditAttachmentDomainModel>(
-    Joi.object<AuditAttachmentDomainModel>()
-      .keys({
-        audit_trip_id: Joi.string().uuid().required(),
-        attachment_id: Joi.string().uuid().required()
-      })
-      .unknown(false)
-  )
+  SchemaValidator<AuditAttachmentDomainModel>({
+    $id: 'AuditAttachment',
+    type: 'object',
+    properties: {
+      audit_trip_id: uuidSchema,
+      attachment_id: uuidSchema
+    },
+    required: ['audit_trip_id', 'attachment_id']
+  })

@@ -26,6 +26,7 @@
     "@mds-core/mds-api-server": "workspace:0.3.3",
     "@mds-core/mds-attachment-service": "workspace:0.1.12",
     "@mds-core/mds-db": "workspace:0.4.1",
+    "@mds-core/mds-ingest-service": "0.4.3",
     "@mds-core/mds-logger": "workspace:0.2.4",
     "@mds-core/mds-providers": "workspace:0.1.36",
     "@mds-core/mds-schema-validators": "workspace:0.3.3",

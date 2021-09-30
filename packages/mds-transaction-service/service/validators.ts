@@ -22,6 +22,7 @@ import {
   ReceiptDomainModel,
   TransactionDomainModel,
   TransactionOperationDomainModel,
+  TransactionSearchParams,
   TransactionStatusDomainModel,
   TRANSACTION_OPERATION_TYPE,
   TRANSACTION_STATUS_TYPE
@@ -75,6 +76,26 @@ const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99
 //   },
 //   required: ['duration', 'end_timestamp', 'geography_id', 'start_timestamp', 'trip_events', 'trip_id', 'vehicle_type']
 // })
+
+export const { validate: validateTransactionSearchParams } = SchemaValidator<TransactionSearchParams>(
+  {
+    $id: 'TransactionSearchParams',
+    type: 'object',
+    properties: {
+      provider_id: { ...uuidSchema, nullable: true, default: null },
+      start_timestamp: { type: 'number', nullable: true, default: null },
+      end_timestamp: { type: 'number', nullable: true, default: null },
+      search_text: { type: 'string', nullable: true, default: null },
+      start_amount: { type: 'number', nullable: true, default: null },
+      end_amount: { type: 'number', nullable: true, default: null },
+      fee_type: { type: 'string', enum: [...FEE_TYPE, null], nullable: true, default: null },
+      before: { type: 'string', nullable: true, default: null },
+      after: { type: 'string', nullable: true, default: null },
+      limit: { type: 'integer', minimum: 1, maximum: 1000, default: 10 }
+    }
+  },
+  { useDefaults: true }
+)
 
 const { $schema: complianceViolationDetailsSchema } = SchemaValidator<ComplianceViolationDetailsDomainModel>({
   type: 'object',

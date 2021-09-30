@@ -124,7 +124,9 @@ describe('ComplianceSnapshots Service Tests', () => {
         end_time: now() - days(3)
       })
     } catch (error: unknown) {
-      expect((error as ServiceErrorDescriptor<'ValidationError'>).details).toMatch('start_time not provided')
+      expect((error as ServiceErrorDescriptor<'ValidationError'>).details).toContain(
+        'start_time should be less than end_time'
+      )
     }
   })
 

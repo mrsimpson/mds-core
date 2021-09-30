@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { SchemaValidator, schemaValidator } from '@mds-core/mds-schema-validators'
+import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import { UUID } from '@mds-core/mds-types'
+import Ajv from 'ajv'
 import gjv from 'geojson-validation'
-import Joi from 'joi'
 import {
   GeographyDomainCreateModel,
   GeographyMetadataDomainCreateModel,
@@ -25,61 +25,71 @@ import {
   GetPublishedGeographiesOptions
 } from '../@types'
 
+const ajvWithGeoJSON = new Ajv({ allErrors: true }).addKeyword({
+  keyword: 'valid-geojson',
+  schema: false,
+  validate: (geography_json: unknown) => {
+    try {
+      return gjv.valid(geography_json, false)
+    } catch (error) {
+      return false
+    }
+  }
+})
+
+const uuidSchema = { type: 'string', format: 'uuid' }
+
 export const { validate: validateGeographyDomainCreateModel, isValid: isValidGeographyDomainCreateModel } =
-  schemaValidator<GeographyDomainCreateModel>(
-    Joi.object<GeographyDomainCreateModel>()
-      .keys({
-        geography_id: Joi.string().uuid().required(),
-        name: Joi.string().max(255).allow(null),
-        description: Joi.string().max(255).allow(null),
-        effective_date: Joi.number().integer().allow(null),
-        publish_date: Joi.number().integer().allow(null),
-        prev_geographies: Joi.array().items(Joi.string().uuid()).allow(null),
-        geography_json: Joi.custom((geography_json, helpers) => {
-          try {
-            const [error] = gjv.valid(geography_json, true)
-            if (error !== undefined) {
-              return helpers.message({ custom: `GeoJSON is invalid ${error}` })
-            }
-          } catch (error) {
-            return helpers.message({ custom: `GeoJSON could not be validated` })
-          }
-          return geography_json
-        }).required()
-      })
-      .unknown(false)
+  SchemaValidator<GeographyDomainCreateModel>(
+    {
+      $id: 'Geography',
+      type: 'object',
+      properties: {
+        geography_id: uuidSchema,
+        name: { type: 'string', maxLength: 255, nullable: true, default: null },
+        description: { type: 'string', maxLength: 255, nullable: true, default: null },
+        effective_date: { type: 'integer', nullable: true, default: null },
+        publish_date: { type: 'integer', nullable: true, default: null },
+        prev_geographies: { type: 'array', items: uuidSchema, nullable: true, default: null },
+        geography_json: { 'valid-geojson': true }
+      },
+      required: ['geography_id', 'geography_json']
+    },
+    { allErrors: true },
+    ajvWithGeoJSON
   )
 
 export const {
   validate: validateGeographyMetadataDomainCreateModel,
   isValid: isValidGeographyMetadataDomainCreateModel
-} = schemaValidator<GeographyMetadataDomainCreateModel>(
-  Joi.object<GeographyMetadataDomainCreateModel>()
-    .keys({
-      geography_id: Joi.string().uuid().required(),
-      geography_metadata: Joi.any().allow(null)
-    })
-    .unknown(false)
-)
+} = SchemaValidator<GeographyMetadataDomainCreateModel>({
+  $id: 'GeographyMetadata',
+  type: 'object',
+  properties: {
+    geography_id: uuidSchema,
+    geography_metadata: { type: 'object', nullable: true, default: null }
+  },
+  required: ['geography_id']
+})
 
 export const { validate: validateGetGeographiesOptions, isValid: isValidGetGeographiesOptions } =
-  schemaValidator<GetGeographiesOptions>(
-    Joi.object<GetGeographiesOptions>()
-      .keys({
-        includeMetadata: Joi.boolean().default(false)
-      })
-      .unknown(false)
-  )
+  SchemaValidator<GetGeographiesOptions>({
+    $id: 'GetGeographyOptions',
+    type: 'object',
+    properties: {
+      includeMetadata: { type: 'boolean', default: false }
+    }
+  })
 
 export const { validate: validateGetPublishedGeographiesOptions, isValid: isValidGetPublishedGeographiesOptions } =
-  schemaValidator<GetPublishedGeographiesOptions>(
-    Joi.object<GetPublishedGeographiesOptions>()
-      .keys({
-        includeMetadata: Joi.boolean().default(false),
-        publishedAfter: Joi.number().integer()
-      })
-      .unknown(false)
-  )
+  SchemaValidator<GetPublishedGeographiesOptions>({
+    $id: 'GetPublishedGeographiesOptions',
+    type: 'object',
+    properties: {
+      includeMetadata: { type: 'boolean', default: false },
+      publishedAfter: { type: 'integer' }
+    }
+  })
 
 export const { validate: validateUuids, isValid: isValidUuids } = SchemaValidator<UUID[]>({
   type: 'array',

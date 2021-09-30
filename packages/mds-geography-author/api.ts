@@ -17,7 +17,6 @@
 import { AccessTokenScopeValidator, ApiRequest, ApiResponse, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
-import { geographyValidationDetails } from '@mds-core/mds-schema-validators'
 import {
   AlreadyPublishedError,
   BadParamsError,
@@ -48,6 +47,7 @@ import {
   GeographyAuthorApiPutGeographyRequest,
   GeographyAuthorApiPutGeographyResponse
 } from './types'
+import { validateGeographyDetails } from './validators'
 
 const checkGeographyAuthorApiAccess = (validator: AccessTokenScopeValidator<GeographyAuthorApiAccessTokenScopes>) =>
   checkAccess(validator)
@@ -125,12 +125,7 @@ function api(app: express.Express): express.Express {
       const geography = req.body
 
       try {
-        const details = geographyValidationDetails(geography)
-        if (details) {
-          throw new ValidationError(JSON.stringify(details))
-        }
-
-        const recorded_geography = await db.writeGeography(geography)
+        const recorded_geography = await db.writeGeography(validateGeographyDetails(geography))
         return res.status(201).send({ version: res.locals.version, data: { geography: recorded_geography } })
       } catch (error) {
         logger.error('POST /geographies failed', error.stack)
@@ -157,11 +152,7 @@ function api(app: express.Express): express.Express {
     ) => {
       const geography = req.body
       try {
-        const details = geographyValidationDetails(geography)
-        if (details) {
-          throw new ValidationError(JSON.stringify(details))
-        }
-        await db.editGeography(geography)
+        await db.editGeography(validateGeographyDetails(geography))
         return res.status(201).send({ version: res.locals.version, data: { geography } })
       } catch (error) {
         logger.error('failed to edit geography', error.stack)

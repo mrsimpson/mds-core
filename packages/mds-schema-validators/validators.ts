@@ -34,7 +34,7 @@ import {
   VEHICLE_TYPES
 } from '@mds-core/mds-types'
 import { areThereCommonElements, ValidationError } from '@mds-core/mds-utils'
-import * as Joi from 'joi'
+import Joi from 'joi'
 
 export { ValidationError }
 

@@ -443,6 +443,7 @@ importers:
       '@mds-core/mds-api-server': workspace:0.3.3
       '@mds-core/mds-attachment-service': workspace:0.1.12
       '@mds-core/mds-db': workspace:0.4.1
+      '@mds-core/mds-ingest-service': 0.4.3
       '@mds-core/mds-logger': workspace:0.2.4
       '@mds-core/mds-providers': workspace:0.1.36
       '@mds-core/mds-schema-validators': workspace:0.3.3
@@ -463,6 +464,7 @@ importers:
       '@mds-core/mds-api-server': link:../mds-api-server
       '@mds-core/mds-attachment-service': link:../mds-attachment-service
       '@mds-core/mds-db': link:../mds-db
+      '@mds-core/mds-ingest-service': link:../mds-ingest-service
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
@@ -666,7 +668,6 @@ importers:
       '@mds-core/mds-stream': workspace:0.1.38
       '@mds-core/mds-types': workspace:0.5.1
       '@mds-core/mds-utils': workspace:0.2.1
-      joi: 17.4.0
       typeorm: 0.2.34
     dependencies:
       '@mds-core/mds-db': link:../mds-db
@@ -680,7 +681,6 @@ importers:
       '@mds-core/mds-stream': link:../mds-stream
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
-      joi: 17.4.0
       typeorm: 0.2.34
 
   packages/mds-db:
@@ -775,6 +775,7 @@ importers:
       '@mds-core/mds-service-helpers': workspace:0.3.5
       '@mds-core/mds-types': workspace:0.5.1
       '@mds-core/mds-utils': workspace:0.2.1
+      ajv: 8.6.1
       geojson-validation: 1.0.2
       joi: 17.4.0
       typeorm: 0.2.34
@@ -786,6 +787,7 @@ importers:
       '@mds-core/mds-service-helpers': link:../mds-service-helpers
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
+      ajv: 8.6.1
       geojson-validation: 1.0.2
       joi: 17.4.0
       typeorm: 0.2.34
@@ -1043,7 +1045,9 @@ importers:
       '@mds-core/mds-types': workspace:0.5.1
       '@mds-core/mds-utils': workspace:0.2.1
       ajv: 8.6.1
+      ajv-errors: 3.0.0
       ajv-formats: 2.1.0
+      ajv-keywords: 5.0.0
       joi: 17.4.0
       joi-to-json: 1.3.1
     dependencies:
@@ -1053,7 +1057,9 @@ importers:
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
       ajv: 8.6.1
+      ajv-errors: 3.0.0_ajv@8.6.1
       ajv-formats: 2.1.0
+      ajv-keywords: 5.0.0_ajv@8.6.1
       joi: 17.4.0
       joi-to-json: 1.3.1
 
@@ -1788,11 +1794,11 @@ packages:
     dev: true
 
   /@hapi/hoek/9.2.0:
-    resolution: {integrity: sha512-sqKVVVOe5ivCaXDWivIJYVSaEgdQK9ul7a4Kity5Iw7u9+wBAPbX1RMSnLLmp7O4Vzj0WOWwMAJsTL00xwaNug==}
+    resolution: {integrity: sha1-85M6RONlhk9NrV25QVgQbVEegTE=}
     dev: false
 
   /@hapi/topo/5.1.0:
-    resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
+    resolution: {integrity: sha1-3ESOMyxsbjek3AL9hLqNRLmvsBI=}
     dependencies:
       '@hapi/hoek': 9.2.0
     dev: false
@@ -2103,17 +2109,17 @@ packages:
     dev: true
 
   /@sideway/address/4.1.2:
-    resolution: {integrity: sha512-idTz8ibqWFrPU8kMirL0CoPH/A29XOzzAzpyN3zQ4kAWnzmNfFmRaoMNN6VI8ske5M73HZyhIaW4OuSFIdM4oA==}
+    resolution: {integrity: sha1-gRuEMzozVznTlpz8Q0c2JoFwytE=}
     dependencies:
       '@hapi/hoek': 9.2.0
     dev: false
 
   /@sideway/formula/3.0.0:
-    resolution: {integrity: sha512-vHe7wZ4NOXVfkoRb8T5otiENVlT7a3IAiw7H5M2+GO+9CDgcVUUsX1zalAztCmwyOr2RUTGJdgB+ZvSVqmdHmg==}
+    resolution: {integrity: sha1-/hWK7jLmvV3oUES+YVvAhHigoTw=}
     dev: false
 
   /@sideway/pinpoint/2.0.0:
-    resolution: {integrity: sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==}
+    resolution: {integrity: sha1-z/j/rcNyrSn9P3gneusp5jLMcN8=}
     dev: false
 
   /@sindresorhus/is/0.14.0:
@@ -2945,6 +2951,14 @@ packages:
       indent-string: 4.0.0
     dev: true
 
+  /ajv-errors/3.0.0_ajv@8.6.1:
+    resolution: {integrity: sha1-5U8pnzo9MP4UQWHl8NjVEZbFJ7w=}
+    peerDependencies:
+      ajv: ^8.0.1
+    dependencies:
+      ajv: 8.6.1
+    dev: false
+
   /ajv-formats/2.1.0:
     resolution: {integrity: sha512-USH2jBb+C/hIpwD2iRjp0pe0k+MvzG0mlSn/FIdCgQhUb9ALPRjt2KIQdfZDS9r0ZIeUAg7gOu9KL0PFqGqr5Q==}
     peerDependenciesMeta:
@@ -2962,6 +2976,15 @@ packages:
       ajv: 6.12.6
     dev: true
 
+  /ajv-keywords/5.0.0_ajv@8.6.1:
+    resolution: {integrity: sha1-0Bs7IXFbL2PQKqURuC/G6zswCDw=}
+    peerDependencies:
+      ajv: ^8.0.0
+    dependencies:
+      ajv: 8.6.1
+      fast-deep-equal: 3.1.3
+    dev: false
+
   /ajv/6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
     dependencies:
@@ -2972,7 +2995,7 @@ packages:
     dev: true
 
   /ajv/8.6.1:
-    resolution: {integrity: sha512-42VLtQUOLefAvKFAQIxIZDaThq6om/PrfP0CYk3/vn+y4BMNkKnbli8ON2QCiHov4KkzOSJ/xSoBJdayiiYvVQ==}
+    resolution: {integrity: sha1-rmV2S/Ht3ozYYSgc2lBXhSNkopU=}
     dependencies:
       fast-deep-equal: 3.1.3
       json-schema-traverse: 1.0.0
@@ -5378,6 +5401,7 @@ packages:
     resolution: {integrity: sha1-ilJveLj99GI7cJ4Ll1xSwkwC/Ro=}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -6762,14 +6786,14 @@ packages:
     dev: false
 
   /joi-to-json/1.3.1:
-    resolution: {integrity: sha512-rqpCDU9uzpVtqfzVqtU/8+fUeHCOsUVcayjTb5z/a3y2BeySGqEqiNLQmp+HqpQD3jAn/ckunbiXmaivxg4/DA==}
+    resolution: {integrity: sha1-8dx2kdAqmK6B152QQxiKW1SEol4=}
     dependencies:
       lodash: 4.17.21
       semver-compare: 1.0.0
     dev: false
 
   /joi/17.4.0:
-    resolution: {integrity: sha512-F4WiW2xaV6wc1jxete70Rw4V/VuMd6IN+a5ilZsxG4uYtUXWu2kq9W5P2dz30e7Gmw8RCbY/u/uk+dMPma9tAg==}
+    resolution: {integrity: sha1-tcInfIUZ4BYxbkmrq9QaGQjZ7yA=}
     dependencies:
       '@hapi/hoek': 9.2.0
       '@hapi/topo': 5.1.0
@@ -6865,7 +6889,7 @@ packages:
     dev: true
 
   /json-schema-traverse/1.0.0:
-    resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
+    resolution: {integrity: sha1-rnvLNlard6c7pcSb9lTzjmtoYOI=}
 
   /json-schema/0.2.3:
     resolution: {integrity: sha1-tIDIkuWaLwWVTOcnvT8qTogvnhM=}
@@ -8554,7 +8578,7 @@ packages:
     dev: false
 
   /punycode/2.1.1:
-    resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==}
+    resolution: {integrity: sha1-tYsBCsQMIsVldhbI0sLALHv0eew=}
     engines: {node: '>=6'}
 
   /pupa/2.1.1:
@@ -8852,7 +8876,7 @@ packages:
     engines: {node: '>=0.10.0'}
 
   /require-from-string/2.0.2:
-    resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
+    resolution: {integrity: sha1-iaf92TgmEmcxjq/hT5wy5ZjDaQk=}
     engines: {node: '>=0.10.0'}
 
   /require-main-filename/2.0.0:
@@ -9333,6 +9357,7 @@ packages:
   /source-map/0.2.0:
     resolution: {integrity: sha1-2rc/vPwrqBm03gO9b26qSBZLP50=}
     engines: {node: '>=0.8.0'}
+    requiresBuild: true
     dependencies:
       amdefine: 1.0.1
     dev: true
@@ -10212,6 +10237,7 @@ packages:
     resolution: {integrity: sha1-pr0NKNOPWSw622sYDqbgfh5UCo0=}
     engines: {node: '>=0.8.0'}
     hasBin: true
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -10285,7 +10311,7 @@ packages:
     dev: true
 
   /uri-js/4.4.1:
-    resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
+    resolution: {integrity: sha1-mxpSWVIlhZ5V9mnZKPiMbFfyp34=}
     dependencies:
       punycode: 2.1.1
 

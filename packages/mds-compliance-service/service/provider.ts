@@ -30,8 +30,8 @@ import { ComplianceRepository } from '../repository'
 import { ComplianceViolationPeriodEntityToDomainCreate } from '../repository/mappers'
 import { ComplianceSnapshotStreamKafka } from './stream'
 import {
-  ValidateComplianceSnapshotDomainModel,
-  ValidateGetComplianceSnapshotsByTimeIntervalOptions
+  validateComplianceSnapshotDomainModel,
+  validateGetComplianceSnapshotsByTimeIntervalOptions
 } from './validators'
 
 export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & ProcessController = {
@@ -44,7 +44,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
   createComplianceSnapshot: async complianceSnapshot => {
     try {
       const snapshot = await ComplianceRepository.createComplianceSnapshot(
-        ValidateComplianceSnapshotDomainModel(complianceSnapshot)
+        validateComplianceSnapshotDomainModel(complianceSnapshot)
       )
       const { vehicles_found, ...kafkaSnapshot } = snapshot
       await ComplianceSnapshotStreamKafka.write(kafkaSnapshot)
@@ -58,7 +58,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
   createComplianceSnapshots: async complianceSnapshots => {
     try {
       const snapshots = await ComplianceRepository.createComplianceSnapshots(
-        complianceSnapshots.map(ValidateComplianceSnapshotDomainModel)
+        complianceSnapshots.map(validateComplianceSnapshotDomainModel)
       )
       const kafkaSnapshots = snapshots.map(snapshot => {
         const { vehicles_found, ...kafkaSnapshot } = snapshot
@@ -88,7 +88,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
     try {
       return ServiceResult(
         await ComplianceRepository.getComplianceSnapshotsByTimeInterval(
-          ValidateGetComplianceSnapshotsByTimeIntervalOptions(options)
+          validateGetComplianceSnapshotsByTimeIntervalOptions(options)
         )
       )
     } catch (error) /* istanbul ignore next */ {
