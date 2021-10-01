@@ -11,6 +11,8 @@ if [[ -n "$REGISTRY" ]]; then  # if non-empty
   REGISTRY="$(echo $REGISTRY | sed 's#/$##')/"  # ensure '/' suffix
 fi
 
+: ${ENV:="dev"}  # assign default if not passed in
+
 buildImage() {
   local image=$1
   local tag=$(echo $image | cut -f2 -d":")
@@ -18,7 +20,7 @@ buildImage() {
   if [[ "$tag" != "latest" ]]; then
     image=${image}$(getBranchSuffix)$(getCommitHash)
   fi
-  docker build -t ${REGISTRY}${image} .
+  docker build -t ${REGISTRY}${image} . --build-arg environment=$ENV
   echo ${REGISTRY}${image} >> $BASE_DIR/dist/images.txt
 }
 
