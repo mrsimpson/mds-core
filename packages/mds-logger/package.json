@@ -15,10 +15,12 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap  ts-mocha --project ../../tsconfig.json"
+    "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand"
   },
   "dependencies": {
+    "@types/debug": "4.1.7",
     "@types/pino": "6.3.11",
+    "debug": "4.3.2",
     "express-http-context": "1.2.4",
     "pino": "6.13.2"
   }

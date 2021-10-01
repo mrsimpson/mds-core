@@ -14,59 +14,27 @@
  * limitations under the License.
  */
 
-import httpContext from 'express-http-context'
-import pino, { Logger } from 'pino'
 import { inspect } from 'util'
-
+import { LogLevel } from './@types'
+import { debugLog, logger } from './loggers'
+import { redact } from './redaction'
 // Verify that defaultOptions is available (not available on non-nodejs platforms)
 if (inspect?.defaultOptions) {
   // Set the inspector depth to infinity. To the moooooooon 🚀 🌕
   inspect.defaultOptions.depth = null
 }
 
-const logger: Pick<Logger, 'info' | 'warn' | 'error' | 'debug'> = pino(pino.destination({ sync: false }))
-type LogLevel = keyof typeof logger
-
-const redact = (arg: string | Record<string, unknown> | Error | undefined) => {
-  if (arg === undefined) return {}
-  const res = JSON.stringify(arg instanceof Error ? { error: arg.toString() } : arg, (k, v) =>
-    ['lat', 'lng'].includes(k) ? '[REDACTED]' : v
-  )
-
-  return JSON.parse(res)
-}
-
 const log =
   (level: LogLevel) =>
-  (
-    message: string,
-    data?: Record<string, unknown> | Error
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): { log_message?: string; log_data?: any } => {
-    if (process.env.QUIET === 'true') {
-      return {}
+  (message: string, data?: Record<string, unknown> | Error): void => {
+    if (process.env.QUIET !== 'true') {
+      return data ? logger[level](redact(data), message) : logger[level](message)
     }
-
-    const { log_message, log_data } = { log_message: redact(message), log_data: redact(data) }
-    const log_timestamp = Date.now()
-    const log_ISO_timestamp = new Date(log_timestamp).toISOString()
-    const log_requestId = httpContext.get('x-request-id')
-
-    logger[level]({
-      log_level: level.toUpperCase(),
-      log_ISO_timestamp,
-      log_timestamp,
-      ...(log_requestId ? { log_requestId } : {}),
-      log_message,
-      log_data
-    })
-
-    return { log_message, log_data }
   }
 
 export default {
   log: (level: LogLevel, ...args: Parameters<ReturnType<typeof log>>) => log(level)(...args),
-  debug: log('debug'),
+  debug: debugLog,
   info: log('info'),
   warn: log('warn'),
   error: log('error')
