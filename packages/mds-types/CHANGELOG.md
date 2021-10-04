@@ -1,5 +1,12 @@
 # @mds-core/mds-types
 
+## 0.5.2
+
+### Patch Changes
+
+- c1001aa8: Add DeepPartial type
+- 15b9d729: Upgrade dependencies
+
 ## 0.5.1
 
 ### Patch Changes

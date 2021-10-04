@@ -1,5 +1,35 @@
 # @mds-core/mds-compliance-service
 
+## 0.5.0
+
+### Minor Changes
+
+- 35daef15: Publish to Kafka topic when a compliance snapshot is written.
+- d8b1387e: migrated all validators from Joi to AJV, error output may be slightly different text or shape in some cases
+
+### Patch Changes
+
+- e6add8b3: Allow nulls in end_time. provider_ids, and policy_ids params of mds-compliance-service:getComplianceSnapshotsByTimeInterval.
+- Updated dependencies [c1001aa8]
+- Updated dependencies [f5403ec3]
+- Updated dependencies [c1001aa8]
+- Updated dependencies [6bd0d935]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [d8b1387e]
+- Updated dependencies [15b9d729]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-stream@0.1.39
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-db@0.4.2
+  - @mds-core/mds-schema-validators@0.3.4
+  - @mds-core/mds-repository@0.1.13
+  - @mds-core/mds-rpc-common@0.1.13
+  - @mds-core/mds-service-helpers@0.3.6
+  - @mds-core/mds-utils@0.2.2
+  - @mds-core/mds-policy-service@0.6.1
+  - @mds-core/mds-providers@0.1.37
+
 ## 0.4.1
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @container-images/mds-ingest-service
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies [6bd0d935]
+- Updated dependencies [1300191f]
+- Updated dependencies [54bcb01d]
+- Updated dependencies [15b9d729]
+- Updated dependencies [f535e6ab]
+  - @mds-core/mds-ingest-service@0.4.4
+  - @mds-core/mds-webpack-config@0.1.4
+
 ## 0.0.15
 
 ### Patch Changes

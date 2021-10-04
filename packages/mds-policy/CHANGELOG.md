@@ -1,5 +1,28 @@
 # @mds-core/mds-policy
 
+## 0.5.1
+
+### Patch Changes
+
+- 15b9d729: Upgrade dependencies
+- Updated dependencies [f5403ec3]
+- Updated dependencies [c1001aa8]
+- Updated dependencies [270c1665]
+- Updated dependencies [6bd0d935]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [d8b1387e]
+- Updated dependencies [15b9d729]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-api-server@0.3.4
+  - @mds-core/mds-db@0.4.2
+  - @mds-core/mds-schema-validators@0.3.4
+  - @mds-core/mds-utils@0.2.2
+  - @mds-core/mds-policy-service@0.6.1
+  - @mds-core/mds-api-helpers@0.1.42
+  - @mds-core/mds-providers@0.1.37
+
 ## 0.5.0
 
 ### Minor Changes
