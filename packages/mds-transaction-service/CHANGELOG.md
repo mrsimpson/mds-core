@@ -1,5 +1,28 @@
 # @mds-core/mds-transaction-service
 
+## 0.2.0
+
+### Minor Changes
+
+- d8b1387e: migrated all validators from Joi to AJV, error output may be slightly different text or shape in some cases
+
+### Patch Changes
+
+- 12269845: Add optional trip_id to ComplianceViolationDetails
+- Updated dependencies [f5403ec3]
+- Updated dependencies [c1001aa8]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [d8b1387e]
+- Updated dependencies [15b9d729]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-schema-validators@0.3.4
+  - @mds-core/mds-repository@0.1.13
+  - @mds-core/mds-rpc-common@0.1.13
+  - @mds-core/mds-service-helpers@0.3.6
+  - @mds-core/mds-utils@0.2.2
+
 ## 0.1.12
 
 ### Patch Changes

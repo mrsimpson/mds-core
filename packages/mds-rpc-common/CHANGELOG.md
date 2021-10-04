@@ -1,5 +1,21 @@
 # @mds-core/mds-rpc-common
 
+## 0.1.13
+
+### Patch Changes
+
+- 15b9d729: Upgrade dependencies
+- Updated dependencies [f5403ec3]
+- Updated dependencies [c1001aa8]
+- Updated dependencies [270c1665]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [15b9d729]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-api-server@0.3.4
+  - @mds-core/mds-service-helpers@0.3.6
+
 ## 0.1.12
 
 ### Patch Changes

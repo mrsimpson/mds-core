@@ -1,5 +1,31 @@
 # @mds-core/mds-ingest-service
 
+## 0.4.4
+
+### Patch Changes
+
+- 6bd0d935: Add new Ingest Service method for getting events joined with device and telemetry info
+- 1300191f: adds index to telemetry timestamp column
+- 54bcb01d: optimize last telemetry for device query
+- f535e6ab: Add identity column to device/telemetry streams
+- Updated dependencies [c1001aa8]
+- Updated dependencies [f5403ec3]
+- Updated dependencies [c1001aa8]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [d8b1387e]
+- Updated dependencies [15b9d729]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-stream@0.1.39
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-schema-validators@0.3.4
+  - @mds-core/mds-agency-cache@0.2.8
+  - @mds-core/mds-repository@0.1.13
+  - @mds-core/mds-rpc-common@0.1.13
+  - @mds-core/mds-service-helpers@0.3.6
+  - @mds-core/mds-utils@0.2.2
+  - @mds-core/mds-providers@0.1.37
+
 ## 0.4.3
 
 ### Patch Changes
