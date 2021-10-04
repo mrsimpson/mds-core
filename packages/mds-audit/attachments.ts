@@ -34,6 +34,8 @@ const s3ACL = String(env.ATTACHMENTS_ACL)
 const s3 = new aws.S3()
 const memoryStorage = multer.memoryStorage()
 
+console.log(JSON.stringify(s3))
+
 if (env.ATTACHMENTS_BUCKET) {
   /* eslint-disable-next-line */
   aws.config.getCredentials(async err => {
