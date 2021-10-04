@@ -18,7 +18,7 @@ import logger from '@mds-core/mds-logger'
 import { Device, DeviceID, Recorded, UUID } from '@mds-core/mds-types'
 import { csv, isUUID, NotFoundError, now } from '@mds-core/mds-utils'
 import { QueryResult } from 'pg'
-import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
+import { getReadOnlyClient, getWriteableClient } from './client'
 import schema from './schema'
 import { cols_sql, logSql, MDSPostgresClient, SqlVals, vals_list, vals_sql } from './sql-utils'
 
@@ -148,9 +148,4 @@ export async function wipeDevice(device_id: UUID): Promise<QueryResult> {
   const res = await client.query(sql)
   // this returns a list of objects that represent the commands that just ran
   return res
-}
-
-export async function getVehicleCountsPerProvider(): Promise<{ provider_id: UUID; count: number }[]> {
-  const sql = `select provider_id, count(provider_id) from ${schema.TABLE.devices} group by provider_id`
-  return makeReadOnlyQuery(sql)
 }

@@ -34,6 +34,8 @@ import {
   EventDomainModel,
   GetDevicesOptions,
   GetDevicesResponse,
+  GetEventsWithDeviceAndTelemetryInfoOptions,
+  GetEventsWithDeviceAndTelemetryInfoResponse,
   GetVehicleEventsFilterParams,
   GetVehicleEventsOrderOption,
   GetVehicleEventsResponse,
@@ -55,6 +57,7 @@ import {
   EventDomainToEntityCreate,
   EventEntityToDomain,
   EventEntityToDomainWithIdentityColumn,
+  EventWithDeviceAndTelemetryInfoEntityToDomain,
   MigratedDeviceToEntityCreate,
   MigratedEventToEntityCreate,
   MigratedTelemetryToEntityCreate,
@@ -64,13 +67,14 @@ import {
 } from './mappers'
 import migrations from './migrations'
 import { MigratedEntityModel } from './mixins/migrated-entity'
+import views from './views'
+import { EventWithDeviceAndTelemetryInfoEntity } from './views/event-with-device-and-telemetry-info'
 
-type GetDeviceQueryParams = GetDevicesOptions & Cursor
-type VehicleEventsQueryParams = GetVehicleEventsFilterParams & Cursor
+type WithCursorOptions<P extends object> = P & Cursor
 
 class IngestReadWriteRepository extends ReadWriteRepository {
   constructor() {
-    super('ingest', { entities, migrations })
+    super('ingest', { entities: [...entities, ...views], migrations })
   }
 
   public createEvents = async (events: EventDomainCreateModel[]) => {
@@ -155,10 +159,10 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     }
   }
 
-  private buildGetDevicesCursor = (params: GetDeviceQueryParams) =>
-    Buffer.from(JSON.stringify(params), 'utf-8').toString('base64')
+  private buildCursor = <T extends {}>(options: WithCursorOptions<T>) =>
+    Buffer.from(JSON.stringify(options), 'utf-8').toString('base64')
 
-  private parseGetDevicesCursor = (cursor: string): GetDeviceQueryParams => {
+  private parseCursor = <T extends {}>(cursor: string): WithCursorOptions<T> => {
     try {
       return JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'))
     } catch (error) {
@@ -170,7 +174,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     limit = 100,
     beforeCursor,
     afterCursor
-  }: GetDeviceQueryParams): Promise<GetDevicesResponse> => {
+  }: WithCursorOptions<GetDevicesOptions>): Promise<GetDevicesResponse> => {
     try {
       const connection = await this.connect('ro')
       const query = connection.createQueryBuilder(DeviceEntity, 'device')
@@ -197,10 +201,10 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         cursor: {
           next:
             nextAfterCursor &&
-            this.buildGetDevicesCursor({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor }),
+            this.buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor }),
           prev:
             nextBeforeCursor &&
-            this.buildGetDevicesCursor({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null })
+            this.buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null })
         }
       }
     } catch (error) {
@@ -212,9 +216,11 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     this.getDevicesQuery({ ...options, beforeCursor: null, afterCursor: null })
 
   public getDevicesUsingCursor = async (cursor: string): Promise<GetDevicesResponse> =>
-    this.getDevicesQuery(this.parseGetDevicesCursor(cursor))
+    this.getDevicesQuery(this.parseCursor<GetDevicesOptions>(cursor))
 
-  private getEvents = async (params: VehicleEventsQueryParams): Promise<GetVehicleEventsResponse> => {
+  private getEvents = async (
+    params: WithCursorOptions<GetVehicleEventsFilterParams>
+  ): Promise<GetVehicleEventsResponse> => {
     const { connect } = this
     const {
       time_range,
@@ -338,23 +344,24 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       return {
         events: data.map(EventEntityToDomain.mapper()),
         cursor: {
-          next: nextAfterCursor && this.buildCursor({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor }),
-          prev: nextBeforeCursor && this.buildCursor({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null })
+          next:
+            nextAfterCursor &&
+            this.buildCursor<GetVehicleEventsFilterParams>({
+              ...cursor,
+              beforeCursor: null,
+              afterCursor: nextAfterCursor
+            }),
+          prev:
+            nextBeforeCursor &&
+            this.buildCursor<GetVehicleEventsFilterParams>({
+              ...cursor,
+              beforeCursor: nextBeforeCursor,
+              afterCursor: null
+            })
         }
       }
     } catch (error) {
       throw RepositoryError(error)
-    }
-  }
-
-  private buildCursor = (cursor: VehicleEventsQueryParams) =>
-    Buffer.from(JSON.stringify(cursor), 'utf-8').toString('base64')
-
-  private parseCursor = (cursor: string): VehicleEventsQueryParams & { limit: number } => {
-    try {
-      return JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'))
-    } catch (error) {
-      throw new ValidationError('Invalid cursor', error)
     }
   }
 
@@ -425,7 +432,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     this.getEvents({ ...options, beforeCursor: null, afterCursor: null, limit: options.limit ?? 100 })
 
   public getEventsUsingCursor = async (cursor: string): Promise<GetVehicleEventsResponse> =>
-    this.getEvents(this.parseCursor(cursor))
+    this.getEvents(this.parseCursor<GetVehicleEventsFilterParams>(cursor))
 
   public getTripEvents = async (params: ReadTripEventsQueryParams) => {
     const { skip, take = 100, start_time, end_time, provider_id } = params
@@ -559,6 +566,77 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       throw RepositoryError(error)
     }
   }
+
+  private getEventsWithDeviceAndTelemetryInfo = async ({
+    provider_ids,
+    device_ids,
+    time_range,
+    limit = 100,
+    ...cursor
+  }: WithCursorOptions<GetEventsWithDeviceAndTelemetryInfoOptions>): Promise<GetEventsWithDeviceAndTelemetryInfoResponse> => {
+    try {
+      const connection = await this.connect('ro')
+
+      const query = connection.getRepository(EventWithDeviceAndTelemetryInfoEntity).createQueryBuilder('events')
+
+      if (provider_ids?.length) {
+        query.andWhere('provider_id = ANY(:provider_ids)', { provider_ids })
+      }
+
+      if (device_ids?.length) {
+        query.andWhere('device_id = ANY(:device_ids)', { device_ids })
+      }
+
+      if (time_range?.start) {
+        query.andWhere('timestamp >= :start', time_range)
+      }
+
+      if (time_range?.end) {
+        query.andWhere('timestamp <= :end', time_range)
+      }
+
+      const {
+        data: entities,
+        cursor: { beforeCursor: nextBeforeCursor, afterCursor: nextAfterCursor }
+      } = await buildPaginator({
+        alias: query.alias,
+        entity: EventWithDeviceAndTelemetryInfoEntity,
+        query: {
+          limit,
+          order: 'ASC',
+          afterCursor: cursor.afterCursor ?? undefined,
+          beforeCursor: cursor.beforeCursor ?? undefined
+        },
+        paginationKeys: ['id']
+      }).paginate(query)
+
+      const options = { limit, time_range, provider_ids, device_ids }
+
+      return {
+        events: entities.map(EventWithDeviceAndTelemetryInfoEntityToDomain.mapper()),
+        cursor: {
+          next:
+            nextAfterCursor &&
+            this.buildCursor<GetDevicesOptions>({ ...options, beforeCursor: null, afterCursor: nextAfterCursor }),
+          prev:
+            nextBeforeCursor &&
+            this.buildCursor<GetDevicesOptions>({ ...options, beforeCursor: nextBeforeCursor, afterCursor: null })
+        }
+      }
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public getEventsWithDeviceAndTelemetryInfoUsingOptions = async (
+    options: GetEventsWithDeviceAndTelemetryInfoOptions
+  ): Promise<GetEventsWithDeviceAndTelemetryInfoResponse> =>
+    this.getEventsWithDeviceAndTelemetryInfo({ ...options, beforeCursor: null, afterCursor: null })
+
+  public getEventsWithDeviceAndTelemetryInfoUsingCursor = async (
+    cursor: string
+  ): Promise<GetEventsWithDeviceAndTelemetryInfoResponse> =>
+    this.getEventsWithDeviceAndTelemetryInfo(this.parseCursor<GetEventsWithDeviceAndTelemetryInfoOptions>(cursor))
 
   /**
    * Nukes everything from orbit. Boom.

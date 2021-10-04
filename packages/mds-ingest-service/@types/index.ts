@@ -34,17 +34,20 @@ import {
 } from '@mds-core/mds-types'
 import { MigratedEntityModel } from '../repository/mixins/migrated-entity'
 
-export interface GetDevicesOptions {
-  limit?: number
-}
-
-export type GetDevicesResponse = {
-  devices: DeviceDomainModel[]
+type ResponseWithCursor<T extends {}> = T & {
   cursor: {
     prev: Nullable<string>
     next: Nullable<string>
   }
 }
+
+export interface GetDevicesOptions {
+  limit?: number
+}
+
+export type GetDevicesResponse = ResponseWithCursor<{
+  devices: DeviceDomainModel[]
+}>
 
 export interface DeviceDomainModel extends RecordedColumn {
   device_id: UUID
@@ -113,13 +116,9 @@ export interface GetVehicleEventsFilterParams {
   order?: GetVehicleEventsOrderOption
 }
 
-export type GetVehicleEventsResponse = {
+export type GetVehicleEventsResponse = ResponseWithCursor<{
   events: EventDomainModel[]
-  cursor: {
-    prev: Nullable<string>
-    next: Nullable<string>
-  }
-}
+}>
 
 export interface ReadTripEventsQueryParams {
   skip?: UUID
@@ -199,6 +198,22 @@ export type EventAnnotationDomainCreateModel = DomainModelCreate<
   Omit<EventAnnotationDomainModel, keyof RecordedColumn>
 > & { events_row_id: number }
 
+export type GetEventsWithDeviceAndTelemetryInfoOptions = Partial<{
+  limit: number
+  time_range: Partial<TimeRange>
+  provider_ids: UUID[]
+  device_ids: UUID[]
+}>
+
+export type EventWithDeviceAndTelemetryInfoDomainModel = Omit<EventDomainModel, 'annotation'> & {
+  device: DeviceDomainModel
+  telemetry: TelemetryDomainModel
+}
+
+export type GetEventsWithDeviceAndTelemetryInfoResponse = ResponseWithCursor<{
+  events: EventWithDeviceAndTelemetryInfoDomainModel[]
+}>
+
 export interface IngestService {
   getDevicesUsingOptions: (options: GetDevicesOptions) => GetDevicesResponse
   getDevicesUsingCursor: (cursor: string) => GetDevicesResponse
@@ -208,6 +223,10 @@ export interface IngestService {
   getLatestTelemetryForDevices: (device_ids: UUID[]) => TelemetryDomainModel[]
   writeEventAnnotations: (params: EventAnnotationDomainCreateModel[]) => EventAnnotationDomainModel[]
   getTripEvents: (params: ReadTripEventsQueryParams) => Record<UUID, EventDomainModel[]>
+  getEventsWithDeviceAndTelemetryInfoUsingOptions: (
+    options?: GetEventsWithDeviceAndTelemetryInfoOptions
+  ) => GetEventsWithDeviceAndTelemetryInfoResponse
+  getEventsWithDeviceAndTelemetryInfoUsingCursor: (cursor: string) => GetEventsWithDeviceAndTelemetryInfoResponse
 }
 
 export interface IngestMigrationService {
@@ -230,5 +249,9 @@ export const IngestServiceDefinition: RpcServiceDefinition<IngestService & Inges
   writeMigratedDevice: RpcRoute<IngestMigrationService['writeMigratedDevice']>(),
   writeMigratedVehicleEvent: RpcRoute<IngestMigrationService['writeMigratedVehicleEvent']>(),
   writeMigratedTelemetry: RpcRoute<IngestMigrationService['writeMigratedTelemetry']>(),
-  getTripEvents: RpcRoute<IngestService['getTripEvents']>()
+  getTripEvents: RpcRoute<IngestService['getTripEvents']>(),
+  getEventsWithDeviceAndTelemetryInfoUsingOptions:
+    RpcRoute<IngestService['getEventsWithDeviceAndTelemetryInfoUsingOptions']>(),
+  getEventsWithDeviceAndTelemetryInfoUsingCursor:
+    RpcRoute<IngestService['getEventsWithDeviceAndTelemetryInfoUsingCursor']>()
 }

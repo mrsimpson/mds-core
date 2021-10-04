@@ -32,6 +32,8 @@ import { DropServiceAreaIdColumn1627680668538 } from './1627680668538-DropServic
 import { SetEventAnnotationsEventsRowIdColumnNotNull1630418242374 } from './1630418242374-SetEventAnnotationsEventsRowIdColumnNotNull'
 import { IncreaseMigratedFromSourceColumnLength1631275864436 } from './1631275864436-IncreaseMigratedFromSourceColumnLength'
 import { AddTelemetryTimestampIndex1632938124126 } from './1632938124126-AddTelemetryTimestampIndex'
+import { CreateTypeormMetadataTable1633181195937 } from './1633181195937-CreateTypeormMetadataTable'
+import { CreateEventsWithDeviceAndTelemetryInfoView1633182766754 } from './1633182766754-CreateEventsWithDeviceAndTelemetryInfoView'
 
 export default [
   CreateDevicesTable1603212409274,
@@ -51,5 +53,7 @@ export default [
   DropServiceAreaIdColumn1627680668538,
   SetEventAnnotationsEventsRowIdColumnNotNull1630418242374,
   IncreaseMigratedFromSourceColumnLength1631275864436,
-  AddTelemetryTimestampIndex1632938124126
+  AddTelemetryTimestampIndex1632938124126,
+  CreateTypeormMetadataTable1633181195937,
+  CreateEventsWithDeviceAndTelemetryInfoView1633182766754
 ]
