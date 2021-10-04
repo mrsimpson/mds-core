@@ -1,5 +1,29 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.13
+
+### Patch Changes
+
+- 125adc4b: Enable the migration processor cache initialization with an environment variable. By default, it will not run.
+- 15b9d729: Upgrade dependencies
+- Updated dependencies [f5403ec3]
+- Updated dependencies [c1001aa8]
+- Updated dependencies [6bd0d935]
+- Updated dependencies [1300191f]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [15b9d729]
+- Updated dependencies [54bcb01d]
+- Updated dependencies [15b9d729]
+- Updated dependencies [f535e6ab]
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-ingest-service@0.4.4
+  - @mds-core/mds-agency-cache@0.2.8
+  - @mds-core/mds-repository@0.1.13
+  - @mds-core/mds-service-helpers@0.3.6
+  - @mds-core/mds-utils@0.2.2
+  - @mds-core/mds-stream-processor@0.2.9
+
 ## 0.0.12
 
 ### Patch Changes

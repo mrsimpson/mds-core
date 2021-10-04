@@ -16,7 +16,7 @@
 
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import { Nullable, Timestamp, UUID } from '@mds-core/mds-types'
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 import { MigratedEntity } from '../mixins/migrated-entity'
 @Entity('telemetry')
 export class TelemetryEntity extends MigratedEntity(IdentityColumn(RecordedColumn(class {}))) {
@@ -27,6 +27,7 @@ export class TelemetryEntity extends MigratedEntity(IdentityColumn(RecordedColum
   provider_id: UUID
 
   @Column('bigint', { transformer: BigintTransformer, primary: true })
+  @Index()
   timestamp: Timestamp
 
   @Column('double precision')

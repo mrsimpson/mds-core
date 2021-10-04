@@ -20,9 +20,17 @@ import db from '@mds-core/mds-db'
 import { validateDeviceDomainModel } from '@mds-core/mds-ingest-service'
 import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers'
-import { validateTripMetadata } from '@mds-core/mds-schema-validators'
+import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import stream from '@mds-core/mds-stream'
-import { UUID, VEHICLE_STATE } from '@mds-core/mds-types'
+import {
+  ACCESSIBILITY_OPTIONS,
+  PAYMENT_METHODS,
+  RESERVATION_METHODS,
+  RESERVATION_TYPES,
+  TripMetadata,
+  UUID,
+  VEHICLE_STATE
+} from '@mds-core/mds-types'
 import { now, ServerError, ValidationError } from '@mds-core/mds-utils'
 import urls from 'url'
 import {
@@ -206,6 +214,45 @@ export const updateVehicle = async (req: AgencyApiUpdateVehicleRequest, res: Age
     await updateVehicleFail(req, res, provider_id, device_id, 'not found')
   }
 }
+
+const uuidSchema = { type: 'string', format: 'uuid' }
+const numberSchema = { type: 'number' }
+const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
+
+export const { validate: validateTripMetadata, isValid: isValidateTripMetadata } = SchemaValidator<TripMetadata>({
+  $id: 'TripMetadata',
+  type: 'object',
+  properties: {
+    trip_id: uuidSchema,
+    provider_id: uuidSchema,
+    requested_trip_start_location: {
+      type: 'object',
+      properties: { lng: numberSchema, lat: numberSchema },
+      required: ['lat', 'lng']
+    },
+    reservation_time: timestampSchema,
+    reservation_method: { type: 'string', enum: RESERVATION_METHODS },
+    reservation_type: { type: 'string', enum: RESERVATION_TYPES },
+    quoted_trip_start_time: timestampSchema,
+    dispatch_time: timestampSchema,
+    trip_start_time: timestampSchema,
+    trip_end_time: timestampSchema,
+    cancellation_reason: { type: 'string' },
+    accessibility_options: { type: 'array', items: { type: 'string', enum: ACCESSIBILITY_OPTIONS } },
+    distance: numberSchema,
+    fare: {
+      type: 'object',
+      properties: {
+        quoted_cost: numberSchema,
+        actual_cost: numberSchema,
+        components: { type: 'object' },
+        currency: { type: 'string' },
+        payment_methods: { type: 'array', items: { type: 'string', enum: PAYMENT_METHODS } }
+      }
+    }
+  },
+  required: ['trip_id', 'provider_id']
+})
 
 /* Experimental Handler */
 export const writeTripMetadata = async (

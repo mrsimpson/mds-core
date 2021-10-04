@@ -61,6 +61,22 @@ describe('Geography Service Tests', () => {
       expect(geographies).toHaveLength(2)
     })
 
+    it('Write Invalid Geographies - throws errors', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const badGeoJSON: any = {
+        geography_id,
+        publish_date: now(),
+        geography_json: { type: 'FeatureCollection', features: [{ funky: 'business' }] }
+      }
+
+      await expect(
+        GeographyServiceClient.writeGeographies([
+          badGeoJSON,
+          { geography_id: uuid(), geography_json: { type: 'FeatureCollection', features: [] } }
+        ])
+      ).rejects.toMatchObject({ type: 'ValidationError' })
+    })
+
     it('Write Geographies Metadata', async () => {
       const metadata = await GeographyServiceClient.writeGeographiesMetadata([
         {

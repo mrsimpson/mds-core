@@ -209,16 +209,6 @@ if (pg_info.database) {
         await shutdownDB()
       })
 
-      it('can get vehicle counts by provider', async () => {
-        const result = await MDSDBPostgres.getVehicleCountsPerProvider()
-        assert.deepEqual(result[0].count, 10)
-      })
-
-      it('.getVehicleCountsPerProvider', async () => {
-        const result = await MDSDBPostgres.getVehicleCountsPerProvider()
-        assert.deepEqual(result[0].count, 10)
-      })
-
       it('.health', async () => {
         const result = await MDSDBPostgres.health()
         assert(result.using === 'postgres')

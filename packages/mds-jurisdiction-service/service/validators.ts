@@ -14,31 +14,22 @@
  * limitations under the License.
  */
 
-import {
-  SchemaBuilder,
-  stringSchema,
-  timestampSchema,
-  uuidSchema,
-  ValidateSchema,
-  ValidationError
-} from '@mds-core/mds-schema-validators'
+import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import { CreateJurisdictionDomainModel } from '../@types'
 
-const createJurisdictionDomainModelSchema = SchemaBuilder.object().keys({
-  jurisdiction_id: uuidSchema.optional(),
-  agency_key: stringSchema,
-  agency_name: stringSchema,
-  geography_id: uuidSchema,
-  timestamp: timestampSchema.optional()
-})
+const uuidSchema = { type: 'string', format: 'uuid' }
+const stringSchema = { type: 'string', transform: ['trim'], minLength: 1 }
+const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
 
-export const ValidateJurisdictionForCreate = (
-  jurisdiction: CreateJurisdictionDomainModel
-): CreateJurisdictionDomainModel => {
-  try {
-    ValidateSchema<CreateJurisdictionDomainModel>(jurisdiction, createJurisdictionDomainModelSchema)
-    return jurisdiction
-  } catch (error) {
-    throw new ValidationError('Invalid Jurisdiction', { jurisdiction, error })
-  }
-}
+export const { validate: ValidateJurisdictionForCreate } = SchemaValidator<CreateJurisdictionDomainModel>({
+  $id: 'Jurisdiction',
+  type: 'object',
+  properties: {
+    jurisdiction_id: { ...uuidSchema, nullable: true, default: null },
+    agency_key: stringSchema,
+    agency_name: stringSchema,
+    geography_id: uuidSchema,
+    timestamp: { ...timestampSchema, nullable: true, default: null }
+  },
+  required: ['agency_key', 'agency_name', 'geography_id']
+})

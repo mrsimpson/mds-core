@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-import { schemaValidator } from '@mds-core/mds-schema-validators'
-import Joi from 'joi'
+import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import { AttachmentDomainModel } from '../@types'
 
+const uuidSchema = { type: 'string', format: 'uuid' }
+
 export const { validate: validateAttachmentDomainModel, isValid: isValidAttachmentDomainModel } =
-  schemaValidator<AttachmentDomainModel>(
-    Joi.object<AttachmentDomainModel>()
-      .keys({
-        attachment_id: Joi.string().uuid().required(),
-        attachment_filename: Joi.string().required(),
-        base_url: Joi.string().required(),
-        mimetype: Joi.string().required(),
-        thumbnail_filename: Joi.string().allow(null),
-        thumbnail_mimetype: Joi.string().allow(null)
-      })
-      .unknown(false)
-  )
+  SchemaValidator<AttachmentDomainModel>({
+    $id: 'Attachment',
+    type: 'object',
+    properties: {
+      attachment_id: uuidSchema,
+      attachment_filename: { type: 'string' },
+      base_url: { type: 'string' },
+      mimetype: { type: 'string' },
+      thumbnail_filename: { type: 'string', nullable: true, default: null },
+      thumbnail_mimetype: { type: 'string', nullable: true, default: null }
+    },
+    required: ['attachment_id', 'attachment_filename', 'base_url', 'mimetype']
+  })

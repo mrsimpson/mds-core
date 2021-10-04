@@ -31,6 +31,7 @@ import {
   EventAnnotationDomainCreateModel,
   EventDomainModel,
   GetDevicesOptions,
+  GetEventsWithDeviceAndTelemetryInfoOptions,
   GetVehicleEventsFilterParams,
   GetVehicleEventsOrderColumn,
   GetVehicleEventsOrderDirection,
@@ -242,3 +243,24 @@ export const { validate: validateEventAnnotationDomainCreateModels } = SchemaVal
     ]
   }
 })
+
+export const { validate: validateGetEventsWithDeviceAndTelemetryInfoOptions } =
+  SchemaValidator<GetEventsWithDeviceAndTelemetryInfoOptions>({
+    type: 'object',
+    properties: {
+      provider_ids: { type: 'array', items: uuidSchema, minItems: 1 },
+      device_ids: { type: 'array', items: uuidSchema, minItems: 1 },
+      time_range: {
+        type: 'object',
+        properties: {
+          start: timestampSchema,
+          end: timestampSchema
+        },
+        additionalProperties: false,
+        required: []
+      },
+      limit: { type: 'integer', minimum: 1 }
+    },
+    additionalProperties: false,
+    required: []
+  })

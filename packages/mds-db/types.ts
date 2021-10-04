@@ -72,11 +72,6 @@ export interface ReadEventsQueryParams {
   trip_id?: UUID
 }
 
-export interface ReadHistoricalEventsQueryParams {
-  provider_id?: UUID
-  end_date: number
-}
-
 export type ReadAuditsQueryParams = Partial<{
   skip: number
   take: number

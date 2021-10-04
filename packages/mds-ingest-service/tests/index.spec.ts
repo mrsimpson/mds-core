@@ -691,6 +691,69 @@ describe('Ingest Service Tests', () => {
     })
   })
 
+  describe('getLatestTelemetryForDevices', () => {
+    const TEST_TELEMETRY_A = [TEST_TELEMETRY_A1, TEST_TELEMETRY_A2]
+    const TEST_TELEMETRY_B = [TEST_TELEMETRY_B1, TEST_TELEMETRY_B2]
+
+    beforeEach(async () => {
+      await IngestRepository.createTelemetries([...TEST_TELEMETRY_A, ...TEST_TELEMETRY_B])
+    })
+
+    it('loads last telemetries per device', async () => {
+      const device_ids = [DEVICE_UUID_A, DEVICE_UUID_B]
+      const telemetries = await IngestServiceClient.getLatestTelemetryForDevices(device_ids)
+      expect(telemetries).toHaveLength(device_ids.length)
+      const [timestampA, timestampB] = telemetries.map(({ timestamp }) => timestamp)
+      expect(timestampA).toStrictEqual(Math.max(...TEST_TELEMETRY_A.map(({ timestamp }) => timestamp)))
+      expect(timestampB).toStrictEqual(Math.max(...TEST_TELEMETRY_B.map(({ timestamp }) => timestamp)))
+    })
+  })
+
+  describe('getEventsWithDeviceAndTelemetryInfo', () => {
+    beforeEach(async () => {
+      await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B])
+      await IngestRepository.createEvents([TEST_EVENT_A1, TEST_EVENT_B1])
+      await IngestRepository.createEvents([TEST_EVENT_A2, TEST_EVENT_B2])
+      await IngestRepository.createTelemetries([TEST_TELEMETRY_A1, TEST_TELEMETRY_B1])
+      await IngestRepository.createTelemetries([TEST_TELEMETRY_A2, TEST_TELEMETRY_B2])
+    })
+
+    it('invalid options throws validation error', async () => {
+      await expect(
+        IngestServiceClient.getEventsWithDeviceAndTelemetryInfoUsingOptions({ limit: 0 })
+      ).rejects.toMatchObject({
+        type: 'ValidationError'
+      })
+    })
+
+    it('fetches first/next page', async () => {
+      // First page
+      const {
+        events,
+        cursor: { prev: firstPrev, next: firstNext }
+      } = await IngestServiceClient.getEventsWithDeviceAndTelemetryInfoUsingOptions({
+        limit: 1,
+        device_ids: [DEVICE_UUID_A]
+      })
+
+      expect(events.length).toEqual(1)
+      expect(firstPrev).toBeNull()
+      expect(firstNext).not.toBeNull()
+
+      // Use cursor for next page
+      if (firstNext) {
+        const {
+          events: nextEvents,
+          cursor: { prev: nextPrev, next: nextNext }
+        } = await IngestServiceClient.getEventsWithDeviceAndTelemetryInfoUsingCursor(firstNext)
+
+        expect(nextEvents.length).toEqual(1)
+        expect(nextPrev).not.toBeNull()
+        expect(nextNext).toBeNull()
+      }
+    })
+  })
+
   afterAll(async () => {
     await IngestRepository.shutdown()
     await IngestServer.stop()

@@ -69,7 +69,6 @@ const DEVICE_UUID = 'ec551174-f324-4251-bfed-28d9f3f473fc'
 const TRIP_UUID = '1f981864-cc17-40cf-aea3-70fd985e2ea7'
 const TEST_TELEMETRY = {
   device_id: DEVICE_UUID,
-  provider_id: TEST1_PROVIDER_ID,
   gps: {
     lat: 37.3382,
     lng: -121.8863,
@@ -1823,8 +1822,7 @@ describe('Tests TripMetadata', async () => {
         .send(subsetMetadata)
         .expect(400)
 
-      test.string(result.body.error.reason).is('invalid_value')
-      test.string(result.body.error.info.details).contains(`value.${key} is required`)
+      test.string(result.body.error.reason).is(` must have required property '${key}'`)
     })
   }
 })
