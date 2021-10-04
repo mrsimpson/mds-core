@@ -21,13 +21,13 @@
     "@mds-core/mds-logger": "workspace:0.2.4",
     "@mds-core/mds-types": "workspace:0.5.1",
     "@mds-core/mds-utils": "workspace:0.2.1",
-    "@types/bluebird": "3.5.35",
-    "@types/redis": "2.8.30",
+    "@types/bluebird": "3.5.36",
+    "@types/redis": "2.8.32",
     "bluebird": "3.7.2",
     "flat": "5.0.2",
     "kafkajs": "1.15.0",
-    "nats": "2.1.0",
+    "nats": "2.2.0",
     "redis": "3.1.2",
-    "sinon": "11.1.1"
+    "sinon": "11.1.2"
   }
 }

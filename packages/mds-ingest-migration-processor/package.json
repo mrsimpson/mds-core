@@ -28,6 +28,6 @@
     "@mds-core/mds-stream-processor": "workspace:0.2.8",
     "@mds-core/mds-types": "workspace:0.5.1",
     "@mds-core/mds-utils": "workspace:0.2.1",
-    "envalid": "7.1.0"
+    "envalid": "7.2.1"
   }
 }

@@ -23,9 +23,9 @@
     "@mds-core/mds-schema-validators": "workspace:0.3.3",
     "@mds-core/mds-types": "workspace:0.5.1",
     "@mds-core/mds-utils": "workspace:0.2.1",
-    "@types/flat": "5.0.1",
-    "@types/ioredis": "4.26.4",
+    "@types/flat": "5.0.2",
+    "@types/ioredis": "4.27.6",
     "flat": "5.0.2",
-    "ioredis": "4.27.6"
+    "ioredis": "4.27.10"
   }
 }

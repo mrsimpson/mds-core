@@ -17,6 +17,6 @@
     "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap ts-mocha --project ../../tsconfig.json"
   },
   "dependencies": {
-    "@types/geojson": "7946.0.7"
+    "@types/geojson": "7946.0.8"
   }
 }

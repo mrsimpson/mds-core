@@ -33,13 +33,13 @@
     "@mds-core/mds-service-helpers": "workspace:0.3.5",
     "@mds-core/mds-types": "workspace:0.5.1",
     "@mds-core/mds-utils": "workspace:0.2.1",
-    "@types/express": "4.17.12",
-    "@types/multer": "1.4.6",
-    "@types/sharp": "0.28.3",
-    "aws-sdk": "2.939.0",
+    "@types/express": "4.17.13",
+    "@types/multer": "1.4.7",
+    "@types/sharp": "0.29.2",
+    "aws-sdk": "2.999.0",
     "express": "4.17.1",
-    "multer": "1.4.2",
-    "sharp": "0.28.3"
+    "multer": "1.4.3",
+    "sharp": "0.29.1"
   },
   "devDependencies": {
     "@mds-core/mds-test-data": "workspace:0.3.1"

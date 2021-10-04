@@ -20,8 +20,8 @@
     "@mds-core/mds-test-data": "workspace:0.3.1",
     "@mds-core/mds-types": "workspace:0.5.1",
     "@mds-core/mds-utils": "workspace:0.2.1",
-    "@types/express": "4.17.12",
-    "@types/jsonwebtoken": "8.5.3",
+    "@types/express": "4.17.13",
+    "@types/jsonwebtoken": "8.5.5",
     "express": "4.17.1",
     "jsonwebtoken": "8.5.1"
   },

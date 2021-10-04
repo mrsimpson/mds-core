@@ -20,9 +20,9 @@
   "dependencies": {
     "@mds-core/mds-logger": "workspace:0.2.4",
     "@mds-core/mds-types": "workspace:0.5.1",
-    "@turf/boolean-point-in-polygon": "6.4.0",
-    "@turf/helpers": "6.4.0",
-    "@types/point-in-polygon": "1.0.0",
+    "@turf/boolean-point-in-polygon": "6.5.0",
+    "@turf/helpers": "6.5.0",
+    "@types/point-in-polygon": "1.1.0",
     "@types/uuid": "8.3.1",
     "circle-to-polygon": "2.2.0",
     "moment-timezone": "0.5.33",

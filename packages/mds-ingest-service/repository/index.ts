@@ -72,15 +72,25 @@ import { EventWithDeviceAndTelemetryInfoEntity } from './views/event-with-device
 
 type WithCursorOptions<P extends object> = P & Cursor
 
+const buildCursor = <T extends {}>(options: WithCursorOptions<T>) =>
+  Buffer.from(JSON.stringify(options), 'utf-8').toString('base64')
+
+const parseCursor = <T extends {}>(cursor: string): WithCursorOptions<T> => {
+  try {
+    return JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'))
+  } catch (error) {
+    throw new ValidationError('Invalid cursor', error)
+  }
+}
+
 class IngestReadWriteRepository extends ReadWriteRepository {
   constructor() {
     super('ingest', { entities: [...entities, ...views], migrations })
   }
 
   public createEvents = async (events: EventDomainCreateModel[]) => {
-    const { connect } = this
     try {
-      const connection = await connect('rw')
+      const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<EventEntity> = await connection
         .getRepository(EventEntity)
         .createQueryBuilder()
@@ -95,9 +105,8 @@ class IngestReadWriteRepository extends ReadWriteRepository {
   }
 
   public createTelemetries = async (events: TelemetryDomainCreateModel[]) => {
-    const { connect } = this
     try {
-      const connection = await connect('rw')
+      const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<TelemetryEntity> = await connection
         .getRepository(TelemetryEntity)
         .createQueryBuilder()
@@ -112,9 +121,8 @@ class IngestReadWriteRepository extends ReadWriteRepository {
   }
 
   public createDevices = async (events: DeviceDomainCreateModel[]) => {
-    const { connect } = this
     try {
-      const connection = await connect('rw')
+      const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<DeviceEntity> = await connection
         .getRepository(DeviceEntity)
         .createQueryBuilder()
@@ -131,9 +139,8 @@ class IngestReadWriteRepository extends ReadWriteRepository {
   public createEventAnnotations = async (
     eventAnnotations: EventAnnotationDomainCreateModel[]
   ): Promise<EventAnnotationDomainModel[]> => {
-    const { connect } = this
     try {
-      const connection = await connect('rw')
+      const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<EventAnnotationEntity> = await connection
         .getRepository(EventAnnotationEntity)
         .createQueryBuilder()
@@ -156,17 +163,6 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       return entities.map(DeviceEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
-    }
-  }
-
-  private buildCursor = <T extends {}>(options: WithCursorOptions<T>) =>
-    Buffer.from(JSON.stringify(options), 'utf-8').toString('base64')
-
-  private parseCursor = <T extends {}>(cursor: string): WithCursorOptions<T> => {
-    try {
-      return JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'))
-    } catch (error) {
-      throw new ValidationError('Invalid cursor', error)
     }
   }
 
@@ -201,10 +197,10 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         cursor: {
           next:
             nextAfterCursor &&
-            this.buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor }),
+            buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor }),
           prev:
             nextBeforeCursor &&
-            this.buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null })
+            buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null })
         }
       }
     } catch (error) {
@@ -216,12 +212,11 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     this.getDevicesQuery({ ...options, beforeCursor: null, afterCursor: null })
 
   public getDevicesUsingCursor = async (cursor: string): Promise<GetDevicesResponse> =>
-    this.getDevicesQuery(this.parseCursor<GetDevicesOptions>(cursor))
+    this.getDevicesQuery(parseCursor<GetDevicesOptions>(cursor))
 
   private getEvents = async (
     params: WithCursorOptions<GetVehicleEventsFilterParams>
   ): Promise<GetVehicleEventsResponse> => {
-    const { connect } = this
     const {
       time_range,
       geography_ids,
@@ -240,7 +235,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     } = params
 
     try {
-      const connection = await connect('ro')
+      const connection = await this.connect('ro')
 
       const query = connection
         .getRepository(EventEntity)
@@ -346,14 +341,14 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         cursor: {
           next:
             nextAfterCursor &&
-            this.buildCursor<GetVehicleEventsFilterParams>({
+            buildCursor<GetVehicleEventsFilterParams>({
               ...cursor,
               beforeCursor: null,
               afterCursor: nextAfterCursor
             }),
           prev:
             nextBeforeCursor &&
-            this.buildCursor<GetVehicleEventsFilterParams>({
+            buildCursor<GetVehicleEventsFilterParams>({
               ...cursor,
               beforeCursor: nextBeforeCursor,
               afterCursor: null
@@ -432,7 +427,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     this.getEvents({ ...options, beforeCursor: null, afterCursor: null, limit: options.limit ?? 100 })
 
   public getEventsUsingCursor = async (cursor: string): Promise<GetVehicleEventsResponse> =>
-    this.getEvents(this.parseCursor<GetVehicleEventsFilterParams>(cursor))
+    this.getEvents(parseCursor<GetVehicleEventsFilterParams>(cursor))
 
   public getTripEvents = async (params: ReadTripEventsQueryParams) => {
     const { skip, take = 100, start_time, end_time, provider_id } = params
@@ -617,10 +612,10 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         cursor: {
           next:
             nextAfterCursor &&
-            this.buildCursor<GetDevicesOptions>({ ...options, beforeCursor: null, afterCursor: nextAfterCursor }),
+            buildCursor<GetDevicesOptions>({ ...options, beforeCursor: null, afterCursor: nextAfterCursor }),
           prev:
             nextBeforeCursor &&
-            this.buildCursor<GetDevicesOptions>({ ...options, beforeCursor: nextBeforeCursor, afterCursor: null })
+            buildCursor<GetDevicesOptions>({ ...options, beforeCursor: nextBeforeCursor, afterCursor: null })
         }
       }
     } catch (error) {
@@ -636,7 +631,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
   public getEventsWithDeviceAndTelemetryInfoUsingCursor = async (
     cursor: string
   ): Promise<GetEventsWithDeviceAndTelemetryInfoResponse> =>
-    this.getEventsWithDeviceAndTelemetryInfo(this.parseCursor<GetEventsWithDeviceAndTelemetryInfoOptions>(cursor))
+    this.getEventsWithDeviceAndTelemetryInfo(parseCursor<GetEventsWithDeviceAndTelemetryInfoOptions>(cursor))
 
   /**
    * Nukes everything from orbit. Boom.

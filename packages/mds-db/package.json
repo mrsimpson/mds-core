@@ -25,9 +25,9 @@
     "@mds-core/mds-policy-service": "workspace:0.6.0",
     "@mds-core/mds-types": "workspace:0.5.1",
     "@mds-core/mds-utils": "workspace:0.2.1",
-    "@types/pg": "8.6.0",
+    "@types/pg": "8.6.1",
     "await-lock": "2.1.0",
-    "pg": "8.6.0"
+    "pg": "8.7.1"
   },
   "devDependencies": {
     "@mds-core/mds-test-data": "workspace:0.3.1"
