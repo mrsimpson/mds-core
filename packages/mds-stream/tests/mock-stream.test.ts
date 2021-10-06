@@ -18,7 +18,7 @@ import { KafkaStreamProducer } from '../kafka'
 import { StreamProducer } from '../stream-interface'
 import { mockStream } from '../test-utils'
 
-type FakeStreamPayload = 'foo'
+type FakeStreamPayload = { a: 'foo' }
 
 describe('Mock stream API', () => {
   it('Mocks successfully', async () => {
@@ -28,8 +28,8 @@ describe('Mock stream API', () => {
     await fakeStream.initialize()
     expect(initialize).toHaveBeenCalledTimes(1)
 
-    await fakeStream.write('foo')
-    expect(write).toHaveBeenCalledWith('foo')
+    await fakeStream.write({ a: 'foo' })
+    expect(write).toHaveBeenCalledWith({ a: 'foo' })
     expect(write).toHaveBeenCalledTimes(1)
 
     await fakeStream.shutdown()
@@ -52,8 +52,8 @@ describe('Mock stream API', () => {
     await fakeStream.initialize()
     expect(initialize).toHaveBeenCalledTimes(1)
 
-    await fakeStream.write('foo')
-    expect(write).toHaveBeenCalledWith('foo')
+    await fakeStream.write({ a: 'foo' })
+    expect(write).toHaveBeenCalledWith({ a: 'foo' })
     expect(write).toHaveBeenCalledTimes(1)
 
     await fakeStream.shutdown()

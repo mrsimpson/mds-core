@@ -49,7 +49,7 @@ export const KafkaSource =
   }
 
 export const KafkaSink =
-  <TMessage>(topic: string, options?: Partial<KafkaStreamProducerOptions>): StreamSink<TMessage> =>
+  <TMessage>(topic: string, options?: Partial<KafkaStreamProducerOptions<TMessage>>): StreamSink<TMessage> =>
   () => {
     logger.info('Creating KafkaSink', { topic, options })
     return stream.KafkaStreamProducer(topic, options)
