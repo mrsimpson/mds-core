@@ -1,5 +1,11 @@
 # @mds-core/mds-types
 
+## 0.5.3
+
+### Patch Changes
+
+- 5167ec02: Add SetIntersection, ExtendedKeys, and DeepExtended keys generic types.
+
 ## 0.5.2
 
 ### Patch Changes

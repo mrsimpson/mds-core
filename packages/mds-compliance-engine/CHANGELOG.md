@@ -1,5 +1,28 @@
 # @mds-core/mds-compliance-engine
 
+## 0.6.0
+
+### Minor Changes
+
+- cb5fc5e1: Exposing compliance engine helper
+
+### Patch Changes
+
+- Updated dependencies [5167ec02]
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-stream@0.1.40
+  - @mds-core/mds-agency-cache@0.2.9
+  - @mds-core/mds-api-helpers@0.1.43
+  - @mds-core/mds-compliance-service@0.5.1
+  - @mds-core/mds-db@0.4.3
+  - @mds-core/mds-policy-service@0.6.2
+  - @mds-core/mds-providers@0.1.38
+  - @mds-core/mds-schema-validators@0.3.5
+  - @mds-core/mds-service-helpers@0.3.7
+  - @mds-core/mds-utils@0.2.3
+  - @mds-core/mds-api-server@0.3.5
+
 ## 0.5.1
 
 ### Patch Changes

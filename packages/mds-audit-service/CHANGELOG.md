@@ -1,5 +1,17 @@
 # @mds-core/mds-audit-service
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-repository@0.1.14
+  - @mds-core/mds-rpc-common@0.1.14
+  - @mds-core/mds-schema-validators@0.3.5
+  - @mds-core/mds-service-helpers@0.3.7
+  - @mds-core/mds-utils@0.2.3
+
 ## 0.2.0
 
 ### Minor Changes
