@@ -26,6 +26,7 @@ export const EventWithDeviceAndTelemetryInfoEntityToDomain = ModelMapper<
   EventWithDeviceAndTelemetryInfoEntityToDomainOptions
 >((entity, options) => {
   const {
+    id,
     vehicle_id,
     vehicle_type,
     propulsion_types,
