@@ -1,5 +1,11 @@
 # @container-images/mds-collector-backend
 
+## 0.0.14
+
+### Patch Changes
+
+- @mds-core/mds-collector-backend@0.1.14
+
 ## 0.0.13
 
 ### Patch Changes

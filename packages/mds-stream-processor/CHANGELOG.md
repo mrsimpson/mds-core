@@ -1,5 +1,17 @@
 # @mds-core/mds-stream-processor
 
+## 0.2.10
+
+### Patch Changes
+
+- 5167ec02: Pass-through TMessage generic
+- Updated dependencies [5167ec02]
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-stream@0.1.40
+  - @mds-core/mds-service-helpers@0.3.7
+  - @mds-core/mds-utils@0.2.3
+
 ## 0.2.9
 
 ### Patch Changes

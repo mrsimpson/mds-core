@@ -1,5 +1,21 @@
 # @mds-core/mds-ingest-service
 
+## 0.4.5
+
+### Patch Changes
+
+- Updated dependencies [5167ec02]
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-stream@0.1.40
+  - @mds-core/mds-agency-cache@0.2.9
+  - @mds-core/mds-providers@0.1.38
+  - @mds-core/mds-repository@0.1.14
+  - @mds-core/mds-rpc-common@0.1.14
+  - @mds-core/mds-schema-validators@0.3.5
+  - @mds-core/mds-service-helpers@0.3.7
+  - @mds-core/mds-utils@0.2.3
+
 ## 0.4.4
 
 ### Patch Changes

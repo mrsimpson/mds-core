@@ -1,5 +1,14 @@
 # @mds-core/mds-stream
 
+## 0.1.40
+
+### Patch Changes
+
+- 5167ec02: Add kafka partition support to KafkaStreamProducer interface through an optional partitionKey parameter.
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-utils@0.2.3
+
 ## 0.1.39
 
 ### Patch Changes

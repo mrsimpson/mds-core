@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-cache",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Cache Interface",
   "keywords": [],
   "license": "Apache-2.0",
@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "@mds-core/mds-logger": "workspace:0.3.0",
-    "@mds-core/mds-types": "workspace:0.5.2",
-    "@mds-core/mds-utils": "workspace:0.2.2",
+    "@mds-core/mds-types": "workspace:0.5.3",
+    "@mds-core/mds-utils": "workspace:0.2.3",
     "@types/ioredis": "4.27.6",
     "envalid": "7.2.1",
     "ioredis": "4.27.10"
