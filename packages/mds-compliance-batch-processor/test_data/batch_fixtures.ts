@@ -23,7 +23,7 @@ import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-bou
 import { Device_v1_1_0, Geography } from '@mds-core/mds-types'
 import { minutes, now } from '@mds-core/mds-utils'
 import { FeatureCollection } from 'geojson'
-import { readJson } from '../tests/engine/helpers'
+import { readJson } from './helpers'
 
 let policies: PolicyDomainModel[] = []
 

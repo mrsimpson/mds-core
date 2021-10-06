@@ -15,14 +15,13 @@
  */
 
 import cache from '@mds-core/mds-agency-cache'
+import { getAllInputs, getSupersedingPolicies, processPolicy } from '@mds-core/mds-compliance-engine'
 import { ComplianceServiceClient, ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
 import db from '@mds-core/mds-db'
 import logger from '@mds-core/mds-logger'
 import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { ProcessManager, SerializedBuffers } from '@mds-core/mds-service-helpers'
 import { minutes, now } from '@mds-core/mds-utils'
-import { processPolicy } from './engine'
-import { getAllInputs, getSupersedingPolicies } from './engine/helpers'
 
 const BATCH_SIZE = Number(process.env.BATCH_SIZE) || 5
 
