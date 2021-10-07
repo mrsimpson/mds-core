@@ -35,5 +35,9 @@ export const IngestServiceClient: ServiceClient<IngestService & IngestMigrationS
   writeMigratedDevice: (...args) => RpcRequest(IngestServiceRpcClient.writeMigratedDevice, args),
   writeMigratedVehicleEvent: (...args) => RpcRequest(IngestServiceRpcClient.writeMigratedVehicleEvent, args),
   writeMigratedTelemetry: (...args) => RpcRequest(IngestServiceRpcClient.writeMigratedTelemetry, args),
-  getTripEvents: (...args) => RpcRequest(IngestServiceRpcClient.getTripEvents, args)
+  getTripEvents: (...args) => RpcRequest(IngestServiceRpcClient.getTripEvents, args),
+  getEventsWithDeviceAndTelemetryInfoUsingOptions: (...args) =>
+    RpcRequest(IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingOptions, args),
+  getEventsWithDeviceAndTelemetryInfoUsingCursor: (...args) =>
+    RpcRequest(IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingCursor, args)
 }

@@ -1,5 +1,59 @@
 # @mds-core/mds-agency
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [5167ec02]
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-stream@0.1.40
+  - @mds-core/mds-agency-cache@0.2.9
+  - @mds-core/mds-api-helpers@0.1.43
+  - @mds-core/mds-db@0.4.3
+  - @mds-core/mds-ingest-service@0.4.5
+  - @mds-core/mds-providers@0.1.38
+  - @mds-core/mds-schema-validators@0.3.5
+  - @mds-core/mds-service-helpers@0.3.7
+  - @mds-core/mds-utils@0.2.3
+  - @mds-core/mds-api-server@0.3.5
+
+## 0.2.0
+
+### Minor Changes
+
+- d8b1387e: migrated all validators from Joi to AJV, error output may be slightly different text or shape in some cases
+
+### Patch Changes
+
+- c1001aa8: Fix bug where provider_id was being required inside of POST /event event.telemetry payloads, fix bug where prev_events was not provided on bulk GET /vehicles requests.
+- 15b9d729: Upgrade dependencies
+- Updated dependencies [c1001aa8]
+- Updated dependencies [f5403ec3]
+- Updated dependencies [c1001aa8]
+- Updated dependencies [270c1665]
+- Updated dependencies [6bd0d935]
+- Updated dependencies [1300191f]
+- Updated dependencies [6bd0d935]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [d8b1387e]
+- Updated dependencies [15b9d729]
+- Updated dependencies [54bcb01d]
+- Updated dependencies [15b9d729]
+- Updated dependencies [f535e6ab]
+  - @mds-core/mds-stream@0.1.39
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-api-server@0.3.4
+  - @mds-core/mds-ingest-service@0.4.4
+  - @mds-core/mds-db@0.4.2
+  - @mds-core/mds-schema-validators@0.3.4
+  - @mds-core/mds-agency-cache@0.2.8
+  - @mds-core/mds-service-helpers@0.3.6
+  - @mds-core/mds-utils@0.2.2
+  - @mds-core/mds-api-helpers@0.1.42
+  - @mds-core/mds-providers@0.1.37
+
 ## 0.1.9
 
 ### Patch Changes

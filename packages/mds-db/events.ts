@@ -16,12 +16,12 @@
 
 import logger from '@mds-core/mds-logger'
 import { Device, Recorded, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { isTimestamp, isUUID, now, seconds, yesterday } from '@mds-core/mds-utils'
-import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
+import { isTimestamp, isUUID } from '@mds-core/mds-utils'
+import { getReadOnlyClient, getWriteableClient } from './client'
 import { readDevice } from './devices'
 import schema from './schema'
 import { cols_sql, logSql, SqlExecuter, SqlVals, vals_list, vals_sql } from './sql-utils'
-import { ReadEventsQueryParams, ReadEventsResult, ReadHistoricalEventsQueryParams } from './types'
+import { ReadEventsQueryParams, ReadEventsResult } from './types'
 
 export async function writeEvent(event: VehicleEvent) {
   const client = await getWriteableClient()
@@ -183,122 +183,6 @@ export async function readTripEvents(params: ReadEventsQueryParams): Promise<Tri
   }
 }
 
-export async function readHistoricalEvents(params: ReadHistoricalEventsQueryParams): Promise<VehicleEvent[]> {
-  const { provider_id: query_provider_id, end_date } = params
-  const client = await getReadOnlyClient()
-  const vals = new SqlVals()
-  const values = vals.values()
-  let sql = `SELECT      e2.provider_id,
-  e2.device_id,
-  e2.event_type,
-  e2.timestamp,
-  lat,
-  lng,
-  speed,
-  heading,
-  accuracy,
-  altitude,
-  recorded
-FROM
-(
-SELECT      provider_id,
-      device_id,
-      event_type,
-      timestamp
-FROM
-(
-SELECT      provider_id,
-          device_id,
-          event_type,
-          timestamp,
-          recorded,
-          RANK() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rownum
-FROM        events
-WHERE         timestamp < '${end_date}'`
-  if (query_provider_id) {
-    sql += `\nAND         provider_id = '${query_provider_id}'`
-  }
-  sql += `) e1
-  WHERE       rownum = 1
-  AND         event_type IN ('trip_enter',
-                       'trip_start',
-                       'trip_end',
-                       'reserve',
-                       'cancel_reservation',
-                       'provider_drop_off',
-                       'service_end',
-                       'service_start')
-  ) e2
-  INNER JOIN  telemetry
-  ON          e2.device_id = telemetry.device_id
-  AND         e2.timestamp = telemetry.timestamp
-  ORDER BY    provider_id,
-    device_id,
-    event_type`
-
-  const { rows } = await client.query(sql, values)
-  const events = rows.reduce((acc: VehicleEvent[], row) => {
-    const { provider_id, device_id, event_type, timestamp, recorded, lat, lng, speed, heading, accuracy, altitude } =
-      row
-    return [
-      ...acc,
-      {
-        provider_id,
-        device_id,
-        event_type,
-        timestamp,
-        recorded,
-        telemetry: {
-          provider_id,
-          device_id,
-          timestamp,
-          gps: {
-            lat,
-            lng,
-            speed,
-            heading,
-            accuracy,
-            altitude
-          }
-        }
-      }
-    ]
-  }, [])
-  return events
-}
-
-export async function getEventCountsPerProviderSince(
-  start = yesterday(),
-  stop = now()
-): Promise<{ provider_id: UUID; event_type: string; count: number; slacount: number }[]> {
-  const thirty_sec = seconds(30)
-  const vals = new SqlVals()
-  const sql = `select provider_id, event_type, count(*), count(case when (recorded-timestamp) > ${vals.add(
-    thirty_sec
-  )} then 1 else null end) as slacount from events where recorded > ${vals.add(start)} and recorded < ${vals.add(
-    stop
-  )} group by provider_id, event_type`
-  return makeReadOnlyQuery(sql, vals)
-}
-
-export async function getEventsLast24HoursPerProvider(start = yesterday(), stop = now()): Promise<VehicleEvent[]> {
-  const vals = new SqlVals()
-  const sql = `select provider_id, device_id, event_type, recorded, timestamp from ${
-    schema.TABLE.events
-  } where recorded > ${vals.add(start)} and recorded < ${vals.add(stop)} order by "timestamp" ASC`
-  return makeReadOnlyQuery(sql, vals)
-}
-
-export async function getNumEventsLast24HoursByProvider(
-  start = yesterday(),
-  stop = now()
-): Promise<{ provider_id: UUID; count: number }[]> {
-  const vals = new SqlVals()
-  const sql = `select provider_id, count(*) from ${schema.TABLE.events} where recorded > ${vals.add(
-    start
-  )} and recorded < ${vals.add(stop)} group by provider_id`
-  return makeReadOnlyQuery(sql, vals)
-}
 export async function readEventsWithTelemetry({
   device_id,
   provider_id,
@@ -462,10 +346,4 @@ export async function readEventsWithTelemetryAndVehicleId({
         : null
     })
   )
-}
-
-// TODO way too slow to be useful -- move into mds-agency-cache
-export async function getMostRecentEventByProvider(): Promise<{ provider_id: UUID; max: number }[]> {
-  const sql = `select provider_id, max(recorded) from ${schema.TABLE.events} group by provider_id`
-  return makeReadOnlyQuery(sql)
 }

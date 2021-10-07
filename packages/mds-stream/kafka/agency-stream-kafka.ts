@@ -23,11 +23,13 @@ import { KafkaStreamProducer } from './stream-producer'
 const { TENANT_ID } = getEnvVar({
   TENANT_ID: 'mds'
 })
-const deviceProducer = KafkaStreamProducer<Device>(`${TENANT_ID}.device`)
-const eventProducer = KafkaStreamProducer<VehicleEvent>(`${TENANT_ID}.event`)
+const deviceProducer = KafkaStreamProducer<Device>(`${TENANT_ID}.device`, { partitionKey: 'device_id' })
+const eventProducer = KafkaStreamProducer<VehicleEvent>(`${TENANT_ID}.event`, { partitionKey: 'device_id' })
 const eventErrorProducer = KafkaStreamProducer<Partial<VehicleEvent>>(`${TENANT_ID}.event.error`)
-const telemetryProducer = KafkaStreamProducer<Telemetry>(`${TENANT_ID}.telemetry`)
-const tripMetadataProducer = KafkaStreamProducer<TripMetadata>(`${TENANT_ID}.trip_metadata`)
+const telemetryProducer = KafkaStreamProducer<Telemetry>(`${TENANT_ID}.telemetry`, { partitionKey: 'device_id' })
+const tripMetadataProducer = KafkaStreamProducer<TripMetadata>(`${TENANT_ID}.trip_metadata`, {
+  partitionKey: 'trip_id'
+})
 
 export const AgencyStreamKafka: AgencyStreamInterface = {
   initialize: async () => {

@@ -42,14 +42,18 @@ import {
   VehicleEvent_v0_4_1
 } from '@mds-core/mds-types'
 import { asArray, filterDefined, ServerError } from '@mds-core/mds-utils'
-import { cleanEnv, num, str } from 'envalid'
+import { bool, cleanEnv, num, str } from 'envalid'
 
-const { KAFKA_HOST, SOURCE_TENANT_ID, TENANT_ID, MIGRATION_BLOCK_SIZE_LIMIT } = cleanEnv(process.env, {
-  KAFKA_HOST: str(),
-  SOURCE_TENANT_ID: str(),
-  TENANT_ID: str(),
-  MIGRATION_BLOCK_SIZE_LIMIT: num({ default: 250 })
-})
+const { KAFKA_HOST, SOURCE_TENANT_ID, TENANT_ID, MIGRATION_BLOCK_SIZE_LIMIT, MIGRATION_INITIALIZE_CACHE } = cleanEnv(
+  process.env,
+  {
+    KAFKA_HOST: str(),
+    SOURCE_TENANT_ID: str(),
+    TENANT_ID: str(),
+    MIGRATION_BLOCK_SIZE_LIMIT: num({ default: 250 }),
+    MIGRATION_INITIALIZE_CACHE: bool({ default: false })
+  }
+)
 
 type MigrationEntityType = 'device' | 'event' | 'telemetry'
 
@@ -217,45 +221,49 @@ const getUncachedDevices = async (devices: DeviceDomainModel[]) => {
 }
 
 const initializeCacheForMigration = async () => {
-  logger.info('Cache initialization commencing')
+  if (MIGRATION_INITIALIZE_CACHE) {
+    logger.info('Cache initialization commencing')
 
-  try {
-    await cache.startup()
-    const {
-      devices,
-      cursor: { next }
-    } = await IngestServiceClient.getDevicesUsingOptions({
-      limit: MIGRATION_BLOCK_SIZE_LIMIT
-    })
-
-    const totals = {
-      progress: devices.length,
-      ...(await cacheDevicesEventsAndTelemetry(await getUncachedDevices(devices)))
-    }
-
-    let cursor = next
-
-    while (cursor !== null) {
-      logger.info('Cache initialization progress', totals)
+    try {
+      await cache.startup()
       const {
         devices,
         cursor: { next }
-      } = await IngestServiceClient.getDevicesUsingCursor(cursor)
+      } = await IngestServiceClient.getDevicesUsingOptions({
+        limit: MIGRATION_BLOCK_SIZE_LIMIT
+      })
 
-      const updates = await cacheDevicesEventsAndTelemetry(await getUncachedDevices(devices))
-      totals.progress += devices.length
-      totals.devices += updates.devices
-      totals.events += updates.events
-      totals.telemetry += updates.telemetry
-      cursor = next
+      const totals = {
+        progress: devices.length,
+        ...(await cacheDevicesEventsAndTelemetry(await getUncachedDevices(devices)))
+      }
+
+      let cursor = next
+
+      while (cursor !== null) {
+        logger.info('Cache initialization progress', totals)
+        const {
+          devices,
+          cursor: { next }
+        } = await IngestServiceClient.getDevicesUsingCursor(cursor)
+
+        const updates = await cacheDevicesEventsAndTelemetry(await getUncachedDevices(devices))
+        totals.progress += devices.length
+        totals.devices += updates.devices
+        totals.events += updates.events
+        totals.telemetry += updates.telemetry
+        cursor = next
+      }
+
+      logger.info('Cache initialization complete', totals)
+    } catch (error) {
+      logger.error('Cache initialization failed', { error })
+      throw error
+    } finally {
+      await cache.shutdown()
     }
-
-    logger.info('Cache initialization complete', totals)
-  } catch (error) {
-    logger.error('Cache initialization failed', { error })
-    throw error
-  } finally {
-    await cache.shutdown()
+  } else {
+    logger.info('Cache initialization bypassed')
   }
 }
 

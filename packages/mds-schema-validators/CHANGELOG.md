@@ -1,5 +1,28 @@
 # @mds-core/mds-schema-validators
 
+## 0.3.5
+
+### Patch Changes
+
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-providers@0.1.38
+  - @mds-core/mds-test-data@0.3.3
+  - @mds-core/mds-utils@0.2.3
+
+## 0.3.4
+
+### Patch Changes
+
+- d8b1387e: added ajv-keywords and ajv-errors to add validator functionality for custom formats and messages
+- 15b9d729: Upgrade dependencies
+- Updated dependencies [c1001aa8]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-utils@0.2.2
+  - @mds-core/mds-test-data@0.3.2
+  - @mds-core/mds-providers@0.1.37
+
 ## 0.3.3
 
 ### Patch Changes

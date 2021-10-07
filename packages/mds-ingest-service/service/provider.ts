@@ -29,6 +29,7 @@ import { IngestRepository } from '../repository'
 import {
   validateEventAnnotationDomainCreateModels,
   validateGetDevicesOptions,
+  validateGetEventsWithDeviceAndTelemetryInfoOptions,
   validateGetVehicleEventsFilterParams,
   validateUUIDs
 } from './validators'
@@ -221,6 +222,30 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     } catch (error) {
       const exception = ServiceException('Error in getTripEvents', error)
       logger.error('getTripEvents exception', { exception, error })
+      return exception
+    }
+  },
+
+  getEventsWithDeviceAndTelemetryInfoUsingOptions: async options => {
+    try {
+      return ServiceResult(
+        await IngestRepository.getEventsWithDeviceAndTelemetryInfoUsingOptions(
+          validateGetEventsWithDeviceAndTelemetryInfoOptions(options ?? {})
+        )
+      )
+    } catch (error) {
+      const exception = ServiceException('Error in getEventsWithDeviceAndTelemetryInfoUsingOptions', error)
+      logger.error('getEventsWithDeviceAndTelemetryInfoUsingOptions exception', { exception, error })
+      return exception
+    }
+  },
+
+  getEventsWithDeviceAndTelemetryInfoUsingCursor: async cursor => {
+    try {
+      return ServiceResult(await IngestRepository.getEventsWithDeviceAndTelemetryInfoUsingCursor(cursor))
+    } catch (error) {
+      const exception = ServiceException('Error in getEventsWithDeviceAndTelemetryInfoUsingCursor', error)
+      logger.error('getEventsWithDeviceAndTelemetryInfoUsingCursor exception', { exception, error })
       return exception
     }
   }

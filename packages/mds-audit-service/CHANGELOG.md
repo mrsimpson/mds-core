@@ -1,5 +1,35 @@
 # @mds-core/mds-audit-service
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-repository@0.1.14
+  - @mds-core/mds-rpc-common@0.1.14
+  - @mds-core/mds-schema-validators@0.3.5
+  - @mds-core/mds-service-helpers@0.3.7
+  - @mds-core/mds-utils@0.2.3
+
+## 0.2.0
+
+### Minor Changes
+
+- d8b1387e: migrated all validators from Joi to AJV, error output may be slightly different text or shape in some cases
+
+### Patch Changes
+
+- Updated dependencies [c1001aa8]
+- Updated dependencies [d8b1387e]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-schema-validators@0.3.4
+  - @mds-core/mds-repository@0.1.13
+  - @mds-core/mds-rpc-common@0.1.13
+  - @mds-core/mds-service-helpers@0.3.6
+  - @mds-core/mds-utils@0.2.2
+
 ## 0.1.12
 
 ### Patch Changes

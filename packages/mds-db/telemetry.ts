@@ -17,12 +17,12 @@
 import logger from '@mds-core/mds-logger'
 import { Recorded, Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
 import { csv, now } from '@mds-core/mds-utils'
-import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
+import { getReadOnlyClient, getWriteableClient } from './client'
 import schema from './schema'
 import { cols_sql, logSql, SqlVals, to_sql, vals_list } from './sql-utils'
 import { TelemetryRecord } from './types'
 
-export function convertTelemetryToTelemetryRecord(telemetry: Telemetry): TelemetryRecord {
+function convertTelemetryToTelemetryRecord(telemetry: Telemetry): TelemetryRecord {
   const {
     gps: { lat, lng, altitude, heading, speed, accuracy },
     recorded = now(),
@@ -40,7 +40,7 @@ export function convertTelemetryToTelemetryRecord(telemetry: Telemetry): Telemet
   }
 }
 
-export function convertTelemetryRecordToTelemetry(telemetryRecord: TelemetryRecord): Telemetry {
+function convertTelemetryRecordToTelemetry(telemetryRecord: TelemetryRecord): Telemetry {
   const { lat, lng, altitude, heading, speed, accuracy, ...props } = telemetryRecord
   return {
     ...props,
@@ -123,10 +123,4 @@ export async function readTelemetry(
     logger.error('read telemetry error', err)
     throw err
   }
-}
-
-// TODO way too slow to be useful -- move into mds-agency-cache
-export async function getMostRecentTelemetryByProvider(): Promise<{ provider_id: UUID; max: number }[]> {
-  const sql = `select provider_id, max(recorded) from ${schema.TABLE.telemetry} group by provider_id`
-  return makeReadOnlyQuery(sql)
 }

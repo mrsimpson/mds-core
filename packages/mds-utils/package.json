@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-utils",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "Mobility Data Specification utility functions",
   "keywords": [
     "mds",
@@ -18,11 +18,11 @@
     "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap --lines 40  ts-mocha --project ../../tsconfig.json"
   },
   "dependencies": {
-    "@mds-core/mds-logger": "workspace:0.2.4",
-    "@mds-core/mds-types": "workspace:0.5.1",
-    "@turf/boolean-point-in-polygon": "6.4.0",
-    "@turf/helpers": "6.4.0",
-    "@types/point-in-polygon": "1.0.0",
+    "@mds-core/mds-logger": "workspace:0.3.0",
+    "@mds-core/mds-types": "workspace:0.5.3",
+    "@turf/boolean-point-in-polygon": "6.5.0",
+    "@turf/helpers": "6.5.0",
+    "@types/point-in-polygon": "1.1.0",
     "@types/uuid": "8.3.1",
     "circle-to-polygon": "2.2.0",
     "moment-timezone": "0.5.33",

@@ -1,5 +1,19 @@
 # @container-images/mds-collector-backend
 
+## 0.0.14
+
+### Patch Changes
+
+- @mds-core/mds-collector-backend@0.1.14
+
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-webpack-config@0.1.4
+  - @mds-core/mds-collector-backend@0.1.13
+
 ## 0.0.12
 
 ### Patch Changes

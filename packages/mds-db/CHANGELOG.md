@@ -1,5 +1,43 @@
 # @mds-core/mds-db
 
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-attachment-service@0.2.1
+  - @mds-core/mds-audit-service@0.2.1
+  - @mds-core/mds-geography-service@0.2.1
+  - @mds-core/mds-ingest-service@0.4.5
+  - @mds-core/mds-policy-service@0.6.2
+  - @mds-core/mds-utils@0.2.3
+
+## 0.4.2
+
+### Patch Changes
+
+- 6bd0d935: Remove some unused methods from mds-db
+- 15b9d729: Upgrade dependencies
+- Updated dependencies [f5403ec3]
+- Updated dependencies [c1001aa8]
+- Updated dependencies [6bd0d935]
+- Updated dependencies [1300191f]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [15b9d729]
+- Updated dependencies [d8b1387e]
+- Updated dependencies [54bcb01d]
+- Updated dependencies [15b9d729]
+- Updated dependencies [f535e6ab]
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-ingest-service@0.4.4
+  - @mds-core/mds-attachment-service@0.2.0
+  - @mds-core/mds-audit-service@0.2.0
+  - @mds-core/mds-geography-service@0.2.0
+  - @mds-core/mds-utils@0.2.2
+  - @mds-core/mds-policy-service@0.6.1
+
 ## 0.4.1
 
 ### Patch Changes

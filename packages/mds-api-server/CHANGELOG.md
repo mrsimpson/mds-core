@@ -1,5 +1,28 @@
 # @mds-core/mds-api-server
 
+## 0.3.5
+
+### Patch Changes
+
+- @mds-core/mds-api-authorizer@0.1.40
+- @mds-core/mds-service-helpers@0.3.7
+- @mds-core/mds-utils@0.2.3
+
+## 0.3.4
+
+### Patch Changes
+
+- 270c1665: Apply path filtering to API Request debug logs and consolidate output
+- 15b9d729: Upgrade dependencies
+- Updated dependencies [f5403ec3]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [15b9d729]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-api-authorizer@0.1.39
+  - @mds-core/mds-service-helpers@0.3.6
+  - @mds-core/mds-utils@0.2.2
+
 ## 0.3.3
 
 ### Patch Changes
