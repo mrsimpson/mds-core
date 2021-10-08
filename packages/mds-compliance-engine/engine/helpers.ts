@@ -151,7 +151,7 @@ export function isRuleActive({ start_time, end_time, days }: Pick<Rule, 'start_t
   return isCurrentDayInDays({ days }) && isCurrentTimeInInterval({ start_time, end_time })
 }
 
-export function isInVehicleTypes(rule: Rule, device: Device): boolean {
+export function isInVehicleTypes(rule: Rule, device: Pick<Device, 'vehicle_type'>): boolean {
   return (
     !rule.vehicle_types ||
     rule.vehicle_types.length === 0 ||
