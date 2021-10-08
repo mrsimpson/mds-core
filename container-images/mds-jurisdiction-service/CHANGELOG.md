@@ -1,5 +1,12 @@
 # @container-images/mds-jurisdiction-service
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [81220ee6]
+  - @mds-core/mds-jurisdiction-service@0.2.2
+
 ## 0.0.14
 
 ### Patch Changes

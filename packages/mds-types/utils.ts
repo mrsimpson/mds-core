@@ -75,7 +75,7 @@ export type SetIntersection<T extends keyof any, U extends keyof any> = T extend
  * type pickStringTest = PickString<{ a: string, b: number, c: boolean }> // 'a'
  *
  * type PickStringOrNumber<T> = ExtendedKeys<T, string | number>
- * type pickStringOrNumberTest = PickStringOrNumber<{ a: string, b: number, c: boolean }> // 'b'
+ * type pickStringOrNumberTest = PickStringOrNumber<{ a: string, b: number, c: boolean }> // 'a' | 'b'
  * ```
  */
 export type ExtendedKeys<T extends object, U> = {

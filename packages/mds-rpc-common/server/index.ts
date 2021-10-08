@@ -22,7 +22,6 @@ import {
   RawBodyParserMiddlewareOptions,
   RequestLoggingMiddleware
 } from '@mds-core/mds-api-server'
-import logger from '@mds-core/mds-logger'
 import { ProcessManager } from '@mds-core/mds-service-helpers'
 import { Nullable } from '@mds-core/mds-types'
 import express from 'express'
@@ -32,6 +31,7 @@ import REPL from 'repl'
 import { ModuleRpcProtocolServer } from 'rpc_ts/lib/protocol/server'
 import { ServiceHandlerFor } from 'rpc_ts/lib/server/server'
 import { REPL_PORT, RpcServiceDefinition, RPC_CONTENT_TYPE, RPC_PORT } from '../@types'
+import { RpcCommonLogger as logger } from '../logger'
 
 export interface RpcServiceHandlers {
   onStart: () => Promise<void>

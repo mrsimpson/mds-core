@@ -1,5 +1,26 @@
 # @mds-core/mds-compliance-service
 
+## 0.5.2
+
+### Patch Changes
+
+- 81220ee6: Upgrade typeorm and pg dependencies
+- Updated dependencies [71a9d1de]
+- Updated dependencies [7bdfdff5]
+- Updated dependencies [81220ee6]
+- Updated dependencies [71a9d1de]
+  - @mds-core/mds-rpc-common@0.1.15
+  - @mds-core/mds-types@0.5.4
+  - @mds-core/mds-policy-service@0.6.3
+  - @mds-core/mds-repository@0.1.15
+  - @mds-core/mds-logger@0.4.0
+  - @mds-core/mds-db@0.4.4
+  - @mds-core/mds-providers@0.1.39
+  - @mds-core/mds-schema-validators@0.3.6
+  - @mds-core/mds-service-helpers@0.3.8
+  - @mds-core/mds-stream@0.1.41
+  - @mds-core/mds-utils@0.2.4
+
 ## 0.5.1
 
 ### Patch Changes
