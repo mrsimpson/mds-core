@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.4.0
+
+### Minor Changes
+
+- 71a9d1de: Add new createLogger method, enabling namespaced loggers for packages. This will be refactored in the future to be a little more breaking, most likely.
+
 ## 0.3.0
 
 ### Minor Changes

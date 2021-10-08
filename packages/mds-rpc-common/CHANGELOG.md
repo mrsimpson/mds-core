@@ -1,5 +1,17 @@
 # @mds-core/mds-rpc-common
 
+## 0.1.15
+
+### Patch Changes
+
+- 71a9d1de: Add namespaced logger for mds-rpc-common, and debug logs for RPCRequest time client-side.
+- Updated dependencies [7bdfdff5]
+- Updated dependencies [71a9d1de]
+  - @mds-core/mds-types@0.5.4
+  - @mds-core/mds-logger@0.4.0
+  - @mds-core/mds-service-helpers@0.3.8
+  - @mds-core/mds-api-server@0.3.6
+
 ## 0.1.14
 
 ### Patch Changes

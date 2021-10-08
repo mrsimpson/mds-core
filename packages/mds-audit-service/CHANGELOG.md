@@ -1,5 +1,20 @@
 # @mds-core/mds-audit-service
 
+## 0.2.2
+
+### Patch Changes
+
+- 81220ee6: Upgrade typeorm and pg dependencies
+- Updated dependencies [71a9d1de]
+- Updated dependencies [7bdfdff5]
+- Updated dependencies [81220ee6]
+  - @mds-core/mds-rpc-common@0.1.15
+  - @mds-core/mds-types@0.5.4
+  - @mds-core/mds-repository@0.1.15
+  - @mds-core/mds-schema-validators@0.3.6
+  - @mds-core/mds-service-helpers@0.3.8
+  - @mds-core/mds-utils@0.2.4
+
 ## 0.2.1
 
 ### Patch Changes
