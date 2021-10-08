@@ -34,6 +34,7 @@
     "@mds-core/mds-stream": "workspace:0.1.40",
     "@mds-core/mds-types": "workspace:0.5.3",
     "@mds-core/mds-utils": "workspace:0.2.3",
-    "typeorm": "0.2.34"
+    "pg": "8.7.1",
+    "typeorm": "0.2.38"
   }
 }

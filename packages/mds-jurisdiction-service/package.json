@@ -30,6 +30,7 @@
     "@mds-core/mds-service-helpers": "workspace:0.3.7",
     "@mds-core/mds-types": "workspace:0.5.3",
     "@mds-core/mds-utils": "workspace:0.2.3",
-    "typeorm": "0.2.34"
+    "pg": "8.7.1",
+    "typeorm": "0.2.38"
   }
 }

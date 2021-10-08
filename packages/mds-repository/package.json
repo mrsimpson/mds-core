@@ -24,12 +24,7 @@
     "@mds-core/mds-utils": "workspace:0.2.3",
     "@types/pg": "8.6.1",
     "await-lock": "2.1.0",
-    "pg": "8.7.1"
-  },
-  "devDependencies": {
-    "typeorm": "0.2.34"
-  },
-  "peerDependencies": {
-    "typeorm": "0.2.34"
+    "pg": "8.7.1",
+    "typeorm": "0.2.38"
   }
 }
