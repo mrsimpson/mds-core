@@ -1,5 +1,11 @@
 # @mds-core/mds-types
 
+## 0.5.4
+
+### Patch Changes
+
+- 7bdfdff5: Fix ExtendedKeys utility type comment
+
 ## 0.5.3
 
 ### Patch Changes

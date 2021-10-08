@@ -1,5 +1,17 @@
 # @mds-core/mds-repository
 
+## 0.1.15
+
+### Patch Changes
+
+- 81220ee6: Upgrade typeorm and pg dependencies
+- Updated dependencies [7bdfdff5]
+- Updated dependencies [71a9d1de]
+  - @mds-core/mds-types@0.5.4
+  - @mds-core/mds-logger@0.4.0
+  - @mds-core/mds-providers@0.1.39
+  - @mds-core/mds-utils@0.2.4
+
 ## 0.1.14
 
 ### Patch Changes
