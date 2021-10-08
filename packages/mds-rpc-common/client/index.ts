@@ -20,6 +20,7 @@ import { AnyFunction } from '@mds-core/mds-types'
 import { ClientRpcError } from 'rpc_ts/lib/client/errors'
 import { ModuleRpcProtocolClient } from 'rpc_ts/lib/protocol/client'
 import { RpcServiceDefinition, RPC_HOST, RPC_PORT } from '../@types'
+import { RpcCommonLogger as logger } from '../logger'
 
 export interface RpcClientOptions {
   host: string
@@ -65,7 +66,13 @@ export const RpcRequest = async <M extends RpcMethod>(
   request: M,
   ...args: RpcRequestType<M>
 ): Promise<RpcResponseType<M>> => {
+  const requestStartTime = Date.now()
   const response = await RpcResponse(request, ...args)
+  logger.debug(`RPC request performance`, {
+    requestName: request.name,
+    duration: Date.now() - requestStartTime
+  })
+
   if (response.error) {
     throw response.error
   }

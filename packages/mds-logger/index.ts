@@ -37,5 +37,11 @@ export default {
   debug: debugLog,
   info: log('info'),
   warn: log('warn'),
-  error: log('error')
+  error: log('error'),
+  createLogger: (name: string) => ({
+    debug: debugLog(name),
+    info: log('info'),
+    warn: log('warn'),
+    error: log('error')
+  })
 }
