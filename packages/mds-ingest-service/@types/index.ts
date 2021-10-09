@@ -200,6 +200,7 @@ export type EventAnnotationDomainCreateModel = DomainModelCreate<
 
 export type GetEventsWithDeviceAndTelemetryInfoOptions = Partial<{
   limit: number
+  follow: boolean
   time_range: Partial<TimeRange>
   provider_ids: UUID[]
   device_ids: UUID[]

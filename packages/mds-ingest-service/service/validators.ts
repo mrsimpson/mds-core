@@ -259,7 +259,8 @@ export const { validate: validateGetEventsWithDeviceAndTelemetryInfoOptions } =
         additionalProperties: false,
         required: []
       },
-      limit: { type: 'integer', minimum: 1 }
+      limit: { type: 'integer', minimum: 1 },
+      follow: { type: 'boolean' }
     },
     additionalProperties: false,
     required: []

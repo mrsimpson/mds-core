@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.4.7
+
+### Patch Changes
+
+- 4bbd8a08: Add a follow option to allow using a cursor to poll for new data
+
 ## 0.4.6
 
 ### Patch Changes
