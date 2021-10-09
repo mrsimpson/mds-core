@@ -21,8 +21,8 @@ import {
   RecordedColumn,
   RepositoryError
 } from '@mds-core/mds-repository'
-import { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { isUUID, testEnvSafeguard, ValidationError } from '@mds-core/mds-utils'
+import { Device, Nullable, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { head, isUUID, tail, testEnvSafeguard, ValidationError } from '@mds-core/mds-utils'
 import { Any, SelectQueryBuilder } from 'typeorm'
 import { buildPaginator, Cursor, PagingResult } from 'typeorm-cursor-pagination'
 import {
@@ -68,16 +68,21 @@ import {
 import migrations from './migrations'
 import { MigratedEntityModel } from './mixins/migrated-entity'
 import views from './views'
-import { EventWithDeviceAndTelemetryInfoEntity } from './views/event-with-device-and-telemetry-info'
+import {
+  EventWithDeviceAndTelemetryInfoEntity,
+  EventWithDeviceAndTelemetryInfoEntityModel
+} from './views/event-with-device-and-telemetry-info'
 
 type WithCursorOptions<P extends object> = P & Cursor
 
-const buildCursor = <T extends {}>(options: WithCursorOptions<T>) =>
-  Buffer.from(JSON.stringify(options), 'utf-8').toString('base64')
+const base64encode = (data: string) => Buffer.from(data, 'utf-8').toString('base64')
+const base64decode = (data: string) => Buffer.from(data, 'base64').toString('utf-8')
+
+const buildCursor = <T extends {}>(options: WithCursorOptions<T>) => base64encode(JSON.stringify(options))
 
 const parseCursor = <T extends {}>(cursor: string): WithCursorOptions<T> => {
   try {
-    return JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'))
+    return JSON.parse(base64decode(cursor))
   } catch (error) {
     throw new ValidationError('Invalid cursor', error)
   }
@@ -195,12 +200,12 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       return {
         devices: data.map(DeviceEntityToDomain.mapper()),
         cursor: {
-          next:
-            nextAfterCursor &&
-            buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor }),
           prev:
             nextBeforeCursor &&
-            buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null })
+            buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null }),
+          next:
+            nextAfterCursor &&
+            buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor })
         }
       }
     } catch (error) {
@@ -339,19 +344,19 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       return {
         events: data.map(EventEntityToDomain.mapper()),
         cursor: {
-          next:
-            nextAfterCursor &&
-            buildCursor<GetVehicleEventsFilterParams>({
-              ...cursor,
-              beforeCursor: null,
-              afterCursor: nextAfterCursor
-            }),
           prev:
             nextBeforeCursor &&
             buildCursor<GetVehicleEventsFilterParams>({
               ...cursor,
               beforeCursor: nextBeforeCursor,
               afterCursor: null
+            }),
+          next:
+            nextAfterCursor &&
+            buildCursor<GetVehicleEventsFilterParams>({
+              ...cursor,
+              beforeCursor: null,
+              afterCursor: nextAfterCursor
             })
         }
       }
@@ -567,8 +572,47 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     device_ids,
     time_range,
     limit = 100,
+    follow = false,
     ...cursor
   }: WithCursorOptions<GetEventsWithDeviceAndTelemetryInfoOptions>): Promise<GetEventsWithDeviceAndTelemetryInfoResponse> => {
+    const paginationKeys: Array<keyof EventWithDeviceAndTelemetryInfoEntityModel> = ['id']
+
+    const buildPrevCursor = (
+      options: GetEventsWithDeviceAndTelemetryInfoOptions,
+      nextBeforeCursor: Nullable<string>,
+      entities: EventWithDeviceAndTelemetryInfoEntityModel[]
+    ) =>
+      nextBeforeCursor === null && options.follow && entities.length > 0
+        ? buildCursor<GetEventsWithDeviceAndTelemetryInfoOptions>({
+            ...options,
+            beforeCursor: base64encode(paginationKeys.map(key => `${key}:${head(entities)[key]}`).join(',')),
+            afterCursor: null
+          })
+        : nextBeforeCursor &&
+          buildCursor<GetEventsWithDeviceAndTelemetryInfoOptions>({
+            ...options,
+            beforeCursor: nextBeforeCursor,
+            afterCursor: null
+          })
+
+    const buildNextCursor = (
+      options: GetEventsWithDeviceAndTelemetryInfoOptions,
+      nextAfterCursor: Nullable<string>,
+      entities: EventWithDeviceAndTelemetryInfoEntityModel[]
+    ) =>
+      nextAfterCursor === null && options.follow && entities.length > 0
+        ? buildCursor<GetEventsWithDeviceAndTelemetryInfoOptions>({
+            ...options,
+            beforeCursor: null,
+            afterCursor: base64encode(paginationKeys.map(key => `${key}:${tail(entities)[key]}`).join(','))
+          })
+        : nextAfterCursor &&
+          buildCursor<GetEventsWithDeviceAndTelemetryInfoOptions>({
+            ...options,
+            beforeCursor: null,
+            afterCursor: nextAfterCursor
+          })
+
     try {
       const connection = await this.connect('ro')
 
@@ -602,20 +646,16 @@ class IngestReadWriteRepository extends ReadWriteRepository {
           afterCursor: cursor.afterCursor ?? undefined,
           beforeCursor: cursor.beforeCursor ?? undefined
         },
-        paginationKeys: ['id']
+        paginationKeys
       }).paginate(query)
 
-      const options = { limit, time_range, provider_ids, device_ids }
+      const options = { limit, follow, time_range, provider_ids, device_ids }
 
       return {
         events: entities.map(EventWithDeviceAndTelemetryInfoEntityToDomain.mapper()),
         cursor: {
-          next:
-            nextAfterCursor &&
-            buildCursor<GetDevicesOptions>({ ...options, beforeCursor: null, afterCursor: nextAfterCursor }),
-          prev:
-            nextBeforeCursor &&
-            buildCursor<GetDevicesOptions>({ ...options, beforeCursor: nextBeforeCursor, afterCursor: null })
+          prev: buildPrevCursor(options, nextBeforeCursor, entities),
+          next: buildNextCursor(options, nextAfterCursor, entities)
         }
       }
     } catch (error) {
