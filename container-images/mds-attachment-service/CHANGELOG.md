@@ -1,5 +1,13 @@
 # @container-images/mds-attachment-service
 
+## 0.0.17
+
+### Patch Changes
+
+- ac0467cd: Upgrade images to use nodejs v16
+- Updated dependencies [73c9c31d]
+  - @mds-core/mds-webpack-config@0.1.5
+
 ## 0.0.16
 
 ### Patch Changes

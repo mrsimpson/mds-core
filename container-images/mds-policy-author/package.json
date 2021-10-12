@@ -1,6 +1,6 @@
 {
   "name": "@container-images/mds-policy-author",
-  "version": "0.1.45",
+  "version": "0.1.46",
   "private": true,
   "description": "Docker Image for MDS policy-author API",
   "keywords": [
@@ -22,6 +22,6 @@
   },
   "dependencies": {
     "@mds-core/mds-policy-author": "workspace:0.5.5",
-    "@mds-core/mds-webpack-config": "workspace:0.1.4"
+    "@mds-core/mds-webpack-config": "workspace:0.1.5"
   }
 }
