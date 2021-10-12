@@ -1,5 +1,14 @@
 # @mds-core/mds-agency
 
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies [eebaac90]
+  - @mds-core/mds-ingest-service@0.4.8
+  - @mds-core/mds-db@0.4.6
+  - @mds-core/mds-api-helpers@0.1.46
+
 ## 0.2.3
 
 ### Patch Changes
