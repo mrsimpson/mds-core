@@ -113,7 +113,7 @@ importers:
   container-images/mds-agency:
     specifiers:
       '@mds-core/mds-agency': workspace:0.2.4
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-agency': link:../../packages/mds-agency
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -121,7 +121,7 @@ importers:
   container-images/mds-attachment-service:
     specifiers:
       '@mds-core/mds-attachment-service': workspace:0.2.2
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-attachment-service': link:../../packages/mds-attachment-service
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -129,7 +129,7 @@ importers:
   container-images/mds-audit:
     specifiers:
       '@mds-core/mds-audit': workspace:0.2.4
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-audit': link:../../packages/mds-audit
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -137,7 +137,7 @@ importers:
   container-images/mds-audit-service:
     specifiers:
       '@mds-core/mds-audit-service': workspace:0.2.2
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-audit-service': link:../../packages/mds-audit-service
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -145,7 +145,7 @@ importers:
   container-images/mds-collector-api:
     specifiers:
       '@mds-core/mds-collector-api': workspace:0.1.20
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-collector-api': link:../../packages/mds-collector-api
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -153,7 +153,7 @@ importers:
   container-images/mds-collector-backend:
     specifiers:
       '@mds-core/mds-collector-backend': workspace:0.1.15
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-collector-backend': link:../../packages/mds-collector-backend
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -161,7 +161,7 @@ importers:
   container-images/mds-compliance-api:
     specifiers:
       '@mds-core/mds-compliance-api': workspace:0.3.6
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-compliance-api': link:../../packages/mds-compliance-api
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -169,7 +169,7 @@ importers:
   container-images/mds-compliance-service:
     specifiers:
       '@mds-core/mds-compliance-service': workspace:0.5.4
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-compliance-service': link:../../packages/mds-compliance-service
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -177,7 +177,7 @@ importers:
   container-images/mds-geography:
     specifiers:
       '@mds-core/mds-geography': workspace:0.1.5
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-geography': link:../../packages/mds-geography
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -185,7 +185,7 @@ importers:
   container-images/mds-geography-author:
     specifiers:
       '@mds-core/mds-geography-author': workspace:0.2.4
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-geography-author': link:../../packages/mds-geography-author
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -193,7 +193,7 @@ importers:
   container-images/mds-geography-service:
     specifiers:
       '@mds-core/mds-geography-service': workspace:0.2.2
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-geography-service': link:../../packages/mds-geography-service
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -201,7 +201,7 @@ importers:
   container-images/mds-ingest-migration-processor:
     specifiers:
       '@mds-core/mds-ingest-migration-processor': workspace:0.0.17
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-ingest-migration-processor': link:../../packages/mds-ingest-migration-processor
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -209,7 +209,7 @@ importers:
   container-images/mds-ingest-service:
     specifiers:
       '@mds-core/mds-ingest-service': workspace:0.4.8
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-ingest-service': link:../../packages/mds-ingest-service
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -217,7 +217,7 @@ importers:
   container-images/mds-jurisdiction:
     specifiers:
       '@mds-core/mds-jurisdiction': workspace:0.1.20
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-jurisdiction': link:../../packages/mds-jurisdiction
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -225,7 +225,7 @@ importers:
   container-images/mds-jurisdiction-service:
     specifiers:
       '@mds-core/mds-jurisdiction-service': workspace:0.2.2
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-jurisdiction-service': link:../../packages/mds-jurisdiction-service
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -233,7 +233,7 @@ importers:
   container-images/mds-policy:
     specifiers:
       '@mds-core/mds-policy': workspace:0.5.5
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-policy': link:../../packages/mds-policy
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -241,7 +241,7 @@ importers:
   container-images/mds-policy-author:
     specifiers:
       '@mds-core/mds-policy-author': workspace:0.5.5
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-policy-author': link:../../packages/mds-policy-author
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -249,7 +249,7 @@ importers:
   container-images/mds-policy-service:
     specifiers:
       '@mds-core/mds-policy-service': workspace:0.6.3
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-policy-service': link:../../packages/mds-policy-service
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -257,7 +257,7 @@ importers:
   container-images/mds-transaction-api:
     specifiers:
       '@mds-core/mds-transaction-api': workspace:0.1.20
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-transaction-api': link:../../packages/mds-transaction-api
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
@@ -265,7 +265,7 @@ importers:
   container-images/mds-transaction-service:
     specifiers:
       '@mds-core/mds-transaction-service': workspace:0.2.2
-      '@mds-core/mds-webpack-config': workspace:0.1.4
+      '@mds-core/mds-webpack-config': workspace:0.1.5
     dependencies:
       '@mds-core/mds-transaction-service': link:../../packages/mds-transaction-service
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config

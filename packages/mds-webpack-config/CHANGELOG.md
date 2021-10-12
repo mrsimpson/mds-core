@@ -1,5 +1,11 @@
 # @mds-core/mds-webpack-config
 
+## 0.1.5
+
+### Patch Changes
+
+- 73c9c31d: Update webpack peer dependency semver
+
 ## 0.1.4
 
 ### Patch Changes

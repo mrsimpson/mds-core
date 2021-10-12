@@ -1,6 +1,6 @@
 {
   "name": "@container-images/mds-jurisdiction-service",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "private": true,
   "description": "Docker Image for MDS Jurisdiction Service",
   "keywords": [
@@ -22,6 +22,6 @@
   },
   "dependencies": {
     "@mds-core/mds-jurisdiction-service": "workspace:0.2.2",
-    "@mds-core/mds-webpack-config": "workspace:0.1.4"
+    "@mds-core/mds-webpack-config": "workspace:0.1.5"
   }
 }
