@@ -1,5 +1,13 @@
 # @container-images/mds-policy
 
+## 0.1.19
+
+### Patch Changes
+
+- ac0467cd: Upgrade images to use nodejs v16
+- Updated dependencies [73c9c31d]
+  - @mds-core/mds-webpack-config@0.1.5
+
 ## 0.1.18
 
 ### Patch Changes

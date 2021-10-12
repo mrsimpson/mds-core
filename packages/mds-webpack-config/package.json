@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-webpack-config",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Webpack Configuration",
   "keywords": [
     "mds"
@@ -25,6 +25,6 @@
     "webpack": "5.56.1"
   },
   "peerDependencies": {
-    "webpack": "5.24.2"
+    "webpack": "5.56.1"
   }
 }
