@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.4.8
+
+### Patch Changes
+
+- eebaac90: Change getEventsUsingOptions and getDevices to not use RPC temporarily
+
 ## 0.4.7
 
 ### Patch Changes
