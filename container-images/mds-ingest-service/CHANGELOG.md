@@ -1,5 +1,14 @@
 # @container-images/mds-ingest-service
 
+## 0.0.22
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-ingest-service@0.4.9
+  - @mds-core/mds-webpack-config@0.1.6
+
 ## 0.0.21
 
 ### Patch Changes

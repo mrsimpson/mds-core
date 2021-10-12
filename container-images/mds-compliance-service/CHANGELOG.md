@@ -1,5 +1,14 @@
 # @container-images/mds-compliance-service
 
+## 0.0.21
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-compliance-service@0.5.5
+  - @mds-core/mds-webpack-config@0.1.6
+
 ## 0.0.20
 
 ### Patch Changes

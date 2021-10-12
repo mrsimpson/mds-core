@@ -1,5 +1,20 @@
 # @mds-core/mds-geography
 
+## 0.1.6
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-api-helpers@0.1.47
+  - @mds-core/mds-api-server@0.3.7
+  - @mds-core/mds-db@0.4.7
+  - @mds-core/mds-logger@0.4.1
+  - @mds-core/mds-providers@0.1.40
+  - @mds-core/mds-schema-validators@0.3.7
+  - @mds-core/mds-types@0.5.5
+  - @mds-core/mds-utils@0.2.5
+
 ## 0.1.5
 
 ### Patch Changes

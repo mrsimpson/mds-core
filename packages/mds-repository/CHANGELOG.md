@@ -1,5 +1,16 @@
 # @mds-core/mds-repository
 
+## 0.1.16
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-logger@0.4.1
+  - @mds-core/mds-providers@0.1.40
+  - @mds-core/mds-types@0.5.5
+  - @mds-core/mds-utils@0.2.5
+
 ## 0.1.15
 
 ### Patch Changes

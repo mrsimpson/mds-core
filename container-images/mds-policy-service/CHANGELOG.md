@@ -1,5 +1,14 @@
 # @container-images/mds-policy-service
 
+## 0.0.18
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-policy-service@0.6.4
+  - @mds-core/mds-webpack-config@0.1.6
+
 ## 0.0.17
 
 ### Patch Changes

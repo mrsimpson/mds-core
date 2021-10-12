@@ -1,5 +1,20 @@
 # @mds-core/mds-db
 
+## 0.4.7
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-attachment-service@0.2.3
+  - @mds-core/mds-audit-service@0.2.3
+  - @mds-core/mds-geography-service@0.2.3
+  - @mds-core/mds-ingest-service@0.4.9
+  - @mds-core/mds-logger@0.4.1
+  - @mds-core/mds-policy-service@0.6.4
+  - @mds-core/mds-types@0.5.5
+  - @mds-core/mds-utils@0.2.5
+
 ## 0.4.6
 
 ### Patch Changes

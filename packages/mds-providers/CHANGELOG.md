@@ -1,5 +1,13 @@
 # @mds-core/mds-providers
 
+## 0.1.40
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-types@0.5.5
+
 ## 0.1.39
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @mds-core/mds-agency-cache
 
+## 0.2.11
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-cache@0.0.17
+  - @mds-core/mds-logger@0.4.1
+  - @mds-core/mds-schema-validators@0.3.7
+  - @mds-core/mds-types@0.5.5
+  - @mds-core/mds-utils@0.2.5
+
 ## 0.2.10
 
 ### Patch Changes

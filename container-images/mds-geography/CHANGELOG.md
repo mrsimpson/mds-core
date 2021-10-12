@@ -1,5 +1,14 @@
 # @container-images/mds-geography
 
+## 0.0.23
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-geography@0.1.6
+  - @mds-core/mds-webpack-config@0.1.6
+
 ## 0.0.22
 
 ### Patch Changes
