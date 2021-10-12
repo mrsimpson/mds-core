@@ -1,5 +1,20 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.18
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-agency-cache@0.2.11
+  - @mds-core/mds-ingest-service@0.4.9
+  - @mds-core/mds-logger@0.4.1
+  - @mds-core/mds-repository@0.1.16
+  - @mds-core/mds-service-helpers@0.3.9
+  - @mds-core/mds-stream-processor@0.2.12
+  - @mds-core/mds-types@0.5.5
+  - @mds-core/mds-utils@0.2.5
+
 ## 0.0.17
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @mds-core/mds-service-helpers
 
+## 0.3.9
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-logger@0.4.1
+  - @mds-core/mds-types@0.5.5
+  - @mds-core/mds-utils@0.2.5
+
 ## 0.3.8
 
 ### Patch Changes

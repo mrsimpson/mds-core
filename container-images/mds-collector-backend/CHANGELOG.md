@@ -1,5 +1,14 @@
 # @container-images/mds-collector-backend
 
+## 0.0.17
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-collector-backend@0.1.16
+  - @mds-core/mds-webpack-config@0.1.6
+
 ## 0.0.16
 
 ### Patch Changes

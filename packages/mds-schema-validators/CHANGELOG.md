@@ -1,5 +1,16 @@
 # @mds-core/mds-schema-validators
 
+## 0.3.7
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-providers@0.1.40
+  - @mds-core/mds-test-data@0.3.5
+  - @mds-core/mds-types@0.5.5
+  - @mds-core/mds-utils@0.2.5
+
 ## 0.3.6
 
 ### Patch Changes

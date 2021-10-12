@@ -1,5 +1,11 @@
 # @mds-core/mds-webpack-config
 
+## 0.1.6
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+
 ## 0.1.5
 
 ### Patch Changes
