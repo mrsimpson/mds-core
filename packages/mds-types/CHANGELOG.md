@@ -1,5 +1,11 @@
 # @mds-core/mds-types
 
+## 0.5.5
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+
 ## 0.5.4
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @mds-core/mds-api-server
 
+## 0.3.7
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-api-authorizer@0.1.42
+  - @mds-core/mds-logger@0.4.1
+  - @mds-core/mds-service-helpers@0.3.9
+  - @mds-core/mds-utils@0.2.5
+
 ## 0.3.6
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.4.1
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+
 ## 0.4.0
 
 ### Minor Changes

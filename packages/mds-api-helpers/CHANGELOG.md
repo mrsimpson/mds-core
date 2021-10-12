@@ -1,5 +1,17 @@
 # @mds-core/mds-api-helpers
 
+## 0.1.47
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-agency-cache@0.2.11
+  - @mds-core/mds-api-server@0.3.7
+  - @mds-core/mds-db@0.4.7
+  - @mds-core/mds-types@0.5.5
+  - @mds-core/mds-utils@0.2.5
+
 ## 0.1.46
 
 ### Patch Changes
