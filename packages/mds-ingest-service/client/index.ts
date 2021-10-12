@@ -17,6 +17,7 @@
 import { RpcClient, RpcRequest } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { IngestMigrationService, IngestService, IngestServiceDefinition } from '../@types'
+import { IngestServiceProvider } from '../service/provider'
 
 const IngestServiceRpcClient = RpcClient(IngestServiceDefinition, {
   host: process.env.INGEST_SERVICE_RPC_HOST,
@@ -27,9 +28,21 @@ const IngestServiceRpcClient = RpcClient(IngestServiceDefinition, {
 export const IngestServiceClient: ServiceClient<IngestService & IngestMigrationService> = {
   getDevicesUsingOptions: (...args) => RpcRequest(IngestServiceRpcClient.getDevicesUsingOptions, args),
   getDevicesUsingCursor: (...args) => RpcRequest(IngestServiceRpcClient.getDevicesUsingCursor, args),
-  getEventsUsingOptions: (...args) => RpcRequest(IngestServiceRpcClient.getEventsUsingOptions, args),
+  getEventsUsingOptions: async args => {
+    const response = await IngestServiceProvider.getEventsUsingOptions(args)
+    if (response.error) {
+      throw response.error
+    }
+    return response.result
+  }, // Temporarily remove RPC hop per APPS-155
   getEventsUsingCursor: (...args) => RpcRequest(IngestServiceRpcClient.getEventsUsingCursor, args),
-  getDevices: (...args) => RpcRequest(IngestServiceRpcClient.getDevices, args),
+  getDevices: async args => {
+    const response = await IngestServiceProvider.getDevices(args)
+    if (response.error) {
+      throw response.error
+    }
+    return response.result
+  }, // Temporarily remove RPC hop per APPS-155
   getLatestTelemetryForDevices: (...args) => RpcRequest(IngestServiceRpcClient.getLatestTelemetryForDevices, args),
   writeEventAnnotations: (...args) => RpcRequest(IngestServiceRpcClient.writeEventAnnotations, args),
   writeMigratedDevice: (...args) => RpcRequest(IngestServiceRpcClient.writeMigratedDevice, args),
