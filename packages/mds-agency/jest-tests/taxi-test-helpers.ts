@@ -39,16 +39,19 @@ const TEST_TELEMETRY = ({ device_id }: Pick<Device, 'device_id'>) => ({
 
 export const fakeVehicle = (overrides?: Partial<Device>) => ({ ...TEST_TAXI(), ...overrides })
 
-export const fakeEvent = ({
-  device_id
-}: Pick<Device, 'device_id'>): Omit<VehicleEvent, 'recorded' | 'provider_id'> => ({
-  device_id,
-  event_types: ['service_start'],
-  vehicle_state: 'available',
-  trip_state: null,
-  telemetry: TEST_TELEMETRY({ device_id }),
-  timestamp: now()
-})
+export const fakeEvent = ({ device_id }: Pick<Device, 'device_id'>): Omit<VehicleEvent, 'recorded' | 'provider_id'> => {
+  const telemetry = TEST_TELEMETRY({ device_id })
+
+  return {
+    device_id,
+    event_types: ['service_start'],
+    vehicle_state: 'available',
+    trip_state: null,
+    telemetry,
+    telemetry_timestamp: telemetry.timestamp,
+    timestamp: now()
+  }
+}
 
 export const registerVehicleRequest = (
   request: supertest.SuperTest<supertest.Test>,

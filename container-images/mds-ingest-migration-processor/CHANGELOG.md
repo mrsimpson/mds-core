@@ -1,5 +1,12 @@
 # @container-images/mds-ingest-migration-processor
 
+## 0.0.21
+
+### Patch Changes
+
+- 5321cca0: Upgrade to node:16.11.1-alpine
+  - @mds-core/mds-ingest-migration-processor@0.0.19
+
 ## 0.0.20
 
 ### Patch Changes

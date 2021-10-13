@@ -109,7 +109,7 @@ export class EventWithDeviceAndTelemetryInfoEntity implements EventWithDeviceAnd
   trip_state: Nullable<TRIP_STATE>
 
   @ViewColumn()
-  telemetry_timestamp: Nullable<Timestamp>
+  telemetry_timestamp: Timestamp
 
   @ViewColumn()
   trip_id: Nullable<UUID>

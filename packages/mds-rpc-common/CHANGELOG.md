@@ -1,5 +1,16 @@
 # @mds-core/mds-rpc-common
 
+## 0.1.17
+
+### Patch Changes
+
+- d1de33fd: Switch to lacuna fork of rpc_ts
+- Updated dependencies [0a238253]
+- Updated dependencies [5c02e73f]
+  - @mds-core/mds-types@0.6.0
+  - @mds-core/mds-service-helpers@0.3.10
+  - @mds-core/mds-api-server@0.3.8
+
 ## 0.1.16
 
 ### Patch Changes

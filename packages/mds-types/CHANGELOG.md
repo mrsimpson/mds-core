@@ -1,5 +1,15 @@
 # @mds-core/mds-types
 
+## 0.6.0
+
+### Minor Changes
+
+- 0a238253: Set Telemetry to non-nullable on VehicleEvents/EventDomainModel
+
+### Patch Changes
+
+- 5c02e73f: Add Compliance Violation Entity
+
 ## 0.5.5
 
 ### Patch Changes

@@ -32,6 +32,7 @@ export const IngestServiceManager = RpcServer(
     getEventsUsingCursor: args => IngestServiceProvider.getEventsUsingCursor(...args),
     getDevices: args => IngestServiceProvider.getDevices(...args),
     getLatestTelemetryForDevices: args => IngestServiceProvider.getLatestTelemetryForDevices(...args),
+    writeEvents: args => IngestServiceProvider.writeEvents(...args),
     writeEventAnnotations: args => IngestServiceProvider.writeEventAnnotations(...args),
     writeMigratedDevice: args => IngestServiceProvider.writeMigratedDevice(...args),
     writeMigratedVehicleEvent: args => IngestServiceProvider.writeMigratedVehicleEvent(...args),

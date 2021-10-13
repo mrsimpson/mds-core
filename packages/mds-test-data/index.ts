@@ -194,29 +194,6 @@ function makeTelemetryStream(origin: Telemetry, steps: number) {
   return stream
 }
 
-function makeEvents(
-  devices: Device[],
-  timestamp: Timestamp,
-  makeEventsOptions: {
-    event_types: VEHICLE_EVENT[]
-    vehicle_state: VEHICLE_STATE
-  } = { event_types: ['trip_start'], vehicle_state: 'on_trip' }
-): VehicleEvent[] {
-  const { event_types, vehicle_state } = makeEventsOptions
-
-  return devices.map(device => {
-    return {
-      device_id: device.device_id,
-      provider_id: device.provider_id,
-      event_types,
-      vehicle_state,
-      trip_state: null,
-      timestamp,
-      recorded: now()
-    }
-  })
-}
-
 function makeEventsWithTelemetry(
   devices: Device[],
   timestamp: Timestamp,
@@ -235,13 +212,15 @@ function makeEventsWithTelemetry(
   const { event_types, vehicle_state, speed, trip_id } = makeEventsWithTelemetryOptions
 
   return devices.map(device => {
+    const telemetry = makeTelemetryInArea(device, timestamp, area, speed)
     return {
       device_id: device.device_id,
       provider_id: device.provider_id,
       event_types,
       vehicle_state,
       trip_state: null,
-      telemetry: makeTelemetryInArea(device, timestamp, area, speed),
+      telemetry,
+      telemetry_timestamp: telemetry.timestamp,
       timestamp,
       recorded: timestamp,
       trip_id
@@ -328,7 +307,6 @@ export {
   LA_CITY_BOUNDARY,
   DISTRICT_SEVEN,
   makeDevices,
-  makeEvents,
   makeEventsWithTelemetry,
   makeTelemetry,
   makeTelemetryInArea,

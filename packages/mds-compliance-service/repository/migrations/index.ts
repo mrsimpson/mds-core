@@ -15,5 +15,6 @@
  */
 
 import { CreateComplianceSnapshotsTable1590524762011 } from './1590524762011-CreateComplianceSnapshotsTable'
+import { AddComplianceViolations1632935069192 } from './1632935069192-add_compliance_violations'
 
-export default [CreateComplianceSnapshotsTable1590524762011]
+export default [CreateComplianceSnapshotsTable1590524762011, AddComplianceViolations1632935069192]

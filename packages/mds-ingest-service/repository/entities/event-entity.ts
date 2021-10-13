@@ -46,13 +46,13 @@ export class EventEntity extends MigratedEntity(IdentityColumn(RecordedColumn(cl
   @Column('varchar', { length: 31, nullable: true })
   trip_state: Nullable<TRIP_STATE>
 
-  @Column('bigint', { transformer: BigintTransformer, nullable: true })
-  telemetry_timestamp: Nullable<Timestamp>
+  @Column('bigint', { transformer: BigintTransformer })
+  telemetry_timestamp: Timestamp
 
   @Column('uuid', { nullable: true })
   trip_id: Nullable<UUID>
 
-  telemetry?: TelemetryEntityModel
+  telemetry: TelemetryEntityModel
 
   @OneToOne(() => EventAnnotationEntity, annotation => annotation.event)
   annotation?: EventAnnotationEntityModel

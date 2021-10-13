@@ -50,13 +50,13 @@ export const MigratedDeviceToEntityCreate = ModelMapper<
   }
 })
 
-export type MigratedEventEntityCreateModel = Omit<EventEntityModel, keyof IdentityColumn>
+export type MigratedEventEntityCreateModel = Omit<EventEntityModel, keyof IdentityColumn | 'telemetry'>
 
 export const MigratedEventToEntityCreate = ModelMapper<
-  VehicleEvent,
+  Omit<VehicleEvent, 'telemetry'>,
   MigratedEventEntityCreateModel,
   MigratedEntityCreateOptions
->(({ telemetry, telemetry_timestamp = null, trip_id = null, trip_state = null, ...migrated }, options) => {
+>(({ trip_id = null, trip_state = null, ...migrated }, options) => {
   const {
     migrated_from_source = null,
     migrated_from_version = null,
@@ -64,7 +64,6 @@ export const MigratedEventToEntityCreate = ModelMapper<
   } = options?.migrated_from ?? {}
 
   return {
-    telemetry_timestamp,
     trip_id,
     trip_state,
     migrated_from_source,

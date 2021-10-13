@@ -8,11 +8,13 @@ export const Enum = <T extends string>(...keys: T[]) =>
 export const isEnum = (enums: { [key: string]: string }, value: unknown) =>
   typeof value === 'string' && typeof enums === 'object' && enums[value] === value
 
+export const TIME_FORMAT = 'HH:mm:ss'
+
 export const DAYS_OF_WEEK = Enum('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
 export type DAY_OF_WEEK = keyof typeof DAYS_OF_WEEK
 /**
  * @format uuid
- * @title A UUID used to uniquely identifty an object
+ * @title A UUID used to uniquely identify an object
  * @examples ["3c9604d6-b5ee-11e8-96f8-529269fb1459"]
  * @pattern ^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$
  */

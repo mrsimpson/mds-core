@@ -47,8 +47,8 @@ export interface VehicleEvent_v1_0_0 {
   provider_id: UUID
   timestamp: Timestamp
   event_types: VEHICLE_EVENT_v1_0_0[]
-  telemetry_timestamp?: Timestamp | null
-  telemetry?: Telemetry | null
+  telemetry_timestamp: Timestamp
+  telemetry: Telemetry
   trip_id?: UUID | null
   vehicle_state: VEHICLE_STATE_v1_0_0
   recorded: Timestamp

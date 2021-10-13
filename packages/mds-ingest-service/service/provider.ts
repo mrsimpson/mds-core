@@ -18,9 +18,11 @@ import cache from '@mds-core/mds-agency-cache'
 import logger from '@mds-core/mds-logger'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
 import stream from '@mds-core/mds-stream'
-import { Nullable, Telemetry } from '@mds-core/mds-types'
+import { Telemetry } from '@mds-core/mds-types'
+import { NotFoundError } from '@mds-core/mds-utils'
 import {
   EventAnnotationDomainCreateModel,
+  EventDomainCreateModel,
   IngestMigrationService,
   IngestService,
   TelemetryDomainModel
@@ -28,6 +30,7 @@ import {
 import { IngestRepository } from '../repository'
 import {
   validateEventAnnotationDomainCreateModels,
+  validateEventDomainModel,
   validateGetDevicesOptions,
   validateGetEventsWithDeviceAndTelemetryInfoOptions,
   validateGetVehicleEventsFilterParams,
@@ -103,6 +106,25 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
+  writeEvents: async (events: EventDomainCreateModel[]) => {
+    try {
+      // Check to see if the devices references in the events exist in the db. This is in a closure to keep the code pretty boxed off, but I didn't feel the need to make a named function elsewhere :)
+      // FIXME: Move this check to the cache (once we have a cache manged by the ingest service)
+      await (async () => {
+        const devicesInPayload = new Set(events.map(e => e.device_id))
+        const devicesInDb = await IngestRepository.getDevices([...devicesInPayload])
+        if (devicesInPayload.size !== devicesInDb.length)
+          throw new NotFoundError('Some device(s) in event payload not registered')
+      })()
+
+      return ServiceResult(await IngestRepository.createEvents(events.map(validateEventDomainModel)))
+    } catch (error) {
+      const exception = ServiceException('Error in writeEvents', error)
+      logger.error('writeEvents exception', { exception, error })
+      return exception
+    }
+  },
+
   writeEventAnnotations: async (eventAnnotations: EventAnnotationDomainCreateModel[]) => {
     try {
       return ServiceResult(
@@ -140,36 +162,30 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     // The fact that event/telemetry data is split between tables should not be something the service
     // need be aware of. The repository should split them apart for writes and join them togehter for reads.
     // Will create a ticket for this refactoring to be done separately.
-    const eventTelemetryModel = (
-      telemetry: Nullable<Telemetry> | undefined,
-      options: { recorded: number }
-    ): Nullable<TelemetryDomainModel> => {
-      if (telemetry) {
-        const {
-          charge = null,
-          gps: {
-            lat,
-            lng,
-            speed = null,
-            heading = null,
-            accuracy = null,
-            hdop = null,
-            altitude = null,
-            satellites = null
-          },
-          stop_id = null,
-          recorded = options.recorded,
-          ...common
-        } = telemetry
-        return {
-          ...common,
-          stop_id,
-          charge,
-          recorded,
-          gps: { lat, lng, speed, heading, accuracy, hdop, altitude, satellites }
-        }
+    const eventTelemetryModel = (telemetry: Telemetry, options: { recorded: number }): TelemetryDomainModel => {
+      const {
+        charge = null,
+        gps: {
+          lat,
+          lng,
+          speed = null,
+          heading = null,
+          accuracy = null,
+          hdop = null,
+          altitude = null,
+          satellites = null
+        },
+        stop_id = null,
+        recorded = options.recorded,
+        ...common
+      } = telemetry
+      return {
+        ...common,
+        stop_id,
+        charge,
+        recorded,
+        gps: { lat, lng, speed, heading, accuracy, hdop, altitude, satellites }
       }
-      return null
     }
 
     try {

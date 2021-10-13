@@ -1,5 +1,12 @@
 # @container-images/mds-attachment-service
 
+## 0.0.19
+
+### Patch Changes
+
+- 5321cca0: Upgrade to node:16.11.1-alpine
+  - @mds-core/mds-attachment-service@0.2.4
+
 ## 0.0.18
 
 ### Patch Changes

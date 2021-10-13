@@ -28,11 +28,16 @@ export const ComplianceServiceManager = RpcServer(
   {
     createComplianceSnapshot: args => ComplianceServiceProvider.createComplianceSnapshot(...args),
     createComplianceSnapshots: args => ComplianceServiceProvider.createComplianceSnapshots(...args),
+    createComplianceViolation: args => ComplianceServiceProvider.createComplianceViolation(...args),
+    createComplianceViolations: args => ComplianceServiceProvider.createComplianceViolations(...args),
     getComplianceSnapshot: args => ComplianceServiceProvider.getComplianceSnapshot(...args),
     getComplianceSnapshotsByTimeInterval: args =>
       ComplianceServiceProvider.getComplianceSnapshotsByTimeInterval(...args),
     getComplianceSnapshotsByIDs: args => ComplianceServiceProvider.getComplianceSnapshotsByIDs(...args),
-    getComplianceViolationPeriods: args => ComplianceServiceProvider.getComplianceViolationPeriods(...args)
+    getComplianceViolationPeriods: args => ComplianceServiceProvider.getComplianceViolationPeriods(...args),
+    getComplianceViolation: args => ComplianceServiceProvider.getComplianceViolation(...args),
+    getComplianceViolationsByTimeInterval: args =>
+      ComplianceServiceProvider.getComplianceViolationsByTimeInterval(...args)
   },
   {
     port: process.env.COMPLIANCE_SERVICE_RPC_PORT,

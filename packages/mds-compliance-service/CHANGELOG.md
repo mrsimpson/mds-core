@@ -1,5 +1,29 @@
 # @mds-core/mds-compliance-service
 
+## 0.6.0
+
+### Minor Changes
+
+- 5c02e73f: Add Compliance Violation Entity
+
+### Patch Changes
+
+- Updated dependencies [0a238253]
+- Updated dependencies [0a238253]
+- Updated dependencies [d1de33fd]
+- Updated dependencies [259ad4bb]
+- Updated dependencies [5c02e73f]
+  - @mds-core/mds-types@0.6.0
+  - @mds-core/mds-utils@0.2.6
+  - @mds-core/mds-rpc-common@0.1.17
+  - @mds-core/mds-db@0.4.8
+  - @mds-core/mds-policy-service@0.6.5
+  - @mds-core/mds-providers@0.1.41
+  - @mds-core/mds-repository@0.1.17
+  - @mds-core/mds-schema-validators@0.3.8
+  - @mds-core/mds-service-helpers@0.3.10
+  - @mds-core/mds-stream@0.1.43
+
 ## 0.5.5
 
 ### Patch Changes

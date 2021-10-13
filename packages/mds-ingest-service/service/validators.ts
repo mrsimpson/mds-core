@@ -146,11 +146,6 @@ export const { validate: validateEventDomainModel, $schema: EventSchema } = Sche
         type: 'string',
         enum: [...new Set(VEHICLE_STATES)]
       },
-      /** NOTE:
-       * Telemetry is considered non-optional as of MDS 1.0, even though some legacy events do not have
-       * telemetry (e.g. `register`). This is why the schema is more restrictive (non-nullable)
-       * than the standard EventDomainModel, and why this returns a more restrictive type post-validation.
-       */
       telemetry: TelemetrySchema,
       // ⬇⬇⬇ NULLABLE/OPTIONAL PROPERTIES ⬇⬇⬇
       trip_state: {
@@ -159,7 +154,6 @@ export const { validate: validateEventDomainModel, $schema: EventSchema } = Sche
         nullable: true,
         default: null
       },
-      telemetry_timestamp: nullableInteger,
       trip_id: { ...uuidSchema, nullable: true, default: null }
     },
     if: {

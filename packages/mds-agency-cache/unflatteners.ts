@@ -31,7 +31,6 @@ import { ParseError } from '@mds-core/mds-utils'
 import {
   CachedItem,
   StringifiedCacheReadDeviceResult,
-  StringifiedEvent,
   StringifiedEventWithTelemetry,
   StringifiedTelemetry
 } from './types'
@@ -59,19 +58,15 @@ function parseTelemetry(telemetry: StringifiedTelemetry): Telemetry {
   }
 }
 
-function parseEvent(
-  event: StringifiedEvent & {
-    telemetry?: StringifiedTelemetry
-  }
-): VehicleEvent {
+function parseEvent(event: StringifiedEventWithTelemetry): VehicleEvent {
   if (event) {
     return {
       device_id: event.device_id,
       provider_id: event.provider_id,
       timestamp: Number(event.timestamp),
       event_types: event.event_types as VEHICLE_EVENT[],
-      telemetry_timestamp: event.telemetry_timestamp ? Number(event.telemetry_timestamp) : null,
-      telemetry: event.telemetry ? parseTelemetry(event.telemetry) : null,
+      telemetry_timestamp: Number(event.telemetry_timestamp),
+      telemetry: parseTelemetry(event.telemetry),
       trip_id: event.trip_id ? event.trip_id : null,
       recorded: Number(event.recorded),
       vehicle_state: event.vehicle_state as VEHICLE_STATE,

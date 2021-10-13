@@ -1,5 +1,12 @@
 # @container-images/mds-policy
 
+## 0.1.21
+
+### Patch Changes
+
+- 5321cca0: Upgrade to node:16.11.1-alpine
+  - @mds-core/mds-policy@0.5.7
+
 ## 0.1.20
 
 ### Patch Changes
