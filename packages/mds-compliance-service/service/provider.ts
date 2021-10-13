@@ -24,7 +24,9 @@ import {
   ComplianceService,
   ComplianceViolationPeriodDomainModel,
   GetComplianceSnapshotsByTimeIntervalOptions,
-  GetComplianceViolationPeriodsOptions
+  GetComplianceViolationOptions,
+  GetComplianceViolationPeriodsOptions,
+  GetComplianceViolationsByTimeIntervalOptions
 } from '../@types'
 import { ComplianceRepository } from '../repository'
 import { ComplianceViolationPeriodEntityToDomainCreate } from '../repository/mappers'
@@ -33,6 +35,16 @@ import {
   validateComplianceSnapshotDomainModel,
   validateGetComplianceSnapshotsByTimeIntervalOptions
 } from './validators'
+
+const serviceErrorWrapper = async <T>(method: string, exec: () => Promise<T>) => {
+  try {
+    return ServiceResult(await exec())
+  } catch (error) {
+    const exception = ServiceException(`Error Compliance:${method}`, error)
+    logger.error(`mds-compliance-service::${method} error`, { exception, error })
+    return exception
+  }
+}
 
 export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & ProcessController = {
   start: async () => {
@@ -72,6 +84,14 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return exception
     }
   },
+  createComplianceViolation: async complianceViolation =>
+    serviceErrorWrapper('createComplianceViolation', () =>
+      ComplianceRepository.createComplianceViolation(complianceViolation)
+    ),
+  createComplianceViolations: async complianceViolations =>
+    serviceErrorWrapper('createComplianceViolations', () =>
+      ComplianceRepository.createComplianceViolations(complianceViolations)
+    ),
   getComplianceSnapshot: async options => {
     try {
       return ServiceResult(await ComplianceRepository.getComplianceSnapshot(options))
@@ -106,6 +126,14 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return exception
     }
   },
+
+  getComplianceViolation: async (options: GetComplianceViolationOptions) =>
+    serviceErrorWrapper('getComplianceViolation', () => ComplianceRepository.getComplianceViolation(options)),
+
+  getComplianceViolationsByTimeInterval: (options: GetComplianceViolationsByTimeIntervalOptions) =>
+    serviceErrorWrapper('getComplianceViolationsByTimeInterval', () =>
+      ComplianceRepository.getComplianceViolationsByTimeInterval(options)
+    ),
 
   getComplianceViolationPeriods: async (options: GetComplianceViolationPeriodsOptions) => {
     try {

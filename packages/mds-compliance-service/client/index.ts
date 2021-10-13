@@ -31,5 +31,11 @@ export const ComplianceServiceClient: ServiceClient<ComplianceService> = {
   getComplianceSnapshotsByIDs: (...args) => RpcRequest(ComplianceServiceRpcClient.getComplianceSnapshotsByIDs, args),
   createComplianceSnapshot: (...args) => RpcRequest(ComplianceServiceRpcClient.createComplianceSnapshot, args),
   createComplianceSnapshots: (...args) => RpcRequest(ComplianceServiceRpcClient.createComplianceSnapshots, args),
-  getComplianceViolationPeriods: (...args) => RpcRequest(ComplianceServiceRpcClient.getComplianceViolationPeriods, args)
+  getComplianceViolationPeriods: (...args) =>
+    RpcRequest(ComplianceServiceRpcClient.getComplianceViolationPeriods, args),
+  getComplianceViolation: (...args) => RpcRequest(ComplianceServiceRpcClient.getComplianceViolation, args),
+  getComplianceViolationsByTimeInterval: (...args) =>
+    RpcRequest(ComplianceServiceRpcClient.getComplianceViolationsByTimeInterval, args),
+  createComplianceViolation: (...args) => RpcRequest(ComplianceServiceRpcClient.createComplianceViolation, args),
+  createComplianceViolations: (...args) => RpcRequest(ComplianceServiceRpcClient.createComplianceViolations, args)
 }
