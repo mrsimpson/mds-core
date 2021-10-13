@@ -1,5 +1,13 @@
 # @container-images/mds-ingest-service
 
+## 0.0.23
+
+### Patch Changes
+
+- 5321cca0: Upgrade to node:16.11.1-alpine
+- Updated dependencies [0a238253]
+  - @mds-core/mds-ingest-service@0.5.0
+
 ## 0.0.22
 
 ### Patch Changes

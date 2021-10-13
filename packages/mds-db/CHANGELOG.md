@@ -1,5 +1,21 @@
 # @mds-core/mds-db
 
+## 0.4.8
+
+### Patch Changes
+
+- 259ad4bb: Remove deprecated mds-db method that's been replaced my mds-ingest-service
+- Updated dependencies [0a238253]
+- Updated dependencies [0a238253]
+- Updated dependencies [5c02e73f]
+  - @mds-core/mds-ingest-service@0.5.0
+  - @mds-core/mds-types@0.6.0
+  - @mds-core/mds-utils@0.2.6
+  - @mds-core/mds-attachment-service@0.2.4
+  - @mds-core/mds-audit-service@0.2.4
+  - @mds-core/mds-geography-service@0.2.4
+  - @mds-core/mds-policy-service@0.6.5
+
 ## 0.4.7
 
 ### Patch Changes

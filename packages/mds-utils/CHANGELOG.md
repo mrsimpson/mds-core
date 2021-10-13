@@ -1,5 +1,14 @@
 # @mds-core/mds-utils
 
+## 0.2.6
+
+### Patch Changes
+
+- 0a238253: Add zip method for zipping up lists with a mapper
+- Updated dependencies [0a238253]
+- Updated dependencies [5c02e73f]
+  - @mds-core/mds-types@0.6.0
+
 ## 0.2.5
 
 ### Patch Changes
