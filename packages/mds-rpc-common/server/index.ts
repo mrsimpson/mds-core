@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { ModuleRpcProtocolServer } from '@lacuna-tech/rpc_ts/lib/protocol/server'
+import { ServiceHandlerFor } from '@lacuna-tech/rpc_ts/lib/server/server'
 import {
   HealthRequestHandler,
   HttpServer,
@@ -28,8 +30,6 @@ import express from 'express'
 import http from 'http'
 import net from 'net'
 import REPL from 'repl'
-import { ModuleRpcProtocolServer } from 'rpc_ts/lib/protocol/server'
-import { ServiceHandlerFor } from 'rpc_ts/lib/server/server'
 import { REPL_PORT, RpcServiceDefinition, RPC_CONTENT_TYPE, RPC_PORT } from '../@types'
 import { RpcCommonLogger as logger } from '../logger'
 
