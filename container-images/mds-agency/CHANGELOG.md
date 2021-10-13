@@ -1,5 +1,12 @@
 # @container-images/mds-agency
 
+## 0.1.48
+
+### Patch Changes
+
+- 5321cca0: Upgrade to node:16.11.1-alpine
+  - @mds-core/mds-agency@0.2.6
+
 ## 0.1.47
 
 ### Patch Changes

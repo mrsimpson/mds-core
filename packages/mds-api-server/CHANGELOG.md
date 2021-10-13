@@ -1,5 +1,14 @@
 # @mds-core/mds-api-server
 
+## 0.3.8
+
+### Patch Changes
+
+- Updated dependencies [0a238253]
+  - @mds-core/mds-utils@0.2.6
+  - @mds-core/mds-api-authorizer@0.1.43
+  - @mds-core/mds-service-helpers@0.3.10
+
 ## 0.3.7
 
 ### Patch Changes

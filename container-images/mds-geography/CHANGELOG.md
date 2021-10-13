@@ -1,5 +1,12 @@
 # @container-images/mds-geography
 
+## 0.0.24
+
+### Patch Changes
+
+- 5321cca0: Upgrade to node:16.11.1-alpine
+  - @mds-core/mds-geography@0.1.7
+
 ## 0.0.23
 
 ### Patch Changes

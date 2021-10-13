@@ -1,5 +1,12 @@
 # @container-images/mds-transaction-api
 
+## 0.0.23
+
+### Patch Changes
+
+- 5321cca0: Upgrade to node:16.11.1-alpine
+  - @mds-core/mds-transaction-api@0.1.22
+
 ## 0.0.22
 
 ### Patch Changes

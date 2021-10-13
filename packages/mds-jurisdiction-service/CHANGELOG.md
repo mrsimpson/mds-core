@@ -1,5 +1,20 @@
 # @mds-core/mds-jurisdiction-service
 
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies [0a238253]
+- Updated dependencies [0a238253]
+- Updated dependencies [d1de33fd]
+- Updated dependencies [5c02e73f]
+  - @mds-core/mds-types@0.6.0
+  - @mds-core/mds-utils@0.2.6
+  - @mds-core/mds-rpc-common@0.1.17
+  - @mds-core/mds-repository@0.1.17
+  - @mds-core/mds-schema-validators@0.3.8
+  - @mds-core/mds-service-helpers@0.3.10
+
 ## 0.2.3
 
 ### Patch Changes

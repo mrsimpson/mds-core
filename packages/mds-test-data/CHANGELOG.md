@@ -1,5 +1,20 @@
 # @mds-core/mds-test-data
 
+## 0.4.0
+
+### Minor Changes
+
+- 0a238253: Remove makeEvents method, in favor of makeEventsWithTelemetry
+
+### Patch Changes
+
+- Updated dependencies [0a238253]
+- Updated dependencies [0a238253]
+- Updated dependencies [5c02e73f]
+  - @mds-core/mds-types@0.6.0
+  - @mds-core/mds-utils@0.2.6
+  - @mds-core/mds-providers@0.1.41
+
 ## 0.3.5
 
 ### Patch Changes
