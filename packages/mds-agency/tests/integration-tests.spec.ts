@@ -32,7 +32,7 @@ import { ApiServer } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
 import stream from '@mds-core/mds-stream'
-import { JUMP_TEST_DEVICE_1, makeDevices, makeEvents, makeTelemetry } from '@mds-core/mds-test-data'
+import { JUMP_TEST_DEVICE_1, makeDevices, makeEventsWithTelemetry, makeTelemetry } from '@mds-core/mds-test-data'
 import {
   Device,
   MICRO_MOBILITY_EVENT_STATES_MAP,
@@ -142,6 +142,7 @@ const test_event: Omit<VehicleEvent, 'recorded' | 'provider_id'> = {
   vehicle_state: 'removed',
   trip_state: null,
   timestamp: testTimestamp,
+  telemetry_timestamp: testTimestamp,
   telemetry: makeTelemetry([TEST_BICYCLE as any], testTimestamp)[0]
 }
 
@@ -157,6 +158,8 @@ function deepCopy<T>(obj: T): T {
 const AUTH = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}|${PROVIDER_SCOPES}`).toString('base64')}`
 const AUTH2 = `basic ${Buffer.from(`${TEST2_PROVIDER_ID}|${PROVIDER_SCOPES}`).toString('base64')}`
 const AUTH_NO_SCOPE = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}`).toString('base64')}`
+
+const SAN_FERNANDO_VALLEY = 'e3ed0a0e-61d3-4887-8b6a-4af4f3769c14'
 
 before(async () => {
   await Promise.all([db.reinitialize(), cache.reinitialize()])
@@ -1553,7 +1556,7 @@ describe('Tests API', () => {
 describe('Tests pagination', async () => {
   before(async () => {
     const devices = makeDevices(100, now())
-    const events = makeEvents(devices, now())
+    const events = makeEventsWithTelemetry(devices, now(), SAN_FERNANDO_VALLEY)
     const seedData = { devices, events, telemetry: [] }
     await Promise.all([db.reinitialize(), cache.reinitialize()])
     await Promise.all([cache.seed(seedData), db.seed(seedData)])

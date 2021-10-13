@@ -97,11 +97,15 @@ export function convert_v0_4_1_vehicle_event_to_v1_0_0(event: VehicleEvent_v0_4_
     timestamp,
     event_type,
     event_type_reason = null,
-    telemetry_timestamp = null,
-    telemetry = null,
+    telemetry_timestamp,
+    telemetry,
     trip_id = null,
     recorded
   } = event
+
+  if (!telemetry_timestamp || !telemetry) {
+    throw new Error('telemetry_timestamp and telemetry are required for all events in 1.0')
+  }
 
   if (event_type === 'register') {
     throw new UnsupportedEventTypeError(`Unexpected 'register' event_type for device_id ${device_id}`)

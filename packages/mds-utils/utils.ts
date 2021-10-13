@@ -595,6 +595,22 @@ export const START_NOW = now()
 export const START_TOMORROW = now() + (now() % days(1))
 export const START_ONE_MONTH_FROM_NOW = now() - (now() % days(1)) + days(30)
 
+/**
+ *
+ * @param arr1 First list to zip
+ * @param arr2 Second list to zip
+ * @returns A list of zipped & mapped values
+ *
+ * @example zip([1, 2, 3], ['a', 'b', 'c'], (a, b) => `${a}${b}`) => ['1a', '2b', '3c']
+ * Zips two lists of equal length, mapping each tuple to a new value.
+ */
+const zip = <T, U, R>(arr1: T[], arr2: U[], mapper: (x: T, y: U) => R) => {
+  if (arr1.length !== arr2.length) {
+    throw new Error('Arrays must be of equal length in order to zip')
+  }
+  return arr1.map((elem, index) => mapper(elem, arr2[index]))
+}
+
 export {
   UUID_REGEX,
   isUUID,
@@ -645,5 +661,6 @@ export {
   filterDefined,
   areThereCommonElements,
   setEmptyArraysToUndefined,
-  testEnvSafeguard
+  testEnvSafeguard,
+  zip
 }

@@ -95,7 +95,7 @@ const TEST_TELEMETRY_B2: TelemetryDomainCreateModel = {
   timestamp: testTimestamp + 1000
 }
 
-const TEST_TNC_A: Omit<Device, 'recorded'> = {
+const TEST_DEVICE_A: Omit<Device, 'recorded'> = {
   accessibility_options: ['wheelchair_accessible'],
   device_id: DEVICE_UUID_A,
   provider_id: TEST1_PROVIDER_ID,
@@ -108,7 +108,7 @@ const TEST_TNC_A: Omit<Device, 'recorded'> = {
   model: 'Mantaray'
 }
 
-const TEST_TNC_B: Omit<Device, 'recorded'> = {
+const TEST_DEVICE_B: Omit<Device, 'recorded'> = {
   accessibility_options: ['wheelchair_accessible'],
   device_id: DEVICE_UUID_B,
   provider_id: TEST1_PROVIDER_ID,
@@ -127,7 +127,7 @@ const TEST_EVENT_A1: EventDomainCreateModel = {
   vehicle_state: 'removed',
   trip_state: 'stopped',
   timestamp: testTimestamp,
-  telemetry_timestamp: testTimestamp,
+  telemetry: TEST_TELEMETRY_A1,
   provider_id: TEST1_PROVIDER_ID,
   trip_id: TRIP_UUID_A
   // test-id-1
@@ -139,7 +139,7 @@ const TEST_EVENT_A2: EventDomainCreateModel = {
   vehicle_state: 'unknown',
   trip_state: 'stopped',
   timestamp: testTimestamp + 1000,
-  telemetry_timestamp: testTimestamp + 1000,
+  telemetry: TEST_TELEMETRY_A2,
   provider_id: TEST1_PROVIDER_ID,
   trip_id: TRIP_UUID_A
   // test-id-1
@@ -151,7 +151,7 @@ const TEST_EVENT_B1: EventDomainCreateModel = {
   vehicle_state: 'removed',
   trip_state: 'stopped',
   timestamp: testTimestamp,
-  telemetry_timestamp: testTimestamp,
+  telemetry: TEST_TELEMETRY_B1,
   provider_id: TEST1_PROVIDER_ID,
   trip_id: TRIP_UUID_B
   // test-id-2
@@ -163,7 +163,7 @@ const TEST_EVENT_B2: EventDomainCreateModel = {
   vehicle_state: 'unknown',
   trip_state: 'stopped',
   timestamp: testTimestamp + 1000,
-  telemetry_timestamp: testTimestamp + 1000,
+  telemetry: TEST_TELEMETRY_B2,
   provider_id: TEST1_PROVIDER_ID,
   trip_id: TRIP_UUID_B
   // test-id-2
@@ -233,7 +233,7 @@ describe('Ingest Service Tests', () => {
 
   describe('getDevices', () => {
     beforeEach(async () => {
-      await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B])
+      await IngestRepository.createDevices([TEST_DEVICE_A, TEST_DEVICE_B])
     })
     describe('all_devices', () => {
       it('gets 2 devices', async () => {
@@ -269,11 +269,9 @@ describe('Ingest Service Tests', () => {
 
   describe('getEventsUsingOptions', () => {
     beforeEach(async () => {
-      await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B])
+      await IngestRepository.createDevices([TEST_DEVICE_A, TEST_DEVICE_B])
       await IngestRepository.createEvents([TEST_EVENT_A1, TEST_EVENT_B1])
       await IngestRepository.createEvents([TEST_EVENT_A2, TEST_EVENT_B2])
-      await IngestRepository.createTelemetries([TEST_TELEMETRY_A1, TEST_TELEMETRY_B1])
-      await IngestRepository.createTelemetries([TEST_TELEMETRY_A2, TEST_TELEMETRY_B2])
       await IngestServiceClient.writeEventAnnotations([TEST_EVENT_ANNOTATION_A, TEST_EVENT_ANNOTATION_B])
     })
     describe('all_events', () => {
@@ -512,7 +510,7 @@ describe('Ingest Service Tests', () => {
       it('gets two events, filters on vehicle_id', async () => {
         const { events } = await IngestServiceClient.getEventsUsingOptions({
           time_range: { start: testTimestamp, end: testTimestamp + 2000 },
-          vehicle_id: TEST_TNC_A.vehicle_id,
+          vehicle_id: TEST_DEVICE_A.vehicle_id,
           grouping_type: 'latest_per_vehicle'
         })
         expect(events.length).toEqual(1)
@@ -531,11 +529,9 @@ describe('Ingest Service Tests', () => {
 
   describe('getEventsUsingCursor', () => {
     beforeEach(async () => {
-      await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B])
+      await IngestRepository.createDevices([TEST_DEVICE_A, TEST_DEVICE_B])
       await IngestRepository.createEvents([TEST_EVENT_A1, TEST_EVENT_B1])
       await IngestRepository.createEvents([TEST_EVENT_A2, TEST_EVENT_B2])
-      await IngestRepository.createTelemetries([TEST_TELEMETRY_A1, TEST_TELEMETRY_B1])
-      await IngestRepository.createTelemetries([TEST_TELEMETRY_A2, TEST_TELEMETRY_B2])
     })
 
     it('fetches the next page', async () => {
@@ -599,7 +595,7 @@ describe('Ingest Service Tests', () => {
     })
 
     it('gets events with 2 annotations', async () => {
-      await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B])
+      await IngestRepository.createDevices([TEST_DEVICE_A, TEST_DEVICE_B])
       await IngestRepository.createEvents([TEST_EVENT_A1, TEST_EVENT_B1])
       await IngestRepository.createEvents([TEST_EVENT_A2, TEST_EVENT_B2])
       await IngestServiceClient.writeEventAnnotations([TEST_EVENT_ANNOTATION_A, TEST_EVENT_ANNOTATION_B])
@@ -615,16 +611,22 @@ describe('Ingest Service Tests', () => {
     it('writes migrated device', async () => {
       expect(
         await IngestServiceClient.writeMigratedDevice(
-          { recorded: 0, ...TEST_TNC_A },
+          { recorded: 0, ...TEST_DEVICE_A },
           { migrated_from_source: 'mds.device', migrated_from_version: '0.0', migrated_from_id: 1 }
         )
-      ).toMatchObject(TEST_TNC_A)
+      ).toMatchObject(TEST_DEVICE_A)
     })
 
     it('writes migrated event', async () => {
       expect(
         await IngestServiceClient.writeMigratedVehicleEvent(
-          { trip_state: null, recorded: 0, ...TEST_EVENT_A1 },
+          {
+            trip_state: null,
+            recorded: 0,
+            ...TEST_EVENT_A1,
+            telemetry: TEST_TELEMETRY_A1,
+            telemetry_timestamp: TEST_TELEMETRY_A1.timestamp
+          },
           { migrated_from_source: 'mds.event', migrated_from_version: '0.0', migrated_from_id: 1 }
         )
       ).toMatchObject(TEST_EVENT_A1)
@@ -644,8 +646,6 @@ describe('Ingest Service Tests', () => {
     beforeEach(async () => {
       await IngestRepository.createEvents([TEST_EVENT_A1, TEST_EVENT_B1])
       await IngestRepository.createEvents([TEST_EVENT_A2, TEST_EVENT_B2])
-      await IngestRepository.createTelemetries([TEST_TELEMETRY_A1, TEST_TELEMETRY_B1])
-      await IngestRepository.createTelemetries([TEST_TELEMETRY_A2, TEST_TELEMETRY_B2])
     })
 
     it('loads all events, with telemetry and gps embeded', async () => {
@@ -711,11 +711,9 @@ describe('Ingest Service Tests', () => {
 
   describe('getEventsWithDeviceAndTelemetryInfo', () => {
     beforeEach(async () => {
-      await IngestRepository.createDevices([TEST_TNC_A, TEST_TNC_B])
+      await IngestRepository.createDevices([TEST_DEVICE_A, TEST_DEVICE_B])
       await IngestRepository.createEvents([TEST_EVENT_A1, TEST_EVENT_B1])
       await IngestRepository.createEvents([TEST_EVENT_A2, TEST_EVENT_B2])
-      await IngestRepository.createTelemetries([TEST_TELEMETRY_A1, TEST_TELEMETRY_B1])
-      await IngestRepository.createTelemetries([TEST_TELEMETRY_A2, TEST_TELEMETRY_B2])
     })
 
     it('invalid options throws validation error', async () => {
@@ -751,6 +749,49 @@ describe('Ingest Service Tests', () => {
         expect(nextPrev).not.toBeNull()
         expect(nextNext).toBeNull()
       }
+    })
+  })
+
+  describe('Tests writeEvent service method', () => {
+    /**
+     * Clear DB after each test runs, and after the file is finished. No side-effects for you.
+     */
+    beforeEach(async () => {
+      await IngestRepository.deleteAll()
+    })
+
+    it('Tests writing an event w/ telemetry for a device that exists', async () => {
+      await IngestRepository.createDevices([TEST_DEVICE_A])
+      const writeResult = await IngestServiceClient.writeEvents([TEST_EVENT_A1])
+
+      expect(writeResult).toHaveLength(1)
+      expect(writeResult).toMatchObject([TEST_EVENT_A1])
+
+      const { events } = await IngestRepository.getEventsUsingOptions({
+        device_ids: [TEST_DEVICE_A.device_id],
+        grouping_type: 'all_events'
+      })
+
+      expect(events).toHaveLength(1)
+      const [event] = events
+      expect(event).toMatchObject(TEST_EVENT_A1)
+      expect(event).toHaveProperty('telemetry') // pretty sure the match tests this, but better safe than sorry
+    })
+
+    it("Tests writing an event w/ telemetry for a device that doesn't exist (should fail)", async () => {
+      await expect(IngestServiceClient.writeEvents([TEST_EVENT_A1])).rejects.toMatchObject({
+        type: 'NotFoundError'
+      })
+    })
+
+    it('Tests writing an event without telemetry (should fail)', async () => {
+      await IngestRepository.createDevices([TEST_DEVICE_A])
+
+      const { telemetry, ...eventWithoutTelemetry } = TEST_EVENT_A1
+
+      await expect(IngestServiceClient.writeEvents([eventWithoutTelemetry as any])).rejects.toMatchObject({
+        type: 'ValidationError'
+      })
     })
   })
 

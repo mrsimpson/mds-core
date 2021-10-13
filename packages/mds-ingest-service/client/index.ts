@@ -44,6 +44,7 @@ export const IngestServiceClient: ServiceClient<IngestService & IngestMigrationS
     return response.result
   }, // Temporarily remove RPC hop per APPS-155
   getLatestTelemetryForDevices: (...args) => RpcRequest(IngestServiceRpcClient.getLatestTelemetryForDevices, args),
+  writeEvents: (...args) => RpcRequest(IngestServiceRpcClient.writeEvents, args),
   writeEventAnnotations: (...args) => RpcRequest(IngestServiceRpcClient.writeEventAnnotations, args),
   writeMigratedDevice: (...args) => RpcRequest(IngestServiceRpcClient.writeMigratedDevice, args),
   writeMigratedVehicleEvent: (...args) => RpcRequest(IngestServiceRpcClient.writeMigratedVehicleEvent, args),

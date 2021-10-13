@@ -34,6 +34,7 @@ import { IncreaseMigratedFromSourceColumnLength1631275864436 } from './163127586
 import { AddTelemetryTimestampIndex1632938124126 } from './1632938124126-AddTelemetryTimestampIndex'
 import { CreateTypeormMetadataTable1633181195937 } from './1633181195937-CreateTypeormMetadataTable'
 import { CreateEventsWithDeviceAndTelemetryInfoView1633182766754 } from './1633182766754-CreateEventsWithDeviceAndTelemetryInfoView'
+import { SetTelemetryTimestampNonNullable1633354341092 } from './1633354341092-SetTelemetryTimestampNonNullable'
 
 export default [
   CreateDevicesTable1603212409274,
@@ -55,5 +56,6 @@ export default [
   IncreaseMigratedFromSourceColumnLength1631275864436,
   AddTelemetryTimestampIndex1632938124126,
   CreateTypeormMetadataTable1633181195937,
-  CreateEventsWithDeviceAndTelemetryInfoView1633182766754
+  CreateEventsWithDeviceAndTelemetryInfoView1633182766754,
+  SetTelemetryTimestampNonNullable1633354341092
 ]

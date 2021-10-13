@@ -32,7 +32,6 @@ import {
   CachedItem,
   CacheReadDeviceResult,
   StringifiedCacheReadDeviceResult,
-  StringifiedEvent,
   StringifiedEventWithTelemetry,
   StringifiedTelemetry
 } from './types'
@@ -335,7 +334,7 @@ async function readDevicesStatus(query: {
   logger.info(`mds-agency-cache readDevicesStatus bbox fetch ${JSON.stringify(bbox)} time elapsed: ${timeElapsed}ms`)
 
   const eventsStart = now()
-  const events = ((await hreads(['event'], deviceIds)) as StringifiedEvent[])
+  const events = ((await hreads(['event'], deviceIds)) as StringifiedEventWithTelemetry[])
     .reduce((acc: VehicleEvent[], item: StringifiedEventWithTelemetry) => {
       try {
         const parsedItem = parseEvent(item)
