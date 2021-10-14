@@ -17,6 +17,7 @@
 import { NodeHttpTransport } from '@improbable-eng/grpc-web-node-http-transport'
 import { ClientRpcError } from '@lacuna-tech/rpc_ts/lib/client/errors'
 import { ModuleRpcProtocolClient } from '@lacuna-tech/rpc_ts/lib/protocol/client'
+import { ModuleRpcProtocolGrpcWebCommon } from '@lacuna-tech/rpc_ts/lib/protocol/grpc_web/common'
 import { ServiceError, ServiceResponse } from '@mds-core/mds-service-helpers'
 import { AnyFunction } from '@mds-core/mds-types'
 import { RpcServiceDefinition, RPC_HOST, RPC_PORT } from '../@types'
@@ -33,7 +34,8 @@ export const RpcClient = <S>(definition: RpcServiceDefinition<S>, options: Parti
 
   return ModuleRpcProtocolClient.getRpcClient(definition, {
     getGrpcWebTransport: NodeHttpTransport(),
-    remoteAddress: `${host}:${port}`
+    remoteAddress: `${host}:${port}`,
+    codec: new ModuleRpcProtocolGrpcWebCommon.GrpcWebJsonWithGzipCodec()
   })
 }
 
