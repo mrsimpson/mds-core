@@ -1,5 +1,12 @@
 # @mds-core/mds-collector-backend
 
+## 0.1.18
+
+### Patch Changes
+
+- Updated dependencies [844098d1]
+  - @mds-core/mds-rpc-common@0.1.18
+
 ## 0.1.17
 
 ### Patch Changes

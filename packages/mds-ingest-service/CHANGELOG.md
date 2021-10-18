@@ -1,5 +1,13 @@
 # @mds-core/mds-ingest-service
 
+## 0.5.1
+
+### Patch Changes
+
+- 28c9e946: Add env var option to enable RPC
+- Updated dependencies [844098d1]
+  - @mds-core/mds-rpc-common@0.1.18
+
 ## 0.5.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-policy-service",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "Mobility Data Specification Policy Service",
   "keywords": [
     "mds",
@@ -23,10 +23,10 @@
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-geography-service": "workspace:0.2.4",
+    "@mds-core/mds-geography-service": "workspace:0.2.5",
     "@mds-core/mds-logger": "workspace:0.4.1",
     "@mds-core/mds-repository": "workspace:0.1.17",
-    "@mds-core/mds-rpc-common": "workspace:0.1.17",
+    "@mds-core/mds-rpc-common": "workspace:0.1.18",
     "@mds-core/mds-schema-validators": "workspace:0.3.8",
     "@mds-core/mds-service-helpers": "workspace:0.3.10",
     "@mds-core/mds-types": "workspace:0.6.0",
