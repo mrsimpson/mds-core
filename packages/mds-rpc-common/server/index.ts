@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { ModuleRpcProtocolGrpcWebCommon } from '@lacuna-tech/rpc_ts/lib/protocol/grpc_web/common'
 import { ModuleRpcProtocolServer } from '@lacuna-tech/rpc_ts/lib/protocol/server'
 import { ServiceHandlerFor } from '@lacuna-tech/rpc_ts/lib/server/server'
 import {
@@ -105,7 +106,11 @@ export const RpcServer = <S>(
             .use(RequestLoggingMiddleware({ includeRemoteAddress: true }))
             .use(RawBodyParserMiddleware({ type: RPC_CONTENT_TYPE, limit: options.maxRequestSize }))
             .get('/health', HealthRequestHandler)
-            .use(ModuleRpcProtocolServer.registerRpcRoutes(definition, routes)),
+            .use(
+              ModuleRpcProtocolServer.registerRpcRoutes(definition, routes, {
+                codec: new ModuleRpcProtocolGrpcWebCommon.GrpcWebJsonWithGzipCodec()
+              })
+            ),
           { port }
         )
         if (options.repl && process.env.NODE_ENV !== 'test') {

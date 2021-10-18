@@ -15,7 +15,7 @@
  */
 
 import { RpcClient, RpcRequest } from '@mds-core/mds-rpc-common'
-import { ServiceClient } from '@mds-core/mds-service-helpers'
+import { ServiceClient, UnwrapServiceResult } from '@mds-core/mds-service-helpers'
 import { IngestMigrationService, IngestService, IngestServiceDefinition } from '../@types'
 import { IngestServiceProvider } from '../service/provider'
 
@@ -28,21 +28,15 @@ const IngestServiceRpcClient = RpcClient(IngestServiceDefinition, {
 export const IngestServiceClient: ServiceClient<IngestService & IngestMigrationService> = {
   getDevicesUsingOptions: (...args) => RpcRequest(IngestServiceRpcClient.getDevicesUsingOptions, args),
   getDevicesUsingCursor: (...args) => RpcRequest(IngestServiceRpcClient.getDevicesUsingCursor, args),
-  getEventsUsingOptions: async args => {
-    const response = await IngestServiceProvider.getEventsUsingOptions(args)
-    if (response.error) {
-      throw response.error
-    }
-    return response.result
-  }, // Temporarily remove RPC hop per APPS-155
+  getEventsUsingOptions: (...args) =>
+    process.env.ENABLE_RPC === 'true'
+      ? RpcRequest(IngestServiceRpcClient.getEventsUsingOptions, args)
+      : UnwrapServiceResult(IngestServiceProvider.getEventsUsingOptions)(...args), // Temporarily remove RPC hop per APPS-155
   getEventsUsingCursor: (...args) => RpcRequest(IngestServiceRpcClient.getEventsUsingCursor, args),
-  getDevices: async args => {
-    const response = await IngestServiceProvider.getDevices(args)
-    if (response.error) {
-      throw response.error
-    }
-    return response.result
-  }, // Temporarily remove RPC hop per APPS-155
+  getDevices: (...args) =>
+    process.env.ENABLE_RPC === 'true'
+      ? RpcRequest(IngestServiceRpcClient.getDevices, args)
+      : UnwrapServiceResult(IngestServiceProvider.getDevices)(...args), // Temporarily remove RPC hop per APPS-155
   getLatestTelemetryForDevices: (...args) => RpcRequest(IngestServiceRpcClient.getLatestTelemetryForDevices, args),
   writeEvents: (...args) => RpcRequest(IngestServiceRpcClient.writeEvents, args),
   writeEventAnnotations: (...args) => RpcRequest(IngestServiceRpcClient.writeEventAnnotations, args),
