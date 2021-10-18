@@ -193,7 +193,7 @@ const cacheDevicesEventsAndTelemetry = async (devices: DeviceDomainModel[]) => {
   const device_ids = devices.map(({ device_id }) => device_id)
 
   // Cache the devices
-  await Promise.all(devices.map(cache.writeDevice))
+  await cache.writeDevices(devices)
 
   // Cache the latest event for each device
   const { events, cursor } = await IngestServiceClient.getEventsUsingOptions({
@@ -204,7 +204,7 @@ const cacheDevicesEventsAndTelemetry = async (devices: DeviceDomainModel[]) => {
   if (cursor.next !== null) {
     throw new ServerError('More than one event returned for a device')
   }
-  await Promise.all(events.map(cache.writeEvent))
+  await cache.writeEvents(events)
 
   // Cache the latest telemetry for each device
   const telemetry = await IngestServiceClient.getLatestTelemetryForDevices(device_ids)

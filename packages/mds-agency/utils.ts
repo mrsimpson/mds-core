@@ -280,22 +280,12 @@ export async function writeTelemetry(telemetry: Telemetry | Telemetry[]) {
   return recorded_telemetry
 }
 
-export async function refresh(device_id: UUID, provider_id: UUID): Promise<string> {
+export async function refresh(devices: Device[]): Promise<string> {
   // TODO all of this back and forth between cache and db is slow
-  const device = await db.readDevice(device_id, provider_id)
-  // logger.info('refresh device', device)
-  await cache.writeDevice(device)
-  try {
-    const event = await db.readEvent(device_id)
-    await cache.writeEvent(event)
-  } catch (error) {
-    logger.info('no events for', { device_id, error })
-  }
-  try {
-    await db.readTelemetry(device_id)
-  } catch (error) {
-    logger.info('no telemetry for', { device_id, error })
-  }
+  await cache.writeDevices(devices)
+  const events = await Promise.all(devices.map(d => db.readEvent(d.device_id)))
+  await cache.writeEvents(events)
+
   return 'done'
 }
 

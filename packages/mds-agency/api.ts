@@ -29,7 +29,7 @@ import {
   updateVehicle,
   writeTripMetadata
 } from './request-handlers'
-import { getCacheInfo, refreshCache, wipeDevice } from './sandbox-admin-request-handlers'
+import { getCacheInfo } from './sandbox-admin-request-handlers'
 import { AgencyApiAccessTokenScopes, AgencyApiRequest, AgencyApiResponse } from './types'
 import { validateDeviceId } from './utils'
 
@@ -122,20 +122,6 @@ function api(app: express.Express): express.Express {
     pathPrefix('/admin/cache/info'),
     checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
     getCacheInfo
-  )
-
-  // wipe a device -- sandbox or admin use only
-  app.get(
-    pathPrefix('/admin/wipe/:device_id'),
-    checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
-    validateDeviceId,
-    wipeDevice
-  )
-
-  app.get(
-    pathPrefix('/admin/cache/refresh'),
-    checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
-    refreshCache
   )
 
   /* Experimental Endpoint */

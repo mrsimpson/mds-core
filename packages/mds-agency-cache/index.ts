@@ -28,6 +28,7 @@ import {
   tail
 } from '@mds-core/mds-utils'
 import flatten, { unflatten } from 'flat'
+import Redis from 'ioredis'
 import {
   CachedItem,
   CacheReadDeviceResult,
@@ -65,10 +66,10 @@ async function info() {
 
 // update the ordered list of (device_id, timestamp) tuples
 // so that we can trivially get a list of "updated since ___" device_ids
-async function updateVehicleList(device_id: UUID, timestamp?: Timestamp) {
+function updateVehicleList(device_id: UUID, pipeline: Redis.Pipeline, timestamp?: Timestamp) {
   const when = timestamp || now()
   // logger.info('redis zadd', device_id, when)
-  return client.zadd(decorateKey('device-ids'), [when, device_id])
+  pipeline.zadd(decorateKey('device-ids'), when.toString(), device_id)
 }
 async function hread(suffix: string, device_id: UUID): Promise<CachedItem> {
   if (!device_id) {
@@ -83,10 +84,9 @@ async function hread(suffix: string, device_id: UUID): Promise<CachedItem> {
 }
 
 /* Store latest known lat/lng for a given device in a redis geo-spatial analysis compatible manner. */
-async function addGeospatialHash(device_id: UUID, coordinates: [number, number]) {
+function addGeospatialHash(device_id: UUID, coordinates: [number, number], pipeline: Redis.Pipeline) {
   const [lat, lng] = coordinates
-  const res = await client.geoadd(decorateKey('locations'), lng, lat, device_id)
-  return res
+  pipeline.geoadd(decorateKey('locations'), lng, lat, device_id)
 }
 
 async function getEventsInBBox(bbox: BoundingBox) {
@@ -131,7 +131,7 @@ async function hreads(
 }
 
 // anything with a device_id, e.g. device, telemetry, etc.
-async function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | VehicleEvent) {
+function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | VehicleEvent, pipeline: Redis.Pipeline) {
   if (typeof item.device_id !== 'string') {
     logger.error(`hwrite: invalid device_id ${item.device_id}`)
     throw new Error(`hwrite: invalid device_id ${item.device_id}`)
@@ -147,23 +147,30 @@ async function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | 
   if (nulls.length > 0) {
     // redis doesn't store null keys, so we have to delete them
     // TODO unit-test
-    await client.hdel(key, ...nulls)
+    pipeline.hdel(key, ...nulls)
   }
 
   const keys = suffix === 'event' ? [decorateKey(`provider:${item.provider_id}:latest_event`), key] : [key]
-  await Promise.all(keys.map(k => client.hset(k, hmap)))
 
-  return updateVehicleList(device_id)
+  keys.forEach(k => pipeline.hset(k, hmap))
+
+  updateVehicleList(device_id, pipeline)
+}
+
+async function writeDevices(devices: Device[]) {
+  const pipeline = await client.multi()
+  devices.forEach(d => writeDevice(d, pipeline))
+  await pipeline.exec()
 }
 
 // put basics of device in the cache
-async function writeDevice(device: Device) {
+function writeDevice(device: Device, pipeline: Redis.Pipeline) {
   try {
     if (!device) {
       throw new Error('null device not legal to write')
     }
 
-    return hwrite('device', device)
+    return hwrite('device', device, pipeline)
   } catch (err) {
     logger.error('Failed to write device to cache', err)
     throw err
@@ -174,7 +181,13 @@ async function readKeys(pattern: string) {
   return client.keys(decorateKey(pattern))
 }
 
-async function wipeDevice(device_id: UUID) {
+async function wipeDevices(device_ids: UUID[]) {
+  const pipeline = await client.multi()
+  device_ids.forEach(d => wipeDevice(d, pipeline))
+  await pipeline.exec()
+}
+
+function wipeDevice(device_id: UUID, pipeline: Redis.Pipeline) {
   const keys = [
     decorateKey(`device:${device_id}:event`),
     decorateKey(`device:${device_id}:telemetry`),
@@ -182,27 +195,35 @@ async function wipeDevice(device_id: UUID) {
   ]
   if (keys.length > 0) {
     logger.info('mds-agency-cache::wipeDevice, deleting keys', { keys })
-    return client.del(...keys)
+    pipeline.del(...keys)
+    return
   }
   logger.warn('mds-agency-cache::wipeDevice, no keys found!', { device_id })
-  return 0
 }
 
-async function writeEvent(event: VehicleEvent) {
-  // FIXME cope with out-of-order -- check timestamp
-  // logger.info('redis write event', event.device_id)
+async function writeEvents(events: VehicleEvent[]) {
+  const pipeline = await client.multi()
+  const prevEvents = await readEvents(events.map(({ device_id }) => device_id))
+  const deviceEventMap = new Map(prevEvents.map(e => [e.device_id, e]))
+  events.forEach(e => writeEvent(e, pipeline, deviceEventMap.get(e.device_id)))
+  await pipeline.exec()
+}
+
+function writeEvent(event: VehicleEvent, pipeline: Redis.Pipeline, prevEvent?: VehicleEvent) {
   try {
     if (tail(event.event_types) === 'decommissioned') {
-      return await wipeDevice(event.device_id)
+      wipeDevice(event.device_id, pipeline)
+      return
     }
-    const prev_event = parseEvent((await hread('event', event.device_id)) as StringifiedEventWithTelemetry)
-    if (prev_event.timestamp < event.timestamp) {
+
+    /* if there's no previous event, or that event is earlier, write a new to the cache */
+    if (!prevEvent || prevEvent.timestamp < event.timestamp) {
       try {
         if (event.telemetry) {
           const { lat, lng } = event.telemetry.gps
-          await addGeospatialHash(event.device_id, [lat, lng])
+          addGeospatialHash(event.device_id, [lat, lng], pipeline)
         }
-        return hwrite('event', event)
+        hwrite('event', event, pipeline)
       } catch (err) {
         logger.error('hwrites', err.stack)
         throw err
@@ -214,9 +235,9 @@ async function writeEvent(event: VehicleEvent) {
     try {
       if (event.telemetry) {
         const { lat, lng } = event.telemetry.gps
-        await addGeospatialHash(event.device_id, [lat, lng])
+        addGeospatialHash(event.device_id, [lat, lng], pipeline)
       }
-      return hwrite('event', event)
+      hwrite('event', event, pipeline)
     } catch (err) {
       logger.error('hwrites', err.stack)
       throw err
@@ -386,16 +407,20 @@ async function readDevicesStatus(query: {
   return valuesWithTelemetry
 }
 
-async function readTelemetry(device_id: UUID): Promise<Telemetry> {
-  // logger.info('redis read telemetry for', device_id)
-  const telemetry = await hread('telemetry', device_id)
-  return parseTelemetry(telemetry as StringifiedTelemetry)
+async function readTelemetry(device_ids: UUID[]): Promise<Telemetry[]> {
+  const results = (await hreads(['telemetry'], device_ids)) as StringifiedTelemetry[]
+  return results.filter(r => r).map(parseTelemetry)
 }
 
-async function writeOneTelemetry(telemetry: Telemetry, options: { quiet: boolean } = { quiet: false }) {
-  const isNewerTelemetry = async () => {
+function writeOneTelemetry(
+  telemetry: Telemetry,
+  options: { quiet: boolean } = { quiet: false },
+  pipeline: Redis.Pipeline,
+  priorTelemetry?: Telemetry
+) {
+  const isNewerTelemetry = () => {
     try {
-      const priorTelemetry = await readTelemetry(telemetry.device_id)
+      if (!priorTelemetry) throw Error('missing prior telemetry')
       return telemetry.timestamp > priorTelemetry.timestamp
     } catch (err) {
       if (!options.quiet) {
@@ -407,12 +432,12 @@ async function writeOneTelemetry(telemetry: Telemetry, options: { quiet: boolean
   }
 
   try {
-    if (await isNewerTelemetry()) {
+    if (isNewerTelemetry()) {
       const { lat, lng } = telemetry.gps
-      await addGeospatialHash(telemetry.device_id, [lat, lng])
-      return hwrite('telemetry', telemetry)
+      addGeospatialHash(telemetry.device_id, [lat, lng], pipeline)
+      hwrite('telemetry', telemetry, pipeline)
     } else {
-      return Promise.resolve()
+      return
     }
   } catch (err) {
     logger.error('writeOneTelemetry error', err.stack)
@@ -422,7 +447,15 @@ async function writeOneTelemetry(telemetry: Telemetry, options: { quiet: boolean
 
 async function writeTelemetry(telemetries: Telemetry[], options: { quiet: boolean } = { quiet: false }) {
   try {
-    await Promise.all(telemetries.map(telemetry => writeOneTelemetry(telemetry, options)))
+    const priorTelemetry = await readTelemetry(telemetries.map(({ device_id }) => device_id))
+    const pipeline = await client.multi()
+    const devicePriorTelemetryMap = new Map(priorTelemetry.map(t => [t.device_id, t]))
+
+    telemetries.forEach(telemetry =>
+      writeOneTelemetry(telemetry, options, pipeline, devicePriorTelemetryMap.get(telemetry.device_id))
+    )
+
+    await pipeline.exec()
   } catch (err) {
     logger.error('Failed to write telemetry to cache', err)
     throw err
@@ -453,11 +486,9 @@ async function seed(dataParam: { devices: Device[]; events: VehicleEvent[]; tele
     events: [],
     telemetry: []
   }
-  //  logger.info('cache seed redis', Object.keys(data).map(key => `${key} (${data[key].length})`))
-  //  logger.info('cache seed redis', Object.keys(data).forEach(key => `${key} (${data[key].length})`))
 
-  await data.devices.map(writeDevice)
-  await data.events.map(writeEvent)
+  await writeDevices(data.devices)
+  await writeEvents(data.events)
   if (data.telemetry.length !== 0) {
     await writeTelemetry(data.telemetry.sort((a, b) => a.timestamp - b.timestamp))
   }
@@ -533,9 +564,8 @@ export default {
   reset,
   startup,
   shutdown,
-  writeDevice,
-  writeEvent,
-  writeOneTelemetry,
+  writeDevices,
+  writeEvents,
   writeTelemetry,
   readDevice,
   readDevices,
@@ -547,7 +577,6 @@ export default {
   readTelemetry,
   readAllTelemetry,
   readKeys,
-  wipeDevice,
-  updateVehicleList,
+  wipeDevices,
   cleanup
 }

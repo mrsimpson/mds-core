@@ -141,7 +141,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     try {
       const [model = null] = await IngestRepository.writeMigratedDevice([device], migrated_from)
       if (model) {
-        const [cached, streamed] = await Promise.allSettled([cache.writeDevice(model), stream.writeDevice(model)])
+        const [cached, streamed] = await Promise.allSettled([cache.writeDevices([model]), stream.writeDevice(model)])
         if (cached.status === 'rejected') {
           logger.warn('Error writing device to cache', { device: model, error: cached.reason })
         }
@@ -192,7 +192,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       const [migrated = null] = await IngestRepository.writeMigratedVehicleEvent([event], migrated_from)
       if (migrated) {
         const model = { ...migrated, telemetry: eventTelemetryModel(telemetry, { recorded: event.recorded }) }
-        const [cached, streamed] = await Promise.allSettled([cache.writeEvent(model), stream.writeEvent(model)])
+        const [cached, streamed] = await Promise.allSettled([cache.writeEvents([model]), stream.writeEvent(model)])
         if (cached.status === 'rejected') {
           logger.warn('Error writing event to cache', { event: model, error: cached.reason })
         }

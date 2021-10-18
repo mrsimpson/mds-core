@@ -93,7 +93,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     // DB Write is critical, and failures to write to the cache/stream should be considered non-critical (though they are likely indicative of a bug).
     await db.writeDevice(device)
     try {
-      await Promise.all([cache.writeDevice(device), stream.writeDevice(device)])
+      await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
     } catch (error) {
       logger.error('failed to write device stream/cache', error)
     }
@@ -204,7 +204,7 @@ export const updateVehicle = async (req: AgencyApiUpdateVehicleRequest, res: Age
       const device = await db.updateDevice(device_id, provider_id, update)
       // TODO should we warn instead of fail if the cache/stream doesn't work?
       try {
-        await Promise.all([cache.writeDevice(device), stream.writeDevice(device)])
+        await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
       } catch (error) {
         logger.warn(`Error writing to cache/stream ${error}`)
       }

@@ -89,7 +89,7 @@ const refreshDeviceCache = async (device: Device, event: VehicleEvent) => {
     await cache.readDevice(event.device_id)
   } catch (err) {
     try {
-      await Promise.all([cache.writeDevice(device), stream.writeDevice(device)])
+      await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
       logger.info('Re-adding previously deregistered device to cache', err)
     } catch (error) {
       logger.warn(`Error writing to cache/stream ${error}`)
@@ -146,7 +146,7 @@ export const createEventHandler = async (
 
     try {
       await Promise.all([
-        cache.writeEvent(recorded_event),
+        cache.writeEvents([recorded_event]),
         stream.writeEvent(recorded_event),
         cache.writeTelemetry([telemetry]),
         stream.writeTelemetry([telemetry])

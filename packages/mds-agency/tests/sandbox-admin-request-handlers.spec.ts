@@ -1,17 +1,8 @@
 import cache from '@mds-core/mds-agency-cache'
-import db from '@mds-core/mds-db'
-import { uuid } from '@mds-core/mds-utils'
 import assert from 'assert'
 import Sinon from 'sinon'
-import {
-  AgencyApiRefreshCacheRequest,
-  AgencyApiWipeDeviceRequest,
-  getCacheInfo,
-  refreshCache,
-  wipeDevice
-} from '../sandbox-admin-request-handlers'
+import { getCacheInfo } from '../sandbox-admin-request-handlers'
 import { AgencyApiRequest, AgencyApiResponse } from '../types'
-import * as utils from '../utils'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -39,104 +30,6 @@ describe('Sandbox admin request handlers', () => {
       Sinon.replace(cache, 'info', Sinon.fake.rejects('it-failed'))
       await getCacheInfo({} as AgencyApiRequest, res)
       assert.equal(statusHandler.calledWith(500), true)
-      Sinon.restore()
-    })
-  })
-  describe('It wipes device', () => {
-    it('Fails to wipe device', async () => {
-      const provider_id = uuid()
-      const device_id = uuid()
-      const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
-      res.locals = { provider_id } as any
-      Sinon.replace(cache, 'wipeDevice', Sinon.fake.rejects('it-failed'))
-      Sinon.replace(db, 'wipeDevice', Sinon.fake.rejects('it-failed'))
-      await wipeDevice(
-        {
-          params: { device_id },
-          query: { cached: false },
-          get: Sinon.fake.returns('foo') as any
-        } as unknown as AgencyApiWipeDeviceRequest,
-        res
-      )
-      assert.equal(statusHandler.calledWith(500), true)
-      Sinon.restore()
-    })
-    it('Successfully wipes device', async () => {
-      const provider_id = uuid()
-      const device_id = uuid()
-      const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
-      res.locals = { provider_id } as any
-      Sinon.replace(cache, 'wipeDevice', Sinon.fake.resolves(1))
-      Sinon.replace(db, 'wipeDevice', Sinon.fake.resolves('it-worked'))
-      await wipeDevice(
-        {
-          params: { device_id },
-          query: { cached: false },
-          get: Sinon.fake.returns('foo') as any
-        } as unknown as AgencyApiWipeDeviceRequest,
-        res
-      )
-      assert.equal(statusHandler.calledWith(200), true)
-      Sinon.restore()
-    })
-  })
-  describe('Refresh cache', () => {
-    it('Successfully refreshes cache', async () => {
-      const provider_id = uuid()
-      const device_id = uuid()
-      const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
-      res.locals = { provider_id } as any
-      Sinon.replace(db, 'readDeviceIds', Sinon.fake.resolves([1]))
-      Sinon.replace(utils, 'refresh', Sinon.fake.resolves([1]))
-      await refreshCache(
-        {
-          params: { device_id },
-          query: { cached: false },
-          get: Sinon.fake.returns('foo') as any
-        } as unknown as AgencyApiRefreshCacheRequest,
-        res
-      )
-      assert.equal(statusHandler.calledWith(200), true)
-      // Sinon.replace(db, 'wipeDevice', Sinon.fake.resolves('it-worked'))
-      Sinon.restore()
-    })
-    it('Fails to refreshes cache', async () => {
-      const provider_id = uuid()
-      const device_id = uuid()
-      const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
-      res.locals = { provider_id } as any
-      Sinon.replace(db, 'readDeviceIds', Sinon.fake.rejects('it-fails'))
-      Sinon.replace(utils, 'refresh', Sinon.fake.rejects('it-fails'))
-      await refreshCache(
-        {
-          params: { device_id },
-          query: { cached: false },
-          get: Sinon.fake.returns('foo') as any
-        } as unknown as AgencyApiRefreshCacheRequest,
-        res
-      )
-      assert.equal(statusHandler.calledWith(500), true)
-      // Sinon.replace(db, 'wipeDevice', Sinon.fake.resolves('it-worked'))
       Sinon.restore()
     })
   })
