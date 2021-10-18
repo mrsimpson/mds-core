@@ -30,6 +30,7 @@ import {
 } from '@mds-core/mds-stream-processor'
 import {
   convert_v0_4_1_device_to_1_0_0,
+  convert_v0_4_1_telemetry_to_1_0_0,
   convert_v0_4_1_vehicle_event_to_v1_0_0,
   convert_v1_0_0_device_to_1_1_0,
   convert_v1_0_0_vehicle_event_to_v1_1_0,
@@ -180,8 +181,8 @@ const TelemetryMigrationProcessor = StreamProcessor<
 >(
   MigrationDataSource('telemetry'),
 
-  async ({ id, ...telemetry }) => ({
-    telemetry,
+  async ({ id, recorded, ...telemetry }) => ({
+    telemetry: { recorded, ...convert_v0_4_1_telemetry_to_1_0_0(telemetry) },
     migrated_from: MigratedFrom('telemetry', id)
   }),
   [IngestServiceMigratedTelemetrySink()],

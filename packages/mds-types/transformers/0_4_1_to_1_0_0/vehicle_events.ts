@@ -6,6 +6,7 @@ import {
   VEHICLE_REASON_v0_4_1
 } from '../@types'
 import { VehicleEvent_v1_0_0, VEHICLE_EVENT_v1_0_0, VEHICLE_STATE_v1_0_0 } from '../@types/1_0_0'
+import { convert_v0_4_1_telemetry_to_1_0_0 } from './telemetry'
 
 export class UnsupportedEventTypeError extends Error {
   public constructor(public name: string, public reason?: string, public info?: unknown) {
@@ -122,7 +123,7 @@ export function convert_v0_4_1_vehicle_event_to_v1_0_0(event: VehicleEvent_v0_4_
     vehicle_state,
     event_types: [new_event_type],
     telemetry_timestamp,
-    telemetry,
+    telemetry: convert_v0_4_1_telemetry_to_1_0_0(telemetry),
     trip_id,
     recorded
   }

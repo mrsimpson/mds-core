@@ -724,6 +724,24 @@ describe('Tests API', () => {
         done(err)
       })
   })
+  it('verifies post event bad heading', done => {
+    request
+      .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
+      .set('Authorization', AUTH)
+      .send({
+        event_types: ['provider_drop_off'],
+        vehicle_state: 'available',
+        telemetry: { ...TEST_TELEMETRY, gps: { ...TEST_TELEMETRY.gps, heading: -1 } },
+        timestamp: testTimestamp
+      })
+      .expect(400)
+      .end((err, result) => {
+        // log('post event', result.body)
+        test.string(result.body.error).contains('bad')
+        test.string(result.body.error_description).contains('A validation error occurred.')
+        done(err)
+      })
+  })
   it('verifies post device maintenance event', done => {
     request
       .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
