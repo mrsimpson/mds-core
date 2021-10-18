@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-rpc-common",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "MDS RPC Common Utilities",
   "keywords": [],
   "license": "Apache-2.0",

@@ -1,5 +1,11 @@
 # @mds-core/mds-rpc-common
 
+## 0.1.18
+
+### Patch Changes
+
+- 844098d1: Use new version of rpc_ts which supports express compression middleware
+
 ## 0.1.17
 
 ### Patch Changes
