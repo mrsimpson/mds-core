@@ -1220,6 +1220,7 @@ importers:
       '@mds-core/mds-rpc-common': workspace:0.1.18
       '@mds-core/mds-schema-validators': workspace:0.3.8
       '@mds-core/mds-service-helpers': workspace:0.3.10
+      '@mds-core/mds-stream': workspace:0.1.38
       '@mds-core/mds-types': workspace:0.6.0
       '@mds-core/mds-utils': workspace:0.2.6
       joi: 17.4.0
@@ -1232,6 +1233,7 @@ importers:
       '@mds-core/mds-rpc-common': link:../mds-rpc-common
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
       '@mds-core/mds-service-helpers': link:../mds-service-helpers
+      '@mds-core/mds-stream': link:../mds-stream
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
       joi: 17.4.0

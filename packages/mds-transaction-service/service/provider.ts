@@ -19,6 +19,7 @@ import { UUID } from '@mds-core/mds-types'
 import { TransactionSearchParams, TransactionService } from '../@types'
 import { TransactionServiceLogger } from '../logger'
 import { TransactionRepository } from '../repository'
+import { TransactionStreamKafka } from './stream'
 import {
   validateTransactionDomainModel,
   validateTransactionId,
@@ -28,11 +29,23 @@ import {
 } from './validators'
 
 export const TransactionServiceProvider: ServiceProvider<TransactionService> & ProcessController = {
-  start: TransactionRepository.initialize,
-  stop: TransactionRepository.shutdown,
+  start: async () => {
+    await Promise.all([TransactionRepository.initialize(), TransactionStreamKafka.initialize()])
+  },
+  stop: async () => {
+    await Promise.all([TransactionRepository.shutdown(), TransactionStreamKafka.shutdown()])
+  },
   createTransaction: async transaction => {
     try {
-      return ServiceResult(await TransactionRepository.createTransaction(validateTransactionDomainModel(transaction)))
+      const recordedTransaction = await TransactionRepository.createTransaction(
+        validateTransactionDomainModel(transaction),
+        {
+          beforeCommit: async pendingTransaction => {
+            await TransactionStreamKafka.write(pendingTransaction)
+          }
+        }
+      )
+      return ServiceResult(recordedTransaction)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating Transaction', error)
       TransactionServiceLogger.error('createTransaction error', { exception, error })
@@ -41,9 +54,15 @@ export const TransactionServiceProvider: ServiceProvider<TransactionService> & P
   },
   createTransactions: async transactions => {
     try {
-      return ServiceResult(
-        await TransactionRepository.createTransactions(transactions.map(validateTransactionDomainModel))
+      const recordedTransactions = await TransactionRepository.createTransactions(
+        transactions.map(validateTransactionDomainModel),
+        {
+          beforeCommit: async pendingTransactions => {
+            await TransactionStreamKafka.write(pendingTransactions)
+          }
+        }
       )
+      return ServiceResult(recordedTransactions)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating Transactions', error)
       TransactionServiceLogger.error('createTransactions error', { exception, error })
