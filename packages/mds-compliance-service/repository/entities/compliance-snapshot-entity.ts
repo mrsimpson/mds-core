@@ -15,18 +15,19 @@
  */
 
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
+import { Timestamp, UUID } from '@mds-core/mds-types'
 import { Column, Entity } from 'typeorm'
-import { ComplianceSnapshotDomainModel } from '../../@types'
+import { MatchedVehicleInformation } from '../../@types'
 
 export interface ComplianceSnapshotEntityModel extends IdentityColumn, RecordedColumn {
-  compliance_snapshot_id: ComplianceSnapshotDomainModel['compliance_snapshot_id']
-  compliance_as_of: ComplianceSnapshotDomainModel['compliance_as_of']
-  provider_id: ComplianceSnapshotDomainModel['provider_id']
-  policy_name: ComplianceSnapshotDomainModel['policy']['name']
-  policy_id: ComplianceSnapshotDomainModel['policy']['policy_id']
-  excess_vehicles_count: ComplianceSnapshotDomainModel['excess_vehicles_count']
-  total_violations: ComplianceSnapshotDomainModel['total_violations']
-  vehicles_found: ComplianceSnapshotDomainModel['vehicles_found']
+  compliance_snapshot_id: UUID
+  compliance_as_of: Timestamp
+  provider_id: UUID
+  policy_name: string
+  policy_id: UUID
+  excess_vehicles_count: number
+  total_violations: number
+  vehicles_found: MatchedVehicleInformation[]
 }
 
 @Entity('compliance_snapshots')
