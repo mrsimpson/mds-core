@@ -15,6 +15,7 @@
  */
 
 import cache from '@mds-core/mds-agency-cache'
+import { RecordedColumn } from '@mds-core/mds-repository'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
 import stream from '@mds-core/mds-stream'
 import { Telemetry } from '@mds-core/mds-types'
@@ -28,6 +29,7 @@ import {
 } from '../@types'
 import { IngestServiceLogger } from '../logger'
 import { IngestRepository } from '../repository'
+import { MigratedEntityModel } from '../repository/mixins/migrated-entity'
 import {
   validateEventAnnotationDomainCreateModels,
   validateEventDomainModel,
@@ -36,6 +38,30 @@ import {
   validateGetVehicleEventsFilterParams,
   validateUUIDs
 } from './validators'
+
+/**
+ *
+ * @param telemetry Telemetry to migrate
+ * @param migrated_from Source information
+ * @returns Migrated telemetry (or null if write fails)
+ * @throws Any errors writing to the database
+ */
+const writeMigratedTelemetry = async (
+  telemetry: Telemetry & Required<RecordedColumn>,
+  migrated_from: MigratedEntityModel
+) => {
+  const [model = null] = await IngestRepository.writeMigratedTelemetry([telemetry], migrated_from)
+  if (model) {
+    const [cached, streamed] = await Promise.allSettled([cache.writeTelemetry([model]), stream.writeTelemetry([model])])
+    if (cached.status === 'rejected') {
+      IngestServiceLogger.warn('Error writing telemetry to cache', { telemetry: model, error: cached.reason })
+    }
+    if (streamed.status === 'rejected') {
+      IngestServiceLogger.warn('Error writing telemetry to stream', { telemetry: model, error: streamed.reason })
+    }
+  }
+  return model
+}
 
 export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrationService> & ProcessController = {
   start: async () => {
@@ -189,9 +215,11 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
 
     try {
-      const [migrated = null] = await IngestRepository.writeMigratedVehicleEvent([event], migrated_from)
-      if (migrated) {
-        const model = { ...migrated, telemetry: eventTelemetryModel(telemetry, { recorded: event.recorded }) }
+      await writeMigratedTelemetry(eventTelemetryModel(telemetry, { recorded: event.recorded }), migrated_from)
+
+      const [migratedEvent = null] = await IngestRepository.writeMigratedVehicleEvent([event], migrated_from)
+      if (migratedEvent) {
+        const model = { ...migratedEvent, telemetry: eventTelemetryModel(telemetry, { recorded: event.recorded }) }
         const [cached, streamed] = await Promise.allSettled([cache.writeEvents([model]), stream.writeEvent(model)])
         if (cached.status === 'rejected') {
           IngestServiceLogger.warn('Error writing event to cache', { event: model, error: cached.reason })
@@ -211,19 +239,8 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
 
   writeMigratedTelemetry: async (telemetry, migrated_from) => {
     try {
-      const [model = null] = await IngestRepository.writeMigratedTelemetry([telemetry], migrated_from)
-      if (model) {
-        const [cached, streamed] = await Promise.allSettled([
-          cache.writeTelemetry([model]),
-          stream.writeTelemetry([model])
-        ])
-        if (cached.status === 'rejected') {
-          IngestServiceLogger.warn('Error writing telemetry to cache', { telemetry: model, error: cached.reason })
-        }
-        if (streamed.status === 'rejected') {
-          IngestServiceLogger.warn('Error writing telemetry to stream', { telemetry: model, error: streamed.reason })
-        }
-      }
+      const model = await writeMigratedTelemetry(telemetry, migrated_from)
+
       return ServiceResult(model)
     } catch (error) {
       const exception = ServiceException('Error in writeMigratedTelemetry', error)
