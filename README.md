@@ -25,7 +25,7 @@ The included code represents what is currently up and running for Los Angeles as
 
 - A current LADOT implementation of all MDS endpoints
 - Development versions of mds-audit, mds-policy, and mds-compliance
-- MDS logging (mds-logger), daily metrics (mds-daily) and Google sheet reporting app for technical compliance.
+- MDS logging (mds-logger).
 
 ![Applications Overview](https://i.imgur.com/AGRubjE.png)
 

@@ -16,7 +16,6 @@
 
 import cache from '@mds-core/mds-agency-cache'
 import { DeviceDomainModel, IngestServiceClient, MigratedEntityModel } from '@mds-core/mds-ingest-service'
-import logger from '@mds-core/mds-logger'
 import { IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import { ProcessManager } from '@mds-core/mds-service-helpers'
 import {
@@ -44,6 +43,7 @@ import {
 } from '@mds-core/mds-types'
 import { asArray, filterDefined, ServerError } from '@mds-core/mds-utils'
 import { bool, cleanEnv, num, str } from 'envalid'
+import { IngestMigrationProcessorLogger } from './logger'
 
 const { KAFKA_HOST, SOURCE_TENANT_ID, TENANT_ID, MIGRATION_BLOCK_SIZE_LIMIT, MIGRATION_INITIALIZE_CACHE } = cleanEnv(
   process.env,
@@ -97,7 +97,7 @@ const IngestServiceMigratedDeviceSink = (): StreamSink<MigratedDevice> => () => 
         const [{ device, migrated_from }] = asArray(message)
         await IngestServiceClient.writeMigratedDevice(device, migrated_from)
       } catch (error) {
-        logger.error(`Error migrating device`, { topic, message })
+        IngestMigrationProcessorLogger.error(`Error migrating device`, { topic, message })
         throw error
       }
     },
@@ -129,7 +129,7 @@ const IngestServiceMigratedVehicleEventSink = (): StreamSink<MigratedVehicleEven
         const [{ event, migrated_from }] = asArray(message)
         await IngestServiceClient.writeMigratedVehicleEvent(event, migrated_from)
       } catch (error) {
-        logger.error(`Error migrating event`, { topic, message })
+        IngestMigrationProcessorLogger.error(`Error migrating event`, { topic, message })
         throw error
       }
     },
@@ -167,7 +167,7 @@ const IngestServiceMigratedTelemetrySink = (): StreamSink<MigratedTelemetry> => 
         const [{ telemetry, migrated_from }] = asArray(message)
         await IngestServiceClient.writeMigratedTelemetry(telemetry, migrated_from)
       } catch (error) {
-        logger.error(`Error migrating telemetry`, { topic, message })
+        IngestMigrationProcessorLogger.error(`Error migrating telemetry`, { topic, message })
         throw error
       }
     },
@@ -223,7 +223,7 @@ const getUncachedDevices = async (devices: DeviceDomainModel[]) => {
 
 const initializeCacheForMigration = async () => {
   if (MIGRATION_INITIALIZE_CACHE) {
-    logger.info('Cache initialization commencing')
+    IngestMigrationProcessorLogger.info('Cache initialization commencing')
 
     try {
       await cache.startup()
@@ -242,7 +242,7 @@ const initializeCacheForMigration = async () => {
       let cursor = next
 
       while (cursor !== null) {
-        logger.info('Cache initialization progress', totals)
+        IngestMigrationProcessorLogger.info('Cache initialization progress', totals)
         const {
           devices,
           cursor: { next }
@@ -256,15 +256,15 @@ const initializeCacheForMigration = async () => {
         cursor = next
       }
 
-      logger.info('Cache initialization complete', totals)
+      IngestMigrationProcessorLogger.info('Cache initialization complete', totals)
     } catch (error) {
-      logger.error('Cache initialization failed', { error })
+      IngestMigrationProcessorLogger.error('Cache initialization failed', { error })
       throw error
     } finally {
       await cache.shutdown()
     }
   } else {
-    logger.info('Cache initialization bypassed')
+    IngestMigrationProcessorLogger.info('Cache initialization bypassed')
   }
 }
 

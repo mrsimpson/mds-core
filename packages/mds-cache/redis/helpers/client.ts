@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { cleanEnv, host, num, str } from 'envalid'
 import Redis from 'ioredis'
+import { CacheLogger } from '../../logger'
 
 const { REDIS_PORT, REDIS_HOST, REDIS_PASS } = cleanEnv(process.env, {
   REDIS_PORT: num({ default: 6379 }),
@@ -34,7 +34,7 @@ export const initClient = async () => {
   })
 
   client.on('connect', () => {
-    logger.info(`Redis connection established to ${REDIS_HOST}:${REDIS_PORT}`)
+    CacheLogger.info(`Redis connection established to ${REDIS_HOST}:${REDIS_PORT}`)
   })
 
   try {
@@ -44,7 +44,10 @@ export const initClient = async () => {
     */
     await client.connect()
   } catch (err) {
-    logger.error(`Initial redis connection to ${REDIS_HOST}:${REDIS_PORT} failed (connection will be retried)`, err)
+    CacheLogger.error(
+      `Initial redis connection to ${REDIS_HOST}:${REDIS_PORT} failed (connection will be retried)`,
+      err
+    )
   }
 
   return client

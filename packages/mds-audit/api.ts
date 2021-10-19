@@ -17,7 +17,6 @@
 import { asJsonApiLinks, parsePagingQueryParams, parseRequest } from '@mds-core/mds-api-helpers'
 import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import { ValidationError } from '@mds-core/mds-schema-validators'
 import { isError } from '@mds-core/mds-service-helpers'
@@ -41,6 +40,7 @@ import {
   readAttachments,
   writeAttachment
 } from './attachments'
+import { AuditLogger } from './logger'
 import { AuditApiVersionMiddleware } from './middleware'
 import {
   deleteAudit,
@@ -92,6 +92,9 @@ import {
   validateUUID
 } from './validators'
 
+const logGenericAuditError = (req: AuditApiRequest<any>, res: AuditApiResponse<any>, err: any) =>
+  AuditLogger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+
 // TODO lib
 function flattenTelemetry(telemetry?: Telemetry): TelemetryData {
   return telemetry
@@ -134,7 +137,7 @@ function api(app: express.Express): express.Express {
           return next()
         }
       }
-      logger.warn('Missing subject_id', { method: req.method, originalUrl: req.originalUrl })
+      AuditLogger.warn('Missing subject_id', { method: req.method, originalUrl: req.originalUrl })
       // 403 Forbidden
       return res.status(403).send({ error: new AuthorizationError('missing_subject_id') })
     }
@@ -158,7 +161,7 @@ function api(app: express.Express): express.Express {
         return res.status(400).send({ error: err })
       }
       // 500 Internal Server Error
-      logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+      logGenericAuditError(req, res, err)
       return res.status(500).send({ error: new ServerError(err) })
     }
   })
@@ -243,7 +246,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -289,7 +292,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -335,7 +338,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -397,7 +400,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -442,7 +445,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -559,7 +562,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -585,7 +588,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -649,7 +652,7 @@ function api(app: express.Express): express.Express {
         })
       } catch (err) /* istanbul ignore next */ {
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -682,7 +685,7 @@ function api(app: express.Express): express.Express {
         const response = await getVehicles(skip, take, url, req.query, bbox, strict, provider_id)
         return res.status(200).send({ version: res.locals.version, ...response })
       } catch (err) {
-        logger.error('getVehicles fail', err)
+        AuditLogger.error('getVehicles fail', err)
         return res.status(500).send({
           error: 'internal_server_error'
         })
@@ -705,7 +708,7 @@ function api(app: express.Express): express.Express {
           res.status(404).send({ error: new NotFoundError('vehicle not found', { provider_id, vin }) })
         }
       } catch (err) {
-        logger.error('getVehicle fail', err)
+        AuditLogger.error('getVehicle fail', err)
         res.status(500).send({
           error: 'internal_server_error'
         })
@@ -739,7 +742,7 @@ function api(app: express.Express): express.Express {
 
         if (isError(err, UnsupportedTypeError)) return res.status(415).send({ error: err })
 
-        logger.error('post attachment fail', err)
+        AuditLogger.error('post attachment fail', err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -754,7 +757,7 @@ function api(app: express.Express): express.Express {
       await deleteAuditAttachment(audit_trip_id, attachment_id)
       res.status(200).send({ version: res.locals.version })
     } catch (err) {
-      logger.error('delete attachment error', err)
+      AuditLogger.error('delete attachment error', err)
       if (err instanceof NotFoundError) {
         return res.status(404).send({ error: err })
       }

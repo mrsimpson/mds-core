@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Device, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
 import bluebird from 'bluebird'
 import redis from 'redis'
 import { KafkaStreamConsumer, KafkaStreamProducer } from './kafka'
 import { AgencyStreamKafka } from './kafka/agency-stream-kafka'
+import { StreamLogger } from './logger'
 import { AgencyStreamNats } from './nats/agency-stream-nats'
 import { NatsStreamConsumer } from './nats/stream-consumer'
 import { NatsStreamProducer } from './nats/stream-producer'
@@ -98,18 +98,18 @@ async function getClient() {
     const { REDIS_HOST, REDIS_PORT, REDIS_PASS } = process.env
     const { host = 'localhost', port = 6379, password } = { host: REDIS_HOST, port: REDIS_PORT, password: REDIS_PASS }
     if (!REDIS_PORT) {
-      logger.info(`no redis port found, falling back to ${port}`)
+      StreamLogger.info(`no redis port found, falling back to ${port}`)
     }
     if (!REDIS_HOST) {
-      logger.info(`no redis host found, falling back to ${host}`)
+      StreamLogger.info(`no redis host found, falling back to ${host}`)
     }
 
-    logger.info(`connecting to redis on ${host}:${port}`)
+    StreamLogger.info(`connecting to redis on ${host}:${port}`)
     cachedClient = redis.createClient(Number(port), host, { password })
     cachedClient.on('error', async err => {
-      logger.error(`redis error ${err}`)
+      StreamLogger.error(`redis error ${err}`)
     })
-    await cachedClient.dbsizeAsync().then(size => logger.info(`redis has ${size} keys`))
+    await cachedClient.dbsizeAsync().then(size => StreamLogger.debug(`redis has ${size} keys`))
   }
   return cachedClient
 }
@@ -126,7 +126,7 @@ async function initialize() {
 
 async function reset() {
   const client = await getClient()
-  await client.flushdbAsync().then(() => logger.info('redis flushed'))
+  await client.flushdbAsync().then(() => StreamLogger.info('redis flushed'))
 }
 
 async function startup() {
@@ -160,7 +160,7 @@ async function writeDevice(device: Device) {
     try {
       await AgencyStreamNats.writeDevice(device)
     } catch (err) {
-      logger.error('Failed to write device to NATS', err)
+      StreamLogger.error('Failed to write device to NATS', err)
       throw err
     }
   }
@@ -168,7 +168,7 @@ async function writeDevice(device: Device) {
     try {
       await AgencyStreamKafka.writeDevice(device)
     } catch (err) {
-      logger.error('Failed to write device to Kafka', err)
+      StreamLogger.error('Failed to write device to Kafka', err)
       throw err
     }
   }
@@ -201,7 +201,7 @@ async function writeTelemetry(telemetry: Telemetry[]) {
     try {
       await AgencyStreamNats.writeTelemetry(telemetry)
     } catch (err) {
-      logger.error('Failed to write telemetry to NATS', err)
+      StreamLogger.error('Failed to write telemetry to NATS', err)
       throw err
     }
   }
@@ -209,7 +209,7 @@ async function writeTelemetry(telemetry: Telemetry[]) {
     try {
       await AgencyStreamKafka.writeTelemetry(telemetry)
     } catch (err) {
-      logger.error('Failed to write telemetry to Kafka', err)
+      StreamLogger.error('Failed to write telemetry to Kafka', err)
       throw err
     }
   }
@@ -217,7 +217,7 @@ async function writeTelemetry(telemetry: Telemetry[]) {
   await writeStreamBatch(DEVICE_RAW_STREAM, 'telemetry', telemetry)
   const delta = now() - start
   if (delta > 200) {
-    logger.info('mds-stream::writeTelemetry', { pointsInserted: telemetry.length, executionTime: delta })
+    StreamLogger.debug('writeTelemetry', { pointsInserted: telemetry.length, executionTime: delta })
   }
 }
 

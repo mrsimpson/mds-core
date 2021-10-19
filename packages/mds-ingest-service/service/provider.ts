@@ -15,7 +15,6 @@
  */
 
 import cache from '@mds-core/mds-agency-cache'
-import logger from '@mds-core/mds-logger'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
 import stream from '@mds-core/mds-stream'
 import { Telemetry } from '@mds-core/mds-types'
@@ -27,6 +26,7 @@ import {
   IngestService,
   TelemetryDomainModel
 } from '../@types'
+import { IngestServiceLogger } from '../logger'
 import { IngestRepository } from '../repository'
 import {
   validateEventAnnotationDomainCreateModels,
@@ -51,7 +51,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       return ServiceResult(await IngestRepository.getDevicesUsingOptions(validateGetDevicesOptions(options)))
     } catch (error) {
       const exception = ServiceException('Error in getDevicesUsingOptions', error)
-      logger.error('getDevicesUsingOptions exception', { exception, error })
+      IngestServiceLogger.error('getDevicesUsingOptions exception', { exception, error })
       return exception
     }
   },
@@ -61,7 +61,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       return ServiceResult(await IngestRepository.getDevicesUsingCursor(cursor))
     } catch (error) {
       const exception = ServiceException('Error in getDevicesUsingCursor', error)
-      logger.error('getDevicesUsingCursor exception', { exception, error })
+      IngestServiceLogger.error('getDevicesUsingCursor exception', { exception, error })
       return exception
     }
   },
@@ -71,7 +71,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       return ServiceResult(await IngestRepository.getEventsUsingOptions(validateGetVehicleEventsFilterParams(params)))
     } catch (error) {
       const exception = ServiceException('Error in getEvents', error)
-      logger.error('getEvents exception', { exception, error })
+      IngestServiceLogger.error('getEvents exception', { exception, error })
       return exception
     }
   },
@@ -81,7 +81,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       return ServiceResult(await IngestRepository.getEventsUsingCursor(cursor))
     } catch (error) {
       const exception = ServiceException('Error in getEvents', error)
-      logger.error('getEvents exception', { exception, error })
+      IngestServiceLogger.error('getEvents exception', { exception, error })
       return exception
     }
   },
@@ -91,7 +91,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       return ServiceResult(await IngestRepository.getDevices(validateUUIDs(device_ids)))
     } catch (error) {
       const exception = ServiceException('Error in getDevices', error)
-      logger.error('getDevices exception', { exception, error })
+      IngestServiceLogger.error('getDevices exception', { exception, error })
       return exception
     }
   },
@@ -101,7 +101,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       return ServiceResult(await IngestRepository.getLatestTelemetryForDevices(device_ids))
     } catch (error) {
       const exception = ServiceException('Error in getLatestTelemetryForDevices', error)
-      logger.error('getLatestTelemetryForDevices exception', { exception, error })
+      IngestServiceLogger.error('getLatestTelemetryForDevices exception', { exception, error })
       return exception
     }
   },
@@ -120,7 +120,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       return ServiceResult(await IngestRepository.createEvents(events.map(validateEventDomainModel)))
     } catch (error) {
       const exception = ServiceException('Error in writeEvents', error)
-      logger.error('writeEvents exception', { exception, error })
+      IngestServiceLogger.error('writeEvents exception', { exception, error })
       return exception
     }
   },
@@ -132,7 +132,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       )
     } catch (error) {
       const exception = ServiceException('Error in writeEventAnnotations', error)
-      logger.error('writeEventAnnotations exception', { exception, error })
+      IngestServiceLogger.error('writeEventAnnotations exception', { exception, error })
       return exception
     }
   },
@@ -143,16 +143,16 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       if (model) {
         const [cached, streamed] = await Promise.allSettled([cache.writeDevices([model]), stream.writeDevice(model)])
         if (cached.status === 'rejected') {
-          logger.warn('Error writing device to cache', { device: model, error: cached.reason })
+          IngestServiceLogger.warn('Error writing device to cache', { device: model, error: cached.reason })
         }
         if (streamed.status === 'rejected') {
-          logger.warn('Error writing device to stream', { device: model, error: streamed.reason })
+          IngestServiceLogger.warn('Error writing device to stream', { device: model, error: streamed.reason })
         }
       }
       return ServiceResult(model)
     } catch (error) {
       const exception = ServiceException('Error in writeMigratedDevice', error)
-      logger.error('writeMigratedDevice exception', { exception, error })
+      IngestServiceLogger.error('writeMigratedDevice exception', { exception, error })
       return exception
     }
   },
@@ -194,17 +194,17 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
         const model = { ...migrated, telemetry: eventTelemetryModel(telemetry, { recorded: event.recorded }) }
         const [cached, streamed] = await Promise.allSettled([cache.writeEvents([model]), stream.writeEvent(model)])
         if (cached.status === 'rejected') {
-          logger.warn('Error writing event to cache', { event: model, error: cached.reason })
+          IngestServiceLogger.warn('Error writing event to cache', { event: model, error: cached.reason })
         }
         if (streamed.status === 'rejected') {
-          logger.warn('Error writing event to stream', { event: model, error: streamed.reason })
+          IngestServiceLogger.warn('Error writing event to stream', { event: model, error: streamed.reason })
         }
         return ServiceResult(model)
       }
       return ServiceResult(null)
     } catch (error) {
       const exception = ServiceException('Error in writeMigratedVehicleEvent', error)
-      logger.error('writeMigratedVehicleEvent exception', { exception, error })
+      IngestServiceLogger.error('writeMigratedVehicleEvent exception', { exception, error })
       return exception
     }
   },
@@ -218,16 +218,16 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
           stream.writeTelemetry([model])
         ])
         if (cached.status === 'rejected') {
-          logger.warn('Error writing telemetry to cache', { telemetry: model, error: cached.reason })
+          IngestServiceLogger.warn('Error writing telemetry to cache', { telemetry: model, error: cached.reason })
         }
         if (streamed.status === 'rejected') {
-          logger.warn('Error writing telemetry to stream', { telemetry: model, error: streamed.reason })
+          IngestServiceLogger.warn('Error writing telemetry to stream', { telemetry: model, error: streamed.reason })
         }
       }
       return ServiceResult(model)
     } catch (error) {
       const exception = ServiceException('Error in writeMigratedTelemetry', error)
-      logger.error('writeMigratedTelemetry exception', { exception, error })
+      IngestServiceLogger.error('writeMigratedTelemetry exception', { exception, error })
       return exception
     }
   },
@@ -237,7 +237,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       return ServiceResult(await IngestRepository.getTripEvents(options))
     } catch (error) {
       const exception = ServiceException('Error in getTripEvents', error)
-      logger.error('getTripEvents exception', { exception, error })
+      IngestServiceLogger.error('getTripEvents exception', { exception, error })
       return exception
     }
   },
@@ -251,7 +251,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       )
     } catch (error) {
       const exception = ServiceException('Error in getEventsWithDeviceAndTelemetryInfoUsingOptions', error)
-      logger.error('getEventsWithDeviceAndTelemetryInfoUsingOptions exception', { exception, error })
+      IngestServiceLogger.error('getEventsWithDeviceAndTelemetryInfoUsingOptions exception', { exception, error })
       return exception
     }
   },
@@ -261,7 +261,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
       return ServiceResult(await IngestRepository.getEventsWithDeviceAndTelemetryInfoUsingCursor(cursor))
     } catch (error) {
       const exception = ServiceException('Error in getEventsWithDeviceAndTelemetryInfoUsingCursor', error)
-      logger.error('getEventsWithDeviceAndTelemetryInfoUsingCursor exception', { exception, error })
+      IngestServiceLogger.error('getEventsWithDeviceAndTelemetryInfoUsingCursor exception', { exception, error })
       return exception
     }
   }

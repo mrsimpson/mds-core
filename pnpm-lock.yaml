@@ -1174,12 +1174,10 @@ importers:
 
   packages/mds-test-data:
     specifiers:
-      '@mds-core/mds-logger': workspace:0.4.1
       '@mds-core/mds-providers': workspace:0.1.41
       '@mds-core/mds-types': workspace:0.6.0
       '@mds-core/mds-utils': workspace:0.2.6
     dependencies:
-      '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils

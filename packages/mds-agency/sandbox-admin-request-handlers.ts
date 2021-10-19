@@ -15,14 +15,12 @@
  */
 
 import cache from '@mds-core/mds-agency-cache'
-import logger from '@mds-core/mds-logger'
 import { ServerError } from '@mds-core/mds-utils'
 import { AgencyApiRequest, AgencyApiResponse } from './types'
 
 export const getCacheInfo = async (req: AgencyApiRequest, res: AgencyApiResponse) => {
   try {
     const details = await cache.info()
-    logger.warn('cache', details)
     res.status(200).send(details)
   } catch (err) {
     res.status(500).send(new ServerError())

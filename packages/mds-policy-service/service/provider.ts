@@ -15,10 +15,10 @@
  */
 
 import { GeographyServiceClient } from '@mds-core/mds-geography-service'
-import logger from '@mds-core/mds-logger'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
 import { BadParamsError, DependencyMissingError } from '@mds-core/mds-utils'
 import { PolicyService } from '../@types'
+import { PolicyServiceLogger } from '../logger'
 import { PolicyRepository } from '../repository'
 import { validatePolicyDomainModel, validatePolicyMetadataDomainModel, validatePresentationOptions } from './validators'
 
@@ -27,7 +27,7 @@ const serviceErrorWrapper = async <T>(method: string, exec: () => Promise<T>) =>
     return ServiceResult(await exec())
   } catch (error) {
     const exception = ServiceException(`Error Policy:${method}`, error)
-    logger.error(`mds-policy-service::${method} error`, { exception, error })
+    PolicyServiceLogger.error(`mds-policy-service::${method} error`, { exception, error })
     return exception
   }
 }

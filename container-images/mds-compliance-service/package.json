@@ -2,7 +2,7 @@
   "name": "@container-images/mds-compliance-service",
   "version": "0.0.23",
   "private": true,
-  "description": "MDS daily-reports prototype",
+  "description": "MDS compliance backend service",
   "keywords": [
     "mds"
   ],

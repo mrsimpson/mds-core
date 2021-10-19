@@ -16,13 +16,13 @@
 
 // utility functions
 
-import logger from '@mds-core/mds-logger'
 import { BBox, BoundingBox, Geography, SingleOrArray, Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
 import circleToPolygon from 'circle-to-polygon'
 import { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson'
 import pointInPoly from 'point-in-polygon'
 import { isArray, isString } from 'util'
 import { getCurrentDate, parseRelative } from './date-time-utils'
+import { UtilsLogger } from './logger'
 import { getNextStates, isEventSequenceValid } from './state-machine'
 
 const RADIUS = 30.48 // 100 feet, in meters
@@ -57,11 +57,11 @@ function isPct(val: unknown): val is number {
 // this is a real-time API, so timestamps should be now +/- some factor, let's start with 24h
 function isTimestamp(val: unknown): val is Timestamp {
   if (typeof val !== 'number') {
-    logger.info('timestamp not an number')
+    UtilsLogger.info('timestamp not an number')
     return false
   }
   if (val < 1420099200000) {
-    logger.info('timestamp is prior to 1/1/2015; this is almost certainly seconds, not milliseconds')
+    UtilsLogger.info('timestamp is prior to 1/1/2015; this is almost certainly seconds, not milliseconds')
     return false
   }
   return true
@@ -531,7 +531,7 @@ const isDefined = <T>(elem: T | undefined | null, options: isDefinedOptions = {}
     return true
   }
   if (warnOnEmpty) {
-    logger.warn(`Encountered empty element at index: ${index}`)
+    UtilsLogger.warn(`Encountered empty element at index: ${index}`)
   }
   return false
 }

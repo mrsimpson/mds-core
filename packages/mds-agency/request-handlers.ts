@@ -18,7 +18,6 @@ import cache from '@mds-core/mds-agency-cache'
 import { parseRequest } from '@mds-core/mds-api-helpers'
 import db from '@mds-core/mds-db'
 import { validateDeviceDomainModel } from '@mds-core/mds-ingest-service'
-import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers'
 import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import stream from '@mds-core/mds-stream'
@@ -33,6 +32,7 @@ import {
 } from '@mds-core/mds-types'
 import { now, ServerError, ValidationError } from '@mds-core/mds-utils'
 import urls from 'url'
+import { AgencyLogger } from './logger'
 import {
   AgencyAipGetVehicleByIdResponse,
   AgencyApiGetVehicleByIdRequest,
@@ -95,10 +95,9 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     try {
       await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
     } catch (error) {
-      logger.error('failed to write device stream/cache', error)
+      AgencyLogger.error('failed to write device stream/cache', error)
     }
 
-    logger.info('new vehicle added', { providerName: providerName(res.locals.provider_id), device })
     return res.status(201).send({})
   } catch (error) {
     if (error instanceof ValidationError) {
@@ -113,7 +112,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
       })
     }
 
-    logger.error('register vehicle failed:', { err: error, providerName: providerName(res.locals.provider_id) })
+    AgencyLogger.error('register vehicle failed:', { err: error, providerName: providerName(res.locals.provider_id) })
     return res.status(500).send(AgencyServerError)
   }
 }
@@ -158,7 +157,7 @@ export const getVehiclesByProvider = async (
     const response = await getVehicles(skip, take, url, req.query, provider_id)
     return res.status(200).send({ ...response })
   } catch (err) {
-    logger.error('getVehicles fail', err)
+    AgencyLogger.error('getVehicles fail', err)
     return res.status(500).send(AgencyServerError)
   }
 }
@@ -180,7 +179,11 @@ export async function updateVehicleFail(
   } else if (!provider_id) {
     res.status(404).send({})
   } else {
-    logger.error(`fail PUT /vehicles/${device_id}`, { providerName: providerName(provider_id), body: req.body, error })
+    AgencyLogger.error(`fail PUT /vehicles/${device_id}`, {
+      providerName: providerName(provider_id),
+      body: req.body,
+      error
+    })
     res.status(500).send(AgencyServerError)
   }
 }
@@ -206,7 +209,7 @@ export const updateVehicle = async (req: AgencyApiUpdateVehicleRequest, res: Age
       try {
         await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
       } catch (error) {
-        logger.warn(`Error writing to cache/stream ${error}`)
+        AgencyLogger.warn(`Error writing to cache/stream ${error}`)
       }
       return res.status(201).send({})
     }

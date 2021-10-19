@@ -1,4 +1,3 @@
-import logger from '@mds-core/mds-logger'
 import { ErrorCheckFunction, isServiceError } from '@mds-core/mds-service-helpers'
 import {
   AuthorizationError,
@@ -11,6 +10,7 @@ import {
 import type express from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { ApiRequest, ApiResponse } from '../@types'
+import { ApiServerLogger } from '../logger'
 
 const isValidationError = ErrorCheckFunction(ValidationError)
 const isBadParamsError = ErrorCheckFunction(BadParamsError)
@@ -45,7 +45,7 @@ export const ApiErrorHandlingMiddleware = (
   if (isDependencyMissingError(error)) return res.status(StatusCodes.FAILED_DEPENDENCY).send({ error })
   if (isServiceError(error, 'ServiceUnavailable')) return res.status(StatusCodes.SERVICE_UNAVAILABLE).send({ error })
 
-  logger.error('Fatal API Error (global error handling middleware)', {
+  ApiServerLogger.error('Fatal API Error (global error handling middleware)', {
     method,
     originalUrl,
     error

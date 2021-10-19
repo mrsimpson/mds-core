@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import express from 'express'
 import httpContext from 'express-http-context'
 import morgan from 'morgan'
 import { ApiRequest, ApiResponse, ApiResponseLocalsClaims } from '../@types'
+import { ApiServerLogger } from '../logger'
 
 export type RequestLoggingMiddlewareOptions = Partial<{
   excludePaths: RegExp[]
@@ -53,7 +53,7 @@ export const RequestLoggingMiddleware = ({
     {
       skip: (req: ApiRequest): boolean => excludePaths.some(path => req.path.match(path)),
       // Use logger, but remove extra line feed added by morgan stream option
-      stream: { write: msg => logger.info(msg.slice(0, -1)) }
+      stream: { write: msg => ApiServerLogger.info(msg.slice(0, -1)) }
     }
   ),
   httpContext.middleware,
@@ -65,11 +65,9 @@ export const RequestLoggingMiddleware = ({
     return next()
   },
   (req: ApiRequest, res: ApiResponse, next: express.NextFunction) => {
-    const { REQUEST_DEBUG } = process.env
-
-    if (REQUEST_DEBUG === 'true' && !excludePaths.some(path => req.path.match(path))) {
-      const { path, params, query, body } = req
-      logger.info('REQUEST_DEBUG', { path, params, query, body })
+    if (!excludePaths.some(path => req.path.match(path))) {
+      const { path, query, body } = req
+      ApiServerLogger.debug('Request details', { path, query, body })
     }
 
     return next()

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Nullable } from '@mds-core/mds-types'
 import {
   BadParamsError,
@@ -29,6 +28,7 @@ import {
 } from '@mds-core/mds-utils'
 import retry, { Options as RetryOptions } from 'async-retry'
 import { ProcessController, ServiceErrorDescriptor, ServiceErrorType, ServiceResultType } from '../@types'
+import { ServiceHelpersLogger } from '../logger'
 
 type ProcessMonitorOptions = Partial<
   Omit<RetryOptions, 'onRetry'> & {
@@ -60,7 +60,7 @@ const ProcessMonitor = async (
   try {
     await retry(
       async () => {
-        logger.info(`Initializing process ${version}`)
+        ServiceHelpersLogger.info(`Initializing process ${version}`)
         await controller.start()
       },
       {
@@ -71,25 +71,25 @@ const ProcessMonitor = async (
         ...retryOptions,
         onRetry: (error, attempt) => {
           /* istanbul ignore next */
-          logger.error(
+          ServiceHelpersLogger.error(
             `Initializing process ${version} failed: ${error.message}, Retrying ${attempt} of ${retries}....`
           )
         }
       }
     )
   } catch (error) /* istanbul ignore next */ {
-    logger.error(`Initializing process ${version} failed: ${error.message}, Exiting...`)
+    ServiceHelpersLogger.error(`Initializing process ${version} failed: ${error.message}, Exiting...`)
     await controller.stop()
     process.exit(1)
   }
 
   // Keep NodeJS process alive
-  logger.info(`Monitoring process ${version} for ${signals.join(', ')}`)
+  ServiceHelpersLogger.info(`Monitoring process ${version} for ${signals.join(', ')}`)
   const timeout = setInterval(() => undefined, interval)
 
   const terminate = async (signal: NodeJS.Signals) => {
     clearInterval(timeout)
-    logger.info(`Terminating process ${version} on ${signal}`)
+    ServiceHelpersLogger.info(`Terminating process ${version} on ${signal}`)
     await controller.stop()
   }
 

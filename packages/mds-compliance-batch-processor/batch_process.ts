@@ -18,10 +18,10 @@ import cache from '@mds-core/mds-agency-cache'
 import { getAllInputs, getSupersedingPolicies, processPolicy } from '@mds-core/mds-compliance-engine'
 import { ComplianceServiceClient, ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
 import db from '@mds-core/mds-db'
-import logger from '@mds-core/mds-logger'
 import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { ProcessManager, SerializedBuffers } from '@mds-core/mds-service-helpers'
 import { minutes, now } from '@mds-core/mds-utils'
+import { ComplianceBatchProcessorLogger } from './logger'
 
 const BATCH_SIZE = Number(process.env.BATCH_SIZE) || 5
 
@@ -47,9 +47,12 @@ export async function computeSnapshot() {
   const snapshots = results.flat()
 
   await batchComplianceSnapshots(snapshots)
-  logger.info('mds-compliance-engine successfully computed snapshots for the following policies: ', {
-    policy_ids: policies.map(p => p.policy_id)
-  })
+  ComplianceBatchProcessorLogger.info(
+    'mds-compliance-engine successfully computed snapshots for the following policies: ',
+    {
+      policy_ids: policies.map(p => p.policy_id)
+    }
+  )
 }
 
 ProcessManager(
@@ -59,11 +62,15 @@ ProcessManager(
         const start = now()
         await computeSnapshot()
         const end = now()
-        logger.info(`mds-compliance-engine time metrics`, { start, end, durationMs: end - start })
+        ComplianceBatchProcessorLogger.debug(`mds-compliance-engine time metrics`, {
+          start,
+          end,
+          durationMs: end - start
+        })
 
         process.exit(0)
       } catch (error) {
-        logger.error('mds-compliance-engine ran into an error, retrying', error)
+        ComplianceBatchProcessorLogger.error('mds-compliance-engine ran into an error, retrying', error)
         throw error
       }
     },

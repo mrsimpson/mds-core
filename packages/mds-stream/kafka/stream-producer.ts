@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { ExtendedKeys, Nullable, RequiredKeys, SetIntersection } from '@mds-core/mds-types'
 import { ClientDisconnectedError, ExceptionMessages, isDefined } from '@mds-core/mds-utils'
 import { Kafka, Producer } from 'kafkajs'
 import { isArray } from 'util'
+import { StreamLogger } from '../logger'
 import { StreamProducer } from '../stream-interface'
 import { getKafkaBrokers } from './helpers'
 
@@ -47,7 +47,7 @@ const createStreamProducer = async <TMessage>({
     await producer.connect()
     return producer
   } catch (err) {
-    logger.error(err)
+    StreamLogger.error(err)
   }
   return null
 }

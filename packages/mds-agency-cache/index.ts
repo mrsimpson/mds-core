@@ -15,7 +15,6 @@
  */
 
 import { RedisCache } from '@mds-core/mds-cache'
-import logger from '@mds-core/mds-logger'
 import { BoundingBox, Device, Telemetry, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
 import {
   isInsideBoundingBox,
@@ -29,6 +28,7 @@ import {
 } from '@mds-core/mds-utils'
 import flatten, { unflatten } from 'flat'
 import Redis from 'ioredis'
+import { AgencyCacheLogger } from './logger'
 import {
   CachedItem,
   CacheReadDeviceResult,
@@ -68,7 +68,6 @@ async function info() {
 // so that we can trivially get a list of "updated since ___" device_ids
 function updateVehicleList(device_id: UUID, pipeline: Redis.Pipeline, timestamp?: Timestamp) {
   const when = timestamp || now()
-  // logger.info('redis zadd', device_id, when)
   pipeline.zadd(decorateKey('device-ids'), when.toString(), device_id)
 }
 async function hread(suffix: string, device_id: UUID): Promise<CachedItem> {
@@ -100,7 +99,7 @@ async function getEventsInBBox(bbox: BoundingBox) {
   const events: string[] = await client.georadius(decorateKey('locations'), lng, lat, radius, 'm')
   const finish: Timestamp = now()
   const timeElapsed = finish - start
-  logger.info(`mds-agency-cache getEventsInBBox ${JSON.stringify(bbox)} time elapsed: ${timeElapsed}ms`)
+  AgencyCacheLogger.debug(`getEventsInBBox ${JSON.stringify(bbox)} time elapsed: ${timeElapsed}ms`)
   return events
 }
 
@@ -133,7 +132,7 @@ async function hreads(
 // anything with a device_id, e.g. device, telemetry, etc.
 function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | VehicleEvent, pipeline: Redis.Pipeline) {
   if (typeof item.device_id !== 'string') {
-    logger.error(`hwrite: invalid device_id ${item.device_id}`)
+    AgencyCacheLogger.error(`hwrite: invalid device_id ${item.device_id}`)
     throw new Error(`hwrite: invalid device_id ${item.device_id}`)
   }
   const { device_id } = item
@@ -172,7 +171,7 @@ function writeDevice(device: Device, pipeline: Redis.Pipeline) {
 
     return hwrite('device', device, pipeline)
   } catch (err) {
-    logger.error('Failed to write device to cache', err)
+    AgencyCacheLogger.error('Failed to write device to cache', err)
     throw err
   }
 }
@@ -194,11 +193,11 @@ function wipeDevice(device_id: UUID, pipeline: Redis.Pipeline) {
     decorateKey(`device:${device_id}:device`)
   ]
   if (keys.length > 0) {
-    logger.info('mds-agency-cache::wipeDevice, deleting keys', { keys })
+    AgencyCacheLogger.debug(':wipeDevice, deleting keys', { keys })
     pipeline.del(...keys)
     return
   }
-  logger.warn('mds-agency-cache::wipeDevice, no keys found!', { device_id })
+  AgencyCacheLogger.warn('wipeDevice, no keys found!', { device_id })
 }
 
 async function writeEvents(events: VehicleEvent[]) {
@@ -225,7 +224,7 @@ function writeEvent(event: VehicleEvent, pipeline: Redis.Pipeline, prevEvent?: V
         }
         hwrite('event', event, pipeline)
       } catch (err) {
-        logger.error('hwrites', err.stack)
+        AgencyCacheLogger.error('hwrites', err.stack)
         throw err
       }
     } else {
@@ -239,7 +238,7 @@ function writeEvent(event: VehicleEvent, pipeline: Redis.Pipeline, prevEvent?: V
       }
       hwrite('event', event, pipeline)
     } catch (err) {
-      logger.error('hwrites', err.stack)
+      AgencyCacheLogger.error('hwrites', err.stack)
       throw err
     }
   }
@@ -260,41 +259,16 @@ async function readEvents(device_ids: UUID[]): Promise<VehicleEvent[]> {
     .filter(e => Boolean(e))
 }
 
-async function readAllEvents(): Promise<Array<VehicleEvent | null>> {
-  // FIXME wildcard searching is slow
-  let start = now()
-  const keys = await readKeys('device:*:event')
-  let finish = now()
-  let timeElapsed = finish - start
-  logger.info(`MDS-DAILY /admin/events -> cache.readAllEvents() readKeys() time elapsed: ${timeElapsed}ms`)
-  const device_ids = keys.map(key => {
-    const [, device_id] = key.split(':')
-    return device_id
-  })
-
-  start = now()
-  const result = (await hreads(['event'], device_ids)).map(event => {
-    return parseEvent(event as StringifiedEventWithTelemetry)
-  })
-  finish = now()
-  timeElapsed = finish - start
-  logger.info(`MDS-DAILY /admin/events -> cache.readAllEvents() hreads() time elapsed: ${timeElapsed}ms`)
-
-  return result
-}
-
 async function readDevice(device_id: UUID) {
   if (!device_id) {
     throw new Error('null device not legal to read')
   }
-  // logger.info('redis read device', device_id)
   const rawDevice = await hread('device', device_id)
   const device = parseDevice(rawDevice as StringifiedCacheReadDeviceResult)
   return device
 }
 
 async function readDevices(device_ids: UUID[]) {
-  // logger.info('redis read device', device_id)
   return ((await hreads(['device'], device_ids)) as StringifiedCacheReadDeviceResult[]).map(device => {
     return parseDevice(device)
   })
@@ -323,7 +297,7 @@ async function readDeviceStatus(device_id: UUID) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return statuses.find((status: any) => status.telemetry) || statuses[0] || null
   } catch (err) {
-    logger.error('Error reading device status', err)
+    AgencyCacheLogger.error('Error reading device status', err)
     throw err
   }
 }
@@ -352,7 +326,7 @@ async function readDevicesStatus(query: {
   const deviceIds = deviceIdsRes.slice(skip, skip + take)
   const geoFinish = now()
   const timeElapsed = geoFinish - geoStart
-  logger.info(`mds-agency-cache readDevicesStatus bbox fetch ${JSON.stringify(bbox)} time elapsed: ${timeElapsed}ms`)
+  AgencyCacheLogger.debug(`readDevicesStatus bbox fetch ${JSON.stringify(bbox)} time elapsed: ${timeElapsed}ms`)
 
   const eventsStart = now()
   const events = ((await hreads(['event'], deviceIds)) as StringifiedEventWithTelemetry[])
@@ -373,9 +347,7 @@ async function readDevicesStatus(query: {
     .filter(item => Boolean(item))
   const eventsFinish = now()
   const eventsTimeElapsed = eventsFinish - eventsStart
-  logger.info(
-    `mds-agency-cache readDevicesStatus bbox check ${JSON.stringify(bbox)} time elapsed: ${eventsTimeElapsed}ms`
-  )
+  AgencyCacheLogger.debug(`readDevicesStatus bbox check ${JSON.stringify(bbox)} time elapsed: ${eventsTimeElapsed}ms`)
 
   const devicesStart = now()
   const eventDeviceIds = events.map(event => event.device_id)
@@ -400,8 +372,8 @@ async function readDevicesStatus(query: {
   const valuesWithTelemetry = values.filter((item: any) => item.telemetry)
   const devicesFinish = now()
   const devicesTimeElapsed = devicesFinish - devicesStart
-  logger.info(
-    `mds-agency-cache readDevicesStatus device processing ${JSON.stringify(bbox)} time elapsed: ${devicesTimeElapsed}ms`
+  AgencyCacheLogger.debug(
+    `readDevicesStatus device processing ${JSON.stringify(bbox)} time elapsed: ${devicesTimeElapsed}ms`
   )
 
   return valuesWithTelemetry
@@ -424,7 +396,7 @@ function writeOneTelemetry(
       return telemetry.timestamp > priorTelemetry.timestamp
     } catch (err) {
       if (!options.quiet) {
-        logger.info('writeOneTelemetry: no prior telemetry found:', err.message)
+        AgencyCacheLogger.info('writeOneTelemetry: no prior telemetry found:', err.message)
       }
       // Cache miss; return true
       return true
@@ -440,7 +412,7 @@ function writeOneTelemetry(
       return
     }
   } catch (err) {
-    logger.error('writeOneTelemetry error', err.stack)
+    AgencyCacheLogger.error('writeOneTelemetry error', err.stack)
     throw err
   }
 }
@@ -457,7 +429,7 @@ async function writeTelemetry(telemetries: Telemetry[], options: { quiet: boolea
 
     await pipeline.exec()
   } catch (err) {
-    logger.error('Failed to write telemetry to cache', err)
+    AgencyCacheLogger.error('Failed to write telemetry to cache', err)
     throw err
   }
 }
@@ -473,14 +445,14 @@ async function readAllTelemetry() {
     try {
       return [...acc, parseTelemetry(telemetry)]
     } catch (err) {
-      logger.info(JSON.parse(err))
+      AgencyCacheLogger.error(JSON.parse(err))
       return acc
     }
   }, [])
 }
 
 async function seed(dataParam: { devices: Device[]; events: VehicleEvent[]; telemetry: Telemetry[] }) {
-  logger.info('cache seed')
+  AgencyCacheLogger.debug('cache seed')
   const data = dataParam || {
     devices: [],
     events: [],
@@ -492,13 +464,13 @@ async function seed(dataParam: { devices: Device[]; events: VehicleEvent[]; tele
   if (data.telemetry.length !== 0) {
     await writeTelemetry(data.telemetry.sort((a, b) => a.timestamp - b.timestamp))
   }
-  logger.info('cache seed redis done')
+  AgencyCacheLogger.debug('cache seed redis done')
 }
 
 async function reset() {
-  logger.info('cache reset')
+  AgencyCacheLogger.warn('cache reset')
   await client.flushdb()
-  return logger.info('redis flushed')
+  return AgencyCacheLogger.warn('redis flushed')
 }
 
 async function reinitialize() {
@@ -524,7 +496,7 @@ async function health() {
 async function cleanup() {
   try {
     const keys = await readKeys('device:*')
-    logger.warn(`cleanup: read ${keys.length} keys`)
+    AgencyCacheLogger.warn(`cleanup: read ${keys.length} keys`)
     const report: { telemetry: number; device: number; event: number; [suffix: string]: number } = {
       telemetry: 0,
       device: 0,
@@ -547,11 +519,11 @@ async function cleanup() {
       report.deleted = result
       return report
     } catch (ex) {
-      logger.error('cleanup: exception', ex)
+      AgencyCacheLogger.error('cleanup: exception', ex)
       throw ex
     }
   } catch (ex) {
-    logger.error('cleanup: exception', ex)
+    AgencyCacheLogger.error('cleanup: exception', ex)
     return Promise.reject(ex)
   }
 }
@@ -573,7 +545,6 @@ export default {
   readDevicesStatus,
   readEvent,
   readEvents,
-  readAllEvents,
   readTelemetry,
   readAllTelemetry,
   readKeys,

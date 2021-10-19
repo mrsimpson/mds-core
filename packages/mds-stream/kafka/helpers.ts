@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
+import { StreamLogger } from '../logger'
 
 export const getKafkaBrokers = () => {
   const {
@@ -23,6 +23,6 @@ export const getKafkaBrokers = () => {
 
   if (KAFKA_HOST) return [KAFKA_HOST]
 
-  logger.warn('KAFKA_HOST is undefined, skipping initialization.')
+  StreamLogger.warn('KAFKA_HOST is undefined, skipping initialization.')
   return null
 }

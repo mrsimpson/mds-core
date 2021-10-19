@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Nullable, UUID } from '@mds-core/mds-types'
 import { uuid } from '@mds-core/mds-utils'
 import AwaitLock from 'await-lock'
@@ -23,6 +22,7 @@ import { Connection, ConnectionOptions, createConnection } from 'typeorm'
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
 import { LoggerOptions } from 'typeorm/logger/LoggerOptions'
 import { RepositoryError } from './exceptions'
+import { RepositoryLogger } from './logger'
 import { MdsNamingStrategy } from './naming-strategies'
 
 const loggingOption = (options: string): LoggerOptions => {
@@ -90,7 +90,7 @@ export class ConnectionManager<TConnectionMode extends ConnectionMode> {
     try {
       if (!connections.has(mode)) {
         const options = connectionOptions(mode)
-        logger.info(`Initializing ${connectionMode(mode)} connection: ${options.name}`)
+        RepositoryLogger.info(`Initializing ${connectionMode(mode)} connection: ${options.name}`)
         connections.set(mode, await createConnection(options))
       }
     } finally {
@@ -114,7 +114,7 @@ export class ConnectionManager<TConnectionMode extends ConnectionMode> {
   public disconnect = async (mode: TConnectionMode) => {
     const { lock, connections, connectionOptions, connectionMode } = this
     const options = connectionOptions(mode)
-    logger.info(`Terminating ${connectionMode(mode)} connection: ${options.name}`)
+    RepositoryLogger.info(`Terminating ${connectionMode(mode)} connection: ${options.name}`)
     try {
       await lock.acquireAsync()
       const connection = connections.get(mode)

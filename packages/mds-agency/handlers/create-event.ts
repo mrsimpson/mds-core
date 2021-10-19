@@ -1,11 +1,11 @@
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
 import { validateEventDomainModel } from '@mds-core/mds-ingest-service'
-import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers'
 import stream from '@mds-core/mds-stream'
 import { DeepPartial, Device, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { normalizeToArray, now, ValidationError } from '@mds-core/mds-utils'
+import { AgencyLogger } from '../logger'
 import { AgencyApiSubmitVehicleEventRequest, AgencyApiSubmitVehicleEventResponse, AgencyServerError } from '../types'
 import { agencyValidationErrorParser, eventValidForMode } from '../utils'
 
@@ -28,19 +28,19 @@ const handleDbError = async (
   })
 
   if (message.includes('duplicate')) {
-    logger.info('duplicate event', { name, event })
+    AgencyLogger.debug('duplicate event', { name, event })
     res.status(400).send({
       error: 'bad_param',
       error_description: 'An event with this device_id and timestamp has already been received'
     })
   } else if (message.includes('not found') || message.includes('unregistered')) {
-    logger.info('event for unregistered', { name, event })
+    AgencyLogger.debug('event for unregistered', { name, event })
     res.status(400).send({
       error: 'unregistered',
       error_description: 'The specified device_id has not been registered'
     })
   } else {
-    logger.error('post event fail:', { event, message })
+    AgencyLogger.error('post event fail:', { event, message })
     res.status(500).send(AgencyServerError)
   }
 }
@@ -60,7 +60,7 @@ const logEventWritePerformance = (event: VehicleEvent, logThreshold = 100) => {
     const { provider_id } = event
     const name = providerName(provider_id || 'unknown')
 
-    logger.info(`${name} post event took ${delta} ms`)
+    AgencyLogger.debug(`${name} post event took ${delta} ms`)
   }
 }
 
@@ -90,9 +90,9 @@ const refreshDeviceCache = async (device: Device, event: VehicleEvent) => {
   } catch (err) {
     try {
       await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
-      logger.info('Re-adding previously deregistered device to cache', err)
+      AgencyLogger.debug('Re-adding previously deregistered device to cache', err)
     } catch (error) {
-      logger.warn(`Error writing to cache/stream ${error}`)
+      AgencyLogger.warn(`Error writing to cache/stream ${error}`)
     }
   }
 }
@@ -152,7 +152,7 @@ export const createEventHandler = async (
         stream.writeTelemetry([telemetry])
       ])
     } catch (err) {
-      logger.warn('/event exception cache/stream', err)
+      AgencyLogger.warn('/event exception cache/stream', err)
     } finally {
       return sendSuccess(req, res, event)
     }

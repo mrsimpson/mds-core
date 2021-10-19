@@ -21,7 +21,7 @@ import { ModuleRpcProtocolGrpcWebCommon } from '@lacuna-tech/rpc_ts/lib/protocol
 import { ServiceError, ServiceResponse } from '@mds-core/mds-service-helpers'
 import { AnyFunction } from '@mds-core/mds-types'
 import { RpcServiceDefinition, RPC_HOST, RPC_PORT } from '../@types'
-import { RpcCommonLogger as logger } from '../logger'
+import { RpcCommonLogger } from '../logger'
 
 export interface RpcClientOptions {
   host: string
@@ -70,7 +70,7 @@ export const RpcRequest = async <M extends RpcMethod>(
 ): Promise<RpcResponseType<M>> => {
   const requestStartTime = Date.now()
   const response = await RpcResponse(request, ...args)
-  logger.debug(`RPC request performance`, {
+  RpcCommonLogger.debug(`RPC request performance`, {
     requestName: request.name,
     duration: Date.now() - requestStartTime
   })
