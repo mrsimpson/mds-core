@@ -63,7 +63,7 @@ export type EventWithDeviceAndTelemetryInfoEntityModel = Omit<
       .addSelect('device.model', 'model')
       .addSelect('device.accessibility_options', 'accessibility_options')
       .addSelect('device.modality', 'modality')
-      .addSelect('device.recoreded', 'device_recorded')
+      .addSelect('device.recorded', 'device_recorded')
       .addSelect('telemetry.lat', 'lat')
       .addSelect('telemetry.lng', 'lng')
       .addSelect('telemetry.altitude', 'altitude')
@@ -74,10 +74,10 @@ export type EventWithDeviceAndTelemetryInfoEntityModel = Omit<
       .addSelect('telemetry.satellites', 'satellites')
       .addSelect('telemetry.charge', 'charge')
       .addSelect('telemetry.stop_id', 'stop_id')
-      .addSelect('telemetry.recoreded', 'telemetry_recorded')
+      .addSelect('telemetry.recorded', 'telemetry_recorded')
       .from(EventEntity, 'event')
-      .leftJoin(DeviceEntity, 'device', 'device.device_id = event.device_id')
-      .leftJoin(
+      .innerJoin(DeviceEntity, 'device', 'device.device_id = event.device_id')
+      .innerJoin(
         TelemetryEntity,
         'telemetry',
         'telemetry.device_id = event.device_id AND telemetry.timestamp = event.telemetry_timestamp'
