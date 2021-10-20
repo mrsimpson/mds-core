@@ -66,7 +66,7 @@ const MigrationDataSource: <MigrationSourceEntity>(entity: MigrationEntityType) 
     return KafkaSource(topic, { groupId: `${topic}.mds-ingest-migration-processor`, fromBeginning: true })
   }
 
-const MigrationErrorTopic = (entityType: MigrationEntityType) => `${TENANT_ID}.${entityType}.error`
+const MigrationErrorTopic = (entityType: MigrationEntityType) => `${TENANT_ID}.${entityType}.migration.error`
 
 const MigrationErrorSink: <MigrationSourceEntity>(
   entity: MigrationEntityType
