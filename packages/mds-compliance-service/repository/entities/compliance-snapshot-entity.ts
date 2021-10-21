@@ -16,7 +16,7 @@
 
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import { Timestamp, UUID } from '@mds-core/mds-types'
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 import { MatchedVehicleInformation } from '../../@types'
 
 export interface ComplianceSnapshotEntityModel extends IdentityColumn, RecordedColumn {
@@ -39,15 +39,18 @@ export class ComplianceSnapshotEntity
   compliance_snapshot_id: ComplianceSnapshotEntityModel['compliance_snapshot_id']
 
   @Column('bigint', { transformer: BigintTransformer })
+  @Index()
   compliance_as_of: ComplianceSnapshotEntityModel['compliance_as_of']
 
   @Column('uuid')
+  @Index()
   provider_id: ComplianceSnapshotEntityModel['provider_id']
 
   @Column('varchar', { length: 255 })
   policy_name: ComplianceSnapshotEntityModel['policy_name']
 
   @Column('uuid')
+  @Index()
   policy_id: ComplianceSnapshotEntityModel['policy_id']
 
   @Column('int')

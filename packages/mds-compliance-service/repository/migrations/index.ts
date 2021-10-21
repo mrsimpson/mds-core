@@ -15,6 +15,11 @@
  */
 
 import { CreateComplianceSnapshotsTable1590524762011 } from './1590524762011-CreateComplianceSnapshotsTable'
-import { AddComplianceViolations1632935069192 } from './1632935069192-add_compliance_violations'
+import { AddComplianceViolations1632935069192 } from './1632935069192-AddComplianceViolations'
+import { CreateComplianceSnapshotFailuresTable1634323054883 } from './1634323054883-CreateComplianceSnapshotFailuresTable'
 
-export default [CreateComplianceSnapshotsTable1590524762011, AddComplianceViolations1632935069192]
+export default [
+  CreateComplianceSnapshotsTable1590524762011,
+  AddComplianceViolations1632935069192,
+  CreateComplianceSnapshotFailuresTable1634323054883
+]

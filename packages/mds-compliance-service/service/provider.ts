@@ -56,10 +56,18 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
   createComplianceSnapshot: async complianceSnapshot => {
     try {
       const snapshot = await ComplianceRepository.createComplianceSnapshot(
-        validateComplianceSnapshotDomainModel(complianceSnapshot)
+        validateComplianceSnapshotDomainModel(complianceSnapshot),
+        async snapshot => {
+          // send to Kafka
+          const { vehicles_found, ...kafkaSnapshot } = snapshot
+          try {
+            await ComplianceSnapshotStreamKafka.write(kafkaSnapshot)
+          } catch (err) {
+            // write to db table TODO
+            await ComplianceRepository.writeComplianceSnapshotFailures([snapshot.compliance_snapshot_id])
+          }
+        }
       )
-      const { vehicles_found, ...kafkaSnapshot } = snapshot
-      await ComplianceSnapshotStreamKafka.write(kafkaSnapshot)
       return ServiceResult(snapshot)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating ComplianceSnapshot', error)
@@ -70,13 +78,23 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
   createComplianceSnapshots: async complianceSnapshots => {
     try {
       const snapshots = await ComplianceRepository.createComplianceSnapshots(
-        complianceSnapshots.map(validateComplianceSnapshotDomainModel)
+        complianceSnapshots.map(validateComplianceSnapshotDomainModel),
+        async snapshots => {
+          // send to Kafka
+          const kafkaSnapshots = snapshots.map(snapshot => {
+            const { vehicles_found, ...kafkaSnapshot } = snapshot
+            return kafkaSnapshot
+          })
+          try {
+            await ComplianceSnapshotStreamKafka.write(kafkaSnapshots)
+          } catch (err) {
+            // write to db table TODO
+            await ComplianceRepository.writeComplianceSnapshotFailures(
+              snapshots.map(snapshot => snapshot.compliance_snapshot_id)
+            )
+          }
+        }
       )
-      const kafkaSnapshots = snapshots.map(snapshot => {
-        const { vehicles_found, ...kafkaSnapshot } = snapshot
-        return kafkaSnapshot
-      })
-      await ComplianceSnapshotStreamKafka.write(kafkaSnapshots)
       return ServiceResult(snapshots)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating ComplianceSnapshots', error)
