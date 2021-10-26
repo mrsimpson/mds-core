@@ -21,6 +21,7 @@
     "@mds-core/mds-logger": "workspace:0.4.2",
     "@mds-core/mds-service-helpers": "workspace:0.4.0",
     "@mds-core/mds-utils": "workspace:0.2.7",
+    "@moebius/http-graceful-shutdown": "1.1.0",
     "@types/body-parser": "1.19.1",
     "@types/compression": "1.7.2",
     "@types/cors": "2.8.12",

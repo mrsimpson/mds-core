@@ -370,6 +370,7 @@ importers:
       '@mds-core/mds-logger': workspace:0.4.2
       '@mds-core/mds-service-helpers': workspace:0.4.0
       '@mds-core/mds-utils': workspace:0.2.7
+      '@moebius/http-graceful-shutdown': 1.1.0
       '@types/body-parser': 1.19.1
       '@types/compression': 1.7.2
       '@types/cors': 2.8.12
@@ -389,6 +390,7 @@ importers:
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-service-helpers': link:../mds-service-helpers
       '@mds-core/mds-utils': link:../mds-utils
+      '@moebius/http-graceful-shutdown': 1.1.0
       '@types/body-parser': 1.19.1
       '@types/compression': 1.7.2
       '@types/cors': 2.8.12
@@ -2176,6 +2178,10 @@ packages:
       globby: 11.0.4
       read-yaml-file: 1.1.0
     dev: true
+
+  /@moebius/http-graceful-shutdown/1.1.0:
+    resolution: {integrity: sha512-cjODgYTIGuCwgsuVMZNDh8RBK697ULAoQAmLqMVpqnqF3nOlPaJHqtGrdLooyn81l83wzHYwG6kPvEIv+Fo+sQ==}
+    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -5521,7 +5527,7 @@ packages:
     dev: false
 
   /fsevents/2.3.2:
-    resolution: {integrity: sha1-ilJveLj99GI7cJ4Ll1xSwkwC/Ro=}
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
     requiresBuild: true
@@ -10460,7 +10466,7 @@ packages:
     dev: true
 
   /uglify-js/3.14.2:
-    resolution: {integrity: sha1-191qRspXIU9UotCkPK0PNduCrJk=}
+    resolution: {integrity: sha512-rtPMlmcO4agTUfz10CbgJ1k6UAoXM2gWb3GoMPPZB/+/Ackf8lNWk11K4rYi2D0apgoFRLtQOZhb+/iGNJq26A==}
     engines: {node: '>=0.8.0'}
     hasBin: true
     requiresBuild: true
