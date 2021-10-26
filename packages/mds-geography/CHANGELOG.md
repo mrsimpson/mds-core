@@ -1,5 +1,22 @@
 # @mds-core/mds-geography
 
+## 0.1.9
+
+### Patch Changes
+
+- a1061650: Add namespaced logger, clean up excess logger messages
+- Updated dependencies [a1061650]
+- Updated dependencies [a1061650]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-api-server@0.3.9
+  - @mds-core/mds-db@0.4.10
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+  - @mds-core/mds-api-helpers@0.1.50
+  - @mds-core/mds-schema-validators@0.3.9
+  - @mds-core/mds-providers@0.1.42
+
 ## 0.1.8
 
 ### Patch Changes

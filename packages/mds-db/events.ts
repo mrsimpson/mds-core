@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Recorded, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { isTimestamp, isUUID } from '@mds-core/mds-utils'
 import { getReadOnlyClient, getWriteableClient } from './client'
 import { readDevice } from './devices'
+import { DbLogger } from './logger'
 import schema from './schema'
 import { cols_sql, logSql, SqlExecuter, SqlVals, vals_list, vals_sql } from './sql-utils'
 import { ReadEventsQueryParams, ReadEventsResult } from './types'
@@ -56,7 +56,7 @@ export async function readEvent(device_id: UUID, timestamp?: Timestamp): Promise
   if (res.rows.length === 1) {
     return res.rows[0]
   }
-  logger.info(`readEvent failed for ${device_id}:${timestamp || 'latest'}`)
+  DbLogger.warn(`readEvent failed for ${device_id}:${timestamp || 'latest'}`)
   throw new Error(`event for ${device_id}:${timestamp} not found`)
 }
 

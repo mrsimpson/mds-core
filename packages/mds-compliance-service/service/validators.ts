@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { SchemaValidator } from '@mds-core/mds-schema-validators'
+import { SchemaObject, SchemaValidator } from '@mds-core/mds-schema-validators'
 import { VEHICLE_EVENTS, VEHICLE_STATES } from '@mds-core/mds-types'
 import {
   ComplianceSnapshotDomainModel,
+  ComplianceViolationDomainModel,
   GetComplianceSnapshotsByTimeIntervalOptions,
   MatchedVehicleInformation
 } from '../@types'
@@ -106,3 +107,28 @@ export const { validate: validateGetComplianceSnapshotsByTimeIntervalOptions } =
     },
     { useDefaults: true, $data: true, allErrors: true }
   )
+
+export const { validate: validateComplianceViolationDomainModel, $schema: ComplianceViolationSchema } =
+  SchemaValidator<ComplianceViolationDomainModel>({
+    $id: 'ComplianceViolation',
+    type: 'object',
+    properties: {
+      violation_id: uuidSchema,
+      timestamp: timestampSchema,
+      policy_id: uuidSchema,
+      provider_id: uuidSchema,
+      rule_id: uuidSchema,
+      violation_details: {
+        type: 'object',
+        properties: {
+          event_timestamp: timestampSchema,
+          device_id: uuidSchema,
+          trip_id: { ...uuidSchema, nullable: true, default: null }
+        },
+        required: ['event_timestamp', 'device_id']
+      }
+    },
+    required: ['violation_id', 'timestamp', 'policy_id', 'provider_id', 'rule_id', 'violation_details']
+  })
+
+export const schemas: SchemaObject[] = [ComplianceViolationSchema]

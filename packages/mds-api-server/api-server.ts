@@ -15,10 +15,10 @@
  */
 
 import { JurisdictionsClaim, ProviderIdClaim, UserEmailClaim } from '@mds-core/mds-api-authorizer'
-import logger from '@mds-core/mds-logger'
 import { pathPrefix } from '@mds-core/mds-utils'
 import express from 'express'
 import { HealthRequestHandler } from './handlers/health'
+import { ApiServerLogger } from './logger'
 import { AuthorizationMiddleware, AuthorizationMiddlewareOptions } from './middleware/authorization'
 import { CompressionMiddleware, CompressionMiddlewareOptions } from './middleware/compression'
 import { CorsMiddleware, CorsMiddlewareOptions } from './middleware/cors'
@@ -45,12 +45,12 @@ export const ApiServer = (
   options: Partial<ApiServerOptions> = {},
   app: express.Express = express()
 ): express.Express => {
-  logger.info(`${serverVersion()} starting`)
+  ApiServerLogger.info(`${serverVersion()} starting`)
 
   // Log the custom authorization namespace/claims
   const claims = [ProviderIdClaim, UserEmailClaim, JurisdictionsClaim]
   claims.forEach(claim => {
-    logger.info(`${serverVersion()} using authorization claim ${claim()}`)
+    ApiServerLogger.info(`${serverVersion()} using authorization claim ${claim()}`)
   })
 
   // Disable x-powered-by header

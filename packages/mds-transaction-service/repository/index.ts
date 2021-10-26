@@ -48,6 +48,14 @@ const testEnvSafeguard = () => {
   }
 }
 
+interface InsertTransactionOptions {
+  beforeCommit: (pendingTransaction: TransactionDomainModel) => Promise<void>
+}
+
+interface InsertTransactionsOptions {
+  beforeCommit: (pendingTransactions: TransactionDomainModel[]) => Promise<void>
+}
+
 class TransactionReadWriteRepository extends ReadWriteRepository {
   public getTransaction = async (transaction_id: UUID): Promise<TransactionDomainModel> => {
     const { connect } = this
@@ -163,37 +171,55 @@ class TransactionReadWriteRepository extends ReadWriteRepository {
     }
   }
 
-  public createTransaction = async (transaction: TransactionDomainModel): Promise<TransactionDomainModel> => {
+  public createTransaction = async (
+    transaction: TransactionDomainModel,
+    options: Partial<InsertTransactionOptions>
+  ): Promise<TransactionDomainModel> => {
     const { connect } = this
+    const { beforeCommit = async () => undefined } = options
     try {
       const connection = await connect('rw')
-      const {
-        raw: [entity]
-      }: InsertReturning<TransactionEntity> = await connection
-        .getRepository(TransactionEntity)
-        .createQueryBuilder()
-        .insert()
-        .values([TransactionDomainToEntityCreate.map(transaction)])
-        .returning('*')
-        .execute()
-      return TransactionEntityToDomain.map(entity)
+      const result = await connection.transaction(async manager => {
+        const {
+          raw: [entity]
+        }: InsertReturning<TransactionEntity> = await manager
+          .getRepository(TransactionEntity)
+          .createQueryBuilder()
+          .insert()
+          .values([TransactionDomainToEntityCreate.map(transaction)])
+          .returning('*')
+          .execute()
+        const pendingTransaction = TransactionEntityToDomain.map(entity)
+        await beforeCommit(pendingTransaction)
+        return pendingTransaction
+      })
+      return result
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
-  public createTransactions = async (transactions: TransactionDomainModel[]): Promise<TransactionDomainModel[]> => {
+  public createTransactions = async (
+    transactions: TransactionDomainModel[],
+    options: Partial<InsertTransactionsOptions>
+  ): Promise<TransactionDomainModel[]> => {
     const { connect } = this
+    const { beforeCommit = async () => undefined } = options
     try {
       const connection = await connect('rw')
-      const { raw: entities }: InsertReturning<TransactionEntity> = await connection
-        .getRepository(TransactionEntity)
-        .createQueryBuilder()
-        .insert()
-        .values(transactions.map(TransactionDomainToEntityCreate.mapper()))
-        .returning('*')
-        .execute()
-      return entities.map(TransactionEntityToDomain.map)
+      const result = await connection.transaction(async manager => {
+        const { raw: entities }: InsertReturning<TransactionEntity> = await manager
+          .getRepository(TransactionEntity)
+          .createQueryBuilder()
+          .insert()
+          .values(transactions.map(TransactionDomainToEntityCreate.mapper()))
+          .returning('*')
+          .execute()
+        const pendingTransactions = entities.map(TransactionEntityToDomain.map)
+        await beforeCommit(pendingTransactions)
+        return pendingTransactions
+      })
+      return result
     } catch (error) {
       throw RepositoryError(error)
     }

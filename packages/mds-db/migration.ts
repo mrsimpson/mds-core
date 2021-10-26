@@ -18,8 +18,8 @@ import { AttachmentRepository } from '@mds-core/mds-attachment-service'
 import { AuditRepository } from '@mds-core/mds-audit-service'
 import { GeographyRepository } from '@mds-core/mds-geography-service'
 import { IngestRepository } from '@mds-core/mds-ingest-service'
-import logger from '@mds-core/mds-logger'
 import { PolicyRepository } from '@mds-core/mds-policy-service'
+import { DbLogger } from './logger'
 
 async function dropTables() {
   await Promise.all(
@@ -27,7 +27,7 @@ async function dropTables() {
       repository.revertAllMigrations()
     )
   )
-  logger.info(`postgres drop table succeeded`)
+  DbLogger.info(`postgres drop table succeeded`)
 }
 
 async function createTables() {
@@ -36,7 +36,7 @@ async function createTables() {
       repository.runAllMigrations()
     )
   )
-  logger.info('postgres create tables suceeded')
+  DbLogger.info('postgres create tables suceeded')
 }
 
 export { dropTables, createTables }

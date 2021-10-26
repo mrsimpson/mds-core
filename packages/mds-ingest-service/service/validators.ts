@@ -107,7 +107,7 @@ export const { validate: validateTelemetryDomainModel, $schema: TelemetrySchema 
             lng: { type: 'number', format: 'float' },
             // ⬇⬇⬇ NULLABLE/OPTIONAL PROPERTIES ⬇⬇⬇
             altitude: nullableFloat,
-            heading: nullableFloat,
+            heading: { ...nullableFloat, minimum: 0, exclusiveMaximum: 360 },
             speed: nullableFloat,
             accuracy: nullableFloat,
             hdop: nullableFloat,

@@ -6,7 +6,7 @@ import { redact } from './redaction'
 
 const deriveRequestId = () => {
   const requestId = httpContext.get('x-request-id')
-  return requestId ? { requestId } : {}
+  return requestId ? { requestId: () => requestId } : {}
 }
 
 export const logger: Pick<Logger, LogLevel> = (() =>
@@ -14,7 +14,7 @@ export const logger: Pick<Logger, LogLevel> = (() =>
     {
       base: {
         ...deriveRequestId(),
-        ISOTimestamp: new Date().toISOString()
+        ISOTimestamp: () => new Date().toISOString()
       },
       timestamp: () => `,"timestamp":"${Date.now()}"`, // This is a gross looking way to rename the default pino timestamp key 'time' to 'timestamp'
       formatters: {

@@ -574,17 +574,6 @@ describe('Tests API', () => {
     await cache.reset()
   })
 
-  it('refreshes the cache', done => {
-    request
-      .get(pathPrefix('/admin/cache/refresh'))
-      .set('Authorization', AUTH)
-      .expect(200)
-      .end((err, result) => {
-        test.string(result.body.result).contains('success')
-        done(err)
-      })
-  })
-
   it('shuts down the db to verify that it will come back up', async () => {
     await db.shutdown()
   })
@@ -715,6 +704,24 @@ describe('Tests API', () => {
         vehicle_state: 'available',
         telemetry: TEST_TELEMETRY,
         timestamp: 'hamster'
+      })
+      .expect(400)
+      .end((err, result) => {
+        // log('post event', result.body)
+        test.string(result.body.error).contains('bad')
+        test.string(result.body.error_description).contains('A validation error occurred.')
+        done(err)
+      })
+  })
+  it('verifies post event bad heading', done => {
+    request
+      .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
+      .set('Authorization', AUTH)
+      .send({
+        event_types: ['provider_drop_off'],
+        vehicle_state: 'available',
+        telemetry: { ...TEST_TELEMETRY, gps: { ...TEST_TELEMETRY.gps, heading: -1 } },
+        timestamp: testTimestamp
       })
       .expect(400)
       .end((err, result) => {
@@ -1505,47 +1512,6 @@ describe('Tests API', () => {
       .get(pathPrefix('/admin/cache/info'))
       .set('Authorization', AUTH)
       .expect(200)
-      .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        done(err)
-      })
-  })
-
-  it('refreshes the cache', done => {
-    request
-      .get(pathPrefix('/admin/cache/refresh'))
-      .set('Authorization', AUTH)
-      .expect(200)
-      .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        done(err)
-      })
-  })
-  it('wipes a vehicle via admin', done => {
-    request
-      .get(pathPrefix(`/admin/wipe/${TEST_BICYCLE.device_id}`))
-      .set('Authorization', AUTH)
-      .expect(200)
-      .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        done(err)
-      })
-  })
-  it('wipes a vehicle via admin that has already been wiped', done => {
-    request
-      .get(pathPrefix(`/admin/wipe/${TEST_BICYCLE.device_id}`))
-      .set('Authorization', AUTH)
-      .expect(404)
-      .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        done(err)
-      })
-  })
-  it('fails to wipe a vehicle via admin', done => {
-    request
-      .get(pathPrefix('/admin/wipe/' + 'bogus'))
-      .set('Authorization', AUTH)
-      .expect(400)
       .end((err, result) => {
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)

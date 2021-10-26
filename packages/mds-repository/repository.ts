@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { pluralize, tail } from '@mds-core/mds-utils'
 import { Connection } from 'typeorm'
 import { ConnectionManager, ConnectionManagerCliOptions, ConnectionManagerOptions, ConnectionMode } from './connection'
+import { RepositoryLogger } from './logger'
 import { CreateRepositoryMigration } from './migration'
 
 export type RepositoryOptions = Pick<ConnectionManagerOptions, 'entities' | 'migrations'>
@@ -51,7 +51,7 @@ export abstract class ReadOnlyRepository extends BaseRepository<'ro'> {
       name,
       manager: { connect }
     } = this
-    logger.info(`Initializing R/O repository: ${name}`)
+    RepositoryLogger.info(`Initializing R/O repository: ${name}`)
     await connect('ro')
   }
 
@@ -60,7 +60,7 @@ export abstract class ReadOnlyRepository extends BaseRepository<'ro'> {
       name,
       manager: { disconnect }
     } = this
-    logger.info(`Terminating R/O repository: ${name}`)
+    RepositoryLogger.info(`Terminating R/O repository: ${name}`)
     await disconnect('ro')
   }
 
@@ -86,7 +86,7 @@ export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
     if (migrationsTableName) {
       if (connection.migrations.length > 0) {
         const migrations = await connection.runMigrations({ transaction: 'all' })
-        logger.info(
+        RepositoryLogger.info(
           `Ran ${migrations.length || 'no'} ${pluralize(
             migrations.length,
             'migration',
@@ -95,9 +95,9 @@ export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
             migrations.length ? `: ${migrations.map(migration => migration.name).join(', ')}` : ''
           }`
         )
-        logger.info(`Schema version (${migrationsTableName}): ${tail(connection.migrations).name}`)
+        RepositoryLogger.info(`Schema version (${migrationsTableName}): ${tail(connection.migrations).name}`)
       } else {
-        logger.info(`No migrations defined (${migrationsTableName})`)
+        RepositoryLogger.info(`No migrations defined (${migrationsTableName})`)
       }
     }
   }
@@ -113,7 +113,7 @@ export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
     if (migrationsTableName) {
       const { migrations } = connection
       await migrations.reduce(p => p.then(() => connection.undoLastMigration()), Promise.resolve())
-      logger.info(
+      RepositoryLogger.info(
         `Reverted ${migrations.length || 'no'} ${pluralize(
           migrations.length,
           'migration',
@@ -130,7 +130,7 @@ export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
       name,
       manager: { connect }
     } = this
-    logger.info(`Initializing R/W repository: ${name}`)
+    RepositoryLogger.info(`Initializing R/W repository: ${name}`)
 
     await Promise.all([connect('rw'), connect('ro')])
 
@@ -148,7 +148,7 @@ export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
       name,
       manager: { disconnect }
     } = this
-    logger.info(`Terminating R/W repository: ${name}`)
+    RepositoryLogger.info(`Terminating R/W repository: ${name}`)
     await Promise.all([disconnect('rw'), disconnect('ro')])
   }
 
@@ -171,7 +171,7 @@ export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
         : [entities]
 
     if (chunks.length > 1) {
-      logger.info(`Splitting ${entities.length} records into ${chunks.length} chunks for insert`)
+      RepositoryLogger.info(`Splitting ${entities.length} records into ${chunks.length} chunks for insert`)
     }
     return chunks
   }

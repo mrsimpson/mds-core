@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { SingleOrArray } from '@mds-core/mds-types'
 import { asArray, getEnvVar } from '@mds-core/mds-utils'
 import { connect, NatsConnection, SubscriptionOptions } from 'nats'
+import { StreamLogger } from '../logger'
 import { natsCbWrapper, NatsProcessorFn } from './codecs'
 
 const initializeNatsClient = () => {
@@ -46,7 +46,7 @@ export const createStreamConsumer = async (
       )
     )
   } catch (err) {
-    logger.error(err)
+    StreamLogger.error(err)
   }
   return natsClient
 }

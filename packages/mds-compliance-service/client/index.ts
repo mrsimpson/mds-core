@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcClient, RpcRequest } from '@mds-core/mds-rpc-common'
+import { RpcClient, RpcRequestOptions, RpcRequestWithOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { ComplianceService, ComplianceServiceDefinition } from '../@types'
 
@@ -24,18 +24,27 @@ const ComplianceServiceRpcClient = RpcClient(ComplianceServiceDefinition, {
 })
 
 // What the API layer, and any other clients, will invoke.
-export const ComplianceServiceClient: ServiceClient<ComplianceService> = {
-  getComplianceSnapshot: (...args) => RpcRequest(ComplianceServiceRpcClient.getComplianceSnapshot, args),
+export const ComplianceServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<ComplianceService> => ({
+  getComplianceSnapshot: (...args) =>
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.getComplianceSnapshot, args),
   getComplianceSnapshotsByTimeInterval: (...args) =>
-    RpcRequest(ComplianceServiceRpcClient.getComplianceSnapshotsByTimeInterval, args),
-  getComplianceSnapshotsByIDs: (...args) => RpcRequest(ComplianceServiceRpcClient.getComplianceSnapshotsByIDs, args),
-  createComplianceSnapshot: (...args) => RpcRequest(ComplianceServiceRpcClient.createComplianceSnapshot, args),
-  createComplianceSnapshots: (...args) => RpcRequest(ComplianceServiceRpcClient.createComplianceSnapshots, args),
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.getComplianceSnapshotsByTimeInterval, args),
+  getComplianceSnapshotsByIDs: (...args) =>
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.getComplianceSnapshotsByIDs, args),
+  createComplianceSnapshot: (...args) =>
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.createComplianceSnapshot, args),
+  createComplianceSnapshots: (...args) =>
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.createComplianceSnapshots, args),
   getComplianceViolationPeriods: (...args) =>
-    RpcRequest(ComplianceServiceRpcClient.getComplianceViolationPeriods, args),
-  getComplianceViolation: (...args) => RpcRequest(ComplianceServiceRpcClient.getComplianceViolation, args),
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.getComplianceViolationPeriods, args),
+  getComplianceViolation: (...args) =>
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.getComplianceViolation, args),
   getComplianceViolationsByTimeInterval: (...args) =>
-    RpcRequest(ComplianceServiceRpcClient.getComplianceViolationsByTimeInterval, args),
-  createComplianceViolation: (...args) => RpcRequest(ComplianceServiceRpcClient.createComplianceViolation, args),
-  createComplianceViolations: (...args) => RpcRequest(ComplianceServiceRpcClient.createComplianceViolations, args)
-}
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.getComplianceViolationsByTimeInterval, args),
+  createComplianceViolation: (...args) =>
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.createComplianceViolation, args),
+  createComplianceViolations: (...args) =>
+    RpcRequestWithOptions(options, ComplianceServiceRpcClient.createComplianceViolations, args)
+})
+
+export const ComplianceServiceClient = ComplianceServiceClientFactory()

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { BIRD_PROVIDER_ID, JUMP_PROVIDER_ID, LIME_PROVIDER_ID, TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
 import {
   Device,
@@ -76,7 +75,6 @@ function makeTelemetry(devices: Device[], timestamp: Timestamp): Telemetry[] {
     [key: string]: { num_clusters: number; cluster_radii: number[]; cluster_centers: { lat: number; lng: number }[] }
   } = {}
 
-  logger.info('clustering')
   serviceAreaKeys.slice(0, 1).map(key => {
     const serviceArea = serviceAreaMap[key]
     const serviceAreaMultipoly = serviceArea.area

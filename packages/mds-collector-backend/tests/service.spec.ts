@@ -14,7 +14,7 @@
 
 import { TestSchema } from '@mds-core/mds-schema-validators'
 import { uuid } from '@mds-core/mds-utils'
-import { CollectorServiceClient, CollectorServiceClientFactory } from '../client'
+import { CollectorServiceClient, CollectorServiceSchemaClient } from '../client'
 import { CollectorRepository } from '../repository'
 import { CollectorBackendController } from '../service/backend'
 
@@ -25,11 +25,11 @@ const TEST_COLLECTOR_MESSAGES: Array<TestSchema> = [
   { id: uuid(), name: 'Prime Minister', country: 'CA', zip: 'K1M 1M4' }
 ]
 
-const TestSchemaCollectorClient = CollectorServiceClientFactory(TEST_SCHEMA_ID, TestSchema)
+const TestSchemaCollectorClient = CollectorServiceSchemaClient(TEST_SCHEMA_ID, TestSchema)
 
 describe('Collector Service', () => {
   it('Service Unavailable', async () => {
-    await expect(CollectorServiceClient.getMessageSchema(TEST_SCHEMA_ID)).rejects.toMatchObject({
+    await expect(TestSchemaCollectorClient.getMessageSchema()).rejects.toMatchObject({
       isServiceError: true,
       type: 'ServiceUnavailable'
     })
@@ -86,6 +86,16 @@ describe('Collector Service', () => {
       expect(written).toMatchObject(
         TEST_COLLECTOR_MESSAGES.map(message => ({ schema_id: TEST_SCHEMA_ID, provider_id, message }))
       )
+    })
+
+    it('Write Schema Messages (Error)', async () => {
+      const [message] = TEST_COLLECTOR_MESSAGES
+      await expect(
+        TestSchemaCollectorClient.writeSchemaMessages(uuid(), [{ ...message, email: 'invalid' }])
+      ).rejects.toMatchObject({
+        isServiceError: true,
+        type: 'ValidationError'
+      })
     })
 
     it('Write Schema Messages (Error)', async () => {

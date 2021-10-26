@@ -1,5 +1,35 @@
 # @mds-core/mds-ingest-service
 
+## 0.6.0
+
+### Minor Changes
+
+- 788cfbfa: Implemented case insensitive vehicle_id comparison.
+- aa1403da: Update RPC client factory methods and implement retry mechanism when services are unavailable
+
+### Patch Changes
+
+- 913dff02: updated mds-agency-cache to use multi-write cache methods
+- a1061650: Add namespaced logger, clean up excess logger messages
+- f6511653: Correct view definition to use INNER JOIN instead of LEFT JOIN
+- 2d16fa02: Write telemetry when writing migrated events.
+- 3f5c4358: Enforce clockwise (positive) GPS heading values
+- Updated dependencies [913dff02]
+- Updated dependencies [a1061650]
+- Updated dependencies [a1061650]
+- Updated dependencies [aa1403da]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-agency-cache@0.4.0
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-repository@0.1.18
+  - @mds-core/mds-rpc-common@0.2.0
+  - @mds-core/mds-service-helpers@0.4.0
+  - @mds-core/mds-stream@0.1.44
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+  - @mds-core/mds-schema-validators@0.3.9
+  - @mds-core/mds-providers@0.1.42
+
 ## 0.5.1
 
 ### Patch Changes

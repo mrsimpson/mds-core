@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import express from 'express'
+import { ApiServerLogger } from './logger'
 import { serverVersion } from './utils'
 
 export type HttpServerOptions = Partial<{
@@ -28,7 +28,7 @@ export const HttpServer = (api: express.Express, options: HttpServerOptions = {}
   const port = Number(options.port || process.env.PORT || 4000)
 
   const server = api.listen(port, () => {
-    logger.info(
+    ApiServerLogger.info(
       `${serverVersion()} running on port ${port}; Timeouts(${HTTP_KEEP_ALIVE_TIMEOUT}/${HTTP_HEADERS_TIMEOUT})`
     )
   })

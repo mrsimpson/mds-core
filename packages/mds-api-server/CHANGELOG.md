@@ -1,5 +1,18 @@
 # @mds-core/mds-api-server
 
+## 0.3.9
+
+### Patch Changes
+
+- a1061650: Add namespaced logger
+- a1061650: Add namespaced logger, clean up excess logger messages
+- Updated dependencies [a1061650]
+- Updated dependencies [aa1403da]
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-service-helpers@0.4.0
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-api-authorizer@0.1.44
+
 ## 0.3.8
 
 ### Patch Changes

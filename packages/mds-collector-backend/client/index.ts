@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcClient, RpcRequest } from '@mds-core/mds-rpc-common'
+import { RpcClient, RpcRequestOptions, RpcRequestWithOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import {
   CollectorMessageDomainModel,
@@ -28,24 +28,30 @@ const CollectorServiceRpcClient = RpcClient(CollectorServiceRpcDefinition, {
   port: process.env.COLLECTOR_BACKEND_RPC_PORT
 })
 
-export const CollectorServiceClient: ServiceClient<CollectorService> = {
-  registerMessageSchema: (...args) => RpcRequest(CollectorServiceRpcClient.registerMessageSchema, args),
-  getMessageSchema: (...args) => RpcRequest(CollectorServiceRpcClient.getMessageSchema, args),
-  writeSchemaMessages: (...args) => RpcRequest(CollectorServiceRpcClient.writeSchemaMessages, args)
-}
+export const CollectorServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<CollectorService> => ({
+  registerMessageSchema: (...args) =>
+    RpcRequestWithOptions(options, CollectorServiceRpcClient.registerMessageSchema, args),
+  getMessageSchema: (...args) => RpcRequestWithOptions(options, CollectorServiceRpcClient.getMessageSchema, args),
+  writeSchemaMessages: (...args) => RpcRequestWithOptions(options, CollectorServiceRpcClient.writeSchemaMessages, args)
+})
 
-export const CollectorServiceClientFactory = (
+export const CollectorServiceClient = CollectorServiceClientFactory()
+
+export const CollectorServiceSchemaClient = (
   schema_id: CollectorSchemaDomainModel['schema_id'],
-  schema: CollectorSchemaDomainModel['schema']
+  schema: CollectorSchemaDomainModel['schema'],
+  options: RpcRequestOptions = {}
 ) => {
   return {
-    registerMessageSchema: async () => CollectorServiceClient.registerMessageSchema(schema_id, schema),
-    getMessageSchema: async () => CollectorServiceClient.getMessageSchema(schema_id),
-    writeSchemaMessages: async (
+    registerMessageSchema: () =>
+      RpcRequestWithOptions(options, CollectorServiceRpcClient.registerMessageSchema, [schema_id, schema]),
+    getMessageSchema: () => RpcRequestWithOptions(options, CollectorServiceRpcClient.getMessageSchema, [schema_id]),
+    writeSchemaMessages: (
       provider_id: CollectorMessageDomainModel['provider_id'],
       messages: Array<CollectorMessageDomainModel['message']>
-    ) => CollectorServiceClient.writeSchemaMessages(schema_id, provider_id, messages)
+    ) =>
+      RpcRequestWithOptions(options, CollectorServiceRpcClient.writeSchemaMessages, [schema_id, provider_id, messages])
   }
 }
 
-export type CollectorServiceClient = ReturnType<typeof CollectorServiceClientFactory>
+export type CollectorServiceSchemaClient = ReturnType<typeof CollectorServiceSchemaClient>

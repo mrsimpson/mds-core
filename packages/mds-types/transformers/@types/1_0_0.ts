@@ -42,13 +42,15 @@ export const VEHICLE_EVENTS_v1_0_0 = [
 ] as const
 export type VEHICLE_EVENT_v1_0_0 = typeof VEHICLE_EVENTS_v1_0_0[number]
 
+export type Telemetry_v1_0_0 = Telemetry
+
 export interface VehicleEvent_v1_0_0 {
   device_id: UUID
   provider_id: UUID
   timestamp: Timestamp
   event_types: VEHICLE_EVENT_v1_0_0[]
   telemetry_timestamp: Timestamp
-  telemetry: Telemetry
+  telemetry: Telemetry_v1_0_0
   trip_id?: UUID | null
   vehicle_state: VEHICLE_STATE_v1_0_0
   recorded: Timestamp

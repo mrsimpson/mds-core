@@ -1,5 +1,32 @@
 # @mds-core/mds-compliance-service
 
+## 0.7.0
+
+### Minor Changes
+
+- aa1403da: Update RPC client factory methods and implement retry mechanism when services are unavailable
+
+### Patch Changes
+
+- a82c7b83: Add ComplianceViolation validator
+- a1061650: Add namespaced logger, clean up excess logger messages
+- e6451f80: PLAT-207 rollback on failed kafka write
+- 6255fbd5: Refactor ComplianceSnapshotEntityModel and ComplianceViolationEntityModel to directly define types instead of referencing their respective Domain Models to avoid some potentially undesirable TypeORM behavior
+- Updated dependencies [a1061650]
+- Updated dependencies [aa1403da]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-db@0.4.10
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-policy-service@0.7.0
+  - @mds-core/mds-repository@0.1.18
+  - @mds-core/mds-rpc-common@0.2.0
+  - @mds-core/mds-service-helpers@0.4.0
+  - @mds-core/mds-stream@0.1.44
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+  - @mds-core/mds-schema-validators@0.3.9
+  - @mds-core/mds-providers@0.1.42
+
 ## 0.6.1
 
 ### Patch Changes

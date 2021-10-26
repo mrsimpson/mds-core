@@ -17,12 +17,12 @@
 import { parseRequest } from '@mds-core/mds-api-helpers'
 import { ApiRequestQuery } from '@mds-core/mds-api-server'
 import { ComplianceServiceClient, ComplianceViolationPeriodDomainModel } from '@mds-core/mds-compliance-service'
-import logger from '@mds-core/mds-logger'
 import { isError } from '@mds-core/mds-service-helpers'
 import { Timestamp } from '@mds-core/mds-types'
 import { AuthorizationError, BadParamsError, isDefined, now, ServerError } from '@mds-core/mds-utils'
 import express from 'express'
 import { ComplianceAggregate, ComplianceApiRequest, ComplianceApiResponse } from '../@types'
+import { ComplianceApiLogger } from '../logger'
 import { base64EncodeArray } from './helpers'
 export type ComplianceApiGetViolationPeriodsRequest = ComplianceApiRequest &
   ApiRequestQuery<'start_time' | 'end_time' | 'provider_ids' | 'policy_ids'>
@@ -94,7 +94,7 @@ export const GetViolationPeriodsHandler = async (
 
     if (isError(error, AuthorizationError)) return res.status(403).send({ error })
 
-    logger.error(error)
+    ComplianceApiLogger.error(error)
     res.status(500).send({ error: new ServerError() })
   }
 }

@@ -1,5 +1,5 @@
-import logger from '@mds-core/mds-logger'
 import { Msg, StringCodec, SubOpts } from 'nats'
+import { StreamLogger } from '../logger'
 
 /**
  * We must encode/decode messages between strings & UInt8Arrays
@@ -17,7 +17,7 @@ export type NatsProcessorFn = (message: DecodedNatsMsg) => void
  */
 export const natsCbWrapper: (processor: NatsProcessorFn) => SubOpts<Msg>['callback'] = processor => (err, msg) => {
   if (err) {
-    logger.error('NATS Error', { err })
+    StreamLogger.error('NATS Error', { err })
     return
   }
   const { data, subject } = msg

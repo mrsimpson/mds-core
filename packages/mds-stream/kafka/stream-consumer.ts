@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Nullable, SingleOrArray } from '@mds-core/mds-types'
 import { asArray, isDefined } from '@mds-core/mds-utils'
 import { Consumer, EachMessagePayload, Kafka } from 'kafkajs'
+import { StreamLogger } from '../logger'
 import { StreamConsumer } from '../stream-interface'
 import { getKafkaBrokers } from './helpers'
 
@@ -46,7 +46,7 @@ const createStreamConsumer = async (
     await consumer.run({ eachMessage })
     return consumer
   } catch (err) {
-    logger.error(err)
+    StreamLogger.error(err)
   }
   return null
 }

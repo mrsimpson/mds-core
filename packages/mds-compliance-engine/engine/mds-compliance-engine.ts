@@ -15,11 +15,11 @@
  */
 
 import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
-import logger from '@mds-core/mds-logger'
 import { PolicyDomainModel } from '@mds-core/mds-policy-service'
 import { Device, Geography, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { filterDefined, now, uuid } from '@mds-core/mds-utils'
 import { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
+import { ComplianceEngineLogger } from '../logger'
 import { processCountPolicy } from './count_processors'
 import { getPolicyType, getProviderIDs, isCountPolicy, isPolicyActive, isSpeedPolicy, isTimePolicy } from './helpers'
 import { processSpeedPolicy } from './speed_processors'
@@ -37,7 +37,7 @@ function computeComplianceSnapshot(
   if (isSpeedPolicy(policy)) return processSpeedPolicy(policy, filteredEvents, geographies, deviceMap)
   if (isTimePolicy(policy)) return processTimePolicy(policy, filteredEvents, geographies, deviceMap)
 
-  logger.error(`Policy type ${policy_type} unsupported by compliance engine`)
+  ComplianceEngineLogger.error(`Policy type ${policy_type} unsupported by compliance engine`)
   return undefined
 }
 

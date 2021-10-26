@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-geography",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "MDS Geography API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -14,18 +14,18 @@
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-helpers": "workspace:0.1.49",
-    "@mds-core/mds-api-server": "workspace:0.3.8",
-    "@mds-core/mds-db": "workspace:0.4.9",
-    "@mds-core/mds-logger": "workspace:0.4.1",
-    "@mds-core/mds-providers": "workspace:0.1.41",
-    "@mds-core/mds-schema-validators": "workspace:0.3.8",
-    "@mds-core/mds-types": "workspace:0.6.0",
-    "@mds-core/mds-utils": "workspace:0.2.6",
+    "@mds-core/mds-api-helpers": "workspace:0.1.50",
+    "@mds-core/mds-api-server": "workspace:0.3.9",
+    "@mds-core/mds-db": "workspace:0.4.10",
+    "@mds-core/mds-logger": "workspace:0.4.2",
+    "@mds-core/mds-providers": "workspace:0.1.42",
+    "@mds-core/mds-schema-validators": "workspace:0.3.9",
+    "@mds-core/mds-types": "workspace:0.6.1",
+    "@mds-core/mds-utils": "workspace:0.2.7",
     "@types/express": "4.17.13",
     "express": "4.17.1"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "workspace:0.4.0"
+    "@mds-core/mds-test-data": "workspace:0.4.1"
   }
 }

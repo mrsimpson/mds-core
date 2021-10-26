@@ -332,7 +332,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       }
 
       if (vehicle_id) {
-        query.andWhere('devices.vehicle_id = :vehicle_id', { vehicle_id })
+        query.andWhere('lower(devices.vehicle_id) = :vehicle_id', { vehicle_id: vehicle_id.toLowerCase() })
       }
 
       if (provider_ids && provider_ids.every(isUUID)) {

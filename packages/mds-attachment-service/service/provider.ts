@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
 import { UUID } from '@mds-core/mds-types'
 import { AttachmentService, ReadAttachmentsOptions } from '../@types'
+import { AttachmentServiceLogger } from '../logger'
 import { AttachmentRepository } from '../repository'
 import { deleteAttachmentS3, validateFile, writeAttachmentS3 } from './helpers'
 
@@ -32,7 +32,7 @@ export const AttachmentServiceProvider: ServiceProvider<AttachmentService> & Pro
       return ServiceResult(attachment)
     } catch (error) {
       const exception = ServiceException('Error Writing Attachment', error)
-      logger.error('mds-attachment-service::writeAttachment error', { exception, error })
+      AttachmentServiceLogger.error('mds-attachment-service::writeAttachment error', { exception, error })
       return exception
     }
   },
@@ -45,7 +45,7 @@ export const AttachmentServiceProvider: ServiceProvider<AttachmentService> & Pro
       return ServiceResult(attachment)
     } catch (error) {
       const exception = ServiceException('Error Deleting Attachment', error)
-      logger.error('mds-attachment-service::deleteAttachment error', { exception, error })
+      AttachmentServiceLogger.error('mds-attachment-service::deleteAttachment error', { exception, error })
       return exception
     }
   },
@@ -55,7 +55,7 @@ export const AttachmentServiceProvider: ServiceProvider<AttachmentService> & Pro
       return ServiceResult(attachment)
     } catch (error) {
       const exception = ServiceException('Error Reading Attachment', error)
-      logger.error('mds-attachment-service::readAttachment error', { exception, error })
+      AttachmentServiceLogger.error('mds-attachment-service::readAttachment error', { exception, error })
       return exception
     }
   },
@@ -65,7 +65,7 @@ export const AttachmentServiceProvider: ServiceProvider<AttachmentService> & Pro
       return ServiceResult(attachments)
     } catch (error) {
       const exception = ServiceException('Error Reading Attachments', error)
-      logger.error('mds-attachment-service::readAttachments error', { exception, error })
+      AttachmentServiceLogger.error('mds-attachment-service::readAttachments error', { exception, error })
       return exception
     }
   }

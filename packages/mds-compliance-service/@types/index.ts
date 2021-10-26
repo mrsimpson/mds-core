@@ -47,6 +47,14 @@ export interface ComplianceSnapshotDomainModel {
 }
 
 /**
+ * If a generated snapshot can't be written to Kafka, make a note for later cleanup
+ */
+export interface ComplianceSnapshotKafkaFailureDomainModel {
+  timestamp: Timestamp
+  compliance_snapshot_id: UUID
+}
+
+/**
  * A violation period starts with the first compliance snapshot that has a violation, and ends
  * with the first snapshot that has no violations. E.g. if A, B, C, D, and E are snapshots,
  * and A and E have no violations, the violation period contains B, C and D, and the end_time is

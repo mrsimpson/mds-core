@@ -1,9 +1,9 @@
 import db from '@mds-core/mds-db'
 import { validateTelemetryDomainModel } from '@mds-core/mds-ingest-service'
-import logger from '@mds-core/mds-logger'
 import { isError } from '@mds-core/mds-service-helpers'
 import { Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
 import { NotFoundError, now, ServerError, ValidationError } from '@mds-core/mds-utils'
+import { AgencyLogger } from '../logger'
 import { AgencyApiSubmitVehicleTelemetryRequest, AgencyApiSubmitVehicleTelemetryResponse } from '../types'
 import { agencyValidationErrorParser, writeTelemetry } from '../utils'
 
@@ -140,7 +140,7 @@ const logTelemetryWritePerformance = ({
   /* we ought not to hit this during our test suite */
   /* istanbul ignore next */
   if (delta > 300) {
-    logger.info('writeTelemetry performance >.3s', {
+    AgencyLogger.debug('writeTelemetry performance >.3s', {
       provider_id,
       validItems: valid.length,
       total: data.length,
@@ -191,14 +191,14 @@ export const createTelemetryHandler = async (
       }
 
       // None of the telemetry was persisted by the db (even though it passed schema validation), ergo, none of it was unique
-      logger.info(`no unique telemetry in ${data.length} items for ${provider_id}`)
+      AgencyLogger.debug(`no unique telemetry in ${data.length} items for ${provider_id}`)
       return res.status(400).send(allInvalidDataBody(failures))
     }
 
     // None of the telemetry passed validation
     const body = `${JSON.stringify(req.body).substring(0, 128)} ...`
     const fails = `${JSON.stringify(failures).substring(0, 128)} ...`
-    logger.info(`no valid telemetry in ${data.length} items for ${provider_id}`, { body, fails })
+    AgencyLogger.debug(`no valid telemetry in ${data.length} items for ${provider_id}`, { body, fails })
 
     return res.status(400).send(allInvalidDataBody(failures))
   } catch (err) {
@@ -221,7 +221,7 @@ export const createTelemetryHandler = async (
 
     if (isError(err, ValidationError)) return res.status(400).send(agencyValidationErrorParser(err))
 
-    logger.error('createTelemetryHandler fatal error', { error: err })
+    AgencyLogger.error('createTelemetryHandler fatal error', { error: err })
     return res.status(500).send({ error: new ServerError() })
   }
 }

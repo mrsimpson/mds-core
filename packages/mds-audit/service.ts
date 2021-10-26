@@ -16,7 +16,6 @@
 
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
-import logger from '@mds-core/mds-logger'
 import {
   Audit,
   AuditEvent,
@@ -32,6 +31,7 @@ import {
 } from '@mds-core/mds-types'
 import { now, tail } from '@mds-core/mds-utils'
 import { Query } from 'express-serve-static-core'
+import { AuditLogger } from './logger'
 
 export async function deleteAudit(audit_trip_id: UUID): Promise<number> {
   const result: number = await db.deleteAudit(audit_trip_id)
@@ -102,7 +102,7 @@ export async function readDevicesByVehicleId(provider_id: UUID, vehicle_id: stri
     )
     const finish = now()
     const timeElapsed = finish - start
-    logger.info(`db.readDevicesByVehicleId ${provider_id} ${vehicle_id} time elapsed: ${timeElapsed}ms`)
+    AuditLogger.debug(`db.readDevicesByVehicleId ${provider_id} ${vehicle_id} time elapsed: ${timeElapsed}ms`)
     return results
   } catch (err) {
     return []
@@ -180,7 +180,7 @@ export async function getVehicle(provider_id: UUID, vehicle_id: string) {
       const deviceStatus = (await cache.readDeviceStatus(device.device_id)) as (VehicleEvent & Device) | null
       if (deviceStatus === null || (deviceStatus.event_types && tail(deviceStatus.event_types) === 'decommissioned')) {
         const { device_id } = device
-        logger.info('Bad vehicle status', { deviceStatus, provider_id, vehicle_id, device_id })
+        AuditLogger.debug('Bad vehicle status', { deviceStatus, provider_id, vehicle_id, device_id })
         deviceStatusMap.inactive.push(device)
       } else {
         const state = deviceStatus.vehicle_state
@@ -226,7 +226,7 @@ export async function getVehicles(
     return [...acc, { ...item, status, updated }]
   }, [])
   const finish = now()
-  logger.info(
+  AuditLogger.debug(
     `getVehicles processing ${JSON.stringify(bbox)} provider ${provider_id} time elapsed: ${finish - start}ms`
   )
 

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { now } from '@mds-core/mds-utils'
 import express from 'express'
+import { PolicyAuthorLogger } from '../logger'
 import { PolicyAuthorApiPublishPolicyRequest, PolicyAuthorApiPublishPolicyResponse } from '../types'
 
 export const PublishPolicyHandler = async (
@@ -31,7 +31,7 @@ export const PublishPolicyHandler = async (
     return res.status(200).send({ version: res.locals.version, data: { policy } })
   } catch (error) {
     /* istanbul ignore next */
-    logger.error('failed to publish policy', error.stack)
+    PolicyAuthorLogger.error('failed to publish policy', error.stack)
     /* istanbul ignore next */
     return next(error)
   }

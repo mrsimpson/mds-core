@@ -238,6 +238,113 @@
           }
         }
       }
+    },
+    "/violation/{violation_id}": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": [
+              "compliance:read",
+              "compliance:read:provider"
+            ]
+          }
+        ],
+        "summary": "Get a compliance violation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "violation_id",
+            "schema": {
+              "$ref": "#/components/schemas/uuid"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "$ref": "#/components/schemas/ComplianceApiVersion"
+                    },
+                    "violation": {
+                      "type": "object",
+                      "properties": {
+                        "violation_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "timestamp": {
+                          "type": "integer",
+                          "minimum": 100000000000,
+                          "maximum": 99999999999999
+                        },
+                        "policy_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "provider_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "rule_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "violation_details": {
+                          "type": "object",
+                          "properties": {
+                            "event_timestamp": {
+                              "type": "integer",
+                              "minimum": 100000000000,
+                              "maximum": 99999999999999
+                            },
+                            "device_id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "trip_id": {
+                              "type": "string",
+                              "format": "uuid",
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "required": [
+                            "event_timestamp",
+                            "device_id"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "violation_id",
+                        "timestamp",
+                        "policy_id",
+                        "provider_id",
+                        "rule_id",
+                        "violation_details"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "No Access Without Scope"
+          },
+          "500": {
+            "description": "Fatal Server Error"
+          }
+        }
+      }
     }
   },
   "components": {

@@ -14,10 +14,30 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import stream, { KafkaStreamConsumerOptions, KafkaStreamProducerOptions } from '@mds-core/mds-stream'
 import { SingleOrArray } from '@mds-core/mds-types'
 import { StreamSink, StreamSource } from '../@types'
+import { StreamProcessorLogger } from '../logger'
+
+/** Counts the number of messages consumed so far, logs & resets once it hits 100 */
+class Counter {
+  private count = 0
+
+  public get() {
+    return this.count
+  }
+
+  public increment() {
+    if (this.count === 100) {
+      StreamProcessorLogger.info(
+        'Processed 100 messages, set the env var DEBUG=mds:mds-stream-processor to log eachMessage details.'
+      )
+      this.count = 0
+    } else {
+      this.count++
+    }
+  }
+}
 
 export const KafkaSource =
   <TMessage>(
@@ -28,7 +48,8 @@ export const KafkaSource =
     }: Partial<KafkaStreamConsumerOptions & { messageLogger: (message: TMessage) => string | undefined }>
   ): StreamSource<TMessage> =>
   processor => {
-    logger.info('Creating KafkaSource', { topics, options })
+    const messageCounter = new Counter()
+    StreamProcessorLogger.info('Creating KafkaSource', { topics, options })
     return stream.KafkaStreamConsumer(
       topics,
       async payload => {
@@ -38,10 +59,13 @@ export const KafkaSource =
         } = payload
         if (value) {
           const message: TMessage = JSON.parse(value.toString())
-          logger.info(`Processing ${topic}/${offset}`, {
+          StreamProcessorLogger.debug(`Processing ${topic}/${offset}`, {
             message: (messageLogger && messageLogger(message)) ?? message
           })
-          return processor(message)
+
+          await processor(message)
+
+          return messageCounter.increment()
         }
       },
       options
@@ -51,6 +75,6 @@ export const KafkaSource =
 export const KafkaSink =
   <TMessage>(topic: string, options?: Partial<KafkaStreamProducerOptions<TMessage>>): StreamSink<TMessage> =>
   () => {
-    logger.info('Creating KafkaSink', { topic, options })
+    StreamProcessorLogger.info('Creating KafkaSink', { topic, options })
     return stream.KafkaStreamProducer(topic, options)
   }

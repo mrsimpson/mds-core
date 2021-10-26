@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcClient, RpcRequest } from '@mds-core/mds-rpc-common'
+import { RpcClient, RpcRequestOptions, RpcRequestWithOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient, UnwrapServiceResult } from '@mds-core/mds-service-helpers'
 import { IngestMigrationService, IngestService, IngestServiceDefinition } from '../@types'
 import { IngestServiceProvider } from '../service/provider'
@@ -25,27 +25,37 @@ const IngestServiceRpcClient = RpcClient(IngestServiceDefinition, {
 })
 
 // What the API layer, and any other clients, will invoke.
-export const IngestServiceClient: ServiceClient<IngestService & IngestMigrationService> = {
-  getDevicesUsingOptions: (...args) => RpcRequest(IngestServiceRpcClient.getDevicesUsingOptions, args),
-  getDevicesUsingCursor: (...args) => RpcRequest(IngestServiceRpcClient.getDevicesUsingCursor, args),
+export const IngestServiceClientFactory = (
+  options: RpcRequestOptions = {}
+): ServiceClient<IngestService & IngestMigrationService> => ({
+  getDevicesUsingOptions: (...args) =>
+    RpcRequestWithOptions(options, IngestServiceRpcClient.getDevicesUsingOptions, args),
+  getDevicesUsingCursor: (...args) =>
+    RpcRequestWithOptions(options, IngestServiceRpcClient.getDevicesUsingCursor, args),
   getEventsUsingOptions: (...args) =>
     process.env.ENABLE_RPC === 'true'
-      ? RpcRequest(IngestServiceRpcClient.getEventsUsingOptions, args)
+      ? RpcRequestWithOptions(options, IngestServiceRpcClient.getEventsUsingOptions, args)
       : UnwrapServiceResult(IngestServiceProvider.getEventsUsingOptions)(...args), // Temporarily remove RPC hop per APPS-155
-  getEventsUsingCursor: (...args) => RpcRequest(IngestServiceRpcClient.getEventsUsingCursor, args),
+  getEventsUsingCursor: (...args) => RpcRequestWithOptions(options, IngestServiceRpcClient.getEventsUsingCursor, args),
   getDevices: (...args) =>
     process.env.ENABLE_RPC === 'true'
-      ? RpcRequest(IngestServiceRpcClient.getDevices, args)
+      ? RpcRequestWithOptions(options, IngestServiceRpcClient.getDevices, args)
       : UnwrapServiceResult(IngestServiceProvider.getDevices)(...args), // Temporarily remove RPC hop per APPS-155
-  getLatestTelemetryForDevices: (...args) => RpcRequest(IngestServiceRpcClient.getLatestTelemetryForDevices, args),
-  writeEvents: (...args) => RpcRequest(IngestServiceRpcClient.writeEvents, args),
-  writeEventAnnotations: (...args) => RpcRequest(IngestServiceRpcClient.writeEventAnnotations, args),
-  writeMigratedDevice: (...args) => RpcRequest(IngestServiceRpcClient.writeMigratedDevice, args),
-  writeMigratedVehicleEvent: (...args) => RpcRequest(IngestServiceRpcClient.writeMigratedVehicleEvent, args),
-  writeMigratedTelemetry: (...args) => RpcRequest(IngestServiceRpcClient.writeMigratedTelemetry, args),
-  getTripEvents: (...args) => RpcRequest(IngestServiceRpcClient.getTripEvents, args),
+  getLatestTelemetryForDevices: (...args) =>
+    RpcRequestWithOptions(options, IngestServiceRpcClient.getLatestTelemetryForDevices, args),
+  writeEvents: (...args) => RpcRequestWithOptions(options, IngestServiceRpcClient.writeEvents, args),
+  writeEventAnnotations: (...args) =>
+    RpcRequestWithOptions(options, IngestServiceRpcClient.writeEventAnnotations, args),
+  writeMigratedDevice: (...args) => RpcRequestWithOptions(options, IngestServiceRpcClient.writeMigratedDevice, args),
+  writeMigratedVehicleEvent: (...args) =>
+    RpcRequestWithOptions(options, IngestServiceRpcClient.writeMigratedVehicleEvent, args),
+  writeMigratedTelemetry: (...args) =>
+    RpcRequestWithOptions(options, IngestServiceRpcClient.writeMigratedTelemetry, args),
+  getTripEvents: (...args) => RpcRequestWithOptions(options, IngestServiceRpcClient.getTripEvents, args),
   getEventsWithDeviceAndTelemetryInfoUsingOptions: (...args) =>
-    RpcRequest(IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingOptions, args),
+    RpcRequestWithOptions(options, IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingOptions, args),
   getEventsWithDeviceAndTelemetryInfoUsingCursor: (...args) =>
-    RpcRequest(IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingCursor, args)
-}
+    RpcRequestWithOptions(options, IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingCursor, args)
+})
+
+export const IngestServiceClient = IngestServiceClientFactory()

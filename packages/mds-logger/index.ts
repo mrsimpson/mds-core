@@ -34,9 +34,21 @@ const log =
 
 export default {
   log: (level: LogLevel, ...args: Parameters<ReturnType<typeof log>>) => log(level)(...args),
+  /** @deprecated
+   * Create a namespaced logger with createLogger instead.
+   */
   debug: debugLog,
+  /** @deprecated
+   * Create a namespaced logger with createLogger instead.
+   */
   info: log('info'),
+  /** @deprecated
+   * Create a namespaced logger with createLogger instead.
+   */
   warn: log('warn'),
+  /** @deprecated
+   * Create a namespaced logger with createLogger instead.
+   */
   error: log('error'),
   createLogger: (name: string) => ({
     debug: debugLog(name),

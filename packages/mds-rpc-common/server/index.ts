@@ -32,7 +32,7 @@ import http from 'http'
 import net from 'net'
 import REPL from 'repl'
 import { REPL_PORT, RpcServiceDefinition, RPC_CONTENT_TYPE, RPC_PORT } from '../@types'
-import { RpcCommonLogger as logger } from '../logger'
+import { RpcCommonLogger } from '../logger'
 
 export interface RpcServiceHandlers {
   onStart: () => Promise<void>
@@ -62,7 +62,7 @@ const stopServer = async (server: http.Server | net.Server): Promise<void> =>
 const startRepl = (options: RpcServerOptions['repl']): Promise<net.Server> =>
   new Promise(resolve => {
     const port = Number(options.port || process.env.REPL_PORT || REPL_PORT)
-    logger.info(`Starting REPL server on port ${port}`)
+    RpcCommonLogger.info(`Starting REPL server on port ${port}`)
     const server = net
       .createServer(socket => {
         const repl = REPL.start({
@@ -78,7 +78,7 @@ const startRepl = (options: RpcServerOptions['repl']): Promise<net.Server> =>
         })
       })
       .on('close', () => {
-        logger.info(`Stopping REPL server`)
+        RpcCommonLogger.info(`Stopping REPL server`)
       })
     server.listen(port, () => {
       resolve(server)
@@ -98,7 +98,7 @@ export const RpcServer = <S>(
     start: async () => {
       if (!server) {
         const port = Number(options.port || process.env.RPC_PORT || RPC_PORT)
-        logger.info(`Starting RPC server listening for ${RPC_CONTENT_TYPE} requests on port ${port}`)
+        RpcCommonLogger.info(`Starting RPC server listening for ${RPC_CONTENT_TYPE} requests on port ${port}`)
         await onStart()
         server = HttpServer(
           express()
@@ -126,7 +126,7 @@ export const RpcServer = <S>(
           await stopServer(repl)
           repl = null
         }
-        logger.info(`Stopping RPC server listening for ${RPC_CONTENT_TYPE} requests`)
+        RpcCommonLogger.info(`Stopping RPC server listening for ${RPC_CONTENT_TYPE} requests`)
         await onStop()
       }
     }

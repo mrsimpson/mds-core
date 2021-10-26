@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
 import { UUID } from '@mds-core/mds-types'
@@ -28,11 +27,13 @@ import {
   GetComplianceViolationPeriodsOptions,
   GetComplianceViolationsByTimeIntervalOptions
 } from '../@types'
+import { ComplianceServiceLogger } from '../logger'
 import { ComplianceRepository } from '../repository'
 import { ComplianceViolationPeriodEntityToDomainCreate } from '../repository/mappers'
 import { ComplianceSnapshotStreamKafka } from './stream'
 import {
   validateComplianceSnapshotDomainModel,
+  validateComplianceViolationDomainModel,
   validateGetComplianceSnapshotsByTimeIntervalOptions
 } from './validators'
 
@@ -41,7 +42,7 @@ const serviceErrorWrapper = async <T>(method: string, exec: () => Promise<T>) =>
     return ServiceResult(await exec())
   } catch (error) {
     const exception = ServiceException(`Error Compliance:${method}`, error)
-    logger.error(`mds-compliance-service::${method} error`, { exception, error })
+    ComplianceServiceLogger.error(`${method} error`, { exception, error })
     return exception
   }
 }
@@ -56,41 +57,59 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
   createComplianceSnapshot: async complianceSnapshot => {
     try {
       const snapshot = await ComplianceRepository.createComplianceSnapshot(
-        validateComplianceSnapshotDomainModel(complianceSnapshot)
+        validateComplianceSnapshotDomainModel(complianceSnapshot),
+        async snapshot => {
+          // send to Kafka
+          const { vehicles_found, ...kafkaSnapshot } = snapshot
+          try {
+            await ComplianceSnapshotStreamKafka.write(kafkaSnapshot)
+          } catch (err) {
+            // write to db table TODO
+            await ComplianceRepository.writeComplianceSnapshotFailures([snapshot.compliance_snapshot_id])
+          }
+        }
       )
-      const { vehicles_found, ...kafkaSnapshot } = snapshot
-      await ComplianceSnapshotStreamKafka.write(kafkaSnapshot)
       return ServiceResult(snapshot)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating ComplianceSnapshot', error)
-      logger.error('mds-compliance-service::createComplianceSnapshot error', { exception, error })
+      ComplianceServiceLogger.error('createComplianceSnapshot error', { exception, error })
       return exception
     }
   },
   createComplianceSnapshots: async complianceSnapshots => {
     try {
       const snapshots = await ComplianceRepository.createComplianceSnapshots(
-        complianceSnapshots.map(validateComplianceSnapshotDomainModel)
+        complianceSnapshots.map(validateComplianceSnapshotDomainModel),
+        async snapshots => {
+          // send to Kafka
+          const kafkaSnapshots = snapshots.map(snapshot => {
+            const { vehicles_found, ...kafkaSnapshot } = snapshot
+            return kafkaSnapshot
+          })
+          try {
+            await ComplianceSnapshotStreamKafka.write(kafkaSnapshots)
+          } catch (err) {
+            // write to db table TODO
+            await ComplianceRepository.writeComplianceSnapshotFailures(
+              snapshots.map(snapshot => snapshot.compliance_snapshot_id)
+            )
+          }
+        }
       )
-      const kafkaSnapshots = snapshots.map(snapshot => {
-        const { vehicles_found, ...kafkaSnapshot } = snapshot
-        return kafkaSnapshot
-      })
-      await ComplianceSnapshotStreamKafka.write(kafkaSnapshots)
       return ServiceResult(snapshots)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating ComplianceSnapshots', error)
-      logger.error('mds-compliance-service::createComplianceSnapshots error', { exception, error })
+      ComplianceServiceLogger.error('createComplianceSnapshots error', { exception, error })
       return exception
     }
   },
   createComplianceViolation: async complianceViolation =>
     serviceErrorWrapper('createComplianceViolation', () =>
-      ComplianceRepository.createComplianceViolation(complianceViolation)
+      ComplianceRepository.createComplianceViolation(validateComplianceViolationDomainModel(complianceViolation))
     ),
   createComplianceViolations: async complianceViolations =>
     serviceErrorWrapper('createComplianceViolations', () =>
-      ComplianceRepository.createComplianceViolations(complianceViolations)
+      ComplianceRepository.createComplianceViolations(complianceViolations.map(validateComplianceViolationDomainModel))
     ),
   getComplianceSnapshot: async options => {
     try {
@@ -100,7 +119,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
         `Error Getting ComplianceSnapshot with these options: ${JSON.stringify(options)}`,
         error
       )
-      logger.error('mds-compliance-service::getComplianceSnapshot error', { exception, error })
+      ComplianceServiceLogger.error('getComplianceSnapshot error', { exception, error })
       return exception
     }
   },
@@ -113,7 +132,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       )
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting ComplianceSnapshots', error)
-      logger.error('mds-compliance-service::getComplianceSnapshotsByTimeInterval error', { exception, error })
+      ComplianceServiceLogger.error('getComplianceSnapshotsByTimeInterval error', { exception, error })
       return exception
     }
   },
@@ -122,7 +141,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return ServiceResult(await ComplianceRepository.getComplianceSnapshotsByIDs(ids))
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting ComplianceSnapshots', error)
-      logger.error('mds-compliance-service::getComplianceSnapshotsByIDs error', { exception, error })
+      ComplianceServiceLogger.error('getComplianceSnapshotsByIDs error', { exception, error })
       return exception
     }
   },
@@ -170,7 +189,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return ServiceResult(results)
     } catch (error) {
       const exception = ServiceException('Error Getting Compliance Violation Periods', error)
-      logger.error('mds-compliance-service::getComplianceViolationPeriods error', { exception, error })
+      ComplianceServiceLogger.error('getComplianceViolationPeriods error', { exception, error })
       return exception
     }
   }

@@ -15,18 +15,18 @@
  */
 
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
+import { Nullable, Timestamp, UUID } from '@mds-core/mds-types'
 import { Column, Entity } from 'typeorm'
-import { ComplianceViolationDomainModel } from '../../@types'
 
 export interface ComplianceViolationEntityModel extends IdentityColumn, RecordedColumn {
-  violation_id: ComplianceViolationDomainModel['violation_id']
-  timestamp: ComplianceViolationDomainModel['timestamp']
-  policy_id: ComplianceViolationDomainModel['policy_id']
-  provider_id: ComplianceViolationDomainModel['provider_id']
-  rule_id: ComplianceViolationDomainModel['rule_id']
-  event_timestamp: ComplianceViolationDomainModel['violation_details']['event_timestamp']
-  device_id: ComplianceViolationDomainModel['violation_details']['device_id']
-  trip_id: ComplianceViolationDomainModel['violation_details']['trip_id']
+  violation_id: UUID
+  timestamp: Timestamp
+  policy_id: UUID
+  provider_id: UUID
+  rule_id: UUID
+  event_timestamp: Timestamp
+  device_id: UUID
+  trip_id: Nullable<UUID>
 }
 
 @Entity('compliance_violations')

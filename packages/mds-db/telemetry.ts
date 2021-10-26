@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Recorded, Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
 import { csv, now } from '@mds-core/mds-utils'
 import { getReadOnlyClient, getWriteableClient } from './client'
+import { DbLogger } from './logger'
 import schema from './schema'
 import { cols_sql, logSql, SqlVals, to_sql, vals_list } from './sql-utils'
 import { TelemetryRecord } from './types'
@@ -72,7 +72,7 @@ export async function writeTelemetry(telemetries: Telemetry[]): Promise<Recorded
 
     const delta = now() - start
     if (delta >= 300) {
-      logger.info(
+      DbLogger.debug(
         `pg db writeTelemetry ${telemetries.length} rows, success in ${delta} ms with ${recorded_telemetries.length} unique`
       )
     }
@@ -88,7 +88,7 @@ export async function writeTelemetry(telemetries: Telemetry[]): Promise<Recorded
         }) as Recorded<Telemetry>
     )
   } catch (err) {
-    logger.error('pg write telemetry error', err)
+    DbLogger.error('pg write telemetry error', err)
     throw err
   }
 }
@@ -120,7 +120,7 @@ export async function readTelemetry(
       return convertTelemetryRecordToTelemetry(row) as Recorded<Telemetry>
     })
   } catch (err) {
-    logger.error('read telemetry error', err)
+    DbLogger.error('read telemetry error', err)
     throw err
   }
 }

@@ -68,8 +68,11 @@ export type FEE_TYPE = typeof FEE_TYPE[number]
 
 export interface ReceiptDomainModel {
   receipt_id: UUID
-  timestamp: Timestamp // could be any time before the Transaction was created
-  origin_url: string // where can I go to dig into the details of the receipt, given this receipt_id?
+  timestamp: Timestamp
+  /**
+   * URL to fetch further details from.
+   */
+  origin_url: `https://${string}`
   receipt_details:
     | TripReceiptDetailsDomainModel
     | CurbUseDetailsDomainModel

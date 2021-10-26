@@ -18,10 +18,11 @@ import { NodeHttpTransport } from '@improbable-eng/grpc-web-node-http-transport'
 import { ClientRpcError } from '@lacuna-tech/rpc_ts/lib/client/errors'
 import { ModuleRpcProtocolClient } from '@lacuna-tech/rpc_ts/lib/protocol/client'
 import { ModuleRpcProtocolGrpcWebCommon } from '@lacuna-tech/rpc_ts/lib/protocol/grpc_web/common'
-import { ServiceError, ServiceResponse } from '@mds-core/mds-service-helpers'
+import { isServiceError, ServiceError, ServiceResponse } from '@mds-core/mds-service-helpers'
 import { AnyFunction } from '@mds-core/mds-types'
+import { seconds } from '@mds-core/mds-utils'
 import { RpcServiceDefinition, RPC_HOST, RPC_PORT } from '../@types'
-import { RpcCommonLogger as logger } from '../logger'
+import { RpcCommonLogger } from '../logger'
 
 export interface RpcClientOptions {
   host: string
@@ -40,11 +41,18 @@ export const RpcClient = <S>(definition: RpcServiceDefinition<S>, options: Parti
 }
 
 const RpcClientError = (error: {}) =>
-  ServiceError({
-    type: 'ServiceUnavailable',
-    message: error instanceof Error ? error.message : error.toString(),
-    details: error instanceof ClientRpcError ? error.errorType : undefined
-  }).error
+  ServiceError(
+    error instanceof ClientRpcError
+      ? {
+          type: error.errorType === 'unavailable' ? 'ServiceUnavailable' : 'ServiceException',
+          message: error.msg ?? error.name,
+          details: error.errorType
+        }
+      : {
+          type: 'ServiceException',
+          message: error instanceof Error ? error.message : error.toString()
+        }
+  ).error
 
 // eslint-reason type inference requires any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,19 +72,60 @@ const RpcResponse = async <M extends RpcMethod>(
   }
 }
 
-export const RpcRequest = async <M extends RpcMethod>(
+export type RpcRequestOptions = Partial<{
+  retries: number | boolean
+  backoff: number
+}>
+
+// By default, allow up to 5 retries with a 5s backoff.
+const RpcRequestManager = async <M extends RpcMethod>(
+  { retries = 5, backoff = seconds(5) }: RpcRequestOptions,
+  request: M,
+  ...args: RpcRequestType<M>
+): Promise<ServiceResponse<RpcResponseType<M>>> => {
+  try {
+    const response = await RpcResponse(request, ...args)
+    return response
+  } catch (error) {
+    if (isServiceError(error, 'ServiceUnavailable')) {
+      if (typeof retries === 'number' ? retries > 0 : retries) {
+        RpcCommonLogger.debug(
+          `RPC Service is unavailable. Retrying in ${backoff}ms.${
+            typeof retries === 'number' ? ` Retries remaining: ${retries}` : ''
+          }`
+        )
+        await new Promise(resolve => setTimeout(resolve, backoff))
+        return RpcRequestManager(
+          { retries: typeof retries === 'number' ? --retries : retries, backoff },
+          request,
+          ...args
+        )
+      }
+    }
+    throw error
+  }
+}
+
+// Make an RPC request using the specified options
+export const RpcRequestWithOptions = async <M extends RpcMethod>(
+  options: RpcRequestOptions,
   request: M,
   ...args: RpcRequestType<M>
 ): Promise<RpcResponseType<M>> => {
   const requestStartTime = Date.now()
-  const response = await RpcResponse(request, ...args)
-  logger.debug(`RPC request performance`, {
-    requestName: request.name,
-    duration: Date.now() - requestStartTime
-  })
-
-  if (response.error) {
-    throw response.error
+  try {
+    const response = await RpcRequestManager(options, request, ...args)
+    if (response.error) {
+      throw response.error
+    }
+    return response.result
+  } finally {
+    RpcCommonLogger.debug(`RPC request performance`, { duration: Date.now() - requestStartTime })
   }
-  return response.result
 }
+
+// Make an RPC request using default options
+export const RpcRequest = async <M extends RpcMethod>(
+  request: M,
+  ...args: RpcRequestType<M>
+): Promise<RpcResponseType<M>> => RpcRequestWithOptions({}, request, ...args)

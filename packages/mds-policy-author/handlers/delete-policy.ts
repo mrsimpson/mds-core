@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { PolicyServiceClient } from '@mds-core/mds-policy-service'
 import express from 'express'
+import { PolicyAuthorLogger } from '../logger'
 import { PolicyAuthorApiDeletePolicyRequest, PolicyAuthorApiDeletePolicyResponse } from '../types'
 
 export const DeletePolicyHandler = async (
@@ -30,7 +30,7 @@ export const DeletePolicyHandler = async (
     return res.status(200).send({ version: res.locals.version, data: { policy_id } })
   } catch (error) {
     /* istanbul ignore next */
-    logger.error('failed to delete policy', error)
+    PolicyAuthorLogger.error('failed to delete policy', error)
     /* istanbul ignore next */
     return next(error)
   }

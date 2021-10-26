@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { PolicyDomainModel, validatePolicyDomainModel } from '@mds-core/mds-policy-service'
 import { validateEvents, validateGeographies } from '@mds-core/mds-schema-validators'
 import { Device, Geography, VehicleEvent } from '@mds-core/mds-types'
@@ -23,6 +22,7 @@ import * as yargs from 'yargs'
 import { ComplianceEngineResult } from './@types'
 import { createComplianceSnapshot } from './engine'
 import { filterEvents, generateDeviceMap, getSupersedingPolicies } from './engine/helpers'
+import { ComplianceEngineLogger } from './logger'
 
 async function readJson(path: string): Promise<object> {
   return Promise.resolve(JSON.parse(fs.readFileSync(path).toString()))
@@ -62,20 +62,20 @@ async function main(): Promise<(ComplianceEngineResult | undefined)[]> {
     }).argv
   const geographies = (await readJson(args.geographies)) as Geography[]
   if (!geographies || !validateGeographies(geographies)) {
-    logger.error('unable to read geographies')
+    ComplianceEngineLogger.error('unable to read geographies')
     process.exit(1)
   }
 
   const policies = (await readJson(args.policies)) as PolicyDomainModel[]
   if (!policies || !validatePolicyDomainModel(policies)) {
-    logger.error('unable to read policies')
+    ComplianceEngineLogger.error('unable to read policies')
     process.exit(1)
   }
 
   // read events
   const events = (await readJson(args.events)) as VehicleEvent[]
   if (!events || !validateEvents(events)) {
-    logger.error('unable to read events')
+    ComplianceEngineLogger.error('unable to read events')
     process.exit(1)
   }
   const recentEvents = filterEvents(events)
@@ -84,7 +84,7 @@ async function main(): Promise<(ComplianceEngineResult | undefined)[]> {
   const devices = generateDeviceMap((await readJson(args.devices)) as Device[])
   // TODO Validate Devices
   if (!devices) {
-    logger.error('unable to read devices')
+    ComplianceEngineLogger.error('unable to read devices')
     process.exit(1)
   }
 
@@ -105,5 +105,5 @@ main()
   })
   /* eslint-disable-next-line promise/prefer-await-to-callbacks */
   .catch(async err => {
-    logger.error('exception:', err.stack)
+    ComplianceEngineLogger.error('exception:', err.stack)
   })
