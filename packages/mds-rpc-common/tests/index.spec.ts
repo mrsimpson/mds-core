@@ -17,7 +17,7 @@
 import { ServiceClient, ServiceError, ServiceResult } from '@mds-core/mds-service-helpers'
 import test from 'unit.js'
 import { RpcServiceDefinition } from '../@types'
-import { RpcClient, RpcRequest } from '../client'
+import { RpcClient, RpcRequestWithOptions } from '../client'
 import { RpcRoute } from '../index'
 import { RpcServer } from '../server'
 
@@ -46,7 +46,7 @@ const TestServer = RpcServer(
 
 describe('Test RPC Client', () => {
   const TestClient: ServiceClient<TestService> = {
-    length: word => RpcRequest(RpcClient(TestServiceRpcDefinition).length, [word])
+    length: word => RpcRequestWithOptions({ retries: false }, RpcClient(TestServiceRpcDefinition).length, [word])
   }
 
   it('Test Service Unavailable', async () => {

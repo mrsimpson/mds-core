@@ -1078,6 +1078,7 @@ importers:
       '@mds-core/mds-logger': workspace:0.4.1
       '@mds-core/mds-service-helpers': workspace:0.3.10
       '@mds-core/mds-types': workspace:0.6.0
+      '@mds-core/mds-utils': workspace:0.2.6
       '@types/express': 4.17.13
       express: 4.17.1
     dependencies:
@@ -1087,6 +1088,7 @@ importers:
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-service-helpers': link:../mds-service-helpers
       '@mds-core/mds-types': link:../mds-types
+      '@mds-core/mds-utils': link:../mds-utils
       '@types/express': 4.17.13
       express: 4.17.1
 

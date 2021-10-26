@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcClient, RpcRequest } from '@mds-core/mds-rpc-common'
+import { RpcClient, RpcRequestOptions, RpcRequestWithOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { TransactionService, TransactionServiceDefinition } from '../@types'
 
@@ -24,14 +24,23 @@ const TransactionServiceRpcClient = RpcClient(TransactionServiceDefinition, {
 })
 
 // What the API layer, and any other clients, will invoke.
-export const TransactionServiceClient: ServiceClient<TransactionService> = {
-  createTransaction: (...args) => RpcRequest(TransactionServiceRpcClient.createTransaction, args),
-  createTransactions: (...args) => RpcRequest(TransactionServiceRpcClient.createTransactions, args),
-  getTransaction: (...args) => RpcRequest(TransactionServiceRpcClient.getTransaction, args),
-  getTransactions: (...args) => RpcRequest(TransactionServiceRpcClient.getTransactions, args),
-  addTransactionOperation: (...args) => RpcRequest(TransactionServiceRpcClient.addTransactionOperation, args),
-  getTransactionOperations: (...args) => RpcRequest(TransactionServiceRpcClient.getTransactionOperations, args),
-  setTransactionStatus: (...args) => RpcRequest(TransactionServiceRpcClient.setTransactionStatus, args),
-  getTransactionsStatuses: (...args) => RpcRequest(TransactionServiceRpcClient.getTransactionsStatuses, args),
-  getTransactionStatuses: (...args) => RpcRequest(TransactionServiceRpcClient.getTransactionStatuses, args)
-}
+export const TransactionServiceClientFactory = (
+  options: RpcRequestOptions = {}
+): ServiceClient<TransactionService> => ({
+  createTransaction: (...args) => RpcRequestWithOptions(options, TransactionServiceRpcClient.createTransaction, args),
+  createTransactions: (...args) => RpcRequestWithOptions(options, TransactionServiceRpcClient.createTransactions, args),
+  getTransaction: (...args) => RpcRequestWithOptions(options, TransactionServiceRpcClient.getTransaction, args),
+  getTransactions: (...args) => RpcRequestWithOptions(options, TransactionServiceRpcClient.getTransactions, args),
+  addTransactionOperation: (...args) =>
+    RpcRequestWithOptions(options, TransactionServiceRpcClient.addTransactionOperation, args),
+  getTransactionOperations: (...args) =>
+    RpcRequestWithOptions(options, TransactionServiceRpcClient.getTransactionOperations, args),
+  setTransactionStatus: (...args) =>
+    RpcRequestWithOptions(options, TransactionServiceRpcClient.setTransactionStatus, args),
+  getTransactionsStatuses: (...args) =>
+    RpcRequestWithOptions(options, TransactionServiceRpcClient.getTransactionsStatuses, args),
+  getTransactionStatuses: (...args) =>
+    RpcRequestWithOptions(options, TransactionServiceRpcClient.getTransactionStatuses, args)
+})
+
+export const TransactionServiceClient = TransactionServiceClientFactory()
