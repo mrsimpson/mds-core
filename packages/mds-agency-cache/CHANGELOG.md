@@ -1,5 +1,24 @@
 # @mds-core/mds-agency-cache
 
+## 0.4.0
+
+### Minor Changes
+
+- 913dff02: added methods to support pipelined multi-writes
+
+### Patch Changes
+
+- a1061650: Clean up logger usage, create namespaced loggers
+- a1061650: Add namespaced logger, clean up excess logger messages
+- Updated dependencies [a1061650]
+- Updated dependencies [a1061650]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-cache@0.0.19
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+  - @mds-core/mds-schema-validators@0.3.9
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.4.2
+
+### Patch Changes
+
+- a1061650: Add namespaced logger, clean up excess logger messages
+
 ## 0.4.1
 
 ### Patch Changes

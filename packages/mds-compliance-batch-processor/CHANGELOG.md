@@ -1,5 +1,29 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.1.8
+
+### Patch Changes
+
+- a1061650: Add namespaced logger, clean up excess logger messages
+- a1061650: Add namespaced loggers, cleanup
+- Updated dependencies [a82c7b83]
+- Updated dependencies [913dff02]
+- Updated dependencies [a1061650]
+- Updated dependencies [a1061650]
+- Updated dependencies [e6451f80]
+- Updated dependencies [aa1403da]
+- Updated dependencies [6255fbd5]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-compliance-service@0.7.0
+  - @mds-core/mds-agency-cache@0.4.0
+  - @mds-core/mds-compliance-engine@0.6.7
+  - @mds-core/mds-db@0.4.10
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-policy-service@0.7.0
+  - @mds-core/mds-service-helpers@0.4.0
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+
 ## 0.1.7
 
 ### Patch Changes

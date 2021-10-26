@@ -1,5 +1,29 @@
 # @mds-core/mds-transaction-service
 
+## 0.3.0
+
+### Minor Changes
+
+- d7015bff: Publishing Transactions to a Kafka topic as they are created
+- aa1403da: Update RPC client factory methods and implement retry mechanism when services are unavailable
+- a82c7b83: Add comment to origin_url typedef, use template string to ensure that this is a URI
+
+### Patch Changes
+
+- a1061650: Add namespaced logger, clean up excess logger messages
+- 04ede231: Bump version of mds-stream to lastest
+- Updated dependencies [a1061650]
+- Updated dependencies [aa1403da]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-repository@0.1.18
+  - @mds-core/mds-rpc-common@0.2.0
+  - @mds-core/mds-service-helpers@0.4.0
+  - @mds-core/mds-stream@0.1.44
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+  - @mds-core/mds-schema-validators@0.3.9
+
 ## 0.2.5
 
 ### Patch Changes

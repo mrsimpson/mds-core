@@ -1,5 +1,11 @@
 # @mds-core/mds-types
 
+## 0.6.1
+
+### Patch Changes
+
+- 3f5c4358: Enforce clockwise (positive) GPS heading values
+
 ## 0.6.0
 
 ### Minor Changes

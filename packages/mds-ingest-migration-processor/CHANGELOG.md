@@ -1,5 +1,31 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.21
+
+### Patch Changes
+
+- 913dff02: updated mds-agency-cache to use multi-write cache methods
+- a1061650: Add namespaced logger, clean up excess logger messages
+- 564d9f1a: Use unique dead leader topics for migration errors
+- 3f5c4358: Enforce clockwise (positive) GPS heading values
+- Updated dependencies [788cfbfa]
+- Updated dependencies [913dff02]
+- Updated dependencies [913dff02]
+- Updated dependencies [a1061650]
+- Updated dependencies [a1061650]
+- Updated dependencies [f6511653]
+- Updated dependencies [2d16fa02]
+- Updated dependencies [aa1403da]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-ingest-service@0.6.0
+  - @mds-core/mds-agency-cache@0.4.0
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-repository@0.1.18
+  - @mds-core/mds-service-helpers@0.4.0
+  - @mds-core/mds-stream-processor@0.2.14
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+
 ## 0.0.20
 
 ### Patch Changes

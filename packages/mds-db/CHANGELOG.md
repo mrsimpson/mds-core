@@ -1,5 +1,27 @@
 # @mds-core/mds-db
 
+## 0.4.10
+
+### Patch Changes
+
+- a1061650: Add namespaced logger, clean up excess logger messages
+- Updated dependencies [788cfbfa]
+- Updated dependencies [913dff02]
+- Updated dependencies [a1061650]
+- Updated dependencies [a1061650]
+- Updated dependencies [f6511653]
+- Updated dependencies [2d16fa02]
+- Updated dependencies [aa1403da]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-ingest-service@0.6.0
+  - @mds-core/mds-attachment-service@0.3.0
+  - @mds-core/mds-geography-service@0.3.0
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-policy-service@0.7.0
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-audit-service@0.3.0
+  - @mds-core/mds-types@0.6.1
+
 ## 0.4.9
 
 ### Patch Changes
