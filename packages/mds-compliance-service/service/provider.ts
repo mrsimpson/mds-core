@@ -33,6 +33,7 @@ import { ComplianceViolationPeriodEntityToDomainCreate } from '../repository/map
 import { ComplianceSnapshotStreamKafka } from './stream'
 import {
   validateComplianceSnapshotDomainModel,
+  validateComplianceViolationDomainModel,
   validateGetComplianceSnapshotsByTimeIntervalOptions
 } from './validators'
 
@@ -104,11 +105,11 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
   },
   createComplianceViolation: async complianceViolation =>
     serviceErrorWrapper('createComplianceViolation', () =>
-      ComplianceRepository.createComplianceViolation(complianceViolation)
+      ComplianceRepository.createComplianceViolation(validateComplianceViolationDomainModel(complianceViolation))
     ),
   createComplianceViolations: async complianceViolations =>
     serviceErrorWrapper('createComplianceViolations', () =>
-      ComplianceRepository.createComplianceViolations(complianceViolations)
+      ComplianceRepository.createComplianceViolations(complianceViolations.map(validateComplianceViolationDomainModel))
     ),
   getComplianceSnapshot: async options => {
     try {

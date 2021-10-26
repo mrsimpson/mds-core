@@ -20,22 +20,7 @@ import { ComplianceViolationDomainModel } from '../@types'
 import { ComplianceServiceClient } from '../client'
 import { ComplianceRepository } from '../repository'
 import { ComplianceServiceManager } from '../service/manager'
-
-const ComplianceViolationFactory = (
-  overrides: Partial<ComplianceViolationDomainModel> = {}
-): ComplianceViolationDomainModel => ({
-  violation_id: uuid(),
-  timestamp: now(),
-  policy_id: uuid(), //FIXME
-  provider_id: uuid(), //FIXME
-  rule_id: uuid(),
-  violation_details: {
-    event_timestamp: now(),
-    device_id: uuid(),
-    trip_id: null
-  },
-  ...overrides
-})
+import { ComplianceViolationFactory } from '../test-fixtures'
 
 const ComplianceServer = ComplianceServiceManager.controller()
 

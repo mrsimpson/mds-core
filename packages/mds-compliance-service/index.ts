@@ -16,3 +16,5 @@
 
 export * from './@types'
 export * from './client'
+export { schemas } from './service/validators'
+export * from './test-fixtures'
