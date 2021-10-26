@@ -1,5 +1,24 @@
 # @mds-core/mds-rpc-common
 
+## 0.2.0
+
+### Minor Changes
+
+- aa1403da: Update RPC client factory methods and implement retry mechanism when services are unavailable
+
+### Patch Changes
+
+- a1061650: Add namespaced logger, clean up excess logger messages
+- Updated dependencies [a1061650]
+- Updated dependencies [a1061650]
+- Updated dependencies [aa1403da]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-api-server@0.3.9
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-service-helpers@0.4.0
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+
 ## 0.1.18
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @container-images/mds-policy-author
 
+## 0.1.50
+
+### Patch Changes
+
+- Updated dependencies [a1061650]
+  - @mds-core/mds-policy-author@0.5.9
+
 ## 0.1.49
 
 ### Patch Changes

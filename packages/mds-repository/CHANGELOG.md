@@ -1,5 +1,17 @@
 # @mds-core/mds-repository
 
+## 0.1.18
+
+### Patch Changes
+
+- a1061650: Add namespaced logger, clean up excess logger messages
+- Updated dependencies [a1061650]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+  - @mds-core/mds-providers@0.1.42
+
 ## 0.1.17
 
 ### Patch Changes
