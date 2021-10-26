@@ -85,7 +85,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       await GeographyServiceClient.writeGeographies([geography])
       await PolicyServiceClient.writePolicy(simplePolicy)
       await PolicyServiceClient.publishPolicy(simplePolicy.policy_id, now())
-      const result = await PolicyServiceClient.readPolicies({ get_published: true })
+      const { policies: result } = await PolicyServiceClient.readPolicies({ get_published: true })
       expect(result.length).toEqual(1)
     })
 
@@ -98,7 +98,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       await GeographyServiceClient.writeGeographies([geography])
       await PolicyServiceClient.writePolicy(policyWithTransactionTypes)
       await PolicyServiceClient.publishPolicy(policyWithTransactionTypes.policy_id, now())
-      const result = await PolicyServiceClient.readPolicies({ get_published: true })
+      const { policies: result } = await PolicyServiceClient.readPolicies({ get_published: true })
       expect(result.length).toEqual(1)
     })
 
@@ -111,7 +111,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       await GeographyServiceClient.writeGeographies([geography])
       await PolicyServiceClient.writePolicy(policyWithServiceTypes)
       await PolicyServiceClient.publishPolicy(policyWithServiceTypes.policy_id, now())
-      const result = await PolicyServiceClient.readPolicies({ get_published: true })
+      const { policies: result } = await PolicyServiceClient.readPolicies({ get_published: true })
       expect(result.length).toEqual(1)
     })
 
@@ -142,7 +142,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       await GeographyServiceClient.writeGeographies([geography])
       await PolicyServiceClient.writePolicy(policyWithRates)
       await PolicyServiceClient.publishPolicy(policyWithRates.policy_id, now())
-      const result = await PolicyServiceClient.readPolicies({ get_published: true })
+      const { policies: result } = await PolicyServiceClient.readPolicies({ get_published: true })
       expect(result.length).toEqual(1)
     })
 
@@ -180,7 +180,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       const policy = await PolicyServiceClient.readPolicy(deletablePolicy.policy_id)
       expect(policy.publish_date).toBeFalsy()
       await PolicyServiceClient.deletePolicy(policy.policy_id)
-      const policy_result = await PolicyServiceClient.readPolicies(
+      const { policies: policy_result } = await PolicyServiceClient.readPolicies(
         {
           policy_ids: [policy.policy_id],
           get_published: null,
@@ -208,14 +208,14 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       await PolicyServiceClient.writePolicy(POLICY3_JSON)
 
       /* Read all policies, no matter whether published or not. */
-      const policies = await PolicyServiceClient.readPolicies({})
+      const { policies } = await PolicyServiceClient.readPolicies({})
       expect(policies.length).toEqual(3)
-      const unpublishedPolicies = await PolicyServiceClient.readPolicies({
+      const { policies: unpublishedPolicies } = await PolicyServiceClient.readPolicies({
         get_unpublished: true,
         get_published: null
       })
       expect(unpublishedPolicies.length).toEqual(2)
-      const publishedPolicies = await PolicyServiceClient.readPolicies({
+      const { policies: publishedPolicies } = await PolicyServiceClient.readPolicies({
         get_published: true,
         get_unpublished: null
       })
@@ -268,7 +268,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
         GeographyFactory({ geography_id: simplePolicy.rules[0].geographies[0] })
       ])
       const rule_id = simplePolicy.rules[0].rule_id
-      const policies = await PolicyServiceClient.readPolicies({ rule_id })
+      const { policies } = await PolicyServiceClient.readPolicies({ rule_id })
       expect(policies[0].rules.map(rule => rule.rule_id).includes(rule_id)).toBeTruthy()
     })
 
@@ -286,7 +286,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
     it('can edit a Policy', async () => {
       await PolicyServiceClient.writePolicy(POLICY3_JSON)
       await PolicyServiceClient.editPolicy({ ...POLICY3_JSON, name: 'a shiny new name' })
-      const result = await PolicyServiceClient.readPolicies({
+      const { policies: result } = await PolicyServiceClient.readPolicies({
         policy_ids: [POLICY3_JSON.policy_id],
         get_unpublished: true,
         get_published: null
@@ -417,7 +417,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
           await PolicyServiceClient.publishPolicy(policyToPublish.policy_id, policyToPublish.start_date)
 
-          const results = await PolicyServiceClient.readPolicies({ statuses: ['draft'] })
+          const { policies: results } = await PolicyServiceClient.readPolicies({ statuses: ['draft'] })
 
           expect(results.length).toStrictEqual(1)
           expect(results[0]).toMatchObject(draftPolicy)
@@ -441,7 +441,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
             policyToPublish.start_date
           )
 
-          const results = await PolicyServiceClient.readPolicies({ statuses: ['active'] })
+          const { policies: results } = await PolicyServiceClient.readPolicies({ statuses: ['active'] })
 
           expect(results.length).toStrictEqual(1)
           expect(results[0]).toStrictEqual(activePolicy)
@@ -462,7 +462,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
           const pendingPolicy = await PolicyServiceClient.publishPolicy(policyToPublish.policy_id, yesterday())
 
-          const results = await PolicyServiceClient.readPolicies({ statuses: ['pending'] })
+          const { policies: results } = await PolicyServiceClient.readPolicies({ statuses: ['pending'] })
 
           expect(results.length).toStrictEqual(1)
           expect(results[0]).toStrictEqual(pendingPolicy)
@@ -488,7 +488,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
           await PolicyServiceClient.publishPolicy(firstPolicy.policy_id, firstPolicy.start_date)
           await PolicyServiceClient.publishPolicy(secondPolicy.policy_id, secondPolicy.start_date)
 
-          const results = await PolicyServiceClient.readPolicies({ statuses: ['deactivated'] })
+          const { policies: results } = await PolicyServiceClient.readPolicies({ statuses: ['deactivated'] })
           expect(results.length).toStrictEqual(1)
           expect(results[0]).toMatchObject(firstPolicy)
         })
@@ -509,7 +509,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
             policies.map(policy => PolicyServiceClient.publishPolicy(policy.policy_id, policy.start_date))
           )
 
-          const results = await PolicyServiceClient.readPolicies({ statuses: ['expired'] })
+          const { policies: results } = await PolicyServiceClient.readPolicies({ statuses: ['expired'] })
 
           expect(results.length).toStrictEqual(1)
           expect(results[0]).toStrictEqual(expiredPolicy)
@@ -532,7 +532,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
           await PolicyServiceClient.publishPolicy(policyToPublish.policy_id, yesterday())
 
-          const results = await PolicyServiceClient.readPolicies({ statuses: ['pending', 'draft'] })
+          const { policies: results } = await PolicyServiceClient.readPolicies({ statuses: ['pending', 'draft'] })
 
           expect(results.length).toStrictEqual(2)
         })
@@ -552,7 +552,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
           await PolicyServiceClient.publishPolicy(policyToPublish.policy_id, policyToPublish.start_date)
 
-          const results = await PolicyServiceClient.readPolicies({ statuses: ['active', 'draft'] })
+          const { policies: results } = await PolicyServiceClient.readPolicies({ statuses: ['active', 'draft'] })
 
           expect(results.length).toStrictEqual(2)
         })
@@ -577,7 +577,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
           await PolicyServiceClient.publishPolicy(firstPolicy.policy_id, firstPolicy.start_date)
           await PolicyServiceClient.publishPolicy(secondPolicy.policy_id, secondPolicy.start_date)
 
-          const results = await PolicyServiceClient.readPolicies({ statuses: ['active', 'deactivated'] })
+          const { policies: results } = await PolicyServiceClient.readPolicies({ statuses: ['active', 'deactivated'] })
 
           expect(results.length).toStrictEqual(2)
         })
@@ -600,7 +600,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
             policies.map(policy => PolicyServiceClient.publishPolicy(policy.policy_id, policy.start_date))
           )
 
-          const results = await PolicyServiceClient.readPolicies({ statuses: ['expired', 'active'] })
+          const { policies: results } = await PolicyServiceClient.readPolicies({ statuses: ['expired', 'active'] })
 
           expect(results.length).toStrictEqual(2)
         })

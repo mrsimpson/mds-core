@@ -15,10 +15,20 @@
  */
 
 import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
-import { Nullable, Timestamp, UUID } from '@mds-core/mds-types'
+import { Nullable, TimeRange, Timestamp, UUID } from '@mds-core/mds-types'
 import { PolicyDomainCreateModel, PolicyDomainModel, PolicyMetadataDomainModel, POLICY_STATUS } from './models'
 
-export type PresentationOptions = { withStatus?: boolean }
+export type FILTER_POLICY_STATUS = Exclude<POLICY_STATUS, 'unknown'>
+
+export const SortPolicyColumn = <const>['start_date', 'status']
+export type SortPolicyColumn = typeof SortPolicyColumn[number]
+
+export const SortPolicyDirection = <const>['ASC', 'DESC']
+export type SortPolicyDirection = typeof SortPolicyDirection[number]
+
+export type PresentationOptions = {
+  withStatus?: boolean
+}
 
 export interface ReadPolicyQueryParams {
   policy_ids?: UUID[]
@@ -28,14 +38,28 @@ export interface ReadPolicyQueryParams {
   start_date?: Timestamp
   get_unpublished?: Nullable<boolean>
   get_published?: Nullable<boolean>
-  statuses?: Exclude<POLICY_STATUS, 'unknown'>[]
+  statuses?: FILTER_POLICY_STATUS[]
   geography_ids?: Nullable<UUID[]>
+  active_on?: TimeRange
+  limit?: number
+  sort?: SortPolicyColumn
+  direction?: SortPolicyDirection
+  afterCursor?: string
+  beforeCursor?: string
+}
+
+export type ReadPoliciesResponse = {
+  policies: PolicyDomainModel[]
+  cursor?: {
+    prev: Nullable<string>
+    next: Nullable<string>
+  }
 }
 
 export interface PolicyService {
   name: () => string
   writePolicy: (policy: PolicyDomainCreateModel) => PolicyDomainModel
-  readPolicies: (params: ReadPolicyQueryParams, presentationOptions?: PresentationOptions) => PolicyDomainModel[]
+  readPolicies: (params: ReadPolicyQueryParams, presentationOptions?: PresentationOptions) => ReadPoliciesResponse
   readActivePolicies: (timestamp: Timestamp) => PolicyDomainModel[]
   deletePolicy: (policy_id: UUID) => UUID
   editPolicy: (policy: PolicyDomainCreateModel) => PolicyDomainModel

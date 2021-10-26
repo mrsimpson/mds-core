@@ -41,5 +41,11 @@ export type PolicyApiGetPolicyResponse = PolicyApiResponse<{
   data: { policies: PolicyDomainModel[] }
 }>
 export type PolicyApiGetPoliciesResponse = PolicyApiResponse<{
-  data: { policies: PolicyDomainModel[] }
+  data: {
+    policies: PolicyDomainModel[]
+    cursor?: {
+      next: string | null
+      prev: string | null
+    }
+  }
 }>

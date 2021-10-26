@@ -17,9 +17,11 @@
 import { CreatePoliciesTable1603045382246 } from './1603045382246-CreatePoliciesTable'
 import { CreatePolicyMetadataTable1603045629619 } from './1603045629619-CreatePolicyMetadataTable'
 import { AddSupersededByColumnToPoliciesTable1629221239968 } from './1629221239968-AddSupersededByColumnToPoliciesTable'
+import { AddColumnsToPoliciesTable1634142716521 } from './1634142716521-AddColumnsToPoliciesTable'
 
 export default [
   CreatePoliciesTable1603045382246,
   CreatePolicyMetadataTable1603045629619,
-  AddSupersededByColumnToPoliciesTable1629221239968
+  AddSupersededByColumnToPoliciesTable1629221239968,
+  AddColumnsToPoliciesTable1634142716521
 ]

@@ -36,7 +36,9 @@ import {
   PolicyMetadataDomainModel,
   PresentationOptions,
   RATE_RECURRENCE_VALUES,
-  RULE_TYPES
+  RULE_TYPES,
+  SortPolicyColumn,
+  SortPolicyDirection
 } from '../@types'
 
 const stringSchema = (options = {}) => ({ type: 'string', ...options })
@@ -57,9 +59,9 @@ const arraySchema = (items = {}, options = {}) => ({
 
 const enumSchema = <T>(enumType: T[]) => ({ type: 'string', enum: enumType })
 
-const micromobilityStateMap = MICRO_MOBILITY_VEHICLE_STATES.reduce<
-  { [k in MICRO_MOBILITY_VEHICLE_STATE]?: SchemaObject }
->((acc, state) => {
+const micromobilityStateMap = MICRO_MOBILITY_VEHICLE_STATES.reduce<{
+  [k in MICRO_MOBILITY_VEHICLE_STATE]?: SchemaObject
+}>((acc, state) => {
   acc[state] = {
     type: 'array',
     items: { type: 'string', enum: [...MICRO_MOBILITY_VEHICLE_EVENTS] }
@@ -186,7 +188,12 @@ export const { validate: validatePresentationOptions, isValid: isValidPresentati
     $id: 'PresentationOptions',
     type: 'object',
     properties: {
-      withStatus: { type: 'boolean' }
+      withStatus: { type: 'boolean' },
+      limit: { type: 'number', nullable: true },
+      sort: { type: 'string', enum: SortPolicyColumn, nullable: true },
+      direction: { type: 'string', enum: SortPolicyDirection, nullable: true },
+      afterCursor: { type: 'string', nullable: true, default: null },
+      beforeCursor: { type: 'string', nullable: true, default: null }
     }
   })
 

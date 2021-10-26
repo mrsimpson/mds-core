@@ -33,7 +33,8 @@
     "@mds-core/mds-utils": "workspace:0.2.7",
     "joi": "17.4.0",
     "pg": "8.7.1",
-    "typeorm": "0.2.38"
+    "typeorm": "0.2.38",
+    "typeorm-cursor-pagination": "0.6.1"
   },
   "devDependencies": {
     "@mds-core/mds-test-data": "workspace:0.4.1"

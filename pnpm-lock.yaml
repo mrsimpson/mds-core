@@ -1028,6 +1028,7 @@ importers:
       joi: 17.4.0
       pg: 8.7.1
       typeorm: 0.2.38
+      typeorm-cursor-pagination: 0.6.1
     dependencies:
       '@mds-core/mds-geography-service': link:../mds-geography-service
       '@mds-core/mds-logger': link:../mds-logger
@@ -1040,6 +1041,7 @@ importers:
       joi: 17.4.0
       pg: 8.7.1
       typeorm: 0.2.38_pg@8.7.1
+      typeorm-cursor-pagination: 0.6.1_typeorm@0.2.38
     devDependencies:
       '@mds-core/mds-test-data': link:../mds-test-data
 
@@ -5519,7 +5521,7 @@ packages:
     dev: false
 
   /fsevents/2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    resolution: {integrity: sha1-ilJveLj99GI7cJ4Ll1xSwkwC/Ro=}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
     requiresBuild: true
@@ -10372,7 +10374,7 @@ packages:
     dev: true
 
   /typeorm-cursor-pagination/0.6.1_typeorm@0.2.38:
-    resolution: {integrity: sha512-lqlvXBG2prsYFsBVZrWz2/wgoAcYzWCks/EMxP4wIVTISEO70dHQtQuaWWQP528lnW+rQNRwIK8sUuXMKJKavw==}
+    resolution: {integrity: sha1-xLgJE1QC441DSul3R+q6rcGMPuA=}
     peerDependencies:
       typeorm: ^0.2
     dependencies:
@@ -10458,7 +10460,7 @@ packages:
     dev: true
 
   /uglify-js/3.14.2:
-    resolution: {integrity: sha512-rtPMlmcO4agTUfz10CbgJ1k6UAoXM2gWb3GoMPPZB/+/Ackf8lNWk11K4rYi2D0apgoFRLtQOZhb+/iGNJq26A==}
+    resolution: {integrity: sha1-191qRspXIU9UotCkPK0PNduCrJk=}
     engines: {node: '>=0.8.0'}
     hasBin: true
     requiresBuild: true

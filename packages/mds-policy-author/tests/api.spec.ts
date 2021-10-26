@@ -216,7 +216,9 @@ describe('Tests app', () => {
 
       test.value(apiResult.body.version).is(POLICY_AUTHOR_API_DEFAULT_VERSION)
 
-      const [result] = await PolicyServiceClient.readPolicies({
+      const {
+        policies: [result]
+      } = await PolicyServiceClient.readPolicies({
         policy_ids: [policy.policy_id],
         get_unpublished: true,
         get_published: null
@@ -364,7 +366,7 @@ describe('Tests app', () => {
         policy_ids: [policy.policy_id],
         get_published: null,
         get_unpublished: null
-      }).should.be.fulfilledWith([])
+      }).should.be.fulfilledWith({ policies: [] })
     })
 
     it('cannot delete a published policy', async () => {
