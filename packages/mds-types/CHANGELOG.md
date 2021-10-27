@@ -1,5 +1,11 @@
 # @mds-core/mds-types
 
+## 0.7.0
+
+### Minor Changes
+
+- a156f493: Added pagination to readPolicies().
+
 ## 0.6.1
 
 ### Patch Changes
