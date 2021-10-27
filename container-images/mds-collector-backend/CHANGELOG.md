@@ -1,5 +1,12 @@
 # @container-images/mds-collector-backend
 
+## 0.0.21
+
+### Patch Changes
+
+- Updated dependencies [2b3c91c4]
+  - @mds-core/mds-collector-backend@0.2.1
+
 ## 0.0.20
 
 ### Patch Changes

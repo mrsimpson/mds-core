@@ -1,5 +1,19 @@
 # @mds-core/mds-jurisdiction-service
 
+## 0.3.1
+
+### Patch Changes
+
+- 2b3c91c4: Switch to RpcRequest and deprecate RpcRequestWithOptions
+- Updated dependencies [2b3c91c4]
+- Updated dependencies [a156f493]
+  - @mds-core/mds-rpc-common@0.2.1
+  - @mds-core/mds-types@0.7.0
+  - @mds-core/mds-repository@0.1.19
+  - @mds-core/mds-schema-validators@0.3.10
+  - @mds-core/mds-service-helpers@0.4.1
+  - @mds-core/mds-utils@0.2.8
+
 ## 0.3.0
 
 ### Minor Changes
