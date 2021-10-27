@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcClient, RpcRequestOptions, RpcRequestWithOptions } from '@mds-core/mds-rpc-common'
+import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { JurisdictionService, JurisdictionServiceDefinition } from '../@types'
 
@@ -26,15 +26,12 @@ const JurisdictionServiceRpcClient = RpcClient(JurisdictionServiceDefinition, {
 export const JurisdictionServiceClientFactory = (
   options: RpcRequestOptions = {}
 ): ServiceClient<JurisdictionService> => ({
-  createJurisdiction: (...args) =>
-    RpcRequestWithOptions(options, JurisdictionServiceRpcClient.createJurisdiction, args),
-  createJurisdictions: (...args) =>
-    RpcRequestWithOptions(options, JurisdictionServiceRpcClient.createJurisdictions, args),
-  deleteJurisdiction: (...args) =>
-    RpcRequestWithOptions(options, JurisdictionServiceRpcClient.deleteJurisdiction, args),
-  getJurisdiction: (...args) => RpcRequestWithOptions(options, JurisdictionServiceRpcClient.getJurisdiction, args),
-  getJurisdictions: (...args) => RpcRequestWithOptions(options, JurisdictionServiceRpcClient.getJurisdictions, args),
-  updateJurisdiction: (...args) => RpcRequestWithOptions(options, JurisdictionServiceRpcClient.updateJurisdiction, args)
+  createJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.createJurisdiction, args),
+  createJurisdictions: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.createJurisdictions, args),
+  deleteJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.deleteJurisdiction, args),
+  getJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.getJurisdiction, args),
+  getJurisdictions: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.getJurisdictions, args),
+  updateJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.updateJurisdiction, args)
 })
 
 export const JurisdictionServiceClient = JurisdictionServiceClientFactory()

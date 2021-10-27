@@ -15,52 +15,93 @@
  */
 
 import { parseRequest } from '@mds-core/mds-api-helpers'
-import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
-import { UUID } from '@mds-core/mds-types'
-import { BadParamsError, NotFoundError, now } from '@mds-core/mds-utils'
+import { PolicyServiceClient, SortPolicyColumn, SortPolicyDirection } from '@mds-core/mds-policy-service'
+import { now, ValidationError } from '@mds-core/mds-utils'
 import express from 'express'
 import { PolicyApiGetPoliciesRequest, PolicyApiGetPoliciesResponse } from '../types'
+
+const getQueryParamsPublished = (req: PolicyApiGetPoliciesRequest, scopes: Array<string>) => {
+  /*
+      If the client is scoped to read unpublished policies,
+      they are permitted to query for both published and unpublished policies.
+      Otherwise, they can only read published.
+    */
+  const publishParams = parseRequest(req).single({ parser: JSON.parse }).query('get_published', 'get_unpublished')
+  if (!scopes.includes('policies:read') && publishParams.get_unpublished === true) {
+    publishParams.get_unpublished = false
+  }
+  if (publishParams.get_published === undefined && publishParams.get_unpublished === undefined) {
+    publishParams.get_published = true
+  }
+  return publishParams
+}
+
+const getQueryParamsDates = (req: PolicyApiGetPoliciesRequest) => {
+  return parseRequest(req).single({ parser: Number }).query('start_date', 'end_date')
+}
+
+const getSort = (req: PolicyApiGetPoliciesRequest) => {
+  return parseRequest(req)
+    .single({
+      parser: s => {
+        if (s && typeof s === 'string' && SortPolicyColumn.includes(s as SortPolicyColumn)) {
+          return s as SortPolicyColumn
+        }
+        throw new ValidationError(`Invalid sort value '${s}'.`)
+      }
+    })
+    .query('sort')
+}
+
+const getSortDirection = (req: PolicyApiGetPoliciesRequest) => {
+  return parseRequest(req)
+    .single({
+      parser: dir => {
+        if (dir && typeof dir === 'string' && SortPolicyDirection.includes(dir as SortPolicyDirection)) {
+          return dir as SortPolicyDirection
+        }
+        throw new ValidationError(`Invalid sort direction '${dir}'.`)
+      }
+    })
+    .query('direction')
+}
+
+const getQueryParams = (req: PolicyApiGetPoliciesRequest, scopes: Array<string>) => {
+  const { get_published, get_unpublished } = getQueryParamsPublished(req, scopes)
+  const { start_date = now(), end_date = now() } = getQueryParamsDates(req)
+  if (start_date > end_date) {
+    throw new ValidationError(`start_date must be after end_date`)
+  }
+  const { limit } = parseRequest(req).single({ parser: Number }).query('limit')
+  const { afterCursor, beforeCursor } = parseRequest(req)
+    .single({ parser: String })
+    .query('afterCursor', 'beforeCursor')
+  const { sort = 'status' } = getSort(req)
+  const { direction = 'DESC' } = getSortDirection(req)
+  return {
+    active_on: {
+      start: start_date,
+      stop: end_date
+    },
+    get_published,
+    get_unpublished,
+    limit,
+    afterCursor,
+    beforeCursor,
+    sort,
+    direction
+  }
+}
 
 export const GetPoliciesHandler = async (
   req: PolicyApiGetPoliciesRequest,
   res: PolicyApiGetPoliciesResponse,
   next: express.NextFunction
 ) => {
-  const { start_date = now(), end_date = now() } = req.query
-  const { scopes } = res.locals
-
   try {
-    /*
-      If the client is scoped to read unpublished policies,
-      they are permitted to query for both published and unpublished policies.
-      Otherwise, they can only read published.
-    */
-    const { get_published = null, get_unpublished = null } = scopes.includes('policies:read')
-      ? parseRequest(req).single({ parser: JSON.parse }).query('get_published', 'get_unpublished')
-      : { get_published: true }
-
-    if (start_date > end_date) {
-      throw new BadParamsError(`start_date must be after end_date`)
-    }
-    const policies = await PolicyServiceClient.readPolicies({ get_published, get_unpublished })
-    const prev_policies: UUID[] = policies.reduce((prev_policies_acc: UUID[], policy: PolicyDomainModel) => {
-      if (policy.prev_policies) {
-        prev_policies_acc.push(...policy.prev_policies)
-      }
-      return prev_policies_acc
-    }, [])
-    const active = policies.filter(p => {
-      // overlapping segment logic
-      const p_start_date = p.start_date
-      const p_end_date = p.end_date || Number.MAX_SAFE_INTEGER
-      return end_date >= p_start_date && p_end_date >= start_date && !prev_policies.includes(p.policy_id)
-    })
-
-    if (active.length === 0) {
-      throw new NotFoundError('No policies found!')
-    }
-
-    res.status(200).send({ version: res.locals.version, data: { policies: active } })
+    const { scopes } = res.locals
+    const { policies, cursor } = await PolicyServiceClient.readPolicies(getQueryParams(req, scopes))
+    res.status(200).send({ version: res.locals.version, data: { policies, cursor } })
   } catch (error) {
     next(error)
   }

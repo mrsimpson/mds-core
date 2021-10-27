@@ -414,6 +414,7 @@ describe('Tests API', () => {
         test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
         test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
         test.object(result.body).match((obj: Device) => obj.state === 'removed')
+        test.assert(!result.body.hasOwnProperty('migrated_from_source'))
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })

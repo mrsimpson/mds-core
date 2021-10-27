@@ -1,5 +1,27 @@
 # @mds-core/mds-policy-author
 
+## 0.6.0
+
+### Minor Changes
+
+- a156f493: Added pagination to readPolicies().
+- a156f493: Refactor policy entity and add pagination to readPolicies.
+
+### Patch Changes
+
+- Updated dependencies [1e0156d3]
+- Updated dependencies [2b3c91c4]
+- Updated dependencies [a156f493]
+- Updated dependencies [a156f493]
+  - @mds-core/mds-api-server@0.3.10
+  - @mds-core/mds-policy-service@0.8.0
+  - @mds-core/mds-types@0.7.0
+  - @mds-core/mds-api-helpers@0.1.51
+  - @mds-core/mds-providers@0.1.43
+  - @mds-core/mds-schema-validators@0.3.10
+  - @mds-core/mds-service-helpers@0.4.1
+  - @mds-core/mds-utils@0.2.8
+
 ## 0.5.9
 
 ### Patch Changes

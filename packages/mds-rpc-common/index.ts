@@ -15,5 +15,5 @@
  */
 
 export { RpcRoute, RpcRouteDefinition, RpcServiceDefinition } from './@types'
-export { RpcClient, RpcClientOptions, RpcRequest, RpcRequestOptions, RpcRequestWithOptions } from './client'
+export { RpcClient, RpcClientOptions, RpcRequest, RpcRequestOptions } from './client'
 export { RpcServer, RpcServerOptions, RpcServiceHandlers } from './server'

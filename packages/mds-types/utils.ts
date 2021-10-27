@@ -21,6 +21,10 @@ export type DAY_OF_WEEK = keyof typeof DAYS_OF_WEEK
 export type UUID = string
 
 export type Timestamp = number
+export type TimeRange = {
+  start: Timestamp
+  stop: Timestamp
+}
 export type TimestampInSeconds = number
 export type Stringify<T> = { [P in keyof T]: string }
 export type Nullable<T> = T | null

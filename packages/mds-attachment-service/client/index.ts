@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcClient, RpcRequestOptions, RpcRequestWithOptions } from '@mds-core/mds-rpc-common'
+import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { AttachmentService, AttachmentServiceDefinition } from '../@types'
 
@@ -25,10 +25,10 @@ const AttachmentServiceRpcClient = RpcClient(AttachmentServiceDefinition, {
 
 // What the API layer, and any other clients, will invoke.
 export const AttachmentServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<AttachmentService> => ({
-  deleteAttachment: (...args) => RpcRequestWithOptions(options, AttachmentServiceRpcClient.deleteAttachment, args),
-  writeAttachment: (...args) => RpcRequestWithOptions(options, AttachmentServiceRpcClient.writeAttachment, args),
-  readAttachment: (...args) => RpcRequestWithOptions(options, AttachmentServiceRpcClient.readAttachment, args),
-  readAttachments: (...args) => RpcRequestWithOptions(options, AttachmentServiceRpcClient.readAttachments, args)
+  deleteAttachment: (...args) => RpcRequest(options, AttachmentServiceRpcClient.deleteAttachment, args),
+  writeAttachment: (...args) => RpcRequest(options, AttachmentServiceRpcClient.writeAttachment, args),
+  readAttachment: (...args) => RpcRequest(options, AttachmentServiceRpcClient.readAttachment, args),
+  readAttachments: (...args) => RpcRequest(options, AttachmentServiceRpcClient.readAttachments, args)
 })
 
 export const AttachmentServiceClient = AttachmentServiceClientFactory()

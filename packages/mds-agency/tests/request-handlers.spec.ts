@@ -1,5 +1,6 @@
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import stream from '@mds-core/mds-stream'
 import { Device } from '@mds-core/mds-types'
 import { uuid } from '@mds-core/mds-utils'
@@ -192,11 +193,13 @@ describe('Agency API request handlers', () => {
       res.status = statusHandler
       res.locals = getLocals(provider_id) as any
       Sinon.replace(
-        db,
-        'readDevice',
-        Sinon.fake.resolves({
-          provider_id
-        })
+        IngestServiceClient,
+        'getDevices',
+        Sinon.fake.resolves([
+          {
+            provider_id
+          }
+        ])
       )
       Sinon.replace(db, 'readEvent', Sinon.fake.resolves({}))
       Sinon.replace(db, 'readTelemetry', Sinon.fake.resolves({}))

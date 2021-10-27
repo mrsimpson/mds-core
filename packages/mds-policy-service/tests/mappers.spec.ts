@@ -8,6 +8,9 @@ describe('Tests Model Mappers', () => {
     const { policy_id } = policy
     const mockPolicyEntity = {
       policy_id,
+      start_date: now() + days(1),
+      end_date: null,
+      publish_date: null,
       policy_json: {
         ...policy,
         currency: null,
@@ -31,6 +34,9 @@ describe('Tests Model Mappers', () => {
     const { policy_id } = policy
     const mockPolicyEntity = {
       policy_id,
+      start_date: now() + days(1),
+      end_date: null,
+      publish_date: yesterday(),
       policy_json: {
         ...policy,
         currency: null,
@@ -55,6 +61,9 @@ describe('Tests Model Mappers', () => {
       const { policy_id } = policy
       const mockPolicyEntity = {
         policy_id,
+        start_date: yesterday(),
+        end_date: null,
+        publish_date: yesterday(),
         policy_json: {
           ...policy,
           currency: null,
@@ -79,6 +88,9 @@ describe('Tests Model Mappers', () => {
     const { policy_id } = policy
     const mockPolicyEntity = {
       policy_id,
+      start_date: now() - days(2),
+      end_date: now() - days(1),
+      publish_date: now() - days(2),
       policy_json: {
         ...policy,
         currency: null,
@@ -102,6 +114,9 @@ describe('Tests Model Mappers', () => {
     const { policy_id } = policy
     const mockPolicyEntity = {
       policy_id,
+      start_date: yesterday(),
+      end_date: null,
+      publish_date: yesterday(),
       policy_json: {
         ...policy,
         currency: null,

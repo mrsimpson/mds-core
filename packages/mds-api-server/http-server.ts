@@ -14,23 +14,34 @@
  * limitations under the License.
  */
 
+import { GracefulShutdownManager } from '@moebius/http-graceful-shutdown'
 import express from 'express'
 import { ApiServerLogger } from './logger'
 import { serverVersion } from './utils'
 
 export type HttpServerOptions = Partial<{
   port: string | number
+  exitSignals: NodeJS.Signals[]
 }>
 
 export const HttpServer = (api: express.Express, options: HttpServerOptions = {}) => {
   const { HTTP_KEEP_ALIVE_TIMEOUT = 15000, HTTP_HEADERS_TIMEOUT = 20000 } = process.env
-
+  const { exitSignals = ['SIGTERM', 'SIGINT'] } = options
   const port = Number(options.port || process.env.PORT || 4000)
 
   const server = api.listen(port, () => {
     ApiServerLogger.info(
       `${serverVersion()} running on port ${port}; Timeouts(${HTTP_KEEP_ALIVE_TIMEOUT}/${HTTP_HEADERS_TIMEOUT})`
     )
+  })
+
+  const shutdownManager = new GracefulShutdownManager(server)
+  exitSignals.forEach(signal => {
+    process.on(signal, () => {
+      shutdownManager.terminate(() => {
+        ApiServerLogger.info('HTTP Server has been gracefully terminated')
+      })
+    })
   })
 
   // Increase default timeout values to mitigate spurious 503 errors from Istio

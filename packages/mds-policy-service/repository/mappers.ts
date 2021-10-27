@@ -29,10 +29,7 @@ import { PolicyMetadataEntityModel } from './entities/policy-metadata-entity'
 type PolicyEntityToDomainOptions = Partial<{ withStatus: boolean }>
 
 export const derivePolicyStatus = (policy: PolicyEntityModel): POLICY_STATUS => {
-  const { policy_json, superseded_by } = policy
-
-  const { start_date, publish_date, end_date } = policy_json
-
+  const { superseded_by, start_date, publish_date, end_date } = policy
   const currentTime = now()
 
   if (publish_date === null) {
@@ -60,15 +57,19 @@ export const derivePolicyStatus = (policy: PolicyEntityModel): POLICY_STATUS => 
 
 export const PolicyEntityToDomain = ModelMapper<PolicyEntityModel, PolicyDomainModel, PolicyEntityToDomainOptions>(
   (entity, options) => {
-    const { policy_json: domain } = entity
-
+    const { policy_json, id, superseded_by, ...rest } = entity
     if (options?.withStatus) {
       const status = derivePolicyStatus(entity)
-
-      return { ...domain, status }
+      return {
+        ...policy_json,
+        ...rest,
+        status
+      }
     }
-
-    return { ...domain }
+    return {
+      ...policy_json,
+      ...rest
+    }
   }
 )
 
@@ -83,12 +84,21 @@ export const PolicyDomainToEntityCreate = ModelMapper<
   PolicyDomainCreateModel,
   PolicyEntityCreateModel,
   PolicyEntityCreateOptions
->(({ currency = null, provider_ids = null, end_date = null, prev_policies = null, ...domain }, _options) => {
+>((entity, _options) => {
+  const { currency = null, provider_ids = null, end_date = null, prev_policies = null, start_date, ...domain } = entity
   const { policy_id } = domain
   return {
     policy_id,
-    policy_json: { currency, provider_ids, end_date, prev_policies, ...domain, publish_date: null },
-    superseded_by: null
+    superseded_by: null,
+    end_date,
+    publish_date: null,
+    start_date,
+    policy_json: {
+      currency,
+      provider_ids,
+      prev_policies,
+      ...domain
+    }
   }
 })
 

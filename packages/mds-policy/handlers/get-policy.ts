@@ -42,7 +42,11 @@ export const GetPolicyHandler = async (
       ? parseRequest(req).single({ parser: JSON.parse }).query('get_published', 'get_unpublished')
       : { get_published: true }
 
-    const policies = await PolicyServiceClient.readPolicies({ policy_ids: [policy_id], get_published, get_unpublished })
+    const { policies } = await PolicyServiceClient.readPolicies({
+      policy_ids: [policy_id],
+      get_published,
+      get_unpublished
+    })
 
     if (policies.length === 0) {
       throw new NotFoundError(`policy_id ${policy_id} not found`)

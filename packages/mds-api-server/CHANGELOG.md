@@ -1,5 +1,14 @@
 # @mds-core/mds-api-server
 
+## 0.3.10
+
+### Patch Changes
+
+- 1e0156d3: Gracefully exit HttpServer when SIGTERM/SIGINT is received by parent process
+  - @mds-core/mds-api-authorizer@0.1.45
+  - @mds-core/mds-service-helpers@0.4.1
+  - @mds-core/mds-utils@0.2.8
+
 ## 0.3.9
 
 ### Patch Changes

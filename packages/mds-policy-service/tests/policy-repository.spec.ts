@@ -2,9 +2,11 @@
 import {
   clone,
   ConflictError,
+  days,
   minutes,
   NotFoundError,
   now,
+  range,
   START_ONE_MONTH_AGO,
   START_ONE_MONTH_FROM_NOW,
   uuid,
@@ -96,7 +98,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
     it('can publish a SimplePolicy', async () => {
       await PolicyRepository.writePolicy(SIMPLE_POLICY_JSON)
       await PolicyRepository.publishPolicy(SIMPLE_POLICY_JSON.policy_id, yesterday())
-      const result = await PolicyRepository.readPolicies({ get_published: true })
+      const { policies: result } = await PolicyRepository.readPolicies({ get_published: true })
       expect(result.length).toEqual(1)
     })
 
@@ -106,7 +108,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
       expect(await PolicyRepository.isPolicyPublished(policy_id)).toBeFalsy()
       await PolicyRepository.deletePolicy(policy_id)
-      const policy_result = await PolicyRepository.readPolicies({
+      const { policies: policy_result } = await PolicyRepository.readPolicies({
         policy_ids: [policy_id],
         get_published: null,
         get_unpublished: null
@@ -127,14 +129,14 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       await PolicyRepository.writePolicy(POLICY3_JSON)
 
       // Read all policies, no matter whether published or not.
-      const policies = await PolicyRepository.readPolicies()
+      const { policies } = await PolicyRepository.readPolicies()
       expect(policies.length).toEqual(3)
-      const unpublishedPolicies = await PolicyRepository.readPolicies({
+      const { policies: unpublishedPolicies } = await PolicyRepository.readPolicies({
         get_unpublished: true,
         get_published: null
       })
       expect(unpublishedPolicies.length).toEqual(2)
-      const publishedPolicies = await PolicyRepository.readPolicies({
+      const { policies: publishedPolicies } = await PolicyRepository.readPolicies({
         get_published: true,
         get_unpublished: null
       })
@@ -197,7 +199,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
     it('can edit a Policy', async () => {
       await PolicyRepository.writePolicy(POLICY3_JSON)
       await PolicyRepository.editPolicy({ ...POLICY3_JSON, name: 'a shiny new name' })
-      const result = await PolicyRepository.readPolicies({
+      const { policies: result } = await PolicyRepository.readPolicies({
         policy_ids: [POLICY3_JSON.policy_id],
         get_unpublished: true,
         get_published: null
@@ -249,7 +251,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       it('can find Policies by rule id', async () => {
         await PolicyRepository.writePolicy(SIMPLE_POLICY_JSON)
         const rule_id = '7ea0d16e-ad15-4337-9722-9924e3af9146'
-        const policies = await PolicyRepository.readPolicies({ rule_id })
+        const { policies } = await PolicyRepository.readPolicies({ rule_id })
         expect(policies[0].rules.map(rule => rule.rule_id).includes(rule_id)).toBeTruthy()
       })
 
@@ -271,13 +273,88 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
           })
         )
         const geography_ids = policy.rules[0].geographies
-        const policies = await PolicyRepository.readPolicies({ geography_ids })
+        const { policies } = await PolicyRepository.readPolicies({ geography_ids })
         /* expect 1 policy to match */
         expect(policies.length).toStrictEqual(1)
         const rule_geography_ids = policies[0].rules.map(rule => rule.geographies).flat()
         /* expect the geography IDs from rule[0] to both be contained within the rule geographies */
         geography_ids.forEach(geography_id => expect(rule_geography_ids).toContain(geography_id))
       })
+
+      it('can paginate Policies', async () => {
+        const n = now()
+        const testPolicies = [
+          PolicyFactory({ start_date: n }),
+          PolicyFactory({ start_date: n + days(1) }),
+          PolicyFactory({ start_date: n + days(2) })
+        ]
+        await Promise.all(testPolicies.map(policy => PolicyRepository.writePolicy(policy)))
+
+        const { policies: p1, cursor: c1 } = await PolicyRepository.readPolicies({ start_date: n, limit: 2 }, {})
+        expect(p1.length).toEqual(2)
+        expect(c1?.next).toBeDefined()
+        expect(c1?.prev).toBeNull()
+
+        const { policies: p2, cursor: c2 } = await PolicyRepository.readPolicies(
+          { limit: 2, afterCursor: c1?.next ?? undefined },
+          {}
+        )
+        expect(p2.length).toEqual(1)
+        expect(c2?.prev).toBeDefined()
+        expect(c2?.next).toBeNull()
+
+        const { policies: p3, cursor: c3 } = await PolicyRepository.readPolicies(
+          { limit: 2, beforeCursor: c1?.prev ?? undefined },
+          {}
+        )
+        expect(p3.length).toEqual(2)
+        expect(c3?.next).toBeDefined()
+        expect(c3?.prev).toBeNull()
+      })
+    })
+
+    it('can sort Policies by start_date', async () => {
+      const n = now()
+      const r = range(5)
+      await Promise.all(
+        r.map(i => PolicyRepository.writePolicy(PolicyFactory({ name: `p${i}`, start_date: n + days(i) })))
+      )
+      const { policies } = await PolicyRepository.readPolicies({ sort: 'start_date' }, {})
+      policies.map(p => p.name).forEach((n, i) => expect(n).toEqual(`p${i}`))
+      const { policies: reversedPolicies } = await PolicyRepository.readPolicies(
+        { sort: 'start_date', direction: 'DESC' },
+        {}
+      )
+      reversedPolicies.map(p => p.name).forEach((n, i) => expect(n).toEqual(`p${r.length - 1 - i}`))
+    })
+
+    it('can sort Policies by status', async () => {
+      const n = now()
+      const p1 = await PolicyRepository.writePolicy(PolicyFactory({ name: 'active', start_date: n }))
+      const p2 = await PolicyRepository.writePolicy(
+        PolicyFactory({ name: 'expired', start_date: n - days(14), end_date: n - days(7), publish_date: n - days(14) })
+      )
+      await PolicyRepository.writePolicy(PolicyFactory({ name: 'draft' }))
+      const p4 = await PolicyRepository.writePolicy(PolicyFactory({ name: 'pending', start_date: n + days(7) }))
+
+      const p5 = await PolicyRepository.writePolicy(PolicyFactory({ name: 'deactivated', start_date: n }))
+      const p6 = await PolicyRepository.writePolicy(
+        PolicyFactory({ name: 'active', start_date: n, prev_policies: [p5.policy_id] })
+      )
+
+      await PolicyRepository.publishPolicy(p1.policy_id, n)
+      await PolicyRepository.publishPolicy(p2.policy_id, n - days(14))
+      await PolicyRepository.publishPolicy(p4.policy_id)
+      await PolicyRepository.publishPolicy(p5.policy_id, n)
+      await PolicyRepository.updatePolicySupersededByColumn(p5.policy_id, p6.policy_id)
+      await PolicyRepository.publishPolicy(p6.policy_id, n)
+      const { policies } = await PolicyRepository.readPolicies({ sort: 'status' }, {})
+      const expected = ['active', 'active', 'pending', 'expired', 'deactivated', 'draft']
+      policies.map(p => p.name).forEach((n, i) => expect(n).toEqual(expected[i]))
+
+      const { policies: reversed } = await PolicyRepository.readPolicies({ sort: 'status', direction: 'DESC' }, {})
+      const expectedReverse = expected.reverse()
+      reversed.map(p => p.name).forEach((n, i) => expect(n).toEqual(expectedReverse[i]))
     })
   })
 
@@ -296,8 +373,8 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
     it('.readBulkPolicyMetadata', async () => {
       await PolicyRepository.writePolicy(ACTIVE_POLICY_JSON)
-      await PolicyRepository.writePolicy(POLICY2_JSON)
-      await PolicyRepository.writePolicy(POLICY3_JSON)
+      await PolicyRepository.writePolicy(POLICY2_JSON) // expired policy
+      await PolicyRepository.writePolicy(POLICY3_JSON) // starts in future (1 month from now)
 
       await PolicyRepository.writePolicyMetadata({
         policy_id: ACTIVE_POLICY_JSON.policy_id,
@@ -314,6 +391,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
       const noParamsResult = await PolicyRepository.readBulkPolicyMetadata()
       expect(noParamsResult.length).toStrictEqual(3)
+      // Looks for policies that start in the future.
       const withStartDateResult: PolicyMetadataDomainModel<{ name: string }>[] =
         await PolicyRepository.readBulkPolicyMetadata({
           start_date: now(),

@@ -16,6 +16,7 @@
 
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import stream from '@mds-core/mds-stream'
 import {
   BoundingBox,
@@ -348,7 +349,8 @@ const normalizeTelemetry = (telemetry: TelemetryResult) => {
 export async function readPayload(device_id: UUID): Promise<VehiclePayload> {
   const payload: VehiclePayload = {}
   try {
-    payload.device = await db.readDevice(device_id)
+    const [device] = await IngestServiceClient.getDevices([device_id])
+    payload.device = device
   } catch (err) {
     AgencyLogger.error('readPayload: db readDevice error', { err })
   }

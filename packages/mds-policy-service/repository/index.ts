@@ -17,12 +17,14 @@
 import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import { Timestamp, UUID } from '@mds-core/mds-types'
 import { ConflictError, NotFoundError, now, testEnvSafeguard } from '@mds-core/mds-utils'
+import { buildPaginator } from 'typeorm-cursor-pagination'
 import {
+  FILTER_POLICY_STATUS,
   PolicyDomainCreateModel,
   PolicyDomainModel,
   PolicyMetadataDomainModel,
-  POLICY_STATUS,
   PresentationOptions,
+  ReadPoliciesResponse,
   ReadPolicyQueryParams
 } from '../@types'
 import entities from './entities'
@@ -46,11 +48,77 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
     presentationOptions: PresentationOptions = {},
     timestamp: Timestamp = now()
   ) => {
-    const { policy_ids, rule_id, get_unpublished, get_published, start_date, geography_ids, statuses } = params
+    const {
+      policy_ids,
+      rule_id,
+      get_unpublished,
+      get_published,
+      start_date,
+      geography_ids,
+      statuses = [],
+      active_on,
+      limit,
+      beforeCursor,
+      afterCursor,
+      sort = 'status',
+      direction
+    } = params
+    const statusFilters = (() => {
+      const filters: FILTER_POLICY_STATUS[] = []
+      if (get_unpublished) filters.push('draft')
+      if (get_published) filters.push('active', 'pending', 'expired')
+      if (filters.length) return filters
+      return statuses
+    })()
+
+    /** Turns statuses into expressions with params */
+    const PUBLISHED = 'publish_date IS NOT NULL'
+    const NOT_PUBLISHED = 'publish_date IS NULL'
+    const START_DATE_IN_PAST = 'start_date IS NOT NULL AND start_date <= :now'
+    const START_DATE_IN_FUTURE = 'start_date IS NOT NULL AND start_date > :now'
+    const END_DATE_IN_PAST = 'end_date IS NOT NULL AND end_date <= :now'
+    const END_DATE_NULL_OR_IN_FUTURE = '(end_date IS NULL OR end_date > :now)'
+    const SUPERSEDED = 'superseded_by IS NOT NULL AND array_length(superseded_by, 1) >= 1'
+    const NOT_SUPERSEDED = 'superseded_by IS NULL'
+    const DELIMITER = ' AND '
+
+    const STATUS_ORDER = `CASE
+      WHEN ${[NOT_PUBLISHED].join(DELIMITER)} THEN 5
+      WHEN ${[SUPERSEDED].join(DELIMITER)} THEN 4
+      WHEN ${[PUBLISHED, END_DATE_IN_PAST, NOT_SUPERSEDED].join(DELIMITER)} THEN 3
+      WHEN ${[PUBLISHED, START_DATE_IN_FUTURE, NOT_SUPERSEDED].join(DELIMITER)} THEN 2
+      WHEN ${[PUBLISHED, START_DATE_IN_PAST, END_DATE_NULL_OR_IN_FUTURE, NOT_SUPERSEDED].join(DELIMITER)} THEN 1
+      ELSE 6
+    END`
 
     try {
       const connection = await this.connect('ro')
       const query = connection.getRepository(PolicyEntity).createQueryBuilder()
+
+      const pager = (() => {
+        if (limit) {
+          const keys: (keyof PolicyEntity)[] = ['id']
+          if (sort === 'start_date') {
+            keys.push('start_date')
+          }
+          return buildPaginator({
+            entity: PolicyEntity,
+            alias: 'PolicyEntity',
+            paginationKeys: keys,
+            query: {
+              limit: limit,
+              order: direction,
+              afterCursor: afterCursor ?? undefined,
+              beforeCursor: beforeCursor ?? undefined
+            }
+          })
+        } else if (sort === 'status') {
+          query.addOrderBy(`(${STATUS_ORDER})`, direction)
+          query.setParameter('now', timestamp)
+        } else {
+          query.addOrderBy(sort, direction)
+        }
+      })()
 
       if (policy_ids) {
         query.andWhere('policy_id = ANY(:policy_ids)', { policy_ids })
@@ -63,16 +131,12 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
         )
       }
 
-      if (get_unpublished) {
-        query.andWhere("policy_json->>'publish_date' IS NULL")
-      }
-
-      if (get_published) {
-        query.andWhere("policy_json->>'publish_date' IS NOT NULL")
+      if (active_on) {
+        query.andWhere('(:stop >= start_date AND (end_date IS NULL OR end_date >= :start))', active_on)
       }
 
       if (start_date) {
-        query.andWhere("policy_json->>'start_date' >= :start_date", { start_date })
+        query.andWhere('start_date >= :start_date', { start_date })
       }
 
       if (geography_ids) {
@@ -82,19 +146,9 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
         )
       }
 
-      if (statuses) {
-        /** Turns statuses into expressions with params */
-        const PUBLISHED = "policy_json->>'publish_date' IS NOT NULL"
-        const NOT_PUBLISHED = "policy_json->>'publish_date' IS NULL"
-        const START_DATE_IN_PAST = "policy_json->>'start_date' IS NOT NULL AND policy_json->>'start_date' <= :now"
-        const START_DATE_IN_FUTURE = "policy_json->>'start_date' IS NOT NULL AND policy_json->>'start_date' > :now"
-        const END_DATE_IN_PAST = "policy_json->>'end_date' IS NOT NULL AND policy_json->>'end_date' <= :now"
-        const END_DATE_NULL_OR_IN_FUTURE = "(policy_json->>'end_date' IS NULL OR policy_json->>'end_date' > :now)"
-        const SUPERSEDED = 'superseded_by IS NOT NULL AND array_length(superseded_by, 1) >= 1'
-        const NOT_SUPERSEDED = 'superseded_by IS NULL'
-        const DELIMITER = ' AND '
+      if (statusFilters && statusFilters.length > 0) {
         const statusToExpressionWithParams: {
-          [key in Exclude<POLICY_STATUS, 'unknown'>]: { expression: string; params?: object }
+          [key in FILTER_POLICY_STATUS]: { expression: string; params?: object }
         } = {
           draft: {
             expression: [NOT_PUBLISHED].join(DELIMITER)
@@ -116,7 +170,7 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
           }
         }
 
-        const expressionsWithParams = statuses.map(status => statusToExpressionWithParams[status])
+        const expressionsWithParams = statusFilters.map(status => statusToExpressionWithParams[status])
 
         if (expressionsWithParams.length === 1) {
           const [{ expression, params }] = expressionsWithParams
@@ -131,8 +185,26 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
           query.andWhere(`(${expressions.join(' OR ')})`, params)
         }
       }
-      const entities = await query.getMany()
-      return entities.map(entity => PolicyEntityToDomain.map(entity, presentationOptions))
+      if (pager) {
+        const { data, cursor } = await pager.paginate(query)
+        const result: ReadPoliciesResponse = {
+          policies: data.map(entity => PolicyEntityToDomain.map(entity, presentationOptions))
+        }
+        if (cursor.afterCursor || cursor.beforeCursor) {
+          result.cursor = {
+            next: cursor.afterCursor,
+            prev: cursor.beforeCursor
+          }
+        }
+        return {
+          policies: data.map(entity => PolicyEntityToDomain.map(entity, presentationOptions)),
+          cursor: {
+            next: cursor.afterCursor,
+            prev: cursor.beforeCursor
+          }
+        }
+      }
+      return { policies: (await query.getMany()).map(entity => PolicyEntityToDomain.map(entity, presentationOptions)) }
     } catch (error) {
       throw RepositoryError(error)
     }
@@ -140,14 +212,15 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
 
   public readActivePolicies = async (timestamp: Timestamp = now()) => {
     try {
-      return this.readPolicies({ statuses: ['active'] }, { withStatus: true }, timestamp)
+      const { policies } = await this.readPolicies({ statuses: ['active'] }, { withStatus: true }, timestamp)
+      return policies
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
   public readBulkPolicyMetadata = async <M>(params: ReadPolicyQueryParams = {}) => {
-    const policies = await this.readPolicies(params)
+    const { policies } = await this.readPolicies(params)
 
     if (policies.length === 0) {
       return []
@@ -190,7 +263,12 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
   }
 
   private throwIfRulesAlreadyExist = async (policy: PolicyDomainCreateModel) => {
-    const policies = await Promise.all(policy.rules.map(({ rule_id }) => this.readPolicies({ rule_id })))
+    const policies = await Promise.all(
+      policy.rules.map(async ({ rule_id }) => {
+        const { policies } = await this.readPolicies({ rule_id })
+        return policies
+      })
+    )
     const policyIds = policies.flat().map(({ policy_id }) => policy_id)
 
     if (policyIds.some(policy_id => policy_id !== policy.policy_id)) {
@@ -240,11 +318,16 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
       throw new ConflictError('Cannot edit published policy')
     }
 
-    const result = await this.readPolicies({ policy_ids: [policy_id], get_unpublished: true, get_published: false })
-    if (result.length === 0) {
+    const { policies } = await this.readPolicies({
+      policy_ids: [policy_id],
+      get_unpublished: true,
+      get_published: false
+    })
+    if (policies.length === 0) {
       throw new NotFoundError(`no policy of id ${policy_id} was found`)
     }
     await this.throwIfRulesAlreadyExist(policy)
+    const { start_date, end_date, publish_date } = policy
     try {
       const connection = await this.connect('rw')
       const {
@@ -253,9 +336,9 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
         .getRepository(PolicyEntity)
         .createQueryBuilder()
         .update()
-        .set({ policy_json: { ...policy } })
+        .set({ start_date, end_date, publish_date, policy_json: { ...policy } })
         .where('policy_id = :policy_id', { policy_id })
-        .andWhere("policy_json->>'publish_date' IS NULL")
+        .andWhere('publish_date IS NULL')
         .returning('*')
         .execute()
       return PolicyEntityToDomain.map(updated)
@@ -278,7 +361,7 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
         .createQueryBuilder()
         .delete()
         .where('policy_id = :policy_id', { policy_id })
-        .andWhere("policy_json->>'publish_date' IS NULL")
+        .andWhere('publish_date IS NULL')
         .returning('*')
         .execute()
       return PolicyEntityToDomain.map(deleted).policy_id
@@ -294,9 +377,10 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
         throw new ConflictError('Cannot re-publish existing policy')
       }
 
-      const policy = (
-        await this.readPolicies({ policy_ids: [policy_id], get_unpublished: true, get_published: null })
-      )[0]
+      const {
+        policies: [policy]
+      } = await this.readPolicies({ policy_ids: [policy_id], get_unpublished: true, get_published: null })
+
       if (!policy) {
         throw new NotFoundError('cannot publish nonexistent policy')
       }
@@ -305,7 +389,6 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
         throw new ConflictError('Policies cannot be published after their start_date')
       }
 
-      const published_policy: PolicyDomainModel = { ...policy, publish_date }
       try {
         const connection = await this.connect('rw')
         const {
@@ -314,9 +397,9 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
           .getRepository(PolicyEntity)
           .createQueryBuilder()
           .update()
-          .set({ policy_json: { ...published_policy } })
+          .set({ publish_date })
           .where('policy_id = :policy_id', { policy_id })
-          .andWhere("policy_json->>'publish_date' IS NULL")
+          .andWhere('publish_date IS NULL')
           .returning('*')
           .execute()
         return PolicyEntityToDomain.map(updated)

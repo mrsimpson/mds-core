@@ -76,13 +76,6 @@ const Post = (path: string, body: {}, provider_id?: UUID, ...scopes: CollectorAp
 }
 
 describe('Collector API', () => {
-  describe('Service Unavailable', () => {
-    Get('/schema/test', TEST_PROVIDER_ID, 'collector:schemas:read').Responds(HttpStatus.SERVICE_UNAVAILABLE, {
-      headers: { 'content-type': CollectorApiContentType },
-      body: { error: { isServiceError: true, type: 'ServiceUnavailable' } }
-    })
-  })
-
   describe('API Endpoints', () => {
     beforeAll(async () => {
       await CollectorBackend.start()
