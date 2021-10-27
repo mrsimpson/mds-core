@@ -25,7 +25,7 @@ const TEST_COLLECTOR_MESSAGES: Array<TestSchema> = [
   { id: uuid(), name: 'Prime Minister', country: 'CA', zip: 'K1M 1M4' }
 ]
 
-const TestSchemaCollectorClient = CollectorServiceSchemaClient(TEST_SCHEMA_ID, TestSchema)
+const TestSchemaCollectorClient = CollectorServiceSchemaClient(TEST_SCHEMA_ID, TestSchema, { retries: false })
 
 describe('Collector Service', () => {
   it('Service Unavailable', async () => {

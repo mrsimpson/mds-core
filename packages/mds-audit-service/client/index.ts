@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcClient, RpcRequestOptions, RpcRequestWithOptions } from '@mds-core/mds-rpc-common'
+import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { AuditService, AuditServiceDefinition } from '../@types'
 
@@ -25,7 +25,7 @@ const AuditServiceRpcClient = RpcClient(AuditServiceDefinition, {
 
 // What the API layer, and any other clients, will invoke.
 export const AuditServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<AuditService> => ({
-  name: (...args) => RpcRequestWithOptions(options, AuditServiceRpcClient.name, args)
+  name: (...args) => RpcRequest(options, AuditServiceRpcClient.name, args)
 })
 
 export const AuditServiceClient = AuditServiceClientFactory()

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcClient, RpcRequestOptions, RpcRequestWithOptions } from '@mds-core/mds-rpc-common'
+import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { GeographyService, GeographyServiceDefinition } from '../@types'
 
@@ -25,16 +25,14 @@ const GeographyServiceRpcClient = RpcClient(GeographyServiceDefinition, {
 
 // What the API layer, and any other clients, will invoke.
 export const GeographyServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<GeographyService> => ({
-  getGeography: (...args) => RpcRequestWithOptions(options, GeographyServiceRpcClient.getGeography, args),
-  getGeographies: (...args) => RpcRequestWithOptions(options, GeographyServiceRpcClient.getGeographies, args),
+  getGeography: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeography, args),
+  getGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeographies, args),
   getUnpublishedGeographies: (...args) =>
-    RpcRequestWithOptions(options, GeographyServiceRpcClient.getUnpublishedGeographies, args),
-  getPublishedGeographies: (...args) =>
-    RpcRequestWithOptions(options, GeographyServiceRpcClient.getPublishedGeographies, args),
-  writeGeographies: (...args) => RpcRequestWithOptions(options, GeographyServiceRpcClient.writeGeographies, args),
-  writeGeographiesMetadata: (...args) =>
-    RpcRequestWithOptions(options, GeographyServiceRpcClient.writeGeographiesMetadata, args),
-  getGeographiesByIds: (...args) => RpcRequestWithOptions(options, GeographyServiceRpcClient.getGeographiesByIds, args)
+    RpcRequest(options, GeographyServiceRpcClient.getUnpublishedGeographies, args),
+  getPublishedGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.getPublishedGeographies, args),
+  writeGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.writeGeographies, args),
+  writeGeographiesMetadata: (...args) => RpcRequest(options, GeographyServiceRpcClient.writeGeographiesMetadata, args),
+  getGeographiesByIds: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeographiesByIds, args)
 })
 
 export const GeographyServiceClient = GeographyServiceClientFactory()

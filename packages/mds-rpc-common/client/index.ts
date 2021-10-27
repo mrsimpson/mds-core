@@ -79,24 +79,20 @@ export type RpcRequestOptions = Partial<{
 
 // By default, allow up to 5 retries with a 5s backoff.
 const RpcRequestManager = async <M extends RpcMethod>(
-  { retries = 5, backoff = seconds(5) }: RpcRequestOptions,
+  { retries = 12, backoff = seconds(5) }: RpcRequestOptions,
   request: M,
   ...args: RpcRequestType<M>
 ): Promise<ServiceResponse<RpcResponseType<M>>> => {
   try {
-    const response = await RpcResponse(request, ...args)
-    return response
+    return await RpcResponse(request, ...args)
   } catch (error) {
     if (isServiceError(error, 'ServiceUnavailable')) {
       if (typeof retries === 'number' ? retries > 0 : retries) {
-        RpcCommonLogger.debug(
-          `RPC Service is unavailable. Retrying in ${backoff}ms.${
-            typeof retries === 'number' ? ` Retries remaining: ${retries}` : ''
-          }`
-        )
+        const remaining = typeof retries === 'number' ? ` Retries remaining: ${retries}` : ''
+        RpcCommonLogger.debug(`RPC Service is unavailable. Retrying in ${backoff}ms.${remaining}`)
         await new Promise(resolve => setTimeout(resolve, backoff))
         return RpcRequestManager(
-          { retries: typeof retries === 'number' ? --retries : retries, backoff },
+          { retries: typeof retries === 'number' ? retries - 1 : retries, backoff },
           request,
           ...args
         )
@@ -107,7 +103,7 @@ const RpcRequestManager = async <M extends RpcMethod>(
 }
 
 // Make an RPC request using the specified options
-export const RpcRequestWithOptions = async <M extends RpcMethod>(
+export const RpcRequest = async <M extends RpcMethod>(
   options: RpcRequestOptions,
   request: M,
   ...args: RpcRequestType<M>
@@ -123,9 +119,3 @@ export const RpcRequestWithOptions = async <M extends RpcMethod>(
     RpcCommonLogger.debug(`RPC request performance`, { duration: Date.now() - requestStartTime })
   }
 }
-
-// Make an RPC request using default options
-export const RpcRequest = async <M extends RpcMethod>(
-  request: M,
-  ...args: RpcRequestType<M>
-): Promise<RpcResponseType<M>> => RpcRequestWithOptions({}, request, ...args)
