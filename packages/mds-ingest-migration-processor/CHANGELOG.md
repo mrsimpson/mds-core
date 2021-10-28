@@ -1,5 +1,21 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.23
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+- Updated dependencies [70586f15]
+  - @mds-core/mds-utils@0.2.9
+  - @mds-core/mds-agency-cache@0.4.2
+  - @mds-core/mds-ingest-service@0.6.2
+  - @mds-core/mds-logger@0.4.3
+  - @mds-core/mds-repository@0.1.20
+  - @mds-core/mds-service-helpers@0.4.2
+  - @mds-core/mds-stream-processor@0.2.16
+  - @mds-core/mds-types@0.7.1
+
 ## 0.0.22
 
 ### Patch Changes

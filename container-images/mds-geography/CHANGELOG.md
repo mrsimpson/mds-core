@@ -1,5 +1,14 @@
 # @container-images/mds-geography
 
+## 0.0.28
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+  - @mds-core/mds-geography@0.1.11
+  - @mds-core/mds-webpack-config@0.1.7
+
 ## 0.0.27
 
 ### Patch Changes

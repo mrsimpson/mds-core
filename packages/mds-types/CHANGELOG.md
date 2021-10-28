@@ -1,5 +1,11 @@
 # @mds-core/mds-types
 
+## 0.7.1
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+
 ## 0.7.0
 
 ### Minor Changes

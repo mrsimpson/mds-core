@@ -1,5 +1,15 @@
 # @mds-core/mds-utils
 
+## 0.2.9
+
+### Patch Changes
+
+- 70586f15: Don't throw in pointInGeometry when shape is not supported
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+  - @mds-core/mds-logger@0.4.3
+  - @mds-core/mds-types@0.7.1
+
 ## 0.2.8
 
 ### Patch Changes

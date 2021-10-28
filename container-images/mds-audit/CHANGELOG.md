@@ -1,5 +1,14 @@
 # @container-images/mds-audit
 
+## 0.1.53
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+  - @mds-core/mds-audit@0.2.10
+  - @mds-core/mds-webpack-config@0.1.7
+
 ## 0.1.52
 
 ### Patch Changes

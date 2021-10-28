@@ -1,5 +1,14 @@
 # @container-images/mds-collector-backend
 
+## 0.0.22
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+  - @mds-core/mds-collector-backend@0.2.2
+  - @mds-core/mds-webpack-config@0.1.7
+
 ## 0.0.21
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # @mds-core/mds-attachment-service
 
+## 0.3.2
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+- Updated dependencies [70586f15]
+  - @mds-core/mds-utils@0.2.9
+  - @mds-core/mds-logger@0.4.3
+  - @mds-core/mds-repository@0.1.20
+  - @mds-core/mds-rpc-common@0.2.2
+  - @mds-core/mds-schema-validators@0.3.11
+  - @mds-core/mds-service-helpers@0.4.2
+  - @mds-core/mds-types@0.7.1
+
 ## 0.3.1
 
 ### Patch Changes

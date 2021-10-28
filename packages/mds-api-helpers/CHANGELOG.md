@@ -1,5 +1,18 @@
 # @mds-core/mds-api-helpers
 
+## 0.1.52
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+- Updated dependencies [70586f15]
+  - @mds-core/mds-utils@0.2.9
+  - @mds-core/mds-agency-cache@0.4.2
+  - @mds-core/mds-api-server@0.3.11
+  - @mds-core/mds-db@0.4.12
+  - @mds-core/mds-types@0.7.1
+
 ## 0.1.51
 
 ### Patch Changes
