@@ -1,5 +1,11 @@
 # @mds-core/mds-webpack-config
 
+## 0.1.7
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+
 ## 0.1.6
 
 ### Patch Changes

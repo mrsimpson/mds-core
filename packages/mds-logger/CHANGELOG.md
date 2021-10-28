@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.4.3
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+
 ## 0.4.2
 
 ### Patch Changes

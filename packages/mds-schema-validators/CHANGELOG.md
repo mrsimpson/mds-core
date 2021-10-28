@@ -1,5 +1,17 @@
 # @mds-core/mds-schema-validators
 
+## 0.3.11
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+- Updated dependencies [70586f15]
+  - @mds-core/mds-utils@0.2.9
+  - @mds-core/mds-providers@0.1.44
+  - @mds-core/mds-test-data@0.4.3
+  - @mds-core/mds-types@0.7.1
+
 ## 0.3.10
 
 ### Patch Changes

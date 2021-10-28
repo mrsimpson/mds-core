@@ -1,5 +1,13 @@
 # @mds-core/mds-providers
 
+## 0.1.44
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+  - @mds-core/mds-types@0.7.1
+
 ## 0.1.43
 
 ### Patch Changes

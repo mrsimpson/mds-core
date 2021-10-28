@@ -1,5 +1,25 @@
 # @mds-core/mds-compliance-api
 
+## 0.3.12
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+- Updated dependencies [70586f15]
+  - @mds-core/mds-utils@0.2.9
+  - @mds-core/mds-api-helpers@0.1.52
+  - @mds-core/mds-api-server@0.3.11
+  - @mds-core/mds-compliance-service@0.7.2
+  - @mds-core/mds-db@0.4.12
+  - @mds-core/mds-logger@0.4.3
+  - @mds-core/mds-policy-service@0.8.1
+  - @mds-core/mds-providers@0.1.44
+  - @mds-core/mds-schema-validators@0.3.11
+  - @mds-core/mds-service-helpers@0.4.2
+  - @mds-core/mds-test-data@0.4.3
+  - @mds-core/mds-types@0.7.1
+
 ## 0.3.11
 
 ### Patch Changes
