@@ -13,22 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import httpContext from 'express-http-context'
 import { inspect } from 'util'
 import { LogLevel } from './@types'
 import { debugLog, logger } from './loggers'
 import { redact } from './redaction'
+
 // Verify that defaultOptions is available (not available on non-nodejs platforms)
 if (inspect?.defaultOptions) {
   // Set the inspector depth to infinity. To the moooooooon 🚀 🌕
   inspect.defaultOptions.depth = null
 }
 
+const getCustomProps = () => {
+  const ISOTimestamp = new Date().toISOString()
+  const requestId = httpContext.get('x-request-id')
+
+  return { ISOTimestamp, requestId }
+}
+
 const log =
   (level: LogLevel) =>
   (message: string, data?: Record<string, unknown> | Error): void => {
     if (process.env.QUIET !== 'true') {
-      return data ? logger[level](redact(data), message) : logger[level](message)
+      return data
+        ? logger[level]({ ...getCustomProps(), data: redact(data), message })
+        : logger[level]({ ...getCustomProps(), message })
     }
   }
 

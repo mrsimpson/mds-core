@@ -50,8 +50,10 @@ describe('MDS Logger', () => {
 
     logger.info('some message', toCensor)
     expect(info).toHaveBeenCalledWith(
-      expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
-      'some message'
+      expect.objectContaining({
+        data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
+        message: 'some message'
+      })
     )
   })
 
@@ -75,8 +77,10 @@ describe('MDS Logger', () => {
 
     logger.warn('some message', toCensor)
     expect(warn).toHaveBeenCalledWith(
-      expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
-      'some message'
+      expect.objectContaining({
+        data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
+        message: 'some message'
+      })
     )
   })
 
@@ -101,8 +105,10 @@ describe('MDS Logger', () => {
 
     logger.error('some message', toCensor)
     expect(error).toHaveBeenCalledWith(
-      expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
-      'some message'
+      expect.objectContaining({
+        data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
+        message: 'some message'
+      })
     )
   })
 
@@ -114,7 +120,9 @@ describe('MDS Logger', () => {
       return
     })
 
-    expect(info).toHaveBeenCalledWith({ error: expect.stringContaining('evidence') }, 'ohai2')
+    expect(info).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { error: expect.stringContaining('evidence') }, message: 'ohai2' })
+    )
   })
 
   it('verifies QUIET mode', () => {
@@ -139,6 +147,6 @@ describe('MDS Logger', () => {
     })
 
     logger.info('some message')
-    expect(info).toHaveBeenCalledWith('some message')
+    expect(info).toHaveBeenCalledWith(expect.objectContaining({ message: 'some message' }))
   })
 })
