@@ -79,7 +79,7 @@ export type RpcRequestOptions = Partial<{
 
 // By default, allow up to 5 retries with a 5s backoff.
 const RpcRequestManager = async <M extends RpcMethod>(
-  { retries = 12, backoff = seconds(5) }: RpcRequestOptions,
+  { retries = process.env.NODE_ENV === 'test' ? false : 10, backoff = seconds(5) }: RpcRequestOptions,
   request: M,
   ...args: RpcRequestType<M>
 ): Promise<ServiceResponse<RpcResponseType<M>>> => {

@@ -1,5 +1,13 @@
 # @mds-core/mds-collector-backend
 
+## 0.2.3
+
+### Patch Changes
+
+- 224bfc3a: Disable service retries during testing by default
+- Updated dependencies [224bfc3a]
+  - @mds-core/mds-rpc-common@0.2.3
+
 ## 0.2.2
 
 ### Patch Changes
