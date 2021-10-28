@@ -1,5 +1,14 @@
 # @container-images/mds-compliance-service
 
+## 0.0.26
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+  - @mds-core/mds-compliance-service@0.7.2
+  - @mds-core/mds-webpack-config@0.1.7
+
 ## 0.0.25
 
 ### Patch Changes

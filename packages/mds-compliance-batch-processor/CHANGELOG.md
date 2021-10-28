@@ -1,5 +1,22 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.1.10
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+- Updated dependencies [70586f15]
+  - @mds-core/mds-utils@0.2.9
+  - @mds-core/mds-agency-cache@0.4.2
+  - @mds-core/mds-compliance-engine@0.6.9
+  - @mds-core/mds-compliance-service@0.7.2
+  - @mds-core/mds-db@0.4.12
+  - @mds-core/mds-logger@0.4.3
+  - @mds-core/mds-policy-service@0.8.1
+  - @mds-core/mds-service-helpers@0.4.2
+  - @mds-core/mds-types@0.7.1
+
 ## 0.1.9
 
 ### Patch Changes

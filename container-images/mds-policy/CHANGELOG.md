@@ -1,5 +1,14 @@
 # @container-images/mds-policy
 
+## 0.1.25
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+  - @mds-core/mds-policy@0.6.1
+  - @mds-core/mds-webpack-config@0.1.7
+
 ## 0.1.24
 
 ### Patch Changes
