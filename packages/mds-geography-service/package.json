@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-geography-service",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Mobility Data Specification Geography Service",
   "keywords": [
     "mds",
@@ -25,7 +25,7 @@
   "dependencies": {
     "@mds-core/mds-logger": "workspace:0.4.3",
     "@mds-core/mds-repository": "workspace:0.1.20",
-    "@mds-core/mds-rpc-common": "workspace:0.2.2",
+    "@mds-core/mds-rpc-common": "workspace:0.2.3",
     "@mds-core/mds-schema-validators": "workspace:0.3.11",
     "@mds-core/mds-service-helpers": "workspace:0.4.2",
     "@mds-core/mds-types": "workspace:0.7.1",
