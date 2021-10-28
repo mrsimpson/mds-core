@@ -1,5 +1,12 @@
 # @mds-core/mds-ingest-service
 
+## 0.6.3
+
+### Patch Changes
+
+- Updated dependencies [224bfc3a]
+  - @mds-core/mds-rpc-common@0.2.3
+
 ## 0.6.2
 
 ### Patch Changes
