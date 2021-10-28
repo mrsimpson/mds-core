@@ -59,6 +59,7 @@ const stopServer = async (server: http.Server | net.Server): Promise<void> =>
     })
   })
 
+/* istanbul ignore next */
 const startRepl = (options: RpcServerOptions['repl']): Promise<net.Server> =>
   new Promise(resolve => {
     const port = Number(options.port || process.env.REPL_PORT || REPL_PORT)
@@ -113,6 +114,7 @@ export const RpcServer = <S>(
             ),
           { port }
         )
+        /* istanbul ignore next */
         if (options.repl && process.env.NODE_ENV !== 'test') {
           repl = await startRepl(options.repl)
         }
@@ -122,6 +124,7 @@ export const RpcServer = <S>(
       if (server) {
         await stopServer(server)
         server = null
+        /* istanbul ignore next */
         if (repl) {
           await stopServer(repl)
           repl = null

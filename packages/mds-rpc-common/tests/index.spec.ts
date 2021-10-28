@@ -17,7 +17,7 @@
 import { ServiceClient, ServiceError, ServiceResult } from '@mds-core/mds-service-helpers'
 import test from 'unit.js'
 import { RpcServiceDefinition } from '../@types'
-import { RpcClient, RpcRequest } from '../client'
+import { RpcClient, RpcRequest, RpcRequestOptions } from '../client'
 import { RpcRoute } from '../index'
 import { RpcServer } from '../server'
 
@@ -44,44 +44,44 @@ const TestServer = RpcServer(
   { repl: { context: {} } }
 ).controller()
 
-describe('Test RPC Client', () => {
-  const TestClient: ServiceClient<TestService> = {
-    length: word => RpcRequest({ retries: false }, RpcClient(TestServiceRpcDefinition).length, [word])
-  }
+const TestClient = (options: RpcRequestOptions = {}): ServiceClient<TestService> => ({
+  length: word => RpcRequest(options, RpcClient(TestServiceRpcDefinition).length, [word])
+})
 
-  it('Test Service Unavailable', async () => {
-    try {
-      await TestClient.length(TEST_WORD)
-      test.value(true).is(false)
-    } catch (error) {
-      test.object(error).hasProperty('type', 'ServiceUnavailable')
-    }
+describe('Test RPC Client', () => {
+  describe('Test Service Unavailable', () => {
+    it('No Retries', async () => {
+      await expect(TestClient({ retries: false }).length(TEST_WORD)).rejects.toMatchObject({
+        isServiceError: true,
+        type: 'ServiceUnavailable'
+      })
+    })
+
+    it('With Retries', async () => {
+      await expect(TestClient({ retries: 5, backoff: 10 }).length(TEST_WORD)).rejects.toMatchObject({
+        isServiceError: true,
+        type: 'ServiceUnavailable'
+      })
+    })
   })
 
   describe('Test Service Available', () => {
-    before(async () => {
+    beforeAll(async () => {
       await TestServer.start()
     })
 
     it('Test Service Result', async () => {
-      try {
-        const length = await TestClient.length(TEST_WORD)
-        test.value(length).is(TEST_WORD.length)
-      } catch (error) {
-        test.value(true).is(false)
-      }
+      test.value(await TestClient().length(TEST_WORD)).is(TEST_WORD.length)
     })
 
     it('Test Service Error', async () => {
-      try {
-        await TestClient.length()
-        test.value(true).is(false)
-      } catch (error) {
-        test.object(error).hasProperty('type', 'NotFoundError')
-      }
+      await expect(TestClient().length()).rejects.toMatchObject({
+        isServiceError: true,
+        type: 'NotFoundError'
+      })
     })
 
-    after(async () => {
+    afterAll(async () => {
       await TestServer.stop()
     })
   })

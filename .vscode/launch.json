@@ -860,6 +860,27 @@
       }
     },
     {
+      "name": "Tests: mds-rpc-common",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
+        "--runInBand",
+        "--coverage",
+        "false"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector",
+      "cwd": "${workspaceFolder}/packages/mds-rpc-common",
+      "env": {
+        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "PG_DEBUG": "true",
+        "npm_package_name": "@mds-core/mds-rpc-common"
+      }
+    },
+    {
       "name": "Tests: mds-schema-validators",
       "type": "node",
       "request": "launch",
