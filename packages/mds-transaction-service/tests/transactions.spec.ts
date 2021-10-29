@@ -79,7 +79,9 @@ describe('Transaction Service Tests', () => {
         })
 
         it('Create one good Compliance Violation transaction', async () => {
-          const [transactionToPersist] = transactionsGenerator(1, { receipt_details: { violatoin_id: uuid() } })
+          const [transactionToPersist] = transactionsGenerator(1, {
+            receipt_details: { violation_id: uuid(), trip_id: null }
+          })
 
           const recordedTransaction = await TransactionServiceClient.createTransaction(transactionToPersist)
           expect(recordedTransaction.device_id).toEqual(transactionToPersist.device_id)

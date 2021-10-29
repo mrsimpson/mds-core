@@ -79,7 +79,7 @@
                       },
                       "receipt_details": {
                         "description": "Free-form object which describes the details of this transaction. Highly use-case dependent.",
-                        "oneOf": [
+                        "anyOf": [
                           {
                             "$schema": "http://json-schema.org/draft-07/schema#",
                             "type": "object",

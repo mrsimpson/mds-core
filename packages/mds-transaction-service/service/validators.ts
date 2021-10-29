@@ -123,7 +123,7 @@ const {
       },
       receipt_details: {
         description: 'Free-form object which describes the details of this transaction. Highly use-case dependent.',
-        oneOf: [complianceViolationDetailsSchema, { type: 'object' }]
+        anyOf: [complianceViolationDetailsSchema, { type: 'object' }]
       }
     },
     required: ['origin_url', 'receipt_details', 'receipt_id', 'timestamp']
