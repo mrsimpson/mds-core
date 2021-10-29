@@ -152,7 +152,7 @@ git clone https://github.com/lacuna-tech/mds-core
 cd mds-core
 ```
 
-#### Docker/Kubernetes
+#### Docker
 
 OSX (Linux and Windows tbd)
 
@@ -167,6 +167,18 @@ Start Docker-Desktop:
 ```sh
 open /Applications/Docker.app
 ```
+
+##### Imaging on non-x86 machines (e.g. ARM/Apple Silicon)
+
+mds-core supports building multi-arch images. At the moment, amd64 is considered the 'default', and _always_ be built. Unfortunately, due to [limitations in docker desktop](https://github.com/docker/buildx/issues/166), we are unable to tag a single image as mutli-arch, so separate images must be created. Non-amd64 images are tagged with a `-$system_arch` suffix, e.g. `-arm64`.
+
+To enable multi-platform docker builds, you first need to configure a buildx builder (you only need to do this once):
+
+```
+docker buildx create --use
+```
+
+##### Kubernetes
 
 Configure Kubernetes in Docker:
 
