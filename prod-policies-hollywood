@@ -1,0 +1,180 @@
+[
+  {
+    "name": "Hollywood Boulevard SOZ",
+    "rules": [
+      {
+        "name": "No reserving, no starting trips, no ending trips, no deployments allowed in Hollywood Blvd SOZ",
+        "maximum": 0,
+        "rule_id": "459c8c27-24c9-4385-b020-3fd6e8b4b1d9",
+        "rule_type": "count",
+        "geographies": [
+          "b1a89ba2-379e-400b-8028-a8d6e15e04df"
+        ],
+        "vehicle_types": [
+          "bicycle",
+          "scooter"
+        ],
+        "states": {
+          "available": [
+            "trip_start",
+            "trip_enter_jurisdiction",
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "off_hours"
+          ],
+          "elsewhere": [
+            "trip_start",
+            "trip_enter_jurisdiction",
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "off_hours"
+          ],
+          "non_operational": [
+            "trip_start",
+            "trip_enter_jurisdiction",
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "off_hours"
+          ],
+          "on_trip": [
+            "trip_start",
+            "trip_enter_jurisdiction",
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "off_hours"
+          ],
+          "removed": [
+            "trip_start",
+            "trip_enter_jurisdiction",
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "off_hours"
+          ],
+          "reserved": [
+            "trip_start",
+            "trip_enter_jurisdiction",
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "off_hours"
+          ],
+          "unknown": [
+            "trip_start",
+            "trip_enter_jurisdiction",
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "off_hours"
+          ]
+        },
+        "modality": "micromobility"
+      }
+    ],
+    "end_date": null,
+    "policy_id": "f9ac7dd0-1d0e-470f-affc-6847cf2b523a",
+    "start_date": 1635826034609,
+    "description": "No vehicles are allowed to start or end trips; Providers are not allowed to drop vehicles in this geography - Migrated from 0.4 b8b5d96b-703a-475d-8113-b3f8493ee101",
+    "provider_ids": [],
+    "prev_policies": [
+      "c8b88d5f-126a-44d4-a508-c500695c60c9"
+    ]
+  },
+  {
+    "name": "Hollywood Boulevard SOZ (2 hour pick-up policy)",
+    "rules": [
+      {
+        "name": "Provider must pickup violations within 2hrs",
+        "maximum": 120,
+        "rule_id": "2648defd-b8da-434a-8b49-e25c6e4cd799",
+        "rule_type": "time",
+        "rule_units": "minutes",
+        "geographies": [
+          "b1a89ba2-379e-400b-8028-a8d6e15e04df"
+        ],
+        "vehicle_types": [
+          "bicycle",
+          "scooter"
+        ],
+        "states": {
+          "available": [
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "reservation_cancel",
+            "off_hours"
+          ],
+          "elsewhere": [
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "reservation_cancel",
+            "off_hours"
+          ],
+          "non_operational": [
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "reservation_cancel",
+            "off_hours"
+          ],
+          "on_trip": [
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "reservation_cancel",
+            "off_hours"
+          ],
+          "removed": [
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "reservation_cancel",
+            "off_hours"
+          ],
+          "reserved": [
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "reservation_cancel",
+            "off_hours"
+          ],
+          "unknown": [
+            "reservation_start",
+            "on_hours",
+            "trip_end",
+            "provider_drop_off",
+            "reservation_cancel",
+            "off_hours"
+          ]
+        },
+        "modality": "micromobility"
+      }
+    ],
+    "end_date": null,
+    "policy_id": "cd3a6bdd-7f3d-4bc3-85bc-d954cdba6636",
+    "start_date": 1635826034609,
+    "description": "Providers have 2 hours to pick up a vehicle if one should be found with any of the listed states - Migrated from 0.4 3bc17cf9-4387-4266-b126-f5c85b11f585",
+    "provider_ids": [],
+    "prev_policies": [
+      "2a109889-5014-41ff-ace2-bf51849df93a"
+    ]
+  }
+]

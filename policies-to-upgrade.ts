@@ -3838,6 +3838,95 @@ const problemPolicy = [{
   "prev_policies": null
 }]
 
+const hollywood_policies = [
+  {
+      "name": "Hollywood Boulevard SOZ",
+      "rules": [
+        {
+          "name": "No reserving, no starting trips, no ending trips, no deployments allowed in Hollywood Blvd SOZ",
+          "maximum": 0,
+          "rule_id": "11c1a342-3a6e-4100-af9e-c9c53f394feb",
+          "statuses": {
+            "trip": [
+              "trip_start",
+              "trip_enter"
+            ],
+            "reserved": [
+              "reserve"
+            ],
+            "available": [
+              "service_start",
+              "trip_end",
+              "provider_drop_off"
+            ],
+            "unavailable": [
+              "service_end"
+            ]
+          },
+          "rule_type": "count",
+          "geographies": [
+            "b1a89ba2-379e-400b-8028-a8d6e15e04df"
+          ],
+          "vehicle_types": [
+            "bicycle",
+            "scooter"
+          ]
+        }
+      ],
+      "end_date": null,
+      "policy_id": "b8b5d96b-703a-475d-8113-b3f8493ee101",
+      "start_date": 1635318000000,
+      "description": "No vehicles are allowed to start or end trips; Providers are not allowed to drop vehicles in this geography",
+      "provider_ids": [],
+      "publish_date": 1635288866829,
+      "prev_policies": [
+        "bc38628f-50c0-4d58-81d0-30c5318902da"
+      ]
+    },
+    {
+      "name": "Hollywood Boulevard SOZ (2 hour pick-up policy)",
+      "rules": [
+        {
+          "name": "Provider must pickup violations within 2hrs",
+          "maximum": 120,
+          "rule_id": "1f998a3b-c470-4894-8779-48f1356fa97b",
+          "statuses": {
+            "reserved": [
+              "reserve"
+            ],
+            "available": [
+              "service_start",
+              "trip_end",
+              "provider_drop_off",
+              "cancel_reservation"
+            ],
+            "unavailable": [
+              "service_end"
+            ]
+          },
+          "rule_type": "time",
+          "rule_units": "minutes",
+          "geographies": [
+            "b1a89ba2-379e-400b-8028-a8d6e15e04df"
+          ],
+          "vehicle_types": [
+            "bicycle",
+            "scooter"
+          ]
+        }
+      ],
+      "end_date": null,
+      "policy_id": "3bc17cf9-4387-4266-b126-f5c85b11f585",
+      "start_date": 1635318000000,
+      "description": "Providers have 2 hours to pick up a vehicle if one should be found with any of the listed states",
+      "provider_ids": [],
+      "publish_date": 1635288871129,
+      "prev_policies": [
+        "0aebcfba-4494-4e42-b0aa-1f66aa45b54e"
+      ]
+    }
+]
+
 ///*
 const fs = require('fs')
 console.log('logging')
@@ -3855,5 +3944,5 @@ function processPolicies(policies: any[], outputFile: string) {
 //  */
 }
 
-processPolicies(policies_prod, 'prod-policies')
+processPolicies(hollywood_policies, 'prod-policies-hollywood')
 //*/
