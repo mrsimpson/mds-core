@@ -15,11 +15,10 @@
  */
 
 import { ApiServer } from '@mds-core/mds-api-server'
-import { ComplianceServiceClient } from '@mds-core/mds-compliance-service'
-import db from '@mds-core/mds-db'
+import { ComplianceServiceClient, ComplianceViolationFactory } from '@mds-core/mds-compliance-service'
+import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { SCOPED_AUTH } from '@mds-core/mds-test-data'
-import { ModalityPolicy } from '@mds-core/mds-types'
-import { pathPrefix } from '@mds-core/mds-utils'
+import { pathPrefix, uuid } from '@mds-core/mds-utils'
 import HttpStatus from 'http-status-codes'
 import supertest from 'supertest'
 import { api } from '../api'
@@ -53,7 +52,7 @@ const utils = require('@mds-core/mds-utils')
 describe('Test Compliances API', () => {
   beforeEach(() => {
     jest.spyOn(utils, 'now').mockImplementation(() => TIME + 500)
-    jest.spyOn(db, 'readActivePolicies').mockImplementation(async (): Promise<ModalityPolicy[]> => {
+    jest.spyOn(PolicyServiceClient, 'readActivePolicies').mockImplementation(async (): Promise<PolicyDomainModel[]> => {
       return [POLICY1, POLICY2]
     })
   })
@@ -337,5 +336,43 @@ describe('Test Compliances API', () => {
         .set('Authorization', SCOPED_AUTH(['compliance:read:provider'], PROVIDER_ID_1))
         .expect(HttpStatus.OK, { version: '1.1.0', data: SNAPSHOT_IDS })
     })
+  })
+})
+
+describe('GET compliance violation tests', () => {
+  const fakeViolation = ComplianceViolationFactory()
+  const { violation_id, provider_id } = fakeViolation
+
+  beforeAll(() => {
+    jest.spyOn(ComplianceServiceClient, 'getComplianceViolation').mockImplementation(async () => fakeViolation)
+  })
+
+  afterAll(() => {
+    jest.clearAllMocks()
+  })
+
+  it('gets compliance violation with the compliance:read scope', async () => {
+    await request
+      .get(pathPrefix(`/violation/${violation_id}`))
+      .set('Authorization', SCOPED_AUTH(['compliance:read'], ''))
+      .expect(HttpStatus.OK, { version: '1.1.0', violation: fakeViolation })
+  })
+
+  it('gets compliance violation with the compliance:read:provider scope (provider_id match)', async () => {
+    await request
+      .get(pathPrefix(`/violation/${violation_id}`))
+      .set('Authorization', SCOPED_AUTH(['compliance:read:provider'], provider_id))
+      .expect(HttpStatus.OK, { version: '1.1.0', violation: fakeViolation })
+  })
+
+  it('fails to get compliance violation with the compliance:read:provider scope (provider_id mismatch)', async () => {
+    await request
+      .get(pathPrefix(`/violation/${violation_id}`))
+      .set('Authorization', SCOPED_AUTH(['compliance:read:provider'], uuid()))
+      .expect(HttpStatus.NOT_FOUND)
+  })
+
+  it('fails to get compliance violation with no scopes', () => {
+    return request.get(pathPrefix(`/violation/${violation_id}`)).expect(HttpStatus.FORBIDDEN)
   })
 })

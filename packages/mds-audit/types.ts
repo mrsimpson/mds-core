@@ -26,6 +26,7 @@ import {
   AttachmentSummary,
   Audit,
   AuditEvent,
+  AUDIT_EVENT_TYPE,
   Device,
   Nullable,
   Telemetry,
@@ -49,7 +50,6 @@ export type AuditApiTripRequest<B = {}> = AuditApiRequest<B> & ApiRequestParams<
 export type AuditApiAuditStartRequest = AuditApiTripRequest<{
   audit_device_id: string
   audit_event_id: UUID
-  audit_event_type: string
   provider_id: UUID
   provider_vehicle_id: string
   telemetry?: Telemetry
@@ -58,7 +58,7 @@ export type AuditApiAuditStartRequest = AuditApiTripRequest<{
 
 export type AuditApiVehicleEventRequest = AuditApiTripRequest<{
   audit_event_id: UUID
-  event_type: string
+  event_type: VEHICLE_EVENT
   telemetry?: Telemetry
   trip_id: UUID
   timestamp: Timestamp
@@ -72,7 +72,7 @@ export type AuditApiVehicleTelemetryRequest = AuditApiTripRequest<{
 
 export type AuditApiAuditNoteRequest = AuditApiTripRequest<{
   audit_event_id: UUID
-  audit_event_type: string
+  audit_event_type: AUDIT_EVENT_TYPE
   audit_issue_code?: string
   note?: string
   telemetry?: Telemetry

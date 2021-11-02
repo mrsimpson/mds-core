@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Device, DeviceID, Recorded, UUID } from '@mds-core/mds-types'
 import { csv, isUUID, NotFoundError, now } from '@mds-core/mds-utils'
 import { QueryResult } from 'pg'
-import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
+import { getReadOnlyClient, getWriteableClient } from './client'
+import { DbLogger } from './logger'
 import schema from './schema'
 import { cols_sql, logSql, MDSPostgresClient, SqlVals, vals_list, vals_sql } from './sql-utils'
 
@@ -43,7 +43,7 @@ export async function readDevicesByVehicleId(
     const error = `device associated with vehicle ${
       vehicle_ids.length === 1 ? vehicle_id : `(${csv(vehicle_ids)})`
     } for provider ${provider_id}: rows=${result.rows.length}`
-    logger.warn(error)
+    DbLogger.warn(error)
   }
   if (result.rows.length === 0) {
     throw new NotFoundError('No device found', { provider_id, vehicle_ids })
@@ -89,7 +89,7 @@ export async function readDevice(
   if (res.rows.length === 1) {
     return res.rows[0]
   }
-  logger.info(`readDevice db failed for ${device_id}: rows=${res.rows.length}`)
+  DbLogger.warn(`readDevice db failed for ${device_id}: rows=${res.rows.length}`)
   throw new NotFoundError(`device_id ${device_id} not found`)
 }
 
@@ -148,9 +148,4 @@ export async function wipeDevice(device_id: UUID): Promise<QueryResult> {
   const res = await client.query(sql)
   // this returns a list of objects that represent the commands that just ran
   return res
-}
-
-export async function getVehicleCountsPerProvider(): Promise<{ provider_id: UUID; count: number }[]> {
-  const sql = `select provider_id, count(provider_id) from ${schema.TABLE.devices} group by provider_id`
-  return makeReadOnlyQuery(sql)
 }

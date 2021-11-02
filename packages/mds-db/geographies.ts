@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Geography, GeographyMetadata, GeographySummary, Recorded, Timestamp, UUID } from '@mds-core/mds-types'
 import {
   AlreadyPublishedError,
@@ -24,6 +23,7 @@ import {
   NotFoundError
 } from '@mds-core/mds-utils'
 import { getReadOnlyClient, getWriteableClient } from './client'
+import { DbLogger } from './logger'
 import schema from './schema'
 import { cols_sql, SqlVals, vals_list, vals_sql } from './sql-utils'
 import { PublishGeographiesParams, ReadGeographiesParams } from './types'
@@ -35,7 +35,7 @@ export async function readSingleGeography(geography_id: UUID): Promise<Geography
   const { rows } = await client.query(sql)
 
   if (rows.length === 0) {
-    logger.info(`readSingleGeography failed for ${geography_id}`)
+    DbLogger.warn(`readSingleGeography failed for ${geography_id}`)
     throw new NotFoundError(`geography of id ${geography_id} not found`)
   }
 
@@ -90,7 +90,7 @@ export async function readGeographies(params: Partial<ReadGeographiesParams> = {
       return geography
     })
   } catch (err) {
-    logger.error('readGeographies', err)
+    DbLogger.error('readGeographies', err)
     throw err
   }
 }
@@ -120,7 +120,7 @@ export async function readPublishedGeographies(only_published_after?: Timestamp)
       return geography
     })
   } catch (err) {
-    logger.error('readPublishedGeographies', err)
+    DbLogger.error('readPublishedGeographies', err)
     throw err
   }
 }
@@ -242,7 +242,7 @@ export async function publishGeography(params: PublishGeographiesParams): Promis
     }: { rows: Recorded<Geography>[] } = await client.query(sql, vals.values())
     return { ...recorded_geography }
   } catch (err) {
-    logger.error(err)
+    DbLogger.error(err)
     throw err
   }
 }
@@ -305,7 +305,7 @@ export async function deleteGeographyMetadata(geography_id: UUID) {
     const sql = `DELETE FROM ${schema.TABLE.geography_metadata} WHERE geography_id = ${vals.add(geography_id)}`
     await client.query(sql, vals.values())
   } catch (err) {
-    logger.error(`deleteGeographyMetadata called on non-existent metadata for ${geography_id}`, err.stack)
+    DbLogger.error(`deleteGeographyMetadata called on non-existent metadata for ${geography_id}`, err.stack)
     throw err
   }
   return geography_id

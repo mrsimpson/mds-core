@@ -4,7 +4,6 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-
     {
       "name": "Server: mds-agency",
       "type": "node",
@@ -161,29 +160,6 @@
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
         "npm_package_name": "@mds-core/mds-compliance",
         "PATH_PREFIX": "/compliance"
-      }
-    },
-    {
-      "name": "Server: mds-daily",
-      "type": "node",
-      "request": "launch",
-      "runtimeArgs": [
-        "-r",
-        "ts-node/register",
-        "-r",
-        "tsconfig-paths/register",
-        "-r",
-        "dotenv/config"
-      ],
-      "args": ["server.ts"],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
-      "cwd": "${workspaceFolder}/packages/mds-daily",
-      "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-daily",
-        "PATH_PREFIX": "/daily"
       }
     },
     {
@@ -606,7 +582,7 @@
       }
     },
     {
-      "name": "Tests: mds-compliance",
+      "name": "Tests: mds-compliance-engine",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
@@ -624,30 +600,7 @@
       "cwd": "${workspaceFolder}/packages/mds-compliance-engine",
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-compliance-engine",
-      }
-    },
-    {
-      "name": "Tests: mds-daily",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "--project",
-        "${workspaceFolder}/tsconfig.json",
-        "-r",
-        "ts-node/register",
-        "--timeout",
-        "0"
-      ],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
-      "cwd": "${workspaceFolder}/packages/mds-daily",
-      "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-daily",
-        "PATH_PREFIX": "/daily"
+        "npm_package_name": "@mds-core/mds-compliance-engine"
       }
     },
     {
@@ -827,14 +780,12 @@
       "name": "Tests: mds-policy",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "--project",
-        "${workspaceFolder}/tsconfig.json",
-        "-r",
-        "ts-node/register",
-        "--timeout",
-        "0"
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
+        "--runInBand",
+        "--coverage",
+        "false"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -842,22 +793,19 @@
       "cwd": "${workspaceFolder}/packages/mds-policy",
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-policy",
-        "PATH_PREFIX": "/policy"
+        "npm_package_name": "@mds-core/mds-policy"
       }
     },
     {
       "name": "Tests: mds-policy-author",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "--project",
-        "${workspaceFolder}/tsconfig.json",
-        "-r",
-        "ts-node/register",
-        "--timeout",
-        "0"
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
+        "--runInBand",
+        "--coverage",
+        "false"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -865,8 +813,7 @@
       "cwd": "${workspaceFolder}/packages/mds-policy-author",
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-policy-author",
-        "PATH_PREFIX": "/policy-author"
+        "npm_package_name": "@mds-core/mds-policy-author"
       }
     },
     {
@@ -886,6 +833,7 @@
       "cwd": "${workspaceFolder}/packages/mds-policy-service",
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "PG_DEBUG": "true",
         "npm_package_name": "@mds-core/mds-policy-service"
       }
     },
@@ -909,6 +857,27 @@
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
         "npm_package_name": "@mds-core/mds-repository"
+      }
+    },
+    {
+      "name": "Tests: mds-rpc-common",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
+        "--runInBand",
+        "--coverage",
+        "false"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector",
+      "cwd": "${workspaceFolder}/packages/mds-rpc-common",
+      "env": {
+        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "PG_DEBUG": "true",
+        "npm_package_name": "@mds-core/mds-rpc-common"
       }
     },
     {
@@ -970,7 +939,7 @@
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
         "npm_package_name": "@mds-core/mds-stream-processor"
       }
-    }
+    },
     {
       "name": "Tests: mds-transaction-api",
       "type": "node",

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { BIRD_PROVIDER_ID, JUMP_PROVIDER_ID, LIME_PROVIDER_ID, TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
 import {
   Device,
@@ -38,34 +37,9 @@ import {
   uuid
 } from '@mds-core/mds-utils'
 import { Geometry } from 'geojson'
-import {
-  DELETEABLE_POLICY,
-  GEOGRAPHY2_UUID,
-  GEOGRAPHY_UUID,
-  NONEXISTENT_GEOGRAPHY_UUID,
-  POLICY2_JSON,
-  POLICY2_UUID,
-  POLICY3_JSON,
-  POLICY3_UUID,
-  POLICY4_JSON,
-  POLICY4_UUID,
-  POLICY5_JSON,
-  POLICY_JSON,
-  POLICY_JSON_MISSING_POLICY_ID,
-  POLICY_UUID,
-  POLICY_WITH_DUPE_RULE,
-  PUBLISHED_POLICY,
-  PUBLISH_DATE_VALIDATION_JSON,
-  START_ONE_MONTH_AGO,
-  START_ONE_MONTH_FROM_NOW,
-  START_ONE_WEEK_AGO,
-  SUPERSEDING_POLICY_JSON,
-  SUPERSEDING_POLICY_UUID,
-  TAXI_POLICY
-} from './policies'
 import { DISTRICT_SEVEN } from './test-areas/district-seven'
 import { LA_CITY_BOUNDARY } from './test-areas/la-city-boundary'
-import { restrictedAreas, serviceAreaMap, veniceSpecOps } from './test-areas/test-areas'
+import { restrictedAreas, serviceAreaMap, venice, veniceSpecOps } from './test-areas/test-areas'
 
 const PROVIDER_SCOPES = 'admin:all'
 
@@ -101,7 +75,6 @@ function makeTelemetry(devices: Device[], timestamp: Timestamp): Telemetry[] {
     [key: string]: { num_clusters: number; cluster_radii: number[]; cluster_centers: { lat: number; lng: number }[] }
   } = {}
 
-  logger.info('clustering')
   serviceAreaKeys.slice(0, 1).map(key => {
     const serviceArea = serviceAreaMap[key]
     const serviceAreaMultipoly = serviceArea.area
@@ -219,29 +192,6 @@ function makeTelemetryStream(origin: Telemetry, steps: number) {
   return stream
 }
 
-function makeEvents(
-  devices: Device[],
-  timestamp: Timestamp,
-  makeEventsOptions: {
-    event_types: VEHICLE_EVENT[]
-    vehicle_state: VEHICLE_STATE
-  } = { event_types: ['trip_start'], vehicle_state: 'on_trip' }
-): VehicleEvent[] {
-  const { event_types, vehicle_state } = makeEventsOptions
-
-  return devices.map(device => {
-    return {
-      device_id: device.device_id,
-      provider_id: device.provider_id,
-      event_types,
-      vehicle_state,
-      trip_state: null,
-      timestamp,
-      recorded: now()
-    }
-  })
-}
-
 function makeEventsWithTelemetry(
   devices: Device[],
   timestamp: Timestamp,
@@ -260,13 +210,15 @@ function makeEventsWithTelemetry(
   const { event_types, vehicle_state, speed, trip_id } = makeEventsWithTelemetryOptions
 
   return devices.map(device => {
+    const telemetry = makeTelemetryInArea(device, timestamp, area, speed)
     return {
       device_id: device.device_id,
       provider_id: device.provider_id,
       event_types,
       vehicle_state,
       trip_state: null,
-      telemetry: makeTelemetryInArea(device, timestamp, area, speed),
+      telemetry,
+      telemetry_timestamp: telemetry.timestamp,
       timestamp,
       recorded: timestamp,
       trip_id
@@ -339,39 +291,20 @@ function makeDevices(count: number, timestamp: Timestamp, provider_id = TEST1_PR
 const SCOPED_AUTH = <AccessTokenScope extends string>(scopes: AccessTokenScope[], principalId = TEST1_PROVIDER_ID) =>
   `basic ${Buffer.from(`${principalId}|${scopes.join(' ')}`).toString('base64')}`
 
+export const GEOGRAPHY_UUID = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
+export const GEOGRAPHY2_UUID = '722b99ca-65c2-4ed6-9be1-056c394fadbf'
+export const POLICY_UUID = '72971a3d-876c-41ea-8e48-c9bb965bbbcc'
+
 export {
   BAD_PROVIDER_UUID,
   PROVIDER_AUTH,
   COMPLIANCE_AUTH,
   JUMP_TEST_DEVICE_1,
   JUMP_PROVIDER_ID,
-  POLICY_JSON,
-  SUPERSEDING_POLICY_JSON,
-  POLICY2_JSON,
-  POLICY3_JSON,
-  POLICY4_JSON,
-  POLICY5_JSON,
-  POLICY_JSON_MISSING_POLICY_ID,
-  POLICY_WITH_DUPE_RULE,
-  PUBLISH_DATE_VALIDATION_JSON,
-  POLICY_UUID,
-  PUBLISHED_POLICY,
-  DELETEABLE_POLICY,
-  SUPERSEDING_POLICY_UUID,
-  POLICY2_UUID,
-  POLICY3_UUID,
-  POLICY4_UUID,
-  GEOGRAPHY_UUID,
-  GEOGRAPHY2_UUID,
-  NONEXISTENT_GEOGRAPHY_UUID,
-  START_ONE_MONTH_AGO,
-  START_ONE_WEEK_AGO,
-  START_ONE_MONTH_FROM_NOW,
   PROVIDER_SCOPES,
   LA_CITY_BOUNDARY,
   DISTRICT_SEVEN,
   makeDevices,
-  makeEvents,
   makeEventsWithTelemetry,
   makeTelemetry,
   makeTelemetryInArea,
@@ -381,5 +314,5 @@ export {
   serviceAreaMap,
   restrictedAreas,
   veniceSpecOps,
-  TAXI_POLICY
+  venice
 }

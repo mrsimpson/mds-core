@@ -20,7 +20,17 @@ describe('Test transformers', () => {
         timestamp: TIME,
         event_type: 'provider_pick_up',
         event_type_reason: 'charge',
-        recorded: TIME
+        recorded: TIME,
+        telemetry_timestamp: TIME,
+        telemetry: {
+          provider_id: PROVIDER_ID,
+          device_id: DEVICE_ID,
+          gps: {
+            lat: 10,
+            lng: 10
+          },
+          timestamp: TIME
+        }
       }
 
       const transformedEvent = convert_v0_4_1_vehicle_event_to_v1_0_0(event)
@@ -31,8 +41,16 @@ describe('Test transformers', () => {
         vehicle_state: 'removed',
         event_types: ['maintenance_pick_up'],
         recorded: TIME,
-        telemetry: null,
-        telemetry_timestamp: null,
+        telemetry_timestamp: TIME,
+        telemetry: {
+          provider_id: PROVIDER_ID,
+          device_id: DEVICE_ID,
+          gps: {
+            lat: 10,
+            lng: 10
+          },
+          timestamp: TIME
+        },
         trip_id: null
       })
     })
@@ -44,7 +62,17 @@ describe('Test transformers', () => {
         timestamp: TIME,
         event_type: 'service_end',
         event_type_reason: 'low_battery',
-        recorded: TIME
+        recorded: TIME,
+        telemetry_timestamp: TIME,
+        telemetry: {
+          provider_id: PROVIDER_ID,
+          device_id: DEVICE_ID,
+          gps: {
+            lat: 10,
+            lng: 10
+          },
+          timestamp: TIME
+        }
       }
 
       const transformedEvent = convert_v0_4_1_vehicle_event_to_v1_0_0(event)
@@ -55,8 +83,16 @@ describe('Test transformers', () => {
         vehicle_state: 'non_operational',
         event_types: ['battery_low'],
         recorded: TIME,
-        telemetry: null,
-        telemetry_timestamp: null,
+        telemetry_timestamp: TIME,
+        telemetry: {
+          provider_id: PROVIDER_ID,
+          device_id: DEVICE_ID,
+          gps: {
+            lat: 10,
+            lng: 10
+          },
+          timestamp: TIME
+        },
         trip_id: null
       })
     })
@@ -67,7 +103,17 @@ describe('Test transformers', () => {
         provider_id: PROVIDER_ID,
         timestamp: TIME,
         event_type: 'trip_enter',
-        recorded: TIME
+        recorded: TIME,
+        telemetry_timestamp: TIME,
+        telemetry: {
+          provider_id: PROVIDER_ID,
+          device_id: DEVICE_ID,
+          gps: {
+            lat: 10,
+            lng: 10
+          },
+          timestamp: TIME
+        }
       }
 
       const transformedEvent = convert_v0_4_1_vehicle_event_to_v1_0_0(event)
@@ -79,8 +125,16 @@ describe('Test transformers', () => {
         vehicle_state: 'on_trip',
         event_types: ['trip_enter_jurisdiction'],
         recorded: TIME,
-        telemetry: null,
-        telemetry_timestamp: null,
+        telemetry_timestamp: TIME,
+        telemetry: {
+          provider_id: PROVIDER_ID,
+          device_id: DEVICE_ID,
+          gps: {
+            lat: 10,
+            lng: 10
+          },
+          timestamp: TIME
+        },
         trip_id: null
       })
     })
@@ -91,7 +145,17 @@ describe('Test transformers', () => {
         provider_id: PROVIDER_ID,
         timestamp: TIME,
         event_type: 'register',
-        recorded: TIME
+        recorded: TIME,
+        telemetry_timestamp: TIME,
+        telemetry: {
+          provider_id: PROVIDER_ID,
+          device_id: DEVICE_ID,
+          gps: {
+            lat: 10,
+            lng: 10
+          },
+          timestamp: TIME
+        }
       }
 
       assert.throws(() => convert_v0_4_1_vehicle_event_to_v1_0_0(event), UnsupportedEventTypeError)
@@ -105,7 +169,17 @@ describe('Test transformers', () => {
       timestamp: TIME,
       vehicle_state: 'on_trip',
       event_types: ['provider_drop_off', 'trip_start'],
-      recorded: TIME
+      recorded: TIME,
+      telemetry_timestamp: TIME,
+      telemetry: {
+        provider_id: PROVIDER_ID,
+        device_id: DEVICE_ID,
+        gps: {
+          lat: 10,
+          lng: 10
+        },
+        timestamp: TIME
+      }
     }
 
     const { 0: converted_eventA_1, 1: converted_eventA_2 } = convert_v1_0_0_vehicle_event_to_v0_4_1(eventA)
@@ -118,6 +192,7 @@ describe('Test transformers', () => {
       timestamp: TIME,
       vehicle_state: 'available',
       event_types: ['comms_lost', 'comms_restored'],
+      telemetry_timestamp: TIME,
       telemetry: {
         provider_id: PROVIDER_ID,
         device_id: DEVICE_ID,

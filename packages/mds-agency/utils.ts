@@ -16,7 +16,7 @@
 
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
-import logger from '@mds-core/mds-logger'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import stream from '@mds-core/mds-stream'
 import {
   BoundingBox,
@@ -44,6 +44,7 @@ import { areThereCommonElements, isInsideBoundingBox, isUUID, ValidationError } 
 import { DefinedError } from 'ajv'
 import express from 'express'
 import { Query } from 'express-serve-static-core'
+import { AgencyLogger } from './logger'
 import { AgencyApiError, CompositeVehicle, PaginatedVehiclesList, TelemetryResult, VehiclePayload } from './types'
 
 /**
@@ -101,7 +102,7 @@ export const agencyValidationErrorParser = (error: ValidationError): AgencyApiEr
     return { error, error_description, error_details }
   }
 
-  logger.error('agencyErrorParser unmatched error', error)
+  AgencyLogger.error('agencyErrorParser unmatched error', error)
   return { error: 'bad_param', error_description: 'A validation error occurred.', error_details: { error } }
 }
 
@@ -124,10 +125,10 @@ export async function getVehicles(
 
   const rows = await db.readDeviceIds(provider_id)
   const total = rows.length
-  logger.info(`read ${total} deviceIds in /vehicles`)
+  AgencyLogger.debug(`read ${total} deviceIds in /vehicles`)
 
   const events = rows.length > 0 ? await cache.readEvents(rows.map(record => record.device_id)) : []
-  const eventMap: { [s: string]: VehicleEvent } = {}
+  const eventMap: { [s: string]: VehicleEvent | undefined } = {}
   events.map(event => {
     if (event) {
       eventMap[event.device_id] = event
@@ -136,7 +137,8 @@ export async function getVehicles(
 
   const deviceIdSuperset = bbox
     ? rows.filter(record => {
-        return eventMap[record.device_id] ? isInsideBoundingBox(eventMap[record.device_id].telemetry, bbox) : true
+        const event = eventMap[record.device_id]
+        return event ? isInsideBoundingBox(event.telemetry, bbox) : true
       })
     : rows
 
@@ -146,10 +148,11 @@ export async function getVehicles(
       throw new Error('device in DB but not in cache')
     }
     const event = eventMap[device.device_id]
+    const prev_events = event ? event.event_types : ['decommissioned']
     const state: VEHICLE_STATE = event ? event.vehicle_state : 'removed'
     const telemetry = event ? event.telemetry : null
     const updated = event ? event.timestamp : null
-    return [...acc, { ...device, state, telemetry, updated }]
+    return [...acc, { ...device, state, prev_events, telemetry, updated }]
   }, [])
 
   const noNext = skip + take >= deviceIdSuperset.length
@@ -273,27 +276,17 @@ export async function writeTelemetry(telemetry: Telemetry | Telemetry[]) {
   try {
     await Promise.all([cache.writeTelemetry(recorded_telemetry), stream.writeTelemetry(recorded_telemetry)])
   } catch (err) {
-    logger.warn(`Failed to write telemetry to cache/stream, ${err}`)
+    AgencyLogger.warn(`Failed to write telemetry to cache/stream, ${err}`)
   }
   return recorded_telemetry
 }
 
-export async function refresh(device_id: UUID, provider_id: UUID): Promise<string> {
+export async function refresh(devices: Device[]): Promise<string> {
   // TODO all of this back and forth between cache and db is slow
-  const device = await db.readDevice(device_id, provider_id)
-  // logger.info('refresh device', device)
-  await cache.writeDevice(device)
-  try {
-    const event = await db.readEvent(device_id)
-    await cache.writeEvent(event)
-  } catch (error) {
-    logger.info('no events for', { device_id, error })
-  }
-  try {
-    await db.readTelemetry(device_id)
-  } catch (error) {
-    logger.info('no telemetry for', { device_id, error })
-  }
+  await cache.writeDevices(devices)
+  const events = await Promise.all(devices.map(d => db.readEvent(d.device_id)))
+  await cache.writeEvents(events)
+
   return 'done'
 }
 
@@ -305,7 +298,7 @@ export async function validateDeviceId(req: express.Request, res: express.Respon
 
   /* istanbul ignore if This is never called with no device_id parameter */
   if (!device_id) {
-    logger.warn('agency: missing device_id', { originalUrl: req.originalUrl })
+    AgencyLogger.debug('agency: missing device_id', { originalUrl: req.originalUrl })
     res.status(400).send({
       error: 'missing_param',
       error_description: 'missing device_id'
@@ -356,9 +349,10 @@ const normalizeTelemetry = (telemetry: TelemetryResult) => {
 export async function readPayload(device_id: UUID): Promise<VehiclePayload> {
   const payload: VehiclePayload = {}
   try {
-    payload.device = await db.readDevice(device_id)
+    const [device] = await IngestServiceClient.getDevices([device_id])
+    payload.device = device
   } catch (err) {
-    logger.error(err)
+    AgencyLogger.error('readPayload: db readDevice error', { err })
   }
   try {
     payload.event = await cache.readEvent(device_id)
@@ -368,7 +362,7 @@ export async function readPayload(device_id: UUID): Promise<VehiclePayload> {
       }
     }
   } catch (err) {
-    logger.error(err)
+    AgencyLogger.error('readPayload: cache readEvent or deserialization error', { err })
   }
   return payload
 }

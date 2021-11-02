@@ -23,12 +23,12 @@ import {
   VehicleEvent
 } from '@mds-core/mds-types'
 
-export type StringifiedEvent = Stringify<Omit<VehicleEvent, 'telemetry' | 'event_types'>> &
-  Pick<VehicleEvent, 'event_types'>
 export type StringifiedTelemetry = Stringify<Omit<Telemetry, 'gps'>> & {
   gps: Stringify<Omit<TelemetryData, 'charge'>>
 }
-export type StringifiedEventWithTelemetry = StringifiedEvent & { telemetry?: StringifiedTelemetry }
+
+type StringifiedEvent = Stringify<Omit<VehicleEvent, 'telemetry' | 'event_types'>> & Pick<VehicleEvent, 'event_types'>
+export type StringifiedEventWithTelemetry = StringifiedEvent & { telemetry: StringifiedTelemetry }
 
 export type StringifiedCacheReadDeviceResult = Stringify<CacheReadDeviceResult & { timestamp?: Timestamp }> & {
   accessibility_options: string[] // FIXME enum

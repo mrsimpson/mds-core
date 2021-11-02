@@ -28,12 +28,10 @@ import {
   JUMP_TEST_DEVICE_1,
   LA_CITY_BOUNDARY,
   makeDevices,
-  makeEventsWithTelemetry,
-  POLICY3_JSON,
-  START_ONE_MONTH_AGO
+  makeEventsWithTelemetry
 } from '@mds-core/mds-test-data'
 import { Device, Geography, Recorded, Telemetry, VehicleEvent } from '@mds-core/mds-types'
-import { clone, ConflictError, days, now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
+import { clone, ConflictError, days, now, rangeRandomInt, START_ONE_MONTH_AGO, uuid } from '@mds-core/mds-utils'
 import assert from 'assert'
 import { FeatureCollection } from 'geojson'
 import test from 'unit.js'
@@ -211,16 +209,6 @@ if (pg_info.database) {
         await shutdownDB()
       })
 
-      it('can get vehicle counts by provider', async () => {
-        const result = await MDSDBPostgres.getVehicleCountsPerProvider()
-        assert.deepEqual(result[0].count, 10)
-      })
-
-      it('.getVehicleCountsPerProvider', async () => {
-        const result = await MDSDBPostgres.getVehicleCountsPerProvider()
-        assert.deepEqual(result[0].count, 10)
-      })
-
       it('.health', async () => {
         const result = await MDSDBPostgres.health()
         assert(result.using === 'postgres')
@@ -344,26 +332,6 @@ if (pg_info.database) {
 
       after(async () => {
         await shutdownDB()
-      })
-
-      it('will throw an error if an attempt is made to publish a Policy but the Geography is unpublished', async () => {
-        await MDSDBPostgres.writeGeography(LAGeography)
-        await MDSDBPostgres.writeGeography(DistrictSeven)
-        assert(!(await MDSDBPostgres.isGeographyPublished(DistrictSeven.geography_id)))
-        assert(!(await MDSDBPostgres.isGeographyPublished(LAGeography.geography_id)))
-        await MDSDBPostgres.writePolicy(POLICY3_JSON)
-
-        await assert.rejects(
-          async () => {
-            await MDSDBPostgres.publishPolicy(POLICY3_JSON.policy_id)
-          },
-          { name: 'DependencyMissingError' }
-        )
-      })
-
-      it('can find policies using geographies by geography ID', async () => {
-        const policies = await MDSDBPostgres.findPoliciesByGeographyID(LAGeography.geography_id)
-        assert.deepEqual(policies[0].policy_id, POLICY3_JSON.policy_id)
       })
 
       it('throws if both get_published and get_unpublished are true for bulk geo reads', async () => {

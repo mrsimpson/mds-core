@@ -30,6 +30,8 @@ import {
   DeviceDomainModel,
   EventAnnotationDomainCreateModel,
   EventDomainModel,
+  GetDevicesOptions,
+  GetEventsWithDeviceAndTelemetryInfoOptions,
   GetVehicleEventsFilterParams,
   GetVehicleEventsOrderColumn,
   GetVehicleEventsOrderDirection,
@@ -42,6 +44,15 @@ const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99
 const nullableInteger = { type: 'integer', nullable: true, default: null }
 const nullableFloat = { type: 'number', format: 'float', nullable: true, default: null }
 const nullableString = { type: 'string', nullable: true, default: null }
+
+export const { validate: validateGetDevicesOptions } = SchemaValidator<GetDevicesOptions>({
+  type: 'object',
+  properties: {
+    limit: { type: 'integer' }
+  },
+  additionalProperties: false,
+  required: []
+})
 
 export const { validate: validateDeviceDomainModel, $schema: DeviceSchema } = SchemaValidator<DeviceDomainModel>(
   {
@@ -96,7 +107,7 @@ export const { validate: validateTelemetryDomainModel, $schema: TelemetrySchema 
             lng: { type: 'number', format: 'float' },
             // ⬇⬇⬇ NULLABLE/OPTIONAL PROPERTIES ⬇⬇⬇
             altitude: nullableFloat,
-            heading: nullableFloat,
+            heading: { ...nullableFloat, minimum: 0, exclusiveMaximum: 360 },
             speed: nullableFloat,
             accuracy: nullableFloat,
             hdop: nullableFloat,
@@ -135,11 +146,6 @@ export const { validate: validateEventDomainModel, $schema: EventSchema } = Sche
         type: 'string',
         enum: [...new Set(VEHICLE_STATES)]
       },
-      /** NOTE:
-       * Telemetry is considered non-optional as of MDS 1.0, even though some legacy events do not have
-       * telemetry (e.g. `register`). This is why the schema is more restrictive (non-nullable)
-       * than the standard EventDomainModel, and why this returns a more restrictive type post-validation.
-       */
       telemetry: TelemetrySchema,
       // ⬇⬇⬇ NULLABLE/OPTIONAL PROPERTIES ⬇⬇⬇
       trip_state: {
@@ -148,7 +154,6 @@ export const { validate: validateEventDomainModel, $schema: EventSchema } = Sche
         nullable: true,
         default: null
       },
-      telemetry_timestamp: nullableInteger,
       trip_id: { ...uuidSchema, nullable: true, default: null }
     },
     if: {
@@ -196,7 +201,7 @@ export const { validate: validateGetVehicleEventsFilterParams } = SchemaValidato
       additionalProperties: false
     }
   },
-  required: ['time_range']
+  required: []
 })
 
 export const { validate: validateUUIDs } = SchemaValidator<UUID[]>({
@@ -232,3 +237,25 @@ export const { validate: validateEventAnnotationDomainCreateModels } = SchemaVal
     ]
   }
 })
+
+export const { validate: validateGetEventsWithDeviceAndTelemetryInfoOptions } =
+  SchemaValidator<GetEventsWithDeviceAndTelemetryInfoOptions>({
+    type: 'object',
+    properties: {
+      provider_ids: { type: 'array', items: uuidSchema, minItems: 1 },
+      device_ids: { type: 'array', items: uuidSchema, minItems: 1 },
+      time_range: {
+        type: 'object',
+        properties: {
+          start: timestampSchema,
+          end: timestampSchema
+        },
+        additionalProperties: false,
+        required: []
+      },
+      limit: { type: 'integer', minimum: 1 },
+      follow: { type: 'boolean' }
+    },
+    additionalProperties: false,
+    required: []
+  })

@@ -16,17 +16,27 @@
 
 import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import { UUID } from '@mds-core/mds-types'
-import { isDefined, NotFoundError, now } from '@mds-core/mds-utils'
-import { getManager } from 'typeorm'
+import { isDefined, NotFoundError, now, testEnvSafeguard } from '@mds-core/mds-utils'
+import { EntityManager, getManager } from 'typeorm'
 import {
   ComplianceSnapshotDomainModel,
+  ComplianceViolationDomainModel,
   ComplianceViolationPeriodEntityModel,
   GetComplianceSnapshotOptions,
   GetComplianceSnapshotsByTimeIntervalOptions,
-  GetComplianceViolationPeriodsOptions
+  GetComplianceViolationOptions,
+  GetComplianceViolationPeriodsOptions,
+  GetComplianceViolationsByTimeIntervalOptions
 } from '../@types'
 import { ComplianceSnapshotEntity } from './entities/compliance-snapshot-entity'
-import { ComplianceSnapshotDomainToEntityCreate, ComplianceSnapshotEntityToDomain } from './mappers'
+import { ComplianceSnapshotFailureEntity } from './entities/compliance-snapshot-failure'
+import { ComplianceViolationEntity } from './entities/compliance-violation-entity'
+import {
+  ComplianceSnapshotDomainToEntityCreate,
+  ComplianceSnapshotEntityToDomain,
+  ComplianceViolationDomainToEntityCreate,
+  ComplianceViolationEntityToDomain
+} from './mappers'
 import migrations from './migrations'
 
 export class SqlVals {
@@ -54,6 +64,7 @@ class ComplianceReadWriteRepository extends ReadWriteRepository {
   public getComplianceSnapshot = async (
     options: GetComplianceSnapshotOptions
   ): Promise<ComplianceSnapshotDomainModel> => {
+    // TODO look for cleaner solution
     const isComplianceIdOption = (option: unknown): option is { compliance_snapshot_id: UUID } =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (option as any).compliance_snapshot_id
@@ -81,9 +92,9 @@ class ComplianceReadWriteRepository extends ReadWriteRepository {
       const query = connection
         .getRepository(ComplianceSnapshotEntity)
         .createQueryBuilder()
-        .where(`provider_id = '${provider_id}'`)
-        .andWhere(`policy_id = '${policy_id}'`)
-        .andWhere(`compliance_as_of >= ${compliance_as_of}`)
+        .where('provider_id = :provider_id', { provider_id })
+        .andWhere('policy_id = :policy_id', { policy_id })
+        .andWhere('compliance_as_of >= :compliance_as_of', { compliance_as_of })
         .orderBy('compliance_as_of')
 
       const entity = await query.getOne()
@@ -93,7 +104,7 @@ class ComplianceReadWriteRepository extends ReadWriteRepository {
             policy_id,
             provider_id,
             compliance_as_of
-          })} not found`
+          })}`
         )
       }
       return ComplianceSnapshotEntityToDomain.map(entity)
@@ -114,8 +125,8 @@ class ComplianceReadWriteRepository extends ReadWriteRepository {
       const query = connection
         .getRepository(ComplianceSnapshotEntity)
         .createQueryBuilder()
-        .where(`compliance_as_of >= ${start_time}`)
-        .andWhere(`compliance_as_of <= ${end_time}`)
+        .where('compliance_as_of >= :start_time', { start_time })
+        .andWhere('compliance_as_of <= :end_time', { end_time })
       if (isDefined(provider_ids)) {
         query.andWhere('provider_id IN (:...provider_ids)', { provider_ids })
       }
@@ -147,40 +158,61 @@ class ComplianceReadWriteRepository extends ReadWriteRepository {
   }
 
   public createComplianceSnapshot = async (
-    complianceSnapshot: ComplianceSnapshotDomainModel
+    complianceSnapshot: ComplianceSnapshotDomainModel,
+    beforeCommit: (domain: ComplianceSnapshotDomainModel) => Promise<void>
   ): Promise<ComplianceSnapshotDomainModel> => {
     const { connect } = this
     try {
       const connection = await connect('rw')
-      const {
-        raw: [entity]
-      }: InsertReturning<ComplianceSnapshotEntity> = await connection
-        .getRepository(ComplianceSnapshotEntity)
-        .createQueryBuilder()
-        .insert()
-        .values([ComplianceSnapshotDomainToEntityCreate.map(complianceSnapshot)])
-        .returning('*')
-        .execute()
-      return ComplianceSnapshotEntityToDomain.map(entity)
+      return connection.transaction(async (trans: EntityManager) => {
+        const {
+          raw: [entity]
+        }: InsertReturning<ComplianceSnapshotEntity> = await trans
+          .getRepository(ComplianceSnapshotEntity)
+          .createQueryBuilder()
+          .insert()
+          .values([ComplianceSnapshotDomainToEntityCreate.map(complianceSnapshot)])
+          .returning('*')
+          .execute()
+        const domain = ComplianceSnapshotEntityToDomain.map(entity)
+
+        // if there's an exception, it blows up and aborts the commit
+        if (beforeCommit) {
+          await beforeCommit(domain)
+        }
+
+        return domain
+      })
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
   public createComplianceSnapshots = async (
-    ComplianceSnapshots: ComplianceSnapshotDomainModel[]
+    ComplianceSnapshots: ComplianceSnapshotDomainModel[],
+    beforeCommit: (domains: ComplianceSnapshotDomainModel[]) => Promise<void>
   ): Promise<ComplianceSnapshotDomainModel[]> => {
+    if (ComplianceSnapshots.length === 0) return []
     const { connect } = this
     try {
       const connection = await connect('rw')
-      const { raw: entities }: InsertReturning<ComplianceSnapshotEntity> = await connection
-        .getRepository(ComplianceSnapshotEntity)
-        .createQueryBuilder()
-        .insert()
-        .values(ComplianceSnapshots.map(ComplianceSnapshotDomainToEntityCreate.mapper()))
-        .returning('*')
-        .execute()
-      return entities.map(ComplianceSnapshotEntityToDomain.map)
+      return connection.transaction(async (trans: EntityManager) => {
+        const { raw: entities }: InsertReturning<ComplianceSnapshotEntity> = await trans
+          .getRepository(ComplianceSnapshotEntity)
+          .createQueryBuilder()
+          .insert()
+          .values(ComplianceSnapshots.map(ComplianceSnapshotDomainToEntityCreate.mapper()))
+          .returning('*')
+          .execute()
+        const domains = entities.map(ComplianceSnapshotEntityToDomain.mapper())
+
+        // submit to kafka or whatever - but if there's an exception, it blows up and aborts the commit
+        if (beforeCommit) {
+          await beforeCommit(domains)
+        }
+
+        return domains
+      })
     } catch (error) {
       throw RepositoryError(error)
     }
@@ -268,9 +300,158 @@ class ComplianceReadWriteRepository extends ReadWriteRepository {
     }
   }
 
+  public getComplianceViolation = async (
+    options: GetComplianceViolationOptions
+  ): Promise<ComplianceViolationDomainModel> => {
+    // TODO look for cleaner solution
+    const isViolationIdOption = (option: unknown): option is { violation_id: UUID } =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (option as any).violation_id
+
+    const { connect } = this
+    try {
+      const connection = await connect('ro')
+      if (isViolationIdOption(options)) {
+        const { violation_id } = options
+        const entity = await connection.getRepository(ComplianceViolationEntity).findOne({
+          where: {
+            violation_id
+          }
+        })
+        if (!entity) {
+          throw new NotFoundError(`ComplianceViolation ${violation_id} not found`)
+        }
+        return ComplianceViolationEntityToDomain.map(entity)
+      }
+
+      const { event_timestamp, device_id, trip_id } = options
+      if (!isDefined(event_timestamp) || !isDefined(device_id)) {
+        throw RepositoryError('event_timestamp and device_id must be given if violation_id is not')
+      }
+      const query = connection
+        .getRepository(ComplianceViolationEntity)
+        .createQueryBuilder()
+        .where('event_timestamp = :event_timestamp', { event_timestamp })
+        .andWhere('device_id = :device_id', { device_id })
+      if (isDefined(trip_id)) {
+        query.andWhere('trip_id = :trip_id', { trip_id })
+      }
+      query.orderBy('event_timestamp')
+      // FIXME what if multiple violations against same device with same timestamp?
+      const entity = await query.getOne()
+      if (!entity) {
+        throw new NotFoundError(
+          `ComplianceViolation not found with params ${JSON.stringify({
+            event_timestamp,
+            device_id,
+            trip_id
+          })}`
+        )
+      }
+      return ComplianceViolationEntityToDomain.map(entity)
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public getComplianceViolationsByTimeInterval = async ({
+    start_time,
+    end_time = now(),
+    provider_ids,
+    policy_ids
+  }: GetComplianceViolationsByTimeIntervalOptions): Promise<ComplianceViolationDomainModel[]> => {
+    const { connect } = this
+    try {
+      const connection = await connect('ro')
+      const query = connection
+        .getRepository(ComplianceViolationEntity)
+        .createQueryBuilder()
+        .where('timestamp >= :start_time', { start_time })
+        .andWhere('timestamp <= :end_time', { end_time })
+      if (isDefined(provider_ids)) {
+        query.andWhere('provider_id = ANY(:provider_ids)', { provider_ids })
+      }
+      if (isDefined(policy_ids)) {
+        query.andWhere('policy_id = ANY(:policy_ids)', { policy_ids })
+      }
+      query.orderBy('timestamp')
+      const entities = await query.getMany()
+      return entities.map(ComplianceViolationEntityToDomain.mapper())
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public createComplianceViolation = async (
+    complianceViolation: ComplianceViolationDomainModel
+  ): Promise<ComplianceViolationDomainModel> => {
+    const { connect } = this
+    try {
+      const connection = await connect('rw')
+      const {
+        raw: [entity]
+      }: InsertReturning<ComplianceViolationEntity> = await connection
+        .getRepository(ComplianceViolationEntity)
+        .createQueryBuilder()
+        .insert()
+        .values([ComplianceViolationDomainToEntityCreate.map(complianceViolation)])
+        .returning('*')
+        .execute()
+      return ComplianceViolationEntityToDomain.map(entity)
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public createComplianceViolations = async (
+    complianceViolations: ComplianceViolationDomainModel[]
+  ): Promise<ComplianceViolationDomainModel[]> => {
+    try {
+      const connection = await this.connect('rw')
+      const { raw: entities }: InsertReturning<ComplianceViolationEntity> = await connection
+        .getRepository(ComplianceViolationEntity)
+        .createQueryBuilder()
+        .insert()
+        .values(complianceViolations.map(ComplianceViolationDomainToEntityCreate.mapper()))
+        .returning('*')
+        .execute()
+      return entities.map(ComplianceViolationEntityToDomain.mapper())
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public writeComplianceSnapshotFailures = async (compliance_snapshot_ids: UUID[]): Promise<void> => {
+    // I just want to write the current timestamp and the IDs
+    const timestamp = Date.now()
+    try {
+      const connection = await this.connect('rw')
+      await connection
+        .getRepository(ComplianceSnapshotFailureEntity)
+        .createQueryBuilder()
+        .insert()
+        .values(compliance_snapshot_ids.map(compliance_snapshot_id => ({ compliance_snapshot_id, timestamp })))
+        .execute()
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public deleteAll = async () => {
+    testEnvSafeguard()
+    try {
+      const connection = await this.connect('rw')
+      await connection
+        .getRepository(ComplianceSnapshotEntity)
+        .query('TRUNCATE compliance_snapshots, compliance_violations RESTART IDENTITY')
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
   constructor() {
     super('compliance', {
-      entities: [ComplianceSnapshotEntity],
+      entities: [ComplianceSnapshotEntity, ComplianceViolationEntity, ComplianceSnapshotFailureEntity],
       migrations
     })
   }

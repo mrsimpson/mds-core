@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { StreamSink } from '../@types'
+import { StreamProcessorLogger } from '../logger'
 
 export const ConsoleSink =
   <TMessage>(): StreamSink<TMessage> =>
@@ -23,7 +23,7 @@ export const ConsoleSink =
     return {
       initialize: async () => undefined,
       write: async (messages: TMessage | TMessage[]) => {
-        logger.info('sink', { messages })
+        StreamProcessorLogger.info('sink', { messages })
       },
       shutdown: async () => undefined
     }

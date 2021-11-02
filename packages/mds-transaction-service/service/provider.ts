@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
 import { UUID } from '@mds-core/mds-types'
 import { TransactionSearchParams, TransactionService } from '../@types'
+import { TransactionServiceLogger } from '../logger'
 import { TransactionRepository } from '../repository'
+import { TransactionStreamKafka } from './stream'
 import {
   validateTransactionDomainModel,
   validateTransactionId,
@@ -28,25 +29,43 @@ import {
 } from './validators'
 
 export const TransactionServiceProvider: ServiceProvider<TransactionService> & ProcessController = {
-  start: TransactionRepository.initialize,
-  stop: TransactionRepository.shutdown,
+  start: async () => {
+    await Promise.all([TransactionRepository.initialize(), TransactionStreamKafka.initialize()])
+  },
+  stop: async () => {
+    await Promise.all([TransactionRepository.shutdown(), TransactionStreamKafka.shutdown()])
+  },
   createTransaction: async transaction => {
     try {
-      return ServiceResult(await TransactionRepository.createTransaction(validateTransactionDomainModel(transaction)))
+      const recordedTransaction = await TransactionRepository.createTransaction(
+        validateTransactionDomainModel(transaction),
+        {
+          beforeCommit: async pendingTransaction => {
+            await TransactionStreamKafka.write(pendingTransaction)
+          }
+        }
+      )
+      return ServiceResult(recordedTransaction)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating Transaction', error)
-      logger.error('mds-transaction-service::createTransaction error', { exception, error })
+      TransactionServiceLogger.error('createTransaction error', { exception, error })
       return exception
     }
   },
   createTransactions: async transactions => {
     try {
-      return ServiceResult(
-        await TransactionRepository.createTransactions(transactions.map(validateTransactionDomainModel))
+      const recordedTransactions = await TransactionRepository.createTransactions(
+        transactions.map(validateTransactionDomainModel),
+        {
+          beforeCommit: async pendingTransactions => {
+            await TransactionStreamKafka.write(pendingTransactions)
+          }
+        }
       )
+      return ServiceResult(recordedTransactions)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating Transactions', error)
-      logger.error('mds-transaction-service::createTransactions error', { exception, error })
+      TransactionServiceLogger.error('createTransactions error', { exception, error })
       return exception
     }
   },
@@ -56,7 +75,7 @@ export const TransactionServiceProvider: ServiceProvider<TransactionService> & P
       return ServiceResult(transaction)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException(`Error Getting Transaction: ${transaction_id}`, error)
-      logger.error('mds-transaction-service::getTransaction error', { exception, error })
+      TransactionServiceLogger.error('getTransaction error', { exception, error })
       return exception
     }
   },
@@ -67,7 +86,7 @@ export const TransactionServiceProvider: ServiceProvider<TransactionService> & P
       return ServiceResult(transactions)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting Transactions', error)
-      logger.error('mds-transaction-service::getTransactions error', { exception, error })
+      TransactionServiceLogger.error('getTransactions error', { exception, error })
       return exception
     }
   },
@@ -79,7 +98,7 @@ export const TransactionServiceProvider: ServiceProvider<TransactionService> & P
       return ServiceResult(operation)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating Transaction Operation', error)
-      logger.error('mds-transaction-service::addTransactionOperation error', { exception, error })
+      TransactionServiceLogger.error('addTransactionOperation error', { exception, error })
       return exception
     }
   },
@@ -90,7 +109,7 @@ export const TransactionServiceProvider: ServiceProvider<TransactionService> & P
       return ServiceResult(operations)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting Transaction Operations', error)
-      logger.error('mds-transaction-service::getTransactionOperations error', { exception, error })
+      TransactionServiceLogger.error('getTransactionOperations error', { exception, error })
       return exception
     }
   },
@@ -102,7 +121,7 @@ export const TransactionServiceProvider: ServiceProvider<TransactionService> & P
       return ServiceResult(status)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Creating Transaction Status', error)
-      logger.error('mds-transaction-service::setTransactionStatus error', { exception, error })
+      TransactionServiceLogger.error('setTransactionStatus error', { exception, error })
       return exception
     }
   },
@@ -114,7 +133,7 @@ export const TransactionServiceProvider: ServiceProvider<TransactionService> & P
       return ServiceResult(statuses)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting Transaction Operations', error)
-      logger.error('mds-transaction-service::getTransactionStatuses error', { exception, error })
+      TransactionServiceLogger.error('getTransactionStatuses error', { exception, error })
       return exception
     }
   },
@@ -125,7 +144,7 @@ export const TransactionServiceProvider: ServiceProvider<TransactionService> & P
       return ServiceResult(statuses)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting Transaction Operations', error)
-      logger.error('mds-transaction-service::getTransactionsStatuses error', { exception, error })
+      TransactionServiceLogger.error('getTransactionsStatuses error', { exception, error })
       return exception
     }
   }

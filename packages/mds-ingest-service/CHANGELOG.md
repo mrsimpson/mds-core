@@ -1,5 +1,345 @@
 # @mds-core/mds-ingest-service
 
+## 0.6.3
+
+### Patch Changes
+
+- Updated dependencies [224bfc3a]
+  - @mds-core/mds-rpc-common@0.2.3
+
+## 0.6.2
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+- Updated dependencies [70586f15]
+  - @mds-core/mds-utils@0.2.9
+  - @mds-core/mds-agency-cache@0.4.2
+  - @mds-core/mds-logger@0.4.3
+  - @mds-core/mds-providers@0.1.44
+  - @mds-core/mds-repository@0.1.20
+  - @mds-core/mds-rpc-common@0.2.2
+  - @mds-core/mds-schema-validators@0.3.11
+  - @mds-core/mds-service-helpers@0.4.2
+  - @mds-core/mds-stream@0.1.46
+  - @mds-core/mds-types@0.7.1
+
+## 0.6.1
+
+### Patch Changes
+
+- 2b3c91c4: Switch to RpcRequest and deprecate RpcRequestWithOptions
+- Updated dependencies [2b3c91c4]
+- Updated dependencies [a156f493]
+  - @mds-core/mds-rpc-common@0.2.1
+  - @mds-core/mds-types@0.7.0
+  - @mds-core/mds-agency-cache@0.4.1
+  - @mds-core/mds-providers@0.1.43
+  - @mds-core/mds-repository@0.1.19
+  - @mds-core/mds-schema-validators@0.3.10
+  - @mds-core/mds-service-helpers@0.4.1
+  - @mds-core/mds-stream@0.1.45
+  - @mds-core/mds-utils@0.2.8
+
+## 0.6.0
+
+### Minor Changes
+
+- 788cfbfa: Implemented case insensitive vehicle_id comparison.
+- aa1403da: Update RPC client factory methods and implement retry mechanism when services are unavailable
+
+### Patch Changes
+
+- 913dff02: updated mds-agency-cache to use multi-write cache methods
+- a1061650: Add namespaced logger, clean up excess logger messages
+- f6511653: Correct view definition to use INNER JOIN instead of LEFT JOIN
+- 2d16fa02: Write telemetry when writing migrated events.
+- 3f5c4358: Enforce clockwise (positive) GPS heading values
+- Updated dependencies [913dff02]
+- Updated dependencies [a1061650]
+- Updated dependencies [a1061650]
+- Updated dependencies [aa1403da]
+- Updated dependencies [3f5c4358]
+  - @mds-core/mds-agency-cache@0.4.0
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-repository@0.1.18
+  - @mds-core/mds-rpc-common@0.2.0
+  - @mds-core/mds-service-helpers@0.4.0
+  - @mds-core/mds-stream@0.1.44
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-types@0.6.1
+  - @mds-core/mds-schema-validators@0.3.9
+  - @mds-core/mds-providers@0.1.42
+
+## 0.5.1
+
+### Patch Changes
+
+- 28c9e946: Add env var option to enable RPC
+- Updated dependencies [844098d1]
+  - @mds-core/mds-rpc-common@0.1.18
+
+## 0.5.0
+
+### Minor Changes
+
+- 0a238253: Set Telemetry to non-nullable on VehicleEvents/EventDomainModel
+
+### Patch Changes
+
+- Updated dependencies [0a238253]
+- Updated dependencies [0a238253]
+- Updated dependencies [d1de33fd]
+- Updated dependencies [5c02e73f]
+  - @mds-core/mds-agency-cache@0.3.0
+  - @mds-core/mds-types@0.6.0
+  - @mds-core/mds-utils@0.2.6
+  - @mds-core/mds-rpc-common@0.1.17
+  - @mds-core/mds-providers@0.1.41
+  - @mds-core/mds-repository@0.1.17
+  - @mds-core/mds-schema-validators@0.3.8
+  - @mds-core/mds-service-helpers@0.3.10
+  - @mds-core/mds-stream@0.1.43
+
+## 0.4.9
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-agency-cache@0.2.11
+  - @mds-core/mds-logger@0.4.1
+  - @mds-core/mds-providers@0.1.40
+  - @mds-core/mds-repository@0.1.16
+  - @mds-core/mds-rpc-common@0.1.16
+  - @mds-core/mds-schema-validators@0.3.7
+  - @mds-core/mds-service-helpers@0.3.9
+  - @mds-core/mds-stream@0.1.42
+  - @mds-core/mds-types@0.5.5
+  - @mds-core/mds-utils@0.2.5
+
+## 0.4.8
+
+### Patch Changes
+
+- eebaac90: Change getEventsUsingOptions and getDevices to not use RPC temporarily
+
+## 0.4.7
+
+### Patch Changes
+
+- 4bbd8a08: Add a follow option to allow using a cursor to poll for new data
+
+## 0.4.6
+
+### Patch Changes
+
+- 81220ee6: Upgrade typeorm and pg dependencies
+- Updated dependencies [71a9d1de]
+- Updated dependencies [7bdfdff5]
+- Updated dependencies [81220ee6]
+- Updated dependencies [71a9d1de]
+  - @mds-core/mds-rpc-common@0.1.15
+  - @mds-core/mds-types@0.5.4
+  - @mds-core/mds-repository@0.1.15
+  - @mds-core/mds-logger@0.4.0
+  - @mds-core/mds-agency-cache@0.2.10
+  - @mds-core/mds-providers@0.1.39
+  - @mds-core/mds-schema-validators@0.3.6
+  - @mds-core/mds-service-helpers@0.3.8
+  - @mds-core/mds-stream@0.1.41
+  - @mds-core/mds-utils@0.2.4
+
+## 0.4.5
+
+### Patch Changes
+
+- Updated dependencies [5167ec02]
+- Updated dependencies [5167ec02]
+  - @mds-core/mds-types@0.5.3
+  - @mds-core/mds-stream@0.1.40
+  - @mds-core/mds-agency-cache@0.2.9
+  - @mds-core/mds-providers@0.1.38
+  - @mds-core/mds-repository@0.1.14
+  - @mds-core/mds-rpc-common@0.1.14
+  - @mds-core/mds-schema-validators@0.3.5
+  - @mds-core/mds-service-helpers@0.3.7
+  - @mds-core/mds-utils@0.2.3
+
+## 0.4.4
+
+### Patch Changes
+
+- 6bd0d935: Add new Ingest Service method for getting events joined with device and telemetry info
+- 1300191f: adds index to telemetry timestamp column
+- 54bcb01d: optimize last telemetry for device query
+- f535e6ab: Add identity column to device/telemetry streams
+- Updated dependencies [c1001aa8]
+- Updated dependencies [f5403ec3]
+- Updated dependencies [c1001aa8]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [d8b1387e]
+- Updated dependencies [15b9d729]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-stream@0.1.39
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-types@0.5.2
+  - @mds-core/mds-schema-validators@0.3.4
+  - @mds-core/mds-agency-cache@0.2.8
+  - @mds-core/mds-repository@0.1.13
+  - @mds-core/mds-rpc-common@0.1.13
+  - @mds-core/mds-service-helpers@0.3.6
+  - @mds-core/mds-utils@0.2.2
+  - @mds-core/mds-providers@0.1.37
+
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [d8b10031]
+  - @mds-core/mds-types@0.5.1
+  - @mds-core/mds-agency-cache@0.2.7
+  - @mds-core/mds-providers@0.1.36
+  - @mds-core/mds-repository@0.1.12
+  - @mds-core/mds-rpc-common@0.1.12
+  - @mds-core/mds-schema-validators@0.3.3
+  - @mds-core/mds-service-helpers@0.3.5
+  - @mds-core/mds-stream@0.1.38
+  - @mds-core/mds-utils@0.2.1
+
+## 0.4.2
+
+### Patch Changes
+
+- 015b3afd: Add id column to streamed/cached events
+- Updated dependencies [61e31276]
+- Updated dependencies [0f548b7f]
+  - @mds-core/mds-types@0.5.0
+  - @mds-core/mds-utils@0.2.0
+  - @mds-core/mds-rpc-common@0.1.11
+  - @mds-core/mds-schema-validators@0.3.2
+  - @mds-core/mds-agency-cache@0.2.6
+  - @mds-core/mds-providers@0.1.35
+  - @mds-core/mds-repository@0.1.11
+  - @mds-core/mds-service-helpers@0.3.4
+  - @mds-core/mds-stream@0.1.37
+
+## 0.4.1
+
+### Patch Changes
+
+- 1579e76e: Add getTripEvents service method
+- Updated dependencies [9af14cbb]
+- Updated dependencies [9af14cbb]
+  - @mds-core/mds-logger@0.2.4
+  - @mds-core/mds-agency-cache@0.2.5
+  - @mds-core/mds-repository@0.1.10
+  - @mds-core/mds-rpc-common@0.1.10
+  - @mds-core/mds-service-helpers@0.3.3
+  - @mds-core/mds-stream@0.1.36
+  - @mds-core/mds-utils@0.1.36
+  - @mds-core/mds-schema-validators@0.3.1
+
+## 0.4.0
+
+### Minor Changes
+
+- 0e0abffd: added getTripEvents to mds-ingest-service
+
+### Patch Changes
+
+- 15fbc633: Synchronize mds-ingest-service schema/models
+
+## 0.3.4
+
+### Patch Changes
+
+- Updated dependencies [439f92c5]
+  - @mds-core/mds-schema-validators@0.3.0
+  - @mds-core/mds-types@0.4.0
+  - @mds-core/mds-rpc-common@0.1.9
+  - @mds-core/mds-agency-cache@0.2.4
+  - @mds-core/mds-providers@0.1.34
+  - @mds-core/mds-repository@0.1.9
+  - @mds-core/mds-service-helpers@0.3.2
+  - @mds-core/mds-stream@0.1.35
+  - @mds-core/mds-utils@0.1.35
+
+## 0.3.3
+
+### Patch Changes
+
+- 1cb521ca: Add service method for getting latest telemetry for a list of devices
+- ba33f76a: Add cache and stream hooks to ingest migration processor
+- e3fc9d1e: Filter register events from the incoming 0.4 stream
+
+## 0.3.2
+
+### Patch Changes
+
+- Updated dependencies [b6802757]
+  - @mds-core/mds-utils@0.1.34
+  - @mds-core/mds-schema-validators@0.2.3
+  - @mds-core/mds-repository@0.1.8
+  - @mds-core/mds-service-helpers@0.3.1
+  - @mds-core/mds-rpc-common@0.1.8
+
+## 0.3.1
+
+### Patch Changes
+
+- 0b917ead: Persist migrated entities to database
+- Updated dependencies [e0860f5b]
+- Updated dependencies [6609400b]
+  - @mds-core/mds-service-helpers@0.3.0
+  - @mds-core/mds-types@0.3.2
+  - @mds-core/mds-rpc-common@0.1.7
+  - @mds-core/mds-providers@0.1.33
+  - @mds-core/mds-repository@0.1.7
+  - @mds-core/mds-schema-validators@0.2.2
+  - @mds-core/mds-utils@0.1.33
+
+## 0.3.0
+
+### Minor Changes
+
+- 12455bee: Implement filtering vehicle events by geography ids.
+
+### Patch Changes
+
+- Updated dependencies [5eb4121b]
+- Updated dependencies [7e56b9b6]
+- Updated dependencies [5eb4121b]
+  - @mds-core/mds-service-helpers@0.2.0
+  - @mds-core/mds-providers@0.1.32
+  - @mds-core/mds-types@0.3.1
+  - @mds-core/mds-rpc-common@0.1.6
+  - @mds-core/mds-repository@0.1.6
+  - @mds-core/mds-schema-validators@0.2.1
+  - @mds-core/mds-utils@0.1.32
+
+## 0.2.0
+
+### Minor Changes
+
+- 24231359: Remove delta, service_area_id, and timestamp_long from a variety of vehicle event types
+- aeedb169: Add new foreign key to event_annotations to associate with events.
+
+### Patch Changes
+
+- 93493a19: Move testEnvSafeguard method to mds-utils
+- da513885: Add missing name property to mds-ingst-service migration AddEventsRowIdColumn1627427307591
+- Updated dependencies [24231359]
+- Updated dependencies [93493a19]
+  - @mds-core/mds-schema-validators@0.2.0
+  - @mds-core/mds-types@0.3.0
+  - @mds-core/mds-utils@0.1.31
+  - @mds-core/mds-providers@0.1.31
+  - @mds-core/mds-repository@0.1.5
+  - @mds-core/mds-rpc-common@0.1.5
+  - @mds-core/mds-service-helpers@0.1.5
+
 ## 0.1.5
 
 ### Patch Changes

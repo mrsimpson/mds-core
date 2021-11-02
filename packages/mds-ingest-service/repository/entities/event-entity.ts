@@ -22,7 +22,10 @@ import { EventAnnotationEntity, EventAnnotationEntityModel } from './event-annot
 import { TelemetryEntityModel } from './telemetry-entity'
 
 @Entity('events')
-@Index('idx_trip_id_timestamp_events', ['trip_id', 'timestamp'])
+@Index(['trip_id', 'timestamp'])
+@Index(['timestamp', 'id'])
+@Index(['provider_id', 'id'])
+@Index(['vehicle_state', 'id'])
 export class EventEntity extends MigratedEntity(IdentityColumn(RecordedColumn(class {}))) {
   @Column('uuid', { primary: true })
   device_id: UUID
@@ -31,6 +34,7 @@ export class EventEntity extends MigratedEntity(IdentityColumn(RecordedColumn(cl
   provider_id: UUID
 
   @Column('bigint', { transformer: BigintTransformer, primary: true })
+  @Index()
   timestamp: Timestamp
 
   @Column('varchar', { array: true, length: 31 })
@@ -42,13 +46,13 @@ export class EventEntity extends MigratedEntity(IdentityColumn(RecordedColumn(cl
   @Column('varchar', { length: 31, nullable: true })
   trip_state: Nullable<TRIP_STATE>
 
-  @Column('bigint', { transformer: BigintTransformer, nullable: true })
-  telemetry_timestamp: Nullable<Timestamp>
+  @Column('bigint', { transformer: BigintTransformer })
+  telemetry_timestamp: Timestamp
 
   @Column('uuid', { nullable: true })
   trip_id: Nullable<UUID>
 
-  telemetry?: TelemetryEntityModel
+  telemetry: TelemetryEntityModel
 
   @OneToOne(() => EventAnnotationEntity, annotation => annotation.event)
   annotation?: EventAnnotationEntityModel

@@ -16,36 +16,13 @@
 
 // utility functions
 
-import logger from '@mds-core/mds-logger'
-import {
-  BBox,
-  BoundingBox,
-  Device,
-  Geography,
-  MicroMobilityVehicleEvent,
-  MICRO_MOBILITY_EVENT_STATES_MAP,
-  MICRO_MOBILITY_VEHICLE_EVENTS,
-  MICRO_MOBILITY_VEHICLE_STATE,
-  Rule,
-  SingleOrArray,
-  TaxiVehicleEvent,
-  TAXI_EVENT_STATES_MAP,
-  TAXI_VEHICLE_EVENTS,
-  TAXI_VEHICLE_STATE,
-  Telemetry,
-  Timestamp,
-  TNCVehicleEvent,
-  TNC_EVENT_STATES_MAP,
-  TNC_VEHICLE_EVENT,
-  TNC_VEHICLE_STATE,
-  UUID,
-  VehicleEvent
-} from '@mds-core/mds-types'
+import { BBox, BoundingBox, Geography, SingleOrArray, Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
 import circleToPolygon from 'circle-to-polygon'
 import { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson'
 import pointInPoly from 'point-in-polygon'
 import { isArray, isString } from 'util'
 import { getCurrentDate, parseRelative } from './date-time-utils'
+import { UtilsLogger } from './logger'
 import { getNextStates, isEventSequenceValid } from './state-machine'
 
 const RADIUS = 30.48 // 100 feet, in meters
@@ -53,26 +30,8 @@ const NUMBER_OF_EDGES = 32 // Number of edges to add, geojson doesn't support re
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
 
 /* Is `as` a subset of `bs`? */
-const isSubset = <T extends Array<string>, U extends Readonly<Array<string>>>(as: T, bs: U) => {
+export const isSubset = <T extends Array<string>, U extends Readonly<Array<string>>>(as: T, bs: U) => {
   return as.every(a => bs.includes(a))
-}
-
-const isMicroMobilityEvent = (
-  { modality }: Pick<Device, 'modality'>,
-  event: VehicleEvent
-): event is MicroMobilityVehicleEvent => {
-  const { event_types } = event
-  return modality === 'micromobility' && isSubset(event_types, MICRO_MOBILITY_VEHICLE_EVENTS)
-}
-
-const isTaxiEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TaxiVehicleEvent => {
-  const { event_types } = event
-  return modality === 'taxi' && isSubset(event_types, TAXI_VEHICLE_EVENTS)
-}
-
-const isTncEvent = ({ modality }: Pick<Device, 'modality'>, event: VehicleEvent): event is TNCVehicleEvent => {
-  const { event_types } = event
-  return modality === 'tnc' && isSubset(event_types, TNC_VEHICLE_EVENT)
 }
 
 function isUUID(s: unknown): s is UUID {
@@ -98,11 +57,11 @@ function isPct(val: unknown): val is number {
 // this is a real-time API, so timestamps should be now +/- some factor, let's start with 24h
 function isTimestamp(val: unknown): val is Timestamp {
   if (typeof val !== 'number') {
-    logger.info('timestamp not an number')
+    UtilsLogger.info('timestamp not an number')
     return false
   }
   if (val < 1420099200000) {
-    logger.info('timestamp is prior to 1/1/2015; this is almost certainly seconds, not milliseconds')
+    UtilsLogger.info('timestamp is prior to 1/1/2015; this is almost certainly seconds, not milliseconds')
     return false
   }
   return true
@@ -295,7 +254,9 @@ function pointInGeometry(pt: [number, number], shape: Geometry): boolean {
     }
     return false
   }
-  throw new Error(`cannot check point in shape for type ${shape.type}`)
+  UtilsLogger.error(`cannot check point in shape for type ${shape.type}, returning false`)
+
+  return false
 }
 
 function pointInFeatureCollection(pt: [number, number], fc: FeatureCollection): boolean {
@@ -542,107 +503,6 @@ function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
   return set.size !== arr1.length + arr2.length
 }
 
-const getPossibleStates = (device: Pick<Device, 'modality'>, event: VehicleEvent) => {
-  if (isMicroMobilityEvent(device, event)) {
-    const { event_types, vehicle_state } = event
-    // All event_types except the last (in most cases this will be an empty list)
-    const transientEventTypes = event_types.splice(0, -1)
-
-    return transientEventTypes.reduce(
-      (acc: MICRO_MOBILITY_VEHICLE_STATE[], event_type) => {
-        return acc.concat(MICRO_MOBILITY_EVENT_STATES_MAP[event_type])
-      },
-      [vehicle_state]
-    )
-  }
-  if (isTaxiEvent(device, event)) {
-    const { event_types, vehicle_state } = event
-    // All event_types except the last (in most cases this will be an empty list)
-    const transientEventTypes = event_types.splice(0, -1)
-
-    return transientEventTypes.reduce(
-      (acc: TAXI_VEHICLE_STATE[], event_type) => {
-        return acc.concat(TAXI_EVENT_STATES_MAP[event_type])
-      },
-      [vehicle_state]
-    )
-  }
-  if (isTncEvent(device, event)) {
-    const { event_types, vehicle_state } = event
-    // All event_types except the last (in most cases this will be an empty list)
-    const transientEventTypes = event_types.splice(0, -1)
-
-    return transientEventTypes.reduce(
-      (acc: TNC_VEHICLE_STATE[], event_type) => {
-        return acc.concat(TNC_EVENT_STATES_MAP[event_type])
-      },
-      [vehicle_state]
-    )
-  }
-
-  return [event.vehicle_state]
-}
-
-/**
- * The rule matches this event if a transient event_type and possible resultant states,
- * or the final event_type and explicitly encoded vehicle_state match with the rule's status definitions.
- * e.g. if the rule states are { reserved: [] } and there's an event with event_types
- *      [trip_end, reservation_start, trip_start], there's an implication
- *      that the vehicle entered the reserved state after reservation_start,
- *      even if the final state of the event is on_trip, and the rule will match.
- *
- * @example Matching transient `event_type`
- * ```typescript
- * isInStatesOrEvents({ states: { reserved: [] } }, { event_types: ['trip_end', 'reservation_start', 'trip_start'], vehicle_state: 'on_trip' }) => true
- * ```
- * @example State matching for transient `event_type` 'off_hours', but `event_type` not matched with explicit `event_type` in rule
- * ```typescript
- * isInStatesOrEvents({ states: { non_operational: ['maintenance'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' }) => false
- * ```
- * @example Match for last `event_type` and encoded `vehicle_state`, with explicit `event_type` in rule
- * ```typescript
- * isInStatesOrEvents({ states: { available: ['on_hours'] } }, { event_types: ['trip_end', 'off_hours', 'on_hours'], vehicle_state: 'available' }) => true
- * ```
- * @example Match for last `event_type` and encoded `vehicle_state`, with catch-all in rule
- * ```typescript
- * isInStatesOrEvents({ states: { available: [] } }, { event_types: ['on_hours'], vehicle_state: 'available' }) => true
- * ```
- */
-function isInStatesOrEvents(
-  rule: Pick<Rule, 'states'>,
-  device: Pick<Device, 'modality'>,
-  event: VehicleEvent
-): boolean {
-  const { states } = rule
-  // If no states are specified, then the rule applies to all VehicleStates.
-  if (states === null || states === undefined) {
-    return true
-  }
-
-  /**
-   * State encoded in the event payload (default acc in the reducer) + states that it is
-   * possible to transition into with any transient event_types
-   */
-  const possibleStates = getPossibleStates(device, event)
-
-  return possibleStates.some(state => {
-    // Explicit events encoded in rule for that state (if any)
-    const matchableEvents: string[] | undefined = state in states ? (states as any)[state] : undefined //FIXME should not have to use an any cast here
-
-    /**
-     * If event_types not encoded in rule, assume state match.
-     * If event_types encoded in rule, see if event.event_types contains a match.
-     */
-    if (
-      matchableEvents !== undefined &&
-      (matchableEvents.length === 0 || areThereCommonElements(matchableEvents, event.event_types))
-    ) {
-      return true
-    }
-    return false
-  })
-}
-
 function routeDistance(coordinates: { lat: number; lng: number }[]): number {
   const R = 6371000 // Earth's mean radius in meters
   return (coordinates || [])
@@ -673,7 +533,7 @@ const isDefined = <T>(elem: T | undefined | null, options: isDefinedOptions = {}
     return true
   }
   if (warnOnEmpty) {
-    logger.warn(`Encountered empty element at index: ${index}`)
+    UtilsLogger.warn(`Encountered empty element at index: ${index}`)
   }
   return false
 }
@@ -721,6 +581,38 @@ const asArray = <T>(value: SingleOrArray<T>): T[] => (Array.isArray(value) ? val
 
 const pluralize = (count: number, singular: string, plural: string) => (count === 1 ? singular : plural)
 
+/**
+ * Aborts execution if not running under a test environment.
+ */
+const testEnvSafeguard = () => {
+  if (process.env.NODE_ENV !== 'test') {
+    throw new Error('This function must be called in a test environment.')
+  }
+}
+
+export const START_ONE_MONTH_AGO = now() - (now() % days(1)) - days(30)
+export const START_ONE_WEEK_AGO = now() - (now() % days(1)) - days(7)
+export const START_YESTERDAY = now() - (now() % days(1))
+export const START_NOW = now()
+export const START_TOMORROW = now() + (now() % days(1))
+export const START_ONE_MONTH_FROM_NOW = now() - (now() % days(1)) + days(30)
+
+/**
+ *
+ * @param arr1 First list to zip
+ * @param arr2 Second list to zip
+ * @returns A list of zipped & mapped values
+ *
+ * @example zip([1, 2, 3], ['a', 'b', 'c'], (a, b) => `${a}${b}`) => ['1a', '2b', '3c']
+ * Zips two lists of equal length, mapping each tuple to a new value.
+ */
+const zip = <T, U, R>(arr1: T[], arr2: U[], mapper: (x: T, y: U) => R) => {
+  if (arr1.length !== arr2.length) {
+    throw new Error('Arrays must be of equal length in order to zip')
+  }
+  return arr1.map((elem, index) => mapper(elem, arr2[index]))
+}
+
 export {
   UUID_REGEX,
   isUUID,
@@ -758,7 +650,6 @@ export {
   getNextStates,
   pointInGeometry,
   getPolygon,
-  isInStatesOrEvents,
   routeDistance,
   clone,
   isDefined,
@@ -771,7 +662,7 @@ export {
   pluralize,
   filterDefined,
   areThereCommonElements,
-  isMicroMobilityEvent,
-  isTaxiEvent,
-  setEmptyArraysToUndefined
+  setEmptyArraysToUndefined,
+  testEnvSafeguard,
+  zip
 }

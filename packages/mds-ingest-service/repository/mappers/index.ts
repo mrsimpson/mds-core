@@ -17,4 +17,6 @@
 export * from './device-mappers'
 export * from './event-annotation-mappers'
 export * from './event-mappers'
+export * from './event-with-device-and-telemetry-info-mapper'
+export * from './migration-mappers'
 export * from './telemetry-mappers'

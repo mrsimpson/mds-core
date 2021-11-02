@@ -15,21 +15,17 @@
  */
 
 import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
-import { schemaValidator } from '@mds-core/mds-schema-validators'
 import { UUID } from '@mds-core/mds-types'
 import { NotFoundError } from '@mds-core/mds-utils'
-import Joi from 'joi'
 import { Between, Brackets, FindOperator, In, LessThan, MoreThan } from 'typeorm'
 import { buildPaginator, Cursor } from 'typeorm-cursor-pagination'
 import {
-  FEE_TYPE,
-  SORTABLE_COLUMN,
-  SORT_DIRECTION,
   TransactionDomainModel,
   TransactionOperationDomainModel,
   TransactionSearchParams,
   TransactionStatusDomainModel
 } from '../@types'
+import { validateTransactionSearchParams } from '../service/validators'
 import { TransactionOperationEntity } from './entities/operation-entity'
 import { TransactionStatusEntity } from './entities/status-entity'
 import { TransactionEntity } from './entities/transaction-entity'
@@ -52,26 +48,13 @@ const testEnvSafeguard = () => {
   }
 }
 
-const { validate: validateTransactionSearchParams } = schemaValidator<TransactionSearchParams>(
-  Joi.object<TransactionSearchParams>()
-    .keys({
-      provider_id: Joi.string().uuid(),
-      start_timestamp: Joi.number().integer(),
-      end_timestamp: Joi.number().integer(),
-      search_text: Joi.string(),
-      start_amount: Joi.number(),
-      end_amount: Joi.number(),
-      fee_type: Joi.string().allow(...FEE_TYPE),
-      before: Joi.string(),
-      after: Joi.string(),
-      limit: Joi.number().integer().min(1).max(1000).default(10),
-      order: Joi.object<TransactionSearchParams['order']>().keys({
-        column: Joi.string().allow(...SORTABLE_COLUMN),
-        direction: Joi.string().allow(...SORT_DIRECTION)
-      })
-    })
-    .unknown(false)
-)
+interface InsertTransactionOptions {
+  beforeCommit: (pendingTransaction: TransactionDomainModel) => Promise<void>
+}
+
+interface InsertTransactionsOptions {
+  beforeCommit: (pendingTransactions: TransactionDomainModel[]) => Promise<void>
+}
 
 class TransactionReadWriteRepository extends ReadWriteRepository {
   public getTransaction = async (transaction_id: UUID): Promise<TransactionDomainModel> => {
@@ -188,37 +171,55 @@ class TransactionReadWriteRepository extends ReadWriteRepository {
     }
   }
 
-  public createTransaction = async (transaction: TransactionDomainModel): Promise<TransactionDomainModel> => {
+  public createTransaction = async (
+    transaction: TransactionDomainModel,
+    options: Partial<InsertTransactionOptions>
+  ): Promise<TransactionDomainModel> => {
     const { connect } = this
+    const { beforeCommit = async () => undefined } = options
     try {
       const connection = await connect('rw')
-      const {
-        raw: [entity]
-      }: InsertReturning<TransactionEntity> = await connection
-        .getRepository(TransactionEntity)
-        .createQueryBuilder()
-        .insert()
-        .values([TransactionDomainToEntityCreate.map(transaction)])
-        .returning('*')
-        .execute()
-      return TransactionEntityToDomain.map(entity)
+      const result = await connection.transaction(async manager => {
+        const {
+          raw: [entity]
+        }: InsertReturning<TransactionEntity> = await manager
+          .getRepository(TransactionEntity)
+          .createQueryBuilder()
+          .insert()
+          .values([TransactionDomainToEntityCreate.map(transaction)])
+          .returning('*')
+          .execute()
+        const pendingTransaction = TransactionEntityToDomain.map(entity)
+        await beforeCommit(pendingTransaction)
+        return pendingTransaction
+      })
+      return result
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
-  public createTransactions = async (transactions: TransactionDomainModel[]): Promise<TransactionDomainModel[]> => {
+  public createTransactions = async (
+    transactions: TransactionDomainModel[],
+    options: Partial<InsertTransactionsOptions>
+  ): Promise<TransactionDomainModel[]> => {
     const { connect } = this
+    const { beforeCommit = async () => undefined } = options
     try {
       const connection = await connect('rw')
-      const { raw: entities }: InsertReturning<TransactionEntity> = await connection
-        .getRepository(TransactionEntity)
-        .createQueryBuilder()
-        .insert()
-        .values(transactions.map(TransactionDomainToEntityCreate.mapper()))
-        .returning('*')
-        .execute()
-      return entities.map(TransactionEntityToDomain.map)
+      const result = await connection.transaction(async manager => {
+        const { raw: entities }: InsertReturning<TransactionEntity> = await manager
+          .getRepository(TransactionEntity)
+          .createQueryBuilder()
+          .insert()
+          .values(transactions.map(TransactionDomainToEntityCreate.mapper()))
+          .returning('*')
+          .execute()
+        const pendingTransactions = entities.map(TransactionEntityToDomain.map)
+        await beforeCommit(pendingTransactions)
+        return pendingTransactions
+      })
+      return result
     } catch (error) {
       throw RepositoryError(error)
     }

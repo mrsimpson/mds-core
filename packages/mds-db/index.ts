@@ -18,7 +18,6 @@ import { AttachmentRepository } from '@mds-core/mds-attachment-service'
 import { AuditRepository } from '@mds-core/mds-audit-service'
 import { GeographyRepository } from '@mds-core/mds-geography-service'
 import { IngestRepository } from '@mds-core/mds-ingest-service'
-import logger from '@mds-core/mds-logger'
 import { PolicyRepository } from '@mds-core/mds-policy-service'
 import { Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
 import * as attachments from './attachments'
@@ -27,8 +26,8 @@ import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './clie
 import * as devices from './devices'
 import * as events from './events'
 import * as geographies from './geographies'
+import { DbLogger } from './logger'
 import { createTables, dropTables } from './migration'
-import * as policies from './policies'
 import * as telemetry from './telemetry'
 import * as trips from './trips'
 
@@ -63,7 +62,7 @@ async function health(): Promise<{
   using: string
   stats: { current_running_queries: number; cache_hit_result: { heap_read: string; heap_hit: string; ratio: string } }
 }> {
-  logger.info('postgres health check')
+  DbLogger.info('Running Postgres health check')
   const currentQueriesSQL = `SELECT query
     FROM pg_stat_activity
     WHERE query <> '<IDLE>' AND query NOT ILIKE '%pg_stat_activity%' AND query <> ''
@@ -105,7 +104,7 @@ async function shutdown(): Promise<void> {
       )
     )
   } catch (err) {
-    logger.error('error during disconnection', err.stack)
+    DbLogger.error('error during disconnection', err.stack)
   }
 }
 
@@ -118,17 +117,17 @@ async function seed(data: {
   telemetry?: Telemetry[]
 }) {
   if (data) {
-    logger.info('postgres seed start')
+    DbLogger.info('postgres seed start')
     if (data.devices) {
       await Promise.all(data.devices.map(async (device: Device) => writeDevice(device)))
     }
-    logger.info('postgres devices seeded')
+    DbLogger.info('postgres devices seeded')
     if (data.events) await Promise.all(data.events.map(async (event: VehicleEvent) => writeEvent(event)))
-    logger.info('postgres events seeded')
+    DbLogger.info('postgres events seeded')
     if (data.telemetry) {
       await writeTelemetry(data.telemetry)
     }
-    logger.info('postgres seed done')
+    DbLogger.info('postgres seed done')
     return Promise.resolve()
   }
   return Promise.resolve('no data')
@@ -142,7 +141,6 @@ export default {
   shutdown,
   ...devices,
   ...events,
-  ...policies,
   ...geographies,
   ...audit,
   ...trips,

@@ -16,9 +16,9 @@
 
 import cache from '@mds-core/mds-agency-cache'
 import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
-import logger from '@mds-core/mds-logger'
 import stream from '@mds-core/mds-stream'
 import { api } from './api'
+import { AgencyLogger } from './logger'
 
 Promise.all([cache.startup(), stream.initialize()])
   .then(() => {
@@ -26,5 +26,5 @@ Promise.all([cache.startup(), stream.initialize()])
   })
   // eslint-disable-next-line promise/prefer-await-to-callbacks
   .catch(err => {
-    logger.error('mds-agency startup failure', err)
+    AgencyLogger.error('mds-agency startup failure', err)
   })

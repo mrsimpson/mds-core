@@ -140,6 +140,35 @@ paths:
           description: No Access Without Scope
         "500":
           description: Fatal Server Error
+  /violation/{violation_id}:
+    get:
+      security:
+        - bearerAuth: ["compliance:read", "compliance:read:provider"]
+      summary: Get a compliance violation
+      parameters:
+        - in: path
+          name: violation_id
+          schema:
+            $ref: "#/components/schemas/uuid"
+          required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    $ref: "#/components/schemas/ComplianceApiVersion"
+                  violation:
+                    $ref: "../schema-gen/ComplianceViolationSchema.json"
+          description: OK
+        "401":
+          description: Unauthorized
+        "403":
+          description: No Access Without Scope
+        "500":
+          description: Fatal Server Error
 components:
   securitySchemes:
     bearerAuth:
@@ -313,7 +342,8 @@ components:
           $ref: "#/components/schemas/uuid"
         vehicles_found:
           type: array
-          $ref: "#/components/schemas/MatchedVehicleInformation"
+          items:
+            $ref: "#/components/schemas/MatchedVehicleInformation"
         excess_vehicles_count:
           type: integer
         total_violations:

@@ -16,8 +16,8 @@
 
 import { AttachmentServiceClient } from '@mds-core/mds-attachment-service'
 import db from '@mds-core/mds-db'
-import logger from '@mds-core/mds-logger'
 import { Attachment, AttachmentSummary, AuditAttachment, Recorded, UUID } from '@mds-core/mds-types'
+import { AuditLogger } from './logger'
 
 /* eslint-disable-next-line */
 const multer = require('multer')
@@ -61,7 +61,7 @@ export async function deleteAuditAttachment(auditTripId: UUID, attachmentId: UUI
       await AttachmentServiceClient.deleteAttachment(attachmentId)
     }
   } catch (err) {
-    logger.error('deleteAttachment error', err.stack || err)
+    AuditLogger.error('deleteAttachment error', err.stack || err)
     throw err
   }
 }

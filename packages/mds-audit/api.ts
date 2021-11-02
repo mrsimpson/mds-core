@@ -17,22 +17,8 @@
 import { asJsonApiLinks, parsePagingQueryParams, parseRequest } from '@mds-core/mds-api-helpers'
 import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
-import {
-  isValidAuditDeviceId,
-  isValidAuditEventId,
-  isValidAuditEventType,
-  isValidAuditIssueCode,
-  isValidAuditNote,
-  isValidAuditTripId,
-  isValidProviderId,
-  isValidProviderVehicleId,
-  isValidTelemetry,
-  isValidTimestamp,
-  isValidVehicleEventType,
-  ValidationError
-} from '@mds-core/mds-schema-validators'
+import { ValidationError } from '@mds-core/mds-schema-validators'
 import { isError } from '@mds-core/mds-service-helpers'
 import { AuditEvent, AUDIT_EVENT_TYPES, Telemetry, TelemetryData, Timestamp } from '@mds-core/mds-types'
 import {
@@ -54,6 +40,7 @@ import {
   readAttachments,
   writeAttachment
 } from './attachments'
+import { AuditLogger } from './logger'
 import { AuditApiVersionMiddleware } from './middleware'
 import {
   deleteAudit,
@@ -95,6 +82,18 @@ import {
   PostAuditTripTelemetryResponse,
   PostAuditTripVehicleEventResponse
 } from './types'
+import {
+  validateAuditApiAuditEndRequest,
+  validateAuditApiAuditNoteRequest,
+  validateAuditApiAuditStartRequest,
+  validateAuditApiVehicleEventRequest,
+  validateTelemetry,
+  validateTimestamp,
+  validateUUID
+} from './validators'
+
+const logGenericAuditError = (req: AuditApiRequest<any>, res: AuditApiResponse<any>, err: any) =>
+  AuditLogger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
 
 // TODO lib
 function flattenTelemetry(telemetry?: Telemetry): TelemetryData {
@@ -138,7 +137,7 @@ function api(app: express.Express): express.Express {
           return next()
         }
       }
-      logger.warn('Missing subject_id', { method: req.method, originalUrl: req.originalUrl })
+      AuditLogger.warn('Missing subject_id', { method: req.method, originalUrl: req.originalUrl })
       // 403 Forbidden
       return res.status(403).send({ error: new AuthorizationError('missing_subject_id') })
     }
@@ -151,10 +150,10 @@ function api(app: express.Express): express.Express {
   app.use(pathPrefix('/trips/:audit_trip_id'), async (req: AuditApiTripRequest, res: AuditApiResponse, next) => {
     try {
       const { audit_trip_id } = req.params
-      if (isValidAuditTripId(audit_trip_id)) {
-        res.locals.audit_trip_id = audit_trip_id
-        res.locals.audit = await readAudit(audit_trip_id)
-      }
+      validateUUID(audit_trip_id)
+      res.locals.audit_trip_id = audit_trip_id
+      res.locals.audit = await readAudit(audit_trip_id)
+
       return next()
     } catch (err) /* istanbul ignore next */ {
       if (err instanceof ValidationError) {
@@ -162,7 +161,7 @@ function api(app: express.Express): express.Express {
         return res.status(400).send({ error: err })
       }
       // 500 Internal Server Error
-      logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+      logGenericAuditError(req, res, err)
       return res.status(500).send({ error: new ServerError(err) })
     }
   })
@@ -191,52 +190,52 @@ function api(app: express.Express): express.Express {
           } = req.body
 
           // Validate input params
-          if (
-            isValidTimestamp(timestamp) &&
-            isValidProviderId(provider_id) &&
-            isValidProviderVehicleId(provider_vehicle_id) &&
-            isValidAuditEventId(audit_event_id) &&
-            isValidAuditDeviceId(audit_device_id) &&
-            isValidTelemetry(telemetry, { required: false })
-          ) {
-            // Find provider device and event by vehicle id lookup
-            const provider_device = await getVehicle(provider_id, provider_vehicle_id)
-            const provider_device_id = provider_device ? provider_device.device_id : null
-            const provider_name = providerName(provider_id)
+          validateAuditApiAuditStartRequest({
+            timestamp,
+            provider_id,
+            provider_vehicle_id,
+            audit_event_id,
+            audit_device_id,
+            telemetry
+          })
 
-            // Create the audit
-            await writeAudit({
-              audit_trip_id,
-              audit_device_id,
-              audit_subject_id,
-              provider_id,
-              provider_name,
-              provider_vehicle_id,
-              provider_device_id,
-              timestamp,
-              recorded
-            })
+          // Find provider device and event by vehicle id lookup
+          const provider_device = await getVehicle(provider_id, provider_vehicle_id)
+          const provider_device_id = provider_device ? provider_device.device_id : null
+          const provider_name = providerName(provider_id)
 
-            // Create the audit start event
-            await writeAuditEvent({
-              audit_trip_id,
-              audit_event_id,
-              audit_subject_id,
-              audit_event_type: AUDIT_EVENT_TYPES.start,
-              ...flattenTelemetry(telemetry),
-              timestamp,
-              recorded
-            })
+          // Create the audit
+          await writeAudit({
+            audit_trip_id,
+            audit_device_id,
+            audit_subject_id,
+            provider_id,
+            provider_name,
+            provider_vehicle_id,
+            provider_device_id,
+            timestamp,
+            recorded
+          })
 
-            // 200 OK
-            return res.status(200).send({
-              version: res.locals.version,
-              provider_id,
-              provider_name,
-              provider_vehicle_id,
-              provider_device
-            })
-          }
+          // Create the audit start event
+          await writeAuditEvent({
+            audit_trip_id,
+            audit_event_id,
+            audit_subject_id,
+            audit_event_type: AUDIT_EVENT_TYPES.start,
+            ...flattenTelemetry(telemetry),
+            timestamp,
+            recorded
+          })
+
+          // 200 OK
+          return res.status(200).send({
+            version: res.locals.version,
+            provider_id,
+            provider_name,
+            provider_vehicle_id,
+            provider_device
+          })
         } else {
           // 409 Conflict
           return res.status(409).send({ error: new ConflictError('audit_trip_id_already_exists', { audit_trip_id }) })
@@ -247,7 +246,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -269,25 +268,20 @@ function api(app: express.Express): express.Express {
           const { audit_event_id = uuid(), event_type, timestamp, telemetry } = req.body
 
           // Validate input params
-          if (
-            isValidVehicleEventType(event_type) &&
-            isValidTimestamp(timestamp) &&
-            isValidTelemetry(telemetry, { required: false })
-          ) {
-            // Create the audit event
-            await writeAuditEvent({
-              audit_trip_id,
-              audit_event_id,
-              audit_subject_id,
-              audit_event_type: event_type,
-              ...flattenTelemetry(telemetry),
-              timestamp,
-              recorded
-            })
+          validateAuditApiVehicleEventRequest({ audit_event_id, event_type, timestamp, telemetry })
+          // Create the audit event
+          await writeAuditEvent({
+            audit_trip_id,
+            audit_event_id,
+            audit_subject_id,
+            audit_event_type: event_type,
+            ...flattenTelemetry(telemetry),
+            timestamp,
+            recorded
+          })
 
-            // 200 OK
-            return res.status(200).send({ version: res.locals.version })
-          }
+          // 200 OK
+          return res.status(200).send({ version: res.locals.version })
         } else {
           // 404 Not Found
           return res.status(404).send({ error: new NotFoundError('audit_trip_id_not_found', { audit_trip_id }) })
@@ -298,7 +292,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -319,21 +313,21 @@ function api(app: express.Express): express.Express {
           const { telemetry, audit_event_id = uuid(), timestamp } = req.body
 
           // Validate input params
-          if (isValidTelemetry(telemetry) && isValidTimestamp(timestamp)) {
-            // Create the telemetry event
-            await writeAuditEvent({
-              audit_trip_id,
-              audit_event_id,
-              audit_subject_id,
-              audit_event_type: AUDIT_EVENT_TYPES.telemetry,
-              ...flattenTelemetry(telemetry),
-              timestamp,
-              recorded
-            })
+          validateTelemetry(telemetry)
+          validateTimestamp(timestamp)
+          // Create the telemetry event
+          await writeAuditEvent({
+            audit_trip_id,
+            audit_event_id,
+            audit_subject_id,
+            audit_event_type: AUDIT_EVENT_TYPES.telemetry,
+            ...flattenTelemetry(telemetry),
+            timestamp,
+            recorded
+          })
 
-            // 200 OK
-            return res.status(200).send({ version: res.locals.version })
-          }
+          // 200 OK
+          return res.status(200).send({ version: res.locals.version })
         } else {
           // 404 Not Found
           return res.status(404).send({ error: new NotFoundError('audit_trip_id_not_found', { audit_trip_id }) })
@@ -344,7 +338,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -372,34 +366,30 @@ function api(app: express.Express): express.Express {
           } = req.body
 
           // Validate input params
-          if (
-            isValidAuditEventId(audit_event_id) &&
-            isValidAuditEventType(audit_event_type, {
-              accept: [AUDIT_EVENT_TYPES.issue, AUDIT_EVENT_TYPES.note, AUDIT_EVENT_TYPES.summary]
-            }) &&
-            isValidTimestamp(timestamp) &&
-            isValidTelemetry(telemetry, { required: false }) &&
-            isValidAuditIssueCode(audit_issue_code, { required: false }) &&
-            isValidAuditNote(note, {
-              required: audit_event_type === AUDIT_EVENT_TYPES.note || audit_event_type === AUDIT_EVENT_TYPES.summary
-            })
-          ) {
-            // Create the audit event
-            await writeAuditEvent({
-              audit_trip_id,
-              audit_event_id,
-              audit_subject_id,
-              audit_event_type,
-              audit_issue_code,
-              note,
-              ...flattenTelemetry(telemetry),
-              timestamp,
-              recorded
-            })
+          validateAuditApiAuditNoteRequest({
+            audit_event_id,
+            audit_event_type,
+            audit_issue_code,
+            note,
+            timestamp,
+            telemetry
+          })
 
-            // 200 OK
-            return res.status(200).send({ version: res.locals.version })
-          }
+          // Create the audit event
+          await writeAuditEvent({
+            audit_trip_id,
+            audit_event_id,
+            audit_subject_id,
+            audit_event_type,
+            audit_issue_code,
+            note,
+            ...flattenTelemetry(telemetry),
+            timestamp,
+            recorded
+          })
+
+          // 200 OK
+          return res.status(200).send({ version: res.locals.version })
         } else {
           // 404 Not Found
           return res.status(404).send({ error: new NotFoundError('audit_trip_id_not_found', { audit_trip_id }) })
@@ -410,7 +400,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -430,25 +420,21 @@ function api(app: express.Express): express.Express {
           const { audit_event_id = uuid(), timestamp, telemetry } = req.body
 
           // Validate input params
-          if (
-            isValidAuditEventId(audit_event_id) &&
-            isValidTimestamp(timestamp) &&
-            isValidTelemetry(telemetry, { required: false })
-          ) {
-            // Create the audit end event
-            await writeAuditEvent({
-              audit_trip_id,
-              audit_event_id,
-              audit_subject_id,
-              audit_event_type: AUDIT_EVENT_TYPES.end,
-              ...flattenTelemetry(telemetry),
-              timestamp,
-              recorded
-            })
+          validateAuditApiAuditEndRequest({ audit_event_id, timestamp, telemetry })
 
-            // 200 OK
-            return res.status(200).send({ version: res.locals.version })
-          }
+          // Create the audit end event
+          await writeAuditEvent({
+            audit_trip_id,
+            audit_event_id,
+            audit_subject_id,
+            audit_event_type: AUDIT_EVENT_TYPES.end,
+            ...flattenTelemetry(telemetry),
+            timestamp,
+            recorded
+          })
+
+          // 200 OK
+          return res.status(200).send({ version: res.locals.version })
         } else {
           // 404 Not Found
           return res.status(404).send({ error: new NotFoundError('audit_trip_id_not_found', { audit_trip_id }) })
@@ -459,7 +445,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -576,7 +562,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -602,7 +588,7 @@ function api(app: express.Express): express.Express {
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -666,7 +652,7 @@ function api(app: express.Express): express.Express {
         })
       } catch (err) /* istanbul ignore next */ {
         // 500 Internal Server Error
-        logger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+        logGenericAuditError(req, res, err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -699,7 +685,7 @@ function api(app: express.Express): express.Express {
         const response = await getVehicles(skip, take, url, req.query, bbox, strict, provider_id)
         return res.status(200).send({ version: res.locals.version, ...response })
       } catch (err) {
-        logger.error('getVehicles fail', err)
+        AuditLogger.error('getVehicles fail', err)
         return res.status(500).send({
           error: 'internal_server_error'
         })
@@ -722,7 +708,7 @@ function api(app: express.Express): express.Express {
           res.status(404).send({ error: new NotFoundError('vehicle not found', { provider_id, vin }) })
         }
       } catch (err) {
-        logger.error('getVehicle fail', err)
+        AuditLogger.error('getVehicle fail', err)
         res.status(500).send({
           error: 'internal_server_error'
         })
@@ -756,7 +742,7 @@ function api(app: express.Express): express.Express {
 
         if (isError(err, UnsupportedTypeError)) return res.status(415).send({ error: err })
 
-        logger.error('post attachment fail', err)
+        AuditLogger.error('post attachment fail', err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -771,7 +757,7 @@ function api(app: express.Express): express.Express {
       await deleteAuditAttachment(audit_trip_id, attachment_id)
       res.status(200).send({ version: res.locals.version })
     } catch (err) {
-      logger.error('delete attachment error', err)
+      AuditLogger.error('delete attachment error', err)
       if (err instanceof NotFoundError) {
         return res.status(404).send({ error: err })
       }

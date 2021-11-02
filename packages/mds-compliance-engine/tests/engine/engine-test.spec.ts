@@ -17,20 +17,25 @@
 import cache from '@mds-core/mds-agency-cache'
 import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
 import db from '@mds-core/mds-db'
+import { PolicyDomainModel } from '@mds-core/mds-policy-service'
 import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
-import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
-import { Device, Geography, ModalityPolicy, VehicleEvent } from '@mds-core/mds-types'
+import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
+import { Device, Geography, VehicleEvent } from '@mds-core/mds-types'
 import assert from 'assert'
 import { FeatureCollection } from 'geojson'
 import test from 'unit.js'
 import { VehicleEventWithTelemetry } from '../../@types'
-import { filterEvents, getSupersedingPolicies } from '../../engine/helpers'
+import { filterEvents, getAllInputs, getSupersedingPolicies } from '../../engine/helpers'
 import { processPolicy } from '../../engine/mds-compliance-engine'
-import { EXPIRED_POLICY, LOW_COUNT_POLICY } from '../../test_data/fixtures'
+import {
+  ARBITRARY_EVENT_TYPES_POLICY,
+  COUNT_POLICY_JSON,
+  EXPIRED_POLICY,
+  LOW_COUNT_POLICY
+} from '../../test_data/fixtures'
 import { readJson } from './helpers'
 
-let policies: ModalityPolicy[] = []
+let policies: PolicyDomainModel[] = []
 
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
@@ -72,8 +77,10 @@ describe('Tests General Compliance Engine Functionality', () => {
 
     // Mimic what we do in the real world to get inputs to feed into the compliance engine.
     const supersedingPolicies = getSupersedingPolicies(policies)
-
-    const policyResults = await Promise.all(supersedingPolicies.map(async policy => processPolicy(policy, geographies)))
+    const inputs = await getAllInputs()
+    const policyResults = await Promise.all(
+      supersedingPolicies.map(policy => processPolicy(policy, geographies, inputs))
+    )
     policyResults.forEach(complianceSnapshots => {
       complianceSnapshots.forEach(complianceSnapshot => {
         test.assert.deepEqual(complianceSnapshot?.vehicles_found.length, 0)
@@ -90,7 +97,8 @@ describe('Tests General Compliance Engine Functionality', () => {
     })
     await cache.seed({ devices, events, telemetry: [] })
     await Promise.all(devices.map(async device => db.writeDevice(device)))
-    const result = await processPolicy(EXPIRED_POLICY, geographies)
+    const inputs = await getAllInputs()
+    const result = await processPolicy(EXPIRED_POLICY, geographies, inputs)
     test.assert.deepEqual(result, [])
   })
 })
@@ -98,6 +106,7 @@ describe('Tests General Compliance Engine Functionality', () => {
 describe('Verifies compliance engine processes by vehicle most recent event', () => {
   beforeEach(async () => {
     await db.reinitialize()
+    await cache.startup()
     await cache.reset()
   })
   it('should process count violation vehicles with the most recent event last', async () => {
@@ -115,8 +124,8 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
     }, []) as VehicleEventWithTelemetry[]
     await cache.seed({ devices, events, telemetry: [] })
     await Promise.all(devices.map(async device => db.writeDevice(device)))
-    const complianceResults = await processPolicy(LOW_COUNT_POLICY, geographies)
-    console.dir(complianceResults, { depth: null })
+    const inputs = await getAllInputs()
+    const complianceResults = await processPolicy(LOW_COUNT_POLICY, geographies, inputs)
     const { 0: result } = complianceResults.filter(
       complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
     ) as ComplianceSnapshotDomainModel[]
@@ -125,6 +134,72 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
       return !vehicle.rule_applied
     })
     test.assert.deepEqual(latest_device.device_id, device.device_id)
+  })
+
+  it('Verifies arbitrary event_types can be set for a state in a rule', async () => {
+    const devices = makeDevices(6, now())
+    const start_time = now() - 10000000
+    const events = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+      const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
+        event_types: ['battery_low'],
+        vehicle_state: 'available',
+        speed: 0
+      })
+      events_acc.push(...device_events)
+      return events_acc
+    }, []) as VehicleEventWithTelemetry[]
+    await cache.seed({ devices, events, telemetry: [] })
+    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    const inputs = await getAllInputs()
+    const complianceResults = processPolicy(ARBITRARY_EVENT_TYPES_POLICY, geographies, inputs)
+    const { 0: result } = complianceResults.filter(
+      complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
+    ) as ComplianceSnapshotDomainModel[]
+    test.assert.deepEqual(result.total_violations, 1)
+  })
+
+  it('Verifies no match when event types do not match policy', async () => {
+    const devices = makeDevices(6, now())
+    const start_time = now() - 10000000
+    const events = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+      const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
+        event_types: ['reservation_cancel'],
+        vehicle_state: 'available',
+        speed: 0
+      })
+      events_acc.push(...device_events)
+      return events_acc
+    }, []) as VehicleEventWithTelemetry[]
+    await cache.seed({ devices, events, telemetry: [] })
+    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    const inputs = await getAllInputs()
+    const complianceResults = processPolicy(ARBITRARY_EVENT_TYPES_POLICY, geographies, inputs)
+    const { 0: result } = complianceResults.filter(
+      complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
+    )
+    test.assert.deepEqual(result.total_violations, 0)
+  })
+
+  it('Verifies state wildcard matching works', async () => {
+    const devices = makeDevices(11, now())
+    const start_time = now() - 10000000
+    const events = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+      const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
+        event_types: ['battery_low'],
+        vehicle_state: 'available',
+        speed: 0
+      })
+      events_acc.push(...device_events)
+      return events_acc
+    }, []) as VehicleEventWithTelemetry[]
+    await cache.seed({ devices, events, telemetry: [] })
+    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    const inputs = await getAllInputs()
+    const complianceResults = processPolicy(COUNT_POLICY_JSON, geographies, inputs)
+    const { 0: result } = complianceResults.filter(
+      complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
+    ) as ComplianceSnapshotDomainModel[]
+    test.assert.deepEqual(result.total_violations, 1)
   })
 })
 
@@ -144,7 +219,8 @@ describe('Verifies errors are being properly thrown', async () => {
 
     await assert.rejects(
       async () => {
-        await processPolicy(policies[0], geographies)
+        const inputs = await getAllInputs()
+        await processPolicy(policies[0], geographies, inputs)
       },
       { name: 'RuntimeError' }
     )

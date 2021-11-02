@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import httpContext from 'express-http-context'
 import { inspect } from 'util'
+import { LogLevel } from './@types'
+import { debugLog, logger } from './loggers'
+import { redact } from './redaction'
 
 // Verify that defaultOptions is available (not available on non-nodejs platforms)
 if (inspect?.defaultOptions) {
@@ -23,52 +25,45 @@ if (inspect?.defaultOptions) {
   inspect.defaultOptions.depth = null
 }
 
-const logger: Pick<Console, 'info' | 'warn' | 'error' | 'debug'> = console
-type LogLevel = keyof typeof logger
+const getCustomProps = () => {
+  const ISOTimestamp = new Date().toISOString()
+  const requestId = httpContext.get('x-request-id')
 
-const redact = (arg: string | Record<string, unknown> | Error | undefined) => {
-  if (arg === undefined) return {}
-  const res = JSON.stringify(arg instanceof Error ? { error: arg.toString() } : arg, (k, v) =>
-    ['lat', 'lng'].includes(k) ? '[REDACTED]' : v
-  )
-
-  return JSON.parse(res)
+  return { ISOTimestamp, requestId }
 }
 
 const log =
   (level: LogLevel) =>
-  (
-    message: string,
-    data?: Record<string, unknown> | Error
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): { log_message?: string; log_data?: any } => {
-    if (process.env.QUIET === 'true') {
-      return {}
+  (message: string, data?: Record<string, unknown> | Error): void => {
+    if (process.env.QUIET !== 'true') {
+      return data
+        ? logger[level]({ ...getCustomProps(), data: redact(data), message })
+        : logger[level]({ ...getCustomProps(), message })
     }
-
-    const { log_message, log_data } = { log_message: redact(message), log_data: redact(data) }
-    const log_timestamp = Date.now()
-    const log_ISO_timestamp = new Date(log_timestamp).toISOString()
-    const log_requestId = httpContext.get('x-request-id')
-
-    logger[level](
-      JSON.stringify({
-        log_level: level.toUpperCase(),
-        log_ISO_timestamp,
-        log_timestamp,
-        ...(log_requestId ? { log_requestId } : {}),
-        log_message,
-        log_data
-      })
-    )
-
-    return { log_message, log_data }
   }
 
 export default {
   log: (level: LogLevel, ...args: Parameters<ReturnType<typeof log>>) => log(level)(...args),
-  debug: log('debug'),
+  /** @deprecated
+   * Create a namespaced logger with createLogger instead.
+   */
+  debug: debugLog,
+  /** @deprecated
+   * Create a namespaced logger with createLogger instead.
+   */
   info: log('info'),
+  /** @deprecated
+   * Create a namespaced logger with createLogger instead.
+   */
   warn: log('warn'),
-  error: log('error')
+  /** @deprecated
+   * Create a namespaced logger with createLogger instead.
+   */
+  error: log('error'),
+  createLogger: (name: string) => ({
+    debug: debugLog(name),
+    info: log('info'),
+    warn: log('warn'),
+    error: log('error')
+  })
 }

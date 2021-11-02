@@ -124,7 +124,7 @@ describe('Jurisdiction Service Tests', () => {
   it('Write One Jurisdiction (validation error)', async () => {
     try {
       const result = await JurisdictionServiceClient.createJurisdiction({
-        agency_key: '',
+        agency_key: ' ',
         agency_name: 'Agency Name One',
         geography_id: uuid()
       })

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Timestamp, UUID } from '@mds-core/mds-types'
 import { getReadOnlyClient } from './client'
+import { DbLogger } from './logger'
 import schema from './schema'
 import { logSql, SqlVals } from './sql-utils'
 
@@ -76,7 +76,7 @@ export async function readTripIds(params: Partial<ReadTripIdsQueryParams> = {}):
       count
     }
   } catch (err) {
-    logger.error('readTripIds error', err)
+    DbLogger.error('readTripIds error', err)
     throw err
   }
 }

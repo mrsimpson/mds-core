@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { asArray } from '@mds-core/mds-utils'
 import { DeadLetterSink, StreamProcessorController, StreamSink, StreamSource, StreamTransform } from './@types'
+import { StreamProcessorLogger } from './logger'
 
 // StreamProcessor - Read from source, apply transform to each message, and write to sink
 export const StreamProcessor = <TMessageIn, TMessageOut>(
@@ -36,7 +36,7 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
           try {
             await Promise.all(sinkProducers.map(producer => producer.write(transformed)))
           } catch (error) {
-            logger.error(`Error when writing to producer`, error)
+            StreamProcessorLogger.error(`Error when writing to producer`, error)
             await Promise.all(sinkProducers.map(producer => producer.shutdown()))
             await Promise.all(sinkProducers.map(producer => producer.initialize()))
             throw error
@@ -46,7 +46,10 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
     } catch (error) {
       // Try to write to dead letter producers. If all fail, then Process.exit(1) is called. If only some fail, it's logged out and no errors are thrown.
       try {
-        logger.error(`Writing to ${deadLetterProducers.length} dead letter producers`, { error, message })
+        StreamProcessorLogger.error(`Writing to ${deadLetterProducers.length} dead letter producers`, {
+          error,
+          message
+        })
 
         // Use Promise.allSettled to not throw errors and wait for all promises to complete.
         const results = await Promise.allSettled(
@@ -57,14 +60,14 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
         const successes = results.filter(result => result.status === 'fulfilled')
         const successCount = successes.length
 
-        logger.error(`Wrote to dead letter producers`, { failureCount, successCount, failures })
+        StreamProcessorLogger.error(`Wrote to dead letter producers`, { failureCount, successCount, failures })
 
         // if there are any deadLetterSinks and none of the writes succeeded, throw because we did not retain the message in any dead letter sinks
         if (deadLetterProducers.length > 0 && successCount === 0) {
           throw new Error(`Failed to write to all dead letter sinks`)
         }
       } catch (deadLetterWriteError) {
-        logger.error(
+        StreamProcessorLogger.error(
           `Fatal error when writing to dead letter producer. Restarting process before ACK to avoid data loss.`,
           { error: deadLetterWriteError, message }
         )
@@ -75,12 +78,12 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
 
   return {
     start: async () => {
-      await Promise.all(sinkProducers.map(producer => producer.initialize()))
+      await Promise.all([...sinkProducers, ...deadLetterProducers].map(producer => producer.initialize()))
       await consumer.initialize()
     },
     stop: async () => {
       await consumer.shutdown()
-      await Promise.all(sinkProducers.map(producer => producer.shutdown()))
+      await Promise.all([...sinkProducers, ...deadLetterProducers].map(producer => producer.shutdown()))
     }
   }
 }
@@ -99,13 +102,13 @@ const launch = async (processor: StreamProcessorController) => {
 
   try {
     await processor.start()
-    logger.info(
+    StreamProcessorLogger.info(
       `Running ${npm_package_name} v${npm_package_version} (${
         npm_package_git_commit ?? 'local'
       }) connected to Kafka on ${KAFKA_HOST}`
     )
   } catch (error) {
-    logger.error(
+    StreamProcessorLogger.error(
       `${npm_package_name} v${npm_package_version} (${
         npm_package_git_commit ?? 'local'
       }) connected to Kafka on ${KAFKA_HOST} failed to start`,

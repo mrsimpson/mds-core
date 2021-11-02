@@ -79,17 +79,6 @@ before('Initializing Database', async () => {
 
 describe('Testing API', () => {
   before(done => {
-    const baseEvent: VehicleEvent = {
-      provider_id,
-      device_id: provider_device_id,
-      event_types: ['agency_drop_off'],
-      vehicle_state: 'available',
-      trip_state: null,
-      telemetry_timestamp: AUDIT_START,
-      trip_id: uuid(),
-      timestamp: AUDIT_START,
-      recorded: AUDIT_START
-    }
     const baseTelemetry = {
       provider_id,
       device_id: provider_device_id,
@@ -104,6 +93,19 @@ describe('Testing API', () => {
         heading: 180
       }
     }
+    const baseEvent: VehicleEvent = {
+      provider_id,
+      device_id: provider_device_id,
+      event_types: ['agency_drop_off'],
+      vehicle_state: 'available',
+      trip_state: null,
+      telemetry_timestamp: AUDIT_START,
+      telemetry: baseTelemetry,
+      trip_id: uuid(),
+      timestamp: AUDIT_START,
+      recorded: AUDIT_START
+    }
+
     db.writeDevice({
       accessibility_options: [],
       device_id: provider_device_id,
@@ -308,6 +310,7 @@ describe('Testing API', () => {
       })
   })
 
+  // ===>>>
   it('verify audit end', done => {
     request
       .post(pathPrefix(`/trips/${audit_trip_id}/end`))

@@ -2,12 +2,13 @@ import { UUID } from '@mds-core/mds-types'
 import { uuid } from '@mds-core/mds-utils'
 import {
   FEE_TYPE,
+  ReceiptDomainModel,
   TransactionDomainModel,
   TransactionOperationDomainCreateModel,
   TransactionStatusDomainModel
 } from '../@types'
 
-const receipt = {
+const receipt: ReceiptDomainModel = {
   receipt_id: uuid(),
   timestamp: Date.now(),
   receipt_details: {},

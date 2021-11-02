@@ -20,6 +20,7 @@ import {
   EventAnnotationDomainModel,
   EventDomainCreateModel,
   EventDomainModel,
+  MigratedEventDomainModel,
   TelemetryDomainModel
 } from '../../@types'
 import { EventEntityModel } from '../entities/event-entity'
@@ -40,15 +41,26 @@ export const EventEntityToDomain = ModelMapper<EventEntityModel, EventDomainMode
       migrated_from_id,
       ...domain
     } = entity
-    const telemetry: Nullable<TelemetryDomainModel> = telemetry_entity
-      ? TelemetryEntityToDomain.map(telemetry_entity)
-      : null
+    const telemetry: TelemetryDomainModel = TelemetryEntityToDomain.map(telemetry_entity)
     const annotation: Nullable<EventAnnotationDomainModel> = annotation_entity
       ? EventAnnotationEntityToDomain.map(annotation_entity)
       : null
     return { telemetry, annotation, ...domain }
   }
 )
+
+/**
+ * Slightly weird mapper that is used only for migrated events
+ * @deprecated
+ */
+export const MigratedEventEntityToDomainWithIdentityColumn = ModelMapper<
+  EventEntityModel,
+  MigratedEventDomainModel,
+  EventEntityToDomainOptions
+>((entity, options) => {
+  const { id, telemetry, annotation, migrated_from_source, migrated_from_version, migrated_from_id, ...domain } = entity
+  return { id, ...domain }
+})
 
 type EventEntityCreateOptions = Partial<{
   recorded: Timestamp
@@ -63,13 +75,16 @@ export const EventDomainToEntityCreate = ModelMapper<
   EventDomainCreateModel,
   EventEntityCreateModel,
   EventEntityCreateOptions
->(({ telemetry, telemetry_timestamp = null, trip_id = null, trip_state = null, ...domain }, options) => {
+>(({ telemetry, trip_id = null, trip_state = null, ...domain }, options) => {
   const { recorded } = options ?? {}
+
+  const { timestamp: telemetry_timestamp } = telemetry
+
   return {
-    telemetry_timestamp,
     trip_id,
     trip_state,
     recorded,
+    telemetry_timestamp,
     ...domain
   }
 })

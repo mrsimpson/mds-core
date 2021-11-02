@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import express from 'express'
 import httpContext from 'express-http-context'
-import HttpStatus from 'http-status-codes'
 import morgan from 'morgan'
 import { ApiRequest, ApiResponse, ApiResponseLocalsClaims } from '../@types'
-
-const { REQUEST_LOGGING_LEVEL = HttpStatus.OK } = process.env
+import { ApiServerLogger } from '../logger'
 
 export type RequestLoggingMiddlewareOptions = Partial<{
-  filters: Array<{ path: RegExp; level: number }>
+  excludePaths: RegExp[]
+  includeRemoteAddress: boolean
 }>
 
+const formatRemoteAddress = (remoteAddr = '-') => {
+  const IPv4Prefix = '::ffff:'
+  return remoteAddr.startsWith(IPv4Prefix) ? remoteAddr.substring(IPv4Prefix.length) : remoteAddr
+}
+
 export const RequestLoggingMiddleware = ({
-  filters = []
+  excludePaths = [],
+  includeRemoteAddress = false
 }: RequestLoggingMiddlewareOptions = {}): express.RequestHandler[] => [
   morgan<ApiRequest, ApiResponse & ApiResponseLocalsClaims>(
     (tokens, req, res) => {
       return [
+        ...(includeRemoteAddress ? [formatRemoteAddress(tokens['remote-addr'](req, res))] : []),
         ...(res.locals.claims?.provider_id ? [res.locals.claims.provider_id] : []),
         tokens.method(req, res),
         tokens.url(req, res),
@@ -46,13 +51,9 @@ export const RequestLoggingMiddleware = ({
         .join(' ')
     },
     {
-      skip: (req: ApiRequest, res: ApiResponse): boolean => {
-        return (
-          res.statusCode < Number(filters.find(filter => req.path.match(filter.path))?.level ?? REQUEST_LOGGING_LEVEL)
-        )
-      },
+      skip: (req: ApiRequest): boolean => excludePaths.some(path => req.path.match(path)),
       // Use logger, but remove extra line feed added by morgan stream option
-      stream: { write: msg => logger.info(msg.slice(0, -1)) }
+      stream: { write: msg => ApiServerLogger.info(msg.slice(0, -1)) }
     }
   ),
   httpContext.middleware,
@@ -64,13 +65,9 @@ export const RequestLoggingMiddleware = ({
     return next()
   },
   (req: ApiRequest, res: ApiResponse, next: express.NextFunction) => {
-    const { REQUEST_DEBUG } = process.env
-
-    if (REQUEST_DEBUG === 'true') {
-      const { body, params, query } = req
-      logger.debug('REQUEST_DEBUG::BODY', { body })
-      logger.debug('REQUEST_DEBUG::PARAMS', { params })
-      logger.debug('REQUEST_DEBUG::QUERY', { query })
+    if (!excludePaths.some(path => req.path.match(path))) {
+      const { path, query, body } = req
+      ApiServerLogger.debug('Request details', { path, query, body })
     }
 
     return next()

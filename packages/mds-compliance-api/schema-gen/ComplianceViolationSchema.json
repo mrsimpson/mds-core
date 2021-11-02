@@ -1,0 +1,58 @@
+{
+  "type": "object",
+  "properties": {
+    "violation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "integer",
+      "minimum": 100000000000,
+      "maximum": 99999999999999
+    },
+    "policy_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "provider_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "rule_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "violation_details": {
+      "type": "object",
+      "properties": {
+        "event_timestamp": {
+          "type": "integer",
+          "minimum": 100000000000,
+          "maximum": 99999999999999
+        },
+        "device_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "trip_id": {
+          "type": "string",
+          "format": "uuid",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "event_timestamp",
+        "device_id"
+      ]
+    }
+  },
+  "required": [
+    "violation_id",
+    "timestamp",
+    "policy_id",
+    "provider_id",
+    "rule_id",
+    "violation_details"
+  ]
+}

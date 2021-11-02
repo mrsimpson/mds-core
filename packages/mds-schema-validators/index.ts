@@ -16,13 +16,14 @@
 
 import { ValidationError } from '@mds-core/mds-utils'
 import Ajv, { JSONSchemaType, Options, SchemaObject, ValidateFunction } from 'ajv'
+import withErrors from 'ajv-errors'
 import withFormats from 'ajv-formats'
+import ajvKeywords from 'ajv-keywords'
 import Joi from 'joi'
 export type { SchemaObject } from 'ajv'
 export * from './generators'
 // Export an example schema for testing purposes
 export * from './tests/test.schema'
-export * from './trip-metadata-validators'
 export * from './v0_4_1'
 export * from './validators'
 
@@ -34,9 +35,19 @@ export type SchemaValidator<T> = {
   $schema: Schema<T> & { $schema: string }
 }
 
-export const SchemaValidator = <T>(schema: Schema<T>, options: Options = { allErrors: true }): SchemaValidator<T> => {
+export const SchemaValidator = <T>(
+  schema: Schema<T>,
+  options: Options = { allErrors: true },
+  ajv?: Ajv
+): SchemaValidator<T> => {
   const $schema = Object.assign({ $schema: 'http://json-schema.org/draft-07/schema#' }, schema)
-  const validator: ValidateFunction<T> = withFormats(new Ajv(options)).compile($schema)
+  let ajvInstance = ajv || new Ajv(options)
+  /* the ajv-errors plugin throws an error when allErrors is not true */
+  if (options.allErrors === true) {
+    ajvInstance = withErrors(ajvInstance)
+  }
+  ajvKeywords(ajvInstance, ['transform', 'dynamicDefaults'])
+  const validator: ValidateFunction<T> = withFormats(ajvInstance).compile($schema)
   return {
     validate: (input: unknown) => {
       if (!validator(input)) {

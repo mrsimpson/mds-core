@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
-import { Nullable } from '@mds-core/mds-types'
+import { ExtendedKeys, Nullable, RequiredKeys, SetIntersection } from '@mds-core/mds-types'
 import { ClientDisconnectedError, ExceptionMessages, isDefined } from '@mds-core/mds-utils'
 import { Kafka, Producer } from 'kafkajs'
 import { isArray } from 'util'
+import { StreamLogger } from '../logger'
 import { StreamProducer } from '../stream-interface'
 import { getKafkaBrokers } from './helpers'
 
-export interface KafkaStreamProducerOptions {
+/**
+ * Gets all the keys of all required properties of T that extend string
+ */
+type RequiredStringKeys<T extends object> = SetIntersection<RequiredKeys<T>, ExtendedKeys<T, string>>
+
+export interface KafkaStreamProducerOptions<TMessage> {
   clientId: string
+  partitionKey: TMessage extends object ? RequiredStringKeys<TMessage> : never
 }
 
-const createStreamProducer = async ({ clientId = 'writer' }: Partial<KafkaStreamProducerOptions> = {}) => {
+const createStreamProducer = async <TMessage>({
+  clientId = 'writer'
+}: Partial<KafkaStreamProducerOptions<TMessage>> = {}) => {
   try {
     const brokers = getKafkaBrokers()
 
@@ -39,7 +47,7 @@ const createStreamProducer = async ({ clientId = 'writer' }: Partial<KafkaStream
     await producer.connect()
     return producer
   } catch (err) {
-    logger.error(err)
+    StreamLogger.error(err)
   }
   return null
 }
@@ -50,11 +58,23 @@ const disconnectProducer = async (producer: Nullable<Producer>) => {
   }
 }
 
+/**
+ * Gets the key to partition on (e.g. a device_id) if partitionKey is set in the options.
+ * By default, this uses a hash of the key to determine what partition it should land on.
+ * If no partitionKey is specified in the options, none will be used.
+ */
+const getKey = <TMessage>(msg: TMessage, options?: Partial<KafkaStreamProducerOptions<TMessage>>) => {
+  const { partitionKey } = options ?? {}
+
+  return partitionKey ? { key: msg[partitionKey] } : {}
+}
+
 export const KafkaStreamProducer = <TMessage>(
   topic: string,
-  options?: Partial<KafkaStreamProducerOptions>
+  options?: Partial<KafkaStreamProducerOptions<TMessage>>
 ): StreamProducer<TMessage> => {
   let producer: Nullable<Producer> = null
+
   return {
     initialize: async () => {
       if (!producer) {
@@ -64,9 +84,8 @@ export const KafkaStreamProducer = <TMessage>(
     write: async (message: TMessage[] | TMessage) => {
       if (isDefined(producer)) {
         const messages = (isArray(message) ? message : [message]).map(msg => {
-          return { value: JSON.stringify(msg) }
+          return { value: JSON.stringify(msg), ...getKey(msg, options) }
         })
-
         await producer.send({
           topic,
           messages

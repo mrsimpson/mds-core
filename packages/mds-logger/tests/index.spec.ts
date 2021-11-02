@@ -14,51 +14,22 @@
  * limitations under the License.
  */
 
-import * as test from 'unit.js'
 import logger from '../index'
+import { logger as pinoLogger } from '../loggers'
+
+const QUIET = process.env.QUIET
 
 describe('MDS Logger', () => {
-  it('censors logs of lat and lng info for mds-logger.info', done => {
-    const toCensor = {
-      device_id: 'ec551174-f324-4251-bfed-28d9f3f473fc',
-      gps: {
-        lat: 1231.21,
-        lng: 1231.21,
-        speed: 0,
-        hdop: 1,
-        heading: 180
-      },
-      charge: 0.5,
-      timestamp: 1555384091559,
-      recorded: 1555384091836
-    }
-    const { log_data } = logger.info('some message', toCensor)
-    test.string(log_data.gps.lat).is('[REDACTED]')
-    test.string(log_data.gps.lng).is('[REDACTED]')
-    done()
+  beforeEach(() => {
+    process.env.QUIET = 'false'
   })
 
-  it('censors logs of lat and lng info for mds-logger.warn', done => {
-    const toCensor = {
-      device_id: 'ec551174-f324-4251-bfed-28d9f3f473fc',
-      gps: {
-        lat: 1231.21,
-        lng: 1231.21,
-        speed: 0,
-        hdop: 1,
-        heading: 180
-      },
-      charge: 0.5,
-      timestamp: 1555384091559,
-      recorded: 1555384091836
-    }
-    const { log_data } = logger.warn('some message', toCensor)
-    test.string(log_data.gps.lat).is('[REDACTED]')
-    test.string(log_data.gps.lng).is('[REDACTED]')
-    done()
+  afterEach(() => {
+    process.env.QUIET = QUIET
+    jest.clearAllMocks()
   })
 
-  it('censors logs of lat and lng info for mds-logger.error', done => {
+  it('censors logs of lat and lng info for mds-logger.info', () => {
     const toCensor = {
       device_id: 'ec551174-f324-4251-bfed-28d9f3f473fc',
       gps: {
@@ -73,61 +44,109 @@ describe('MDS Logger', () => {
       recorded: 1555384091836
     }
 
-    const { log_data } = logger.error('some message', toCensor)
-    test.string(log_data.gps.lat).is('[REDACTED]')
-    test.string(log_data.gps.lng).is('[REDACTED]')
-    done()
+    const info = jest.spyOn(pinoLogger, 'info').mockImplementation(() => {
+      return
+    })
+
+    logger.info('some message', toCensor)
+    expect(info).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
+        message: 'some message'
+      })
+    )
   })
 
-  it('verifies conversion of an error', done => {
+  it('censors logs of lat and lng info for mds-logger.warn', () => {
+    const toCensor = {
+      device_id: 'ec551174-f324-4251-bfed-28d9f3f473fc',
+      gps: {
+        lat: 1231.21,
+        lng: 1231.21,
+        speed: 0,
+        hdop: 1,
+        heading: 180
+      },
+      charge: 0.5,
+      timestamp: 1555384091559,
+      recorded: 1555384091836
+    }
+    const warn = jest.spyOn(pinoLogger, 'warn').mockImplementation(() => {
+      return
+    })
+
+    logger.warn('some message', toCensor)
+    expect(warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
+        message: 'some message'
+      })
+    )
+  })
+
+  it('censors logs of lat and lng info for mds-logger.error', () => {
+    const toCensor = {
+      device_id: 'ec551174-f324-4251-bfed-28d9f3f473fc',
+      gps: {
+        lat: 1231.21,
+        lng: 1231.21,
+        speed: 0,
+        hdop: 1,
+        heading: 180
+      },
+      charge: 0.5,
+      timestamp: 1555384091559,
+      recorded: 1555384091836
+    }
+
+    const error = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
+      return
+    })
+
+    logger.error('some message', toCensor)
+    expect(error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
+        message: 'some message'
+      })
+    )
+  })
+
+  it('verifies conversion of an error', () => {
     const err = new Error('puzzling evidence')
-    const {
-      log_message,
-      log_data: { error }
-    } = logger.info('ohai2', err)
-    test.string(log_message).is('ohai2')
-    test.string(error).contains('evidence')
-    done()
+    logger.info('ohai2', err)
+
+    const info = jest.spyOn(pinoLogger, 'info').mockImplementation(() => {
+      return
+    })
+
+    expect(info).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { error: expect.stringContaining('evidence') }, message: 'ohai2' })
+    )
   })
 
   it('verifies QUIET mode', () => {
-    process.env.QUIET = 'false'
-    const { log_data: log_data1 } = logger.log('error', 'some message', { key1: 'key1', key2: 'key2' })
-    test.value(Object.keys(log_data1).length).is(2)
+    const errorLoud = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
+      return
+    })
+    logger.log('error', 'some message', { key1: 'key1', key2: 'key2' })
+    expect(errorLoud).toHaveBeenCalled()
+
     process.env.QUIET = 'true'
-    const result = logger.log('error', 'some message', { key1: 'key1', key2: 'key2' })
-    test.value(Object.keys(result).length).is(0)
-    process.env.QUIET = 'false'
+    jest.clearAllMocks()
+    const errorQuiet = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
+      return
+    })
+    logger.log('error', 'some message', { key1: 'key1', key2: 'key2' })
+    expect(errorQuiet).not.toHaveBeenCalled()
   })
 
   it('can write a log with only a message, and no data', () => {
+    const info = jest.spyOn(pinoLogger, 'info').mockImplementation(() => {
+      return
+    })
+
     logger.info('some message')
-  })
-
-  it('can write out a reasonably deep object and retain proper format', () => {
-    /**
-     * NOTE: This test doesn't really _test_ anything, because unfortunately we can't listen to the console output trivially.
-     *       That being said, for any future engineers looking at this test...
-     *       Make sure that the output in the console doesn't contain `[Object]` instead of fully qualifying :)
-     */
-
-    // With default logger depth, this will be printed out as `{ a: 'a', b: { c: 'c', d: [Object] } }`. Not ideal, we want the full object.
-    const object = {
-      a: 'a',
-      b: {
-        c: 'c',
-        d: {
-          e: 'e',
-          f: {
-            g: 'g',
-            h: {
-              i: 'i'
-            }
-          }
-        }
-      }
-    }
-
-    logger.log('error', 'some message', object)
+    expect(info).toHaveBeenCalledWith(expect.objectContaining({ message: 'some message' }))
   })
 })

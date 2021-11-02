@@ -26,13 +26,22 @@ export const IngestServiceManager = RpcServer(
     onStop: IngestServiceProvider.stop
   },
   {
+    getDevicesUsingOptions: args => IngestServiceProvider.getDevicesUsingOptions(...args),
+    getDevicesUsingCursor: args => IngestServiceProvider.getDevicesUsingCursor(...args),
     getEventsUsingOptions: args => IngestServiceProvider.getEventsUsingOptions(...args),
     getEventsUsingCursor: args => IngestServiceProvider.getEventsUsingCursor(...args),
     getDevices: args => IngestServiceProvider.getDevices(...args),
+    getLatestTelemetryForDevices: args => IngestServiceProvider.getLatestTelemetryForDevices(...args),
+    writeEvents: args => IngestServiceProvider.writeEvents(...args),
     writeEventAnnotations: args => IngestServiceProvider.writeEventAnnotations(...args),
     writeMigratedDevice: args => IngestServiceProvider.writeMigratedDevice(...args),
     writeMigratedVehicleEvent: args => IngestServiceProvider.writeMigratedVehicleEvent(...args),
-    writeMigratedTelemetry: args => IngestServiceProvider.writeMigratedTelemetry(...args)
+    writeMigratedTelemetry: args => IngestServiceProvider.writeMigratedTelemetry(...args),
+    getTripEvents: args => IngestServiceProvider.getTripEvents(...args),
+    getEventsWithDeviceAndTelemetryInfoUsingOptions: args =>
+      IngestServiceProvider.getEventsWithDeviceAndTelemetryInfoUsingOptions(...args),
+    getEventsWithDeviceAndTelemetryInfoUsingCursor: args =>
+      IngestServiceProvider.getEventsWithDeviceAndTelemetryInfoUsingCursor(...args)
   },
   {
     port: process.env.INGEST_SERVICE_RPC_PORT,

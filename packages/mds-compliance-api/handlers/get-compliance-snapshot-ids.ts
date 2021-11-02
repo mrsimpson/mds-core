@@ -15,10 +15,10 @@
  */
 
 import { parseRequest } from '@mds-core/mds-api-helpers'
-import logger from '@mds-core/mds-logger'
 import { UUID } from '@mds-core/mds-types'
 import { isDefined, ServerError } from '@mds-core/mds-utils'
 import { ComplianceApiRequest, ComplianceApiResponse } from '../@types'
+import { ComplianceApiLogger } from '../logger'
 import { base64DecodeComplianceIDsToken } from './helpers'
 export type ComplianceApiGetComplianceSnapshotIDsRequest = ComplianceApiRequest
 
@@ -50,7 +50,7 @@ export const GetComplianceSnapshotIDsHandler = async (
     const { version } = res.locals
     return res.status(200).send({ version, data: base64DecodeComplianceIDsToken(compliance_ids_token) })
   } catch (error) {
-    logger.error(error)
+    ComplianceApiLogger.error(error)
     return res.status(500).send({ error: new ServerError() })
   }
 }

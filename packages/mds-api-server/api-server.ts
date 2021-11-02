@@ -15,11 +15,10 @@
  */
 
 import { JurisdictionsClaim, ProviderIdClaim, UserEmailClaim } from '@mds-core/mds-api-authorizer'
-import logger from '@mds-core/mds-logger'
 import { pathPrefix } from '@mds-core/mds-utils'
 import express from 'express'
-import HttpStatus from 'http-status-codes'
 import { HealthRequestHandler } from './handlers/health'
+import { ApiServerLogger } from './logger'
 import { AuthorizationMiddleware, AuthorizationMiddlewareOptions } from './middleware/authorization'
 import { CompressionMiddleware, CompressionMiddlewareOptions } from './middleware/compression'
 import { CorsMiddleware, CorsMiddlewareOptions } from './middleware/cors'
@@ -39,19 +38,19 @@ export interface ApiServerOptions {
   prometheus: PrometheusMiddlewareOptions
 }
 
-export const ApiServer = <T extends {} = {}>(
+export const ApiServer = (
   // The linter does not realize that the type variable is used.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  api: <G = T>(server: express.Express) => express.Express,
+  api: (server: express.Express) => express.Express,
   options: Partial<ApiServerOptions> = {},
   app: express.Express = express()
 ): express.Express => {
-  logger.info(`${serverVersion()} starting`)
+  ApiServerLogger.info(`${serverVersion()} starting`)
 
   // Log the custom authorization namespace/claims
   const claims = [ProviderIdClaim, UserEmailClaim, JurisdictionsClaim]
   claims.forEach(claim => {
-    logger.info(`${serverVersion()} using authorization claim ${claim()}`)
+    ApiServerLogger.info(`${serverVersion()} using authorization claim ${claim()}`)
   })
 
   // Disable x-powered-by header
@@ -73,9 +72,7 @@ export const ApiServer = <T extends {} = {}>(
      * Placed after the other middleware to avoid causing collisions
      * see express-http-context's README for more information
      */
-    ...RequestLoggingMiddleware(
-      options.requestLogging ?? { filters: [{ path: /\/health$/, level: HttpStatus.BAD_REQUEST }] }
-    )
+    ...RequestLoggingMiddleware(options.requestLogging ?? { excludePaths: [/\/health$/] })
   )
 
   // Health Route
@@ -84,5 +81,5 @@ export const ApiServer = <T extends {} = {}>(
   // Everything except /health will return a 503 when in maintenance mode
   app.use(MaintenanceModeMiddleware(options.maintenanceMode))
 
-  return api<T>(app)
+  return api(app)
 }

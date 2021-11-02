@@ -32,7 +32,7 @@ import { ApiServer } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
 import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
 import stream from '@mds-core/mds-stream'
-import { JUMP_TEST_DEVICE_1, makeDevices, makeEvents, makeTelemetry } from '@mds-core/mds-test-data'
+import { JUMP_TEST_DEVICE_1, makeDevices, makeEventsWithTelemetry, makeTelemetry } from '@mds-core/mds-test-data'
 import {
   Device,
   MICRO_MOBILITY_EVENT_STATES_MAP,
@@ -69,7 +69,6 @@ const DEVICE_UUID = 'ec551174-f324-4251-bfed-28d9f3f473fc'
 const TRIP_UUID = '1f981864-cc17-40cf-aea3-70fd985e2ea7'
 const TEST_TELEMETRY = {
   device_id: DEVICE_UUID,
-  provider_id: TEST1_PROVIDER_ID,
   gps: {
     lat: 37.3382,
     lng: -121.8863,
@@ -143,6 +142,7 @@ const test_event: Omit<VehicleEvent, 'recorded' | 'provider_id'> = {
   vehicle_state: 'removed',
   trip_state: null,
   timestamp: testTimestamp,
+  telemetry_timestamp: testTimestamp,
   telemetry: makeTelemetry([TEST_BICYCLE as any], testTimestamp)[0]
 }
 
@@ -158,6 +158,8 @@ function deepCopy<T>(obj: T): T {
 const AUTH = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}|${PROVIDER_SCOPES}`).toString('base64')}`
 const AUTH2 = `basic ${Buffer.from(`${TEST2_PROVIDER_ID}|${PROVIDER_SCOPES}`).toString('base64')}`
 const AUTH_NO_SCOPE = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}`).toString('base64')}`
+
+const SAN_FERNANDO_VALLEY = 'e3ed0a0e-61d3-4887-8b6a-4af4f3769c14'
 
 before(async () => {
   await Promise.all([db.reinitialize(), cache.reinitialize()])
@@ -412,6 +414,7 @@ describe('Tests API', () => {
         test.object(result.body).match((obj: Device) => obj.device_id === DEVICE_UUID)
         test.object(result.body).match((obj: Device) => obj.provider_id === TEST1_PROVIDER_ID)
         test.object(result.body).match((obj: Device) => obj.state === 'removed')
+        test.assert(!result.body.hasOwnProperty('migrated_from_source'))
         test.value(result).hasHeader('content-type', APP_JSON)
         done(err)
       })
@@ -572,17 +575,6 @@ describe('Tests API', () => {
     await cache.reset()
   })
 
-  it('refreshes the cache', done => {
-    request
-      .get(pathPrefix('/admin/cache/refresh'))
-      .set('Authorization', AUTH)
-      .expect(200)
-      .end((err, result) => {
-        test.string(result.body.result).contains('success')
-        done(err)
-      })
-  })
-
   it('shuts down the db to verify that it will come back up', async () => {
     await db.shutdown()
   })
@@ -713,6 +705,24 @@ describe('Tests API', () => {
         vehicle_state: 'available',
         telemetry: TEST_TELEMETRY,
         timestamp: 'hamster'
+      })
+      .expect(400)
+      .end((err, result) => {
+        // log('post event', result.body)
+        test.string(result.body.error).contains('bad')
+        test.string(result.body.error_description).contains('A validation error occurred.')
+        done(err)
+      })
+  })
+  it('verifies post event bad heading', done => {
+    request
+      .post(pathPrefix(`/vehicles/${DEVICE_UUID}/event`))
+      .set('Authorization', AUTH)
+      .send({
+        event_types: ['provider_drop_off'],
+        vehicle_state: 'available',
+        telemetry: { ...TEST_TELEMETRY, gps: { ...TEST_TELEMETRY.gps, heading: -1 } },
+        timestamp: testTimestamp
       })
       .expect(400)
       .end((err, result) => {
@@ -1508,53 +1518,12 @@ describe('Tests API', () => {
         done(err)
       })
   })
-
-  it('refreshes the cache', done => {
-    request
-      .get(pathPrefix('/admin/cache/refresh'))
-      .set('Authorization', AUTH)
-      .expect(200)
-      .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        done(err)
-      })
-  })
-  it('wipes a vehicle via admin', done => {
-    request
-      .get(pathPrefix(`/admin/wipe/${TEST_BICYCLE.device_id}`))
-      .set('Authorization', AUTH)
-      .expect(200)
-      .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        done(err)
-      })
-  })
-  it('wipes a vehicle via admin that has already been wiped', done => {
-    request
-      .get(pathPrefix(`/admin/wipe/${TEST_BICYCLE.device_id}`))
-      .set('Authorization', AUTH)
-      .expect(404)
-      .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        done(err)
-      })
-  })
-  it('fails to wipe a vehicle via admin', done => {
-    request
-      .get(pathPrefix('/admin/wipe/' + 'bogus'))
-      .set('Authorization', AUTH)
-      .expect(400)
-      .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        done(err)
-      })
-  })
 })
 
 describe('Tests pagination', async () => {
   before(async () => {
     const devices = makeDevices(100, now())
-    const events = makeEvents(devices, now())
+    const events = makeEventsWithTelemetry(devices, now(), SAN_FERNANDO_VALLEY)
     const seedData = { devices, events, telemetry: [] }
     await Promise.all([db.reinitialize(), cache.reinitialize()])
     await Promise.all([cache.seed(seedData), db.seed(seedData)])
@@ -1823,8 +1792,7 @@ describe('Tests TripMetadata', async () => {
         .send(subsetMetadata)
         .expect(400)
 
-      test.string(result.body.error.reason).is('invalid_value')
-      test.string(result.body.error.info.details).contains(`value.${key} is required`)
+      test.string(result.body.error.reason).is(` must have required property '${key}'`)
     })
   }
 })

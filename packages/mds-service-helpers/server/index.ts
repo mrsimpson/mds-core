@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { Nullable } from '@mds-core/mds-types'
 import {
+  BadParamsError,
   ConflictError,
+  DependencyMissingError,
   hours,
   minutes,
   NotFoundError,
@@ -27,6 +28,7 @@ import {
 } from '@mds-core/mds-utils'
 import retry, { Options as RetryOptions } from 'async-retry'
 import { ProcessController, ServiceErrorDescriptor, ServiceErrorType, ServiceResultType } from '../@types'
+import { ServiceHelpersLogger } from '../logger'
 
 type ProcessMonitorOptions = Partial<
   Omit<RetryOptions, 'onRetry'> & {
@@ -58,7 +60,7 @@ const ProcessMonitor = async (
   try {
     await retry(
       async () => {
-        logger.info(`Initializing process ${version}`)
+        ServiceHelpersLogger.info(`Initializing process ${version}`)
         await controller.start()
       },
       {
@@ -69,25 +71,25 @@ const ProcessMonitor = async (
         ...retryOptions,
         onRetry: (error, attempt) => {
           /* istanbul ignore next */
-          logger.error(
+          ServiceHelpersLogger.error(
             `Initializing process ${version} failed: ${error.message}, Retrying ${attempt} of ${retries}....`
           )
         }
       }
     )
   } catch (error) /* istanbul ignore next */ {
-    logger.error(`Initializing process ${version} failed: ${error.message}, Exiting...`)
+    ServiceHelpersLogger.error(`Initializing process ${version} failed: ${error.message}, Exiting...`)
     await controller.stop()
     process.exit(1)
   }
 
   // Keep NodeJS process alive
-  logger.info(`Monitoring process ${version} for ${signals.join(', ')}`)
+  ServiceHelpersLogger.info(`Monitoring process ${version} for ${signals.join(', ')}`)
   const timeout = setInterval(() => undefined, interval)
 
   const terminate = async (signal: NodeJS.Signals) => {
     clearInterval(timeout)
-    logger.info(`Terminating process ${version} on ${signal}`)
+    ServiceHelpersLogger.info(`Terminating process ${version} on ${signal}`)
     await controller.stop()
   }
 
@@ -156,8 +158,19 @@ export const ServiceException = (message: string, error?: unknown) => {
     return ServiceError({ type: 'ConflictError', message, details })
   }
 
+  /* istanbul ignore if */
   if (error instanceof UnsupportedTypeError) {
     return ServiceError({ type: 'UnsupportedTypeError', message, details })
+  }
+
+  /* istanbul ignore if */
+  if (error instanceof DependencyMissingError) {
+    return ServiceError({ type: 'DependencyMissingError', message, details })
+  }
+
+  /* istanbul ignore if */
+  if (error instanceof BadParamsError) {
+    return ServiceError({ type: 'BadParamsError', message, details })
   }
 
   return ServiceError({ type: 'ServiceException', message, details })

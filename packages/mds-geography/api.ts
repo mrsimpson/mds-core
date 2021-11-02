@@ -16,16 +16,15 @@
 
 import { AccessTokenScopeValidator, ApiRequest, ApiResponse, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import logger from '@mds-core/mds-logger'
 import { InsufficientPermissionsError, NotFoundError, pathPrefix, ServerError } from '@mds-core/mds-utils'
 import express, { NextFunction } from 'express'
+import { GeographyLogger } from './logger'
 import { GeographyApiVersionMiddleware } from './middleware'
 import {
   GeographyApiAccessTokenScopes,
   GeographyApiGetGeographiesRequest,
   GeographyApiGetGeographiesResponse,
-  GeographyApiGetGeographyRequest,
-  GeographyApiGetGeographyResponse
+  GeographyApiGetGeographyRequest
 } from './types'
 
 const checkGeographyApiAccess = (validator: AccessTokenScopeValidator<GeographyApiAccessTokenScopes>) =>
@@ -39,16 +38,20 @@ function api(app: express.Express): express.Express {
     checkGeographyApiAccess(scopes => {
       return scopes.includes('geographies:read:published') || scopes.includes('geographies:read:unpublished')
     }),
-    async (req: GeographyApiGetGeographyRequest, res: GeographyApiGetGeographyResponse, next: express.NextFunction) => {
+    async (
+      req: GeographyApiGetGeographyRequest,
+      res: GeographyApiGetGeographiesResponse,
+      next: express.NextFunction
+    ) => {
       const { geography_id } = req.params
       try {
         const geography = await db.readSingleGeography(geography_id)
         if (!geography.publish_date && !res.locals.scopes.includes('geographies:read:unpublished')) {
           throw new InsufficientPermissionsError('permission to read unpublished geographies missing')
         }
-        return res.status(200).send({ version: res.locals.version, data: { geography } })
+        return res.status(200).send({ version: res.locals.version, data: { geographies: [geography] } })
       } catch (error) {
-        logger.error('failed to read geography', error.stack)
+        GeographyLogger.error('failed to read geography', error.stack)
         if (error instanceof NotFoundError) {
           return res.status(404).send({ error })
         }
@@ -99,7 +102,7 @@ function api(app: express.Express): express.Express {
         if (error instanceof InsufficientPermissionsError) {
           return res.status(403).send({ error })
         }
-        logger.error('failed to read geographies', error.stack)
+        GeographyLogger.error('failed to read geographies', error.stack)
         return next(new ServerError(error))
       }
     }
@@ -110,7 +113,11 @@ function api(app: express.Express): express.Express {
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   app.use(async (error: Error, req: ApiRequest, res: ApiResponse, next: NextFunction) => {
     const { method, originalUrl } = req
-    logger.error('Fatal MDS Geography Error (global error handling middleware)', { method, originalUrl, error })
+    GeographyLogger.error('Fatal MDS Geography Error (global error handling middleware)', {
+      method,
+      originalUrl,
+      error
+    })
     return res.status(500).send({ error })
   })
 

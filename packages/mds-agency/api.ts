@@ -15,12 +15,12 @@
  */
 
 import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
-import logger from '@mds-core/mds-logger'
 import { isUUID, pathPrefix } from '@mds-core/mds-utils'
 import express from 'express'
 import { readAllVehicleIds } from './agency-candidate-request-handlers'
 import { createEventHandler } from './handlers/create-event'
 import { createTelemetryHandler } from './handlers/create-telemetry'
+import { AgencyLogger } from './logger'
 import { AgencyApiVersionMiddleware } from './middleware/agency-api-version'
 import {
   getVehicleById,
@@ -29,8 +29,8 @@ import {
   updateVehicle,
   writeTripMetadata
 } from './request-handlers'
-import { getCacheInfo, refreshCache, wipeDevice } from './sandbox-admin-request-handlers'
-import { AgencyApiAccessTokenScopes, AgencyApiRequest, AgencyApiResponse } from './types'
+import { getCacheInfo } from './sandbox-admin-request-handlers'
+import { AgencyApiAccessTokenScopes, AgencyApiRequest, AgencyApiResponse, AgencyServerError } from './types'
 import { validateDeviceId } from './utils'
 
 const checkAgencyApiAccess = (validator: AccessTokenScopeValidator<AgencyApiAccessTokenScopes>) =>
@@ -50,7 +50,7 @@ function api(app: express.Express): express.Express {
           const { provider_id } = res.locals.claims
 
           if (!isUUID(provider_id)) {
-            logger.warn('invalid provider_id is not a UUID', { provider_id, originalUrl: req.originalUrl })
+            AgencyLogger.warn('invalid provider_id is not a UUID', { provider_id, originalUrl: req.originalUrl })
             return res.status(400).send({
               error: 'authentication_error',
               error_description: `invalid provider_id ${provider_id} is not a UUID`
@@ -59,15 +59,14 @@ function api(app: express.Express): express.Express {
 
           // stash provider_id
           res.locals.provider_id = provider_id
-
-          // logger.info(providerName(provider_id), req.method, req.originalUrl)
         } else {
           return res.status(401).send({ error: 'authentication_error', error_description: 'Unauthorized' })
         }
       }
     } catch (error) {
       /* istanbul ignore next */
-      logger.error('request validation fail:', { originalUrl: req.originalUrl, error })
+      AgencyLogger.error('request claims parsing fail:', { originalUrl: req.originalUrl, error })
+      return res.status(500).send(AgencyServerError)
     }
     next()
   })
@@ -122,20 +121,6 @@ function api(app: express.Express): express.Express {
     pathPrefix('/admin/cache/info'),
     checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
     getCacheInfo
-  )
-
-  // wipe a device -- sandbox or admin use only
-  app.get(
-    pathPrefix('/admin/wipe/:device_id'),
-    checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
-    validateDeviceId,
-    wipeDevice
-  )
-
-  app.get(
-    pathPrefix('/admin/cache/refresh'),
-    checkAgencyApiAccess(scopes => scopes.includes('admin:all')),
-    refreshCache
   )
 
   /* Experimental Endpoint */

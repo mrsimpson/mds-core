@@ -43,7 +43,7 @@ import { GEOGRAPHY_AUTHOR_API_DEFAULT_VERSION } from '../types'
 
 const request = supertest(ApiServer(api))
 
-const APP_JSON = 'application/vnd.mds.geography-author+json; charset=utf-8; version=0.4'
+const APP_JSON = 'application/vnd.mds.geography-author+json; charset=utf-8; version=1.0'
 const EMPTY_SCOPE = SCOPED_AUTH([], '')
 const EVENTS_READ_SCOPE = SCOPED_AUTH(['events:read'])
 const GEOGRAPHIES_WRITE_SCOPE = SCOPED_AUTH(['geographies:write'])
@@ -513,7 +513,7 @@ describe('Tests app', () => {
         .expect(400)
         .end((err, result) => {
           test.assert(result.body.error.name === `ValidationError`)
-          test.assert(result.body.error.reason.includes('publish_date'))
+          test.assert(result.body.error.info[0].params.additionalProperty.includes('publish_date'))
           test.value(result).hasHeader('content-type', APP_JSON)
           done(err)
         })
@@ -533,7 +533,7 @@ describe('Tests app', () => {
         .expect(400)
         .end((err, result) => {
           test.assert(result.body.error.name === `ValidationError`)
-          test.assert(result.body.error.reason.includes('publish_date'))
+          test.assert(result.body.error.info[0].params.additionalProperty.includes('publish_date'))
           test.value(result).hasHeader('content-type', APP_JSON)
           done(err)
         })

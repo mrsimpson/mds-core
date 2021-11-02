@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+import stream from '@mds-core/mds-stream'
 import { uuid } from '@mds-core/mds-utils'
-import { TransactionDomainModel } from '../@types'
+import { ComplianceViolationDetailsDomainModel, TransactionDomainModel } from '../@types'
 import { TransactionServiceClient } from '../client'
 import { TransactionRepository } from '../repository'
 import { TransactionServiceManager } from '../service/manager'
+import { TransactionStreamKafka } from '../service/stream'
 import { transactionsGenerator } from '../test-fixtures'
 
 describe('Transaction Repository Tests', () => {
@@ -41,6 +43,8 @@ describe('Transaction Repository Tests', () => {
 
 const TransactionServer = TransactionServiceManager.controller()
 
+const mockStream = stream.mockStream(TransactionStreamKafka)
+
 describe('Transaction Service Tests', () => {
   beforeAll(async () => {
     await TransactionServer.start()
@@ -57,6 +61,10 @@ describe('Transaction Service Tests', () => {
     ])
   })
 
+  afterEach(async () => {
+    mockStream.write.mockReset()
+  })
+
   describe('Transaction Tests', () => {
     describe('Transaction Creation Tests', () => {
       describe('Success Tests', () => {
@@ -66,6 +74,25 @@ describe('Transaction Service Tests', () => {
           const recordedTransaction = await TransactionServiceClient.createTransaction(transactionToPersist)
           expect(recordedTransaction.device_id).toEqual(transactionToPersist.device_id)
           expect(recordedTransaction.transaction_id).toEqual(transactionToPersist.transaction_id)
+          expect(mockStream.write).toHaveBeenCalledTimes(1)
+          expect(mockStream.write).toHaveBeenCalledWith(recordedTransaction)
+        })
+
+        it('Create one good Compliance Violation transaction', async () => {
+          const [transactionToPersist] = transactionsGenerator(1, {
+            receipt_details: { violation_id: uuid(), trip_id: null }
+          })
+
+          const recordedTransaction = await TransactionServiceClient.createTransaction(transactionToPersist)
+          expect(recordedTransaction.device_id).toEqual(transactionToPersist.device_id)
+          expect(recordedTransaction.transaction_id).toEqual(transactionToPersist.transaction_id)
+          expect(
+            (recordedTransaction.receipt.receipt_details as ComplianceViolationDetailsDomainModel).violation_id
+          ).toEqual(
+            (transactionToPersist.receipt.receipt_details as ComplianceViolationDetailsDomainModel).violation_id
+          )
+          expect(mockStream.write).toHaveBeenCalledTimes(1)
+          expect(mockStream.write).toHaveBeenCalledWith(recordedTransaction)
         })
 
         it('Verifies good bulk-transaction creation', async () => {
@@ -77,6 +104,9 @@ describe('Transaction Service Tests', () => {
           })
 
           expect(recordedTransactions.length).toStrictEqual(transactionsToPersist.length)
+
+          expect(mockStream.write).toHaveBeenCalledTimes(1)
+          expect(mockStream.write).toHaveBeenCalledWith(recordedTransactions)
         })
       })
 
@@ -88,6 +118,7 @@ describe('Transaction Service Tests', () => {
           await expect(TransactionServiceClient.createTransaction(malformedTransaction)).rejects.toMatchObject({
             type: 'ValidationError'
           })
+          expect(mockStream.write).not.toHaveBeenCalled()
         })
 
         it('Create one transaction with missing fee_type rejects', async () => {
@@ -99,6 +130,7 @@ describe('Transaction Service Tests', () => {
           ).rejects.toMatchObject({
             type: 'ValidationError'
           })
+          expect(mockStream.write).not.toHaveBeenCalled()
         })
 
         it('Post Transaction duplicate transaction_id', async () => {
@@ -108,6 +140,34 @@ describe('Transaction Service Tests', () => {
 
           await expect(TransactionServiceClient.createTransaction(transaction)).rejects.toMatchObject({
             type: 'ConflictError'
+          })
+          expect(mockStream.write).toHaveBeenCalledTimes(1) // 1 - setup; 2 - re-insert; expect 1 not 2
+        })
+
+        it('Kafka failure reverts postgres create', async () => {
+          const [transaction] = transactionsGenerator(1)
+
+          mockStream.write.mockImplementationOnce(async () => {
+            throw new Error('Test failure')
+          })
+          await expect(TransactionServiceClient.createTransaction(transaction)).rejects.toMatchObject({
+            type: 'ServiceException'
+          })
+          await expect(TransactionServiceClient.getTransaction(transaction.transaction_id)).rejects.toMatchObject({
+            type: 'NotFoundError'
+          })
+        })
+        it('Kafka failure reverts bulk postgres create', async () => {
+          const transactions = [...transactionsGenerator(10)]
+
+          mockStream.write.mockImplementationOnce(async () => {
+            throw new Error('Test failure')
+          })
+          await expect(TransactionServiceClient.createTransactions(transactions)).rejects.toMatchObject({
+            type: 'ServiceException'
+          })
+          await expect(TransactionServiceClient.getTransaction(transactions[0].transaction_id)).rejects.toMatchObject({
+            type: 'NotFoundError'
           })
         })
       })
@@ -356,7 +416,13 @@ describe('Transaction Service Tests', () => {
           })
         })
 
-        it('Get All Transactions with bogus provider serach', async () => {
+        it('Verify that asking for missing transaction will fail', async () => {
+          const [transaction] = transactionsGenerator(1)
+          await expect(TransactionServiceClient.getTransaction(transaction.transaction_id)).rejects.toMatchObject({
+            type: 'NotFoundError'
+          })
+        })
+        it('Get All Transactions with bogus provider search', async () => {
           const { transactions } = await TransactionServiceClient.getTransactions({
             provider_id: uuid()
           })

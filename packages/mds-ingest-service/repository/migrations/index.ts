@@ -29,6 +29,14 @@ import { AddEventsProviderIdIdIndex1627315276644 } from './1627315276644-AddEven
 import { AddEventsVehicleStateIdIndex1627315357677 } from './1627315357677-AddEventsVehicleStateIdIndex'
 import { AddEventsRowIdColumn1627427307591 } from './1627427307591-AddEventsRowIdColumn'
 import { DropServiceAreaIdColumn1627680668538 } from './1627680668538-DropServiceAreaIdColumn'
+import { SetEventAnnotationsEventsRowIdColumnNotNull1630418242374 } from './1630418242374-SetEventAnnotationsEventsRowIdColumnNotNull'
+import { IncreaseMigratedFromSourceColumnLength1631275864436 } from './1631275864436-IncreaseMigratedFromSourceColumnLength'
+import { AddTelemetryTimestampIndex1632938124126 } from './1632938124126-AddTelemetryTimestampIndex'
+import { CreateTypeormMetadataTable1633181195937 } from './1633181195937-CreateTypeormMetadataTable'
+import { CreateEventsWithDeviceAndTelemetryInfoView1633182766754 } from './1633182766754-CreateEventsWithDeviceAndTelemetryInfoView'
+import { SetTelemetryTimestampNonNullable1633354341092 } from './1633354341092-SetTelemetryTimestampNonNullable'
+import { ChangeEventsWithDeviceAndTelemetryInfoToUseInnerJoin1634672590753 } from './1634672590753-ChangeEventsWithDeviceAndTelemetryInfoToUseInnerJoin'
+import { AddIndexToDeviceVehicleId1635174402366 } from './1635174402366-AddIndexToDeviceVehicleId'
 
 export default [
   CreateDevicesTable1603212409274,
@@ -45,5 +53,13 @@ export default [
   AddEventsProviderIdIdIndex1627315276644,
   AddEventsVehicleStateIdIndex1627315357677,
   AddEventsRowIdColumn1627427307591,
-  DropServiceAreaIdColumn1627680668538
+  DropServiceAreaIdColumn1627680668538,
+  SetEventAnnotationsEventsRowIdColumnNotNull1630418242374,
+  IncreaseMigratedFromSourceColumnLength1631275864436,
+  AddTelemetryTimestampIndex1632938124126,
+  CreateTypeormMetadataTable1633181195937,
+  CreateEventsWithDeviceAndTelemetryInfoView1633182766754,
+  SetTelemetryTimestampNonNullable1633354341092,
+  ChangeEventsWithDeviceAndTelemetryInfoToUseInnerJoin1634672590753,
+  AddIndexToDeviceVehicleId1635174402366
 ]

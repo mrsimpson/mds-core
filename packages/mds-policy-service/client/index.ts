@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcClient, RpcRequest } from '@mds-core/mds-rpc-common'
+import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { PolicyService, PolicyServiceDefinition } from '../@types'
 
@@ -24,6 +24,19 @@ const PolicyServiceRpcClient = RpcClient(PolicyServiceDefinition, {
 })
 
 // What the API layer, and any other clients, will invoke.
-export const PolicyServiceClient: ServiceClient<PolicyService> = {
-  name: (...args) => RpcRequest(PolicyServiceRpcClient.name, args)
-}
+export const PolicyServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<PolicyService> => ({
+  name: (...args) => RpcRequest(options, PolicyServiceRpcClient.name, args),
+  writePolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.writePolicy, args),
+  readPolicies: (...args) => RpcRequest(options, PolicyServiceRpcClient.readPolicies, args),
+  readActivePolicies: (...args) => RpcRequest(options, PolicyServiceRpcClient.readActivePolicies, args),
+  deletePolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.deletePolicy, args),
+  editPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.editPolicy, args),
+  publishPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.publishPolicy, args),
+  readBulkPolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.readBulkPolicyMetadata, args),
+  readPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.readPolicy, args),
+  readSinglePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.readSinglePolicyMetadata, args),
+  updatePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.updatePolicyMetadata, args),
+  writePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.writePolicyMetadata, args)
+})
+
+export const PolicyServiceClient = PolicyServiceClientFactory()

@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
-import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
-import { UUID } from '@mds-core/mds-types'
-import { isUUID, ValidationError } from '@mds-core/mds-utils'
+import {
+  IdentityColumn,
+  InsertReturning,
+  ReadWriteRepository,
+  RecordedColumn,
+  RepositoryError
+} from '@mds-core/mds-repository'
+import { Device, Nullable, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { head, isUUID, tail, testEnvSafeguard, ValidationError, zip } from '@mds-core/mds-utils'
 import { Any, SelectQueryBuilder } from 'typeorm'
 import { buildPaginator, Cursor, PagingResult } from 'typeorm-cursor-pagination'
 import {
@@ -26,9 +32,15 @@ import {
   EventAnnotationDomainModel,
   EventDomainCreateModel,
   EventDomainModel,
+  GetDevicesOptions,
+  GetDevicesResponse,
+  GetEventsWithDeviceAndTelemetryInfoOptions,
+  GetEventsWithDeviceAndTelemetryInfoResponse,
   GetVehicleEventsFilterParams,
   GetVehicleEventsOrderOption,
   GetVehicleEventsResponse,
+  MigratedEventDomainModel,
+  ReadTripEventsQueryParams,
   TelemetryDomainCreateModel,
   TelemetryDomainModel
 } from '../@types'
@@ -40,69 +52,100 @@ import { TelemetryEntity, TelemetryEntityModel } from './entities/telemetry-enti
 import {
   DeviceDomainToEntityCreate,
   DeviceEntityToDomain,
+  DeviceEntityToDomainWithIdentityColumn,
   EventAnnotationDomainToEntityCreate,
   EventAnnotationEntityToDomain,
   EventDomainToEntityCreate,
   EventEntityToDomain,
+  EventWithDeviceAndTelemetryInfoEntityToDomain,
+  MigratedDeviceToEntityCreate,
+  MigratedEventEntityToDomainWithIdentityColumn,
+  MigratedEventToEntityCreate,
+  MigratedTelemetryToEntityCreate,
   TelemetryDomainToEntityCreate,
-  TelemetryEntityToDomain
+  TelemetryEntityToDomain,
+  TelemetryEntityToDomainWithIdentityColumn
 } from './mappers'
 import migrations from './migrations'
 import { MigratedEntityModel } from './mixins/migrated-entity'
+import views from './views'
+import {
+  EventWithDeviceAndTelemetryInfoEntity,
+  EventWithDeviceAndTelemetryInfoEntityModel
+} from './views/event-with-device-and-telemetry-info'
 
-type VehicleEventsQueryParams = GetVehicleEventsFilterParams & Cursor
+type WithCursorOptions<P extends object> = P & Cursor
 
-/**
- * Aborts execution if not running under a test environment.
- */
-const testEnvSafeguard = () => {
-  if (process.env.NODE_ENV !== 'test') {
-    throw new Error(`This method is only supported when executing tests`)
+const base64encode = (data: string) => Buffer.from(data, 'utf-8').toString('base64')
+const base64decode = (data: string) => Buffer.from(data, 'base64').toString('utf-8')
+
+const buildCursor = <T extends {}>(options: WithCursorOptions<T>) => base64encode(JSON.stringify(options))
+
+const parseCursor = <T extends {}>(cursor: string): WithCursorOptions<T> => {
+  try {
+    return JSON.parse(base64decode(cursor))
+  } catch (error) {
+    throw new ValidationError('Invalid cursor', error)
   }
 }
+
 class IngestReadWriteRepository extends ReadWriteRepository {
   constructor() {
-    super('ingest', { entities, migrations })
+    super('ingest', { entities: [...entities, ...views], migrations })
   }
 
-  public createEvents = async (events: EventDomainCreateModel[]) => {
-    const { connect } = this
+  public createEvents = async (events: EventDomainCreateModel[]): Promise<EventDomainModel[]> => {
     try {
-      const connection = await connect('rw')
-      const { raw: entities }: InsertReturning<EventEntity> = await connection
+      const telemetryEntities = await this.createTelemetriesEntityReturning(events.map(({ telemetry }) => telemetry))
+
+      const connection = await this.connect('rw')
+      const { raw: eventEntities }: InsertReturning<EventEntity> = await connection
         .getRepository(EventEntity)
         .createQueryBuilder()
         .insert()
         .values(events.map(EventDomainToEntityCreate.mapper()))
         .returning('*')
         .execute()
-      return entities.map(EventEntityToDomain.map)
+
+      return zip(eventEntities, telemetryEntities, (event, telemetry) =>
+        EventEntityToDomain.map({
+          ...event,
+          telemetry
+        })
+      )
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
-  public createTelemetries = async (events: TelemetryDomainCreateModel[]) => {
-    const { connect } = this
+  private createTelemetriesEntityReturning = async (telemetries: TelemetryDomainCreateModel[]) => {
     try {
-      const connection = await connect('rw')
+      const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<TelemetryEntity> = await connection
         .getRepository(TelemetryEntity)
         .createQueryBuilder()
         .insert()
-        .values(events.map(TelemetryDomainToEntityCreate.mapper()))
+        .values(telemetries.map(TelemetryDomainToEntityCreate.mapper()))
         .returning('*')
         .execute()
-      return entities.map(TelemetryEntityToDomain.map)
+      return entities
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public createTelemetries = async (telemetries: TelemetryDomainCreateModel[]) => {
+    try {
+      const entities = await this.createTelemetriesEntityReturning(telemetries)
+      return entities.map(TelemetryEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
   public createDevices = async (events: DeviceDomainCreateModel[]) => {
-    const { connect } = this
     try {
-      const connection = await connect('rw')
+      const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<DeviceEntity> = await connection
         .getRepository(DeviceEntity)
         .createQueryBuilder()
@@ -110,7 +153,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .values(events.map(DeviceDomainToEntityCreate.mapper()))
         .returning('*')
         .execute()
-      return entities.map(DeviceEntityToDomain.map)
+      return entities.map(DeviceEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
@@ -119,9 +162,8 @@ class IngestReadWriteRepository extends ReadWriteRepository {
   public createEventAnnotations = async (
     eventAnnotations: EventAnnotationDomainCreateModel[]
   ): Promise<EventAnnotationDomainModel[]> => {
-    const { connect } = this
     try {
-      const connection = await connect('rw')
+      const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<EventAnnotationEntity> = await connection
         .getRepository(EventAnnotationEntity)
         .createQueryBuilder()
@@ -129,27 +171,78 @@ class IngestReadWriteRepository extends ReadWriteRepository {
         .values(eventAnnotations.map(EventAnnotationDomainToEntityCreate.mapper()))
         .returning('*')
         .execute()
-      return entities.map(EventAnnotationEntityToDomain.map)
+      return entities.map(EventAnnotationEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
-  public getDevices = async (ids: UUID[]): Promise<DeviceDomainModel[]> => {
+  public getDevices = async (device_ids: UUID[]): Promise<DeviceDomainModel[]> => {
     try {
       const connection = await this.connect('ro')
-      const entities = await connection.getRepository(DeviceEntity).find({ where: { device_id: Any(ids) } })
-      return entities.map(DeviceEntityToDomain.map)
+      const entities = await connection
+        .getRepository(DeviceEntity)
+        .find(device_ids ? { where: { device_id: Any(device_ids) } } : {})
+      return entities.map(DeviceEntityToDomain.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
-  private getEvents = async (params: VehicleEventsQueryParams): Promise<GetVehicleEventsResponse> => {
-    const { connect } = this
+  private getDevicesQuery = async ({
+    limit = 100,
+    beforeCursor,
+    afterCursor
+  }: WithCursorOptions<GetDevicesOptions>): Promise<GetDevicesResponse> => {
+    try {
+      const connection = await this.connect('ro')
+      const query = connection.createQueryBuilder(DeviceEntity, 'device')
+      const pager = buildPaginator({
+        entity: DeviceEntity,
+        alias: 'device',
+        paginationKeys: ['recorded', 'id'],
+        query: {
+          limit,
+          beforeCursor: beforeCursor ?? undefined,
+          afterCursor: afterCursor ?? undefined
+        }
+      })
+
+      const {
+        data,
+        cursor: { beforeCursor: nextBeforeCursor, afterCursor: nextAfterCursor }
+      } = await pager.paginate(query)
+
+      const cursor = { limit }
+
+      return {
+        devices: data.map(DeviceEntityToDomain.mapper()),
+        cursor: {
+          prev:
+            nextBeforeCursor &&
+            buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null }),
+          next:
+            nextAfterCursor &&
+            buildCursor<GetDevicesOptions>({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor })
+        }
+      }
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public getDevicesUsingOptions = async (options: GetDevicesOptions): Promise<GetDevicesResponse> =>
+    this.getDevicesQuery({ ...options, beforeCursor: null, afterCursor: null })
+
+  public getDevicesUsingCursor = async (cursor: string): Promise<GetDevicesResponse> =>
+    this.getDevicesQuery(parseCursor<GetDevicesOptions>(cursor))
+
+  private getEvents = async (
+    params: WithCursorOptions<GetVehicleEventsFilterParams>
+  ): Promise<GetVehicleEventsResponse> => {
     const {
       time_range,
-      // geography_ids,
+      geography_ids,
       grouping_type = 'latest_per_vehicle',
       event_types,
       vehicle_states,
@@ -164,16 +257,13 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       order
     } = params
 
-    const { start, end } = time_range
-
     try {
-      const connection = await connect('ro')
+      const connection = await this.connect('ro')
 
       const query = connection
         .getRepository(EventEntity)
         .createQueryBuilder('events')
         .innerJoin(qb => qb.from(DeviceEntity, 'd'), 'devices', 'devices.device_id = events.device_id')
-        .leftJoinAndSelect('events.annotation', 'annotation')
         .leftJoinAndMapOne(
           'events.telemetry',
           TelemetryEntity,
@@ -181,15 +271,23 @@ class IngestReadWriteRepository extends ReadWriteRepository {
           'telemetry.device_id = events.device_id AND telemetry.timestamp = events.telemetry_timestamp'
         )
 
+      if (geography_ids) {
+        query.innerJoin('events.annotation', 'annotation', 'annotation.geography_ids && :geography_ids', {
+          geography_ids
+        })
+      } else {
+        query.leftJoinAndSelect('events.annotation', 'annotation')
+      }
+
       if (grouping_type === 'latest_per_vehicle') {
         query.innerJoin(
           qb => {
-            return qb
+            const subquery = qb
               .select(
                 'device_id, id as event_id, RANK() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rownum'
               )
               .from(EventEntity, 'e')
-              .where('timestamp >= :start AND timestamp <= :end', { start, end })
+            return time_range ? subquery.where('timestamp >= :start AND timestamp <= :end', time_range) : subquery
           },
           'last_device_event',
           'last_device_event.event_id = events.id AND last_device_event.rownum = 1'
@@ -199,18 +297,18 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       if (grouping_type === 'latest_per_trip') {
         query.innerJoin(
           qb => {
-            return qb
+            const subquery = qb
               .select('trip_id, id as event_id, RANK() OVER (PARTITION BY trip_id ORDER BY timestamp DESC) AS rownum')
               .from(EventEntity, 'e')
-              .where('timestamp >= :start AND timestamp <= :end', { start, end })
+            return time_range ? subquery.where('timestamp >= :start AND timestamp <= :end', time_range) : subquery
           },
           'last_trip_event',
           'last_trip_event.event_id = events.id AND last_trip_event.rownum = 1'
         )
       }
 
-      if (grouping_type === 'all_events') {
-        query.andWhere('events.timestamp >= :start AND events.timestamp <= :end', { start, end })
+      if (grouping_type === 'all_events' && time_range) {
+        query.andWhere('events.timestamp >= :start AND events.timestamp <= :end', time_range)
       }
 
       if (event_types) {
@@ -234,7 +332,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       }
 
       if (vehicle_id) {
-        query.andWhere('devices.vehicle_id = :vehicle_id', { vehicle_id })
+        query.andWhere('lower(devices.vehicle_id) = :vehicle_id', { vehicle_id: vehicle_id.toLowerCase() })
       }
 
       if (provider_ids && provider_ids.every(isUUID)) {
@@ -248,7 +346,7 @@ class IngestReadWriteRepository extends ReadWriteRepository {
 
       const cursor = {
         time_range,
-        // geography_ids,
+        geography_ids,
         grouping_type,
         event_types,
         vehicle_states,
@@ -262,25 +360,26 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       }
 
       return {
-        events: data.map(EventEntityToDomain.map),
+        events: data.map(EventEntityToDomain.mapper()),
         cursor: {
-          next: nextAfterCursor && this.buildCursor({ ...cursor, beforeCursor: null, afterCursor: nextAfterCursor }),
-          prev: nextBeforeCursor && this.buildCursor({ ...cursor, beforeCursor: nextBeforeCursor, afterCursor: null })
+          prev:
+            nextBeforeCursor &&
+            buildCursor<GetVehicleEventsFilterParams>({
+              ...cursor,
+              beforeCursor: nextBeforeCursor,
+              afterCursor: null
+            }),
+          next:
+            nextAfterCursor &&
+            buildCursor<GetVehicleEventsFilterParams>({
+              ...cursor,
+              beforeCursor: null,
+              afterCursor: nextAfterCursor
+            })
         }
       }
     } catch (error) {
       throw RepositoryError(error)
-    }
-  }
-
-  private buildCursor = (cursor: VehicleEventsQueryParams) =>
-    Buffer.from(JSON.stringify(cursor), 'utf-8').toString('base64')
-
-  private parseCursor = (cursor: string): VehicleEventsQueryParams & { limit: number } => {
-    try {
-      return JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'))
-    } catch (error) {
-      throw new ValidationError('Invalid cursor', error)
     }
   }
 
@@ -351,67 +450,259 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     this.getEvents({ ...options, beforeCursor: null, afterCursor: null, limit: options.limit ?? 100 })
 
   public getEventsUsingCursor = async (cursor: string): Promise<GetVehicleEventsResponse> =>
-    this.getEvents(this.parseCursor(cursor))
+    this.getEvents(parseCursor<GetVehicleEventsFilterParams>(cursor))
+
+  public getTripEvents = async (params: ReadTripEventsQueryParams) => {
+    const { skip, take = 100, start_time, end_time, provider_id } = params
+    try {
+      const connection = await this.connect('rw')
+      const tripIdQuery = connection
+        .getRepository(EventEntity)
+        .createQueryBuilder()
+        .select('distinct trip_id')
+        .limit(take)
+
+      if (start_time) tripIdQuery.where('timestamp >= :start_time', { start_time })
+      if (end_time) tripIdQuery.andWhere('timestamp <= :end_time', { end_time })
+      if (provider_id) tripIdQuery.andWhere('provider_id = :provider_id', { provider_id })
+      if (skip) tripIdQuery.andWhere('trip_id > :skip', { skip })
+
+      const bigQuery = connection
+        .createQueryBuilder()
+        .select('et.trip_id, array_agg(row_to_json(et.*) ORDER BY et.timestamp) AS events')
+        .from(
+          qb =>
+            qb
+              .select('e.*, to_json(t.*) AS telemetry')
+              .from('events', 'e')
+              .innerJoin(
+                'telemetry',
+                't',
+                `e.device_id = t.device_id AND e.telemetry_timestamp = t.timestamp AND e.trip_id IN (${tripIdQuery.getQuery()})`
+              ),
+          'et'
+        )
+        .setParameters(tripIdQuery.getParameters())
+        .groupBy('et.trip_id')
+        .orderBy('et.trip_id')
+
+      const entities: { trip_id: UUID; events: EventEntity[] }[] = await bigQuery.execute()
+
+      return entities.reduce<Record<UUID, EventDomainModel[]>>((acc, { trip_id, events }) => {
+        const mappedEvents = events.map(EventEntityToDomain.map)
+        return Object.assign(acc, { [trip_id]: mappedEvents })
+      }, {})
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public getLatestTelemetryForDevices = async (device_ids: UUID[]): Promise<TelemetryDomainModel[]> => {
+    try {
+      const connection = await this.connect('ro')
+
+      /**
+       * Run the query within a transaction so we can safely disable bitmapscan
+       * https://github.com/typeorm/typeorm/blob/master/docs/transactions.md
+       */
+      const entities = await connection.transaction(async manager => {
+        await manager.query(`select set_config('enable_bitmapscan','off', true)`)
+        return await manager
+          .createQueryBuilder(TelemetryEntity, 'telemetry')
+          .distinctOn(['device_id'])
+          .orderBy('device_id', 'DESC')
+          .addOrderBy('timestamp', 'DESC')
+          .where('device_id = ANY (:device_ids)', { device_ids })
+          .getMany()
+      })
+
+      return entities.map(TelemetryEntityToDomain.mapper())
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
 
   public writeMigratedDevice = async (
-    devices: DeviceDomainCreateModel[],
+    devices: Array<Device & Required<RecordedColumn>>,
     migrated_from: MigratedEntityModel
-  ): Promise<DeviceDomainModel[]> => {
+  ): Promise<Array<DeviceDomainModel & IdentityColumn>> => {
     try {
       const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<DeviceEntityModel> = await connection
         .getRepository(DeviceEntity)
         .createQueryBuilder()
         .insert()
-        .values(devices.map(DeviceDomainToEntityCreate.mapper()))
-        .onConflict('DO NOTHING') /* May need DO UPDATE to support PUT vehicle_id */
+        .values(devices.map(MigratedDeviceToEntityCreate.mapper({ migrated_from })))
+        /* DO UPDATE to support PUT vehicle_id */
+        .onConflict(
+          '("device_id") DO UPDATE SET "vehicle_id" = EXCLUDED."vehicle_id" WHERE "devices"."vehicle_id" <> EXCLUDED."vehicle_id"'
+        )
         .returning('*')
         .execute()
-      return entities.map(DeviceEntityToDomain.mapper())
+      return entities.map(DeviceEntityToDomainWithIdentityColumn.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
-  public writeMigratedEvent = async (
-    events: EventDomainCreateModel[],
+  public writeMigratedVehicleEvent = async (
+    events: Array<Omit<VehicleEvent, 'telemetry'> & Required<RecordedColumn>>,
     migrated_from: MigratedEntityModel
-  ): Promise<EventDomainModel[]> => {
+  ): Promise<Array<MigratedEventDomainModel>> => {
     try {
       const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<EventEntityModel> = await connection
         .getRepository(EventEntity)
         .createQueryBuilder()
         .insert()
-        .values(events.map(EventDomainToEntityCreate.mapper()))
+        .values(events.map(MigratedEventToEntityCreate.mapper({ migrated_from })))
         .onConflict('DO NOTHING')
         .returning('*')
         .execute()
-      return entities.map(EventEntityToDomain.mapper())
+
+      return entities.map(MigratedEventEntityToDomainWithIdentityColumn.mapper())
     } catch (error) {
       throw RepositoryError(error)
     }
   }
 
-  public writeMigratedTelemetry = async (
-    telemetry: TelemetryDomainCreateModel[],
+  private writeMigratedTelemetryEntityReturning = async (
+    telemetry: Array<Telemetry & Required<RecordedColumn>>,
     migrated_from: MigratedEntityModel
-  ): Promise<TelemetryDomainModel[]> => {
+  ) => {
     try {
       const connection = await this.connect('rw')
       const { raw: entities }: InsertReturning<TelemetryEntityModel> = await connection
         .getRepository(TelemetryEntity)
         .createQueryBuilder()
         .insert()
-        .values(telemetry.map(TelemetryDomainToEntityCreate.mapper()))
+        .values(telemetry.map(MigratedTelemetryToEntityCreate.mapper({ migrated_from })))
         .onConflict('DO NOTHING')
         .returning('*')
         .execute()
-      return entities.map(TelemetryEntityToDomain.mapper())
+      return entities
     } catch (error) {
       throw RepositoryError(error)
     }
   }
+
+  public writeMigratedTelemetry = async (
+    telemetry: Array<Telemetry & Required<RecordedColumn>>,
+    migrated_from: MigratedEntityModel
+  ): Promise<Array<TelemetryDomainModel & IdentityColumn>> => {
+    try {
+      const entities = await this.writeMigratedTelemetryEntityReturning(telemetry, migrated_from)
+      return entities.map(TelemetryEntityToDomainWithIdentityColumn.mapper())
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  private getEventsWithDeviceAndTelemetryInfo = async ({
+    provider_ids,
+    device_ids,
+    time_range,
+    limit = 100,
+    follow = false,
+    ...cursor
+  }: WithCursorOptions<GetEventsWithDeviceAndTelemetryInfoOptions>): Promise<GetEventsWithDeviceAndTelemetryInfoResponse> => {
+    const paginationKeys: Array<keyof EventWithDeviceAndTelemetryInfoEntityModel> = ['id']
+
+    const buildPrevCursor = (
+      options: GetEventsWithDeviceAndTelemetryInfoOptions,
+      nextBeforeCursor: Nullable<string>,
+      entities: EventWithDeviceAndTelemetryInfoEntityModel[]
+    ) =>
+      nextBeforeCursor === null && options.follow && entities.length > 0
+        ? buildCursor<GetEventsWithDeviceAndTelemetryInfoOptions>({
+            ...options,
+            beforeCursor: base64encode(paginationKeys.map(key => `${key}:${head(entities)[key]}`).join(',')),
+            afterCursor: null
+          })
+        : nextBeforeCursor &&
+          buildCursor<GetEventsWithDeviceAndTelemetryInfoOptions>({
+            ...options,
+            beforeCursor: nextBeforeCursor,
+            afterCursor: null
+          })
+
+    const buildNextCursor = (
+      options: GetEventsWithDeviceAndTelemetryInfoOptions,
+      nextAfterCursor: Nullable<string>,
+      entities: EventWithDeviceAndTelemetryInfoEntityModel[]
+    ) =>
+      nextAfterCursor === null && options.follow && entities.length > 0
+        ? buildCursor<GetEventsWithDeviceAndTelemetryInfoOptions>({
+            ...options,
+            beforeCursor: null,
+            afterCursor: base64encode(paginationKeys.map(key => `${key}:${tail(entities)[key]}`).join(','))
+          })
+        : nextAfterCursor &&
+          buildCursor<GetEventsWithDeviceAndTelemetryInfoOptions>({
+            ...options,
+            beforeCursor: null,
+            afterCursor: nextAfterCursor
+          })
+
+    try {
+      const connection = await this.connect('ro')
+
+      const query = connection.getRepository(EventWithDeviceAndTelemetryInfoEntity).createQueryBuilder('events')
+
+      if (provider_ids?.length) {
+        query.andWhere('provider_id = ANY(:provider_ids)', { provider_ids })
+      }
+
+      if (device_ids?.length) {
+        query.andWhere('device_id = ANY(:device_ids)', { device_ids })
+      }
+
+      if (time_range?.start) {
+        query.andWhere('timestamp >= :start', time_range)
+      }
+
+      if (time_range?.end) {
+        query.andWhere('timestamp <= :end', time_range)
+      }
+
+      const {
+        data: entities,
+        cursor: { beforeCursor: nextBeforeCursor, afterCursor: nextAfterCursor }
+      } = await buildPaginator({
+        alias: query.alias,
+        entity: EventWithDeviceAndTelemetryInfoEntity,
+        query: {
+          limit,
+          order: 'ASC',
+          afterCursor: cursor.afterCursor ?? undefined,
+          beforeCursor: cursor.beforeCursor ?? undefined
+        },
+        paginationKeys
+      }).paginate(query)
+
+      const options = { limit, follow, time_range, provider_ids, device_ids }
+
+      return {
+        events: entities.map(EventWithDeviceAndTelemetryInfoEntityToDomain.mapper()),
+        cursor: {
+          prev: buildPrevCursor(options, nextBeforeCursor, entities),
+          next: buildNextCursor(options, nextAfterCursor, entities)
+        }
+      }
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public getEventsWithDeviceAndTelemetryInfoUsingOptions = async (
+    options: GetEventsWithDeviceAndTelemetryInfoOptions
+  ): Promise<GetEventsWithDeviceAndTelemetryInfoResponse> =>
+    this.getEventsWithDeviceAndTelemetryInfo({ ...options, beforeCursor: null, afterCursor: null })
+
+  public getEventsWithDeviceAndTelemetryInfoUsingCursor = async (
+    cursor: string
+  ): Promise<GetEventsWithDeviceAndTelemetryInfoResponse> =>
+    this.getEventsWithDeviceAndTelemetryInfo(parseCursor<GetEventsWithDeviceAndTelemetryInfoOptions>(cursor))
 
   /**
    * Nukes everything from orbit. Boom.

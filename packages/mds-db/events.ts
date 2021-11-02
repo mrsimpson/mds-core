@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
-import { Device, Recorded, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { isTimestamp, isUUID, now, seconds, yesterday } from '@mds-core/mds-utils'
-import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
+import { Recorded, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { isTimestamp, isUUID } from '@mds-core/mds-utils'
+import { getReadOnlyClient, getWriteableClient } from './client'
 import { readDevice } from './devices'
+import { DbLogger } from './logger'
 import schema from './schema'
 import { cols_sql, logSql, SqlExecuter, SqlVals, vals_list, vals_sql } from './sql-utils'
-import { ReadEventsQueryParams, ReadEventsResult, ReadHistoricalEventsQueryParams } from './types'
+import { ReadEventsQueryParams, ReadEventsResult } from './types'
 
 export async function writeEvent(event: VehicleEvent) {
   const client = await getWriteableClient()
@@ -56,7 +56,7 @@ export async function readEvent(device_id: UUID, timestamp?: Timestamp): Promise
   if (res.rows.length === 1) {
     return res.rows[0]
   }
-  logger.info(`readEvent failed for ${device_id}:${timestamp || 'latest'}`)
+  DbLogger.warn(`readEvent failed for ${device_id}:${timestamp || 'latest'}`)
   throw new Error(`event for ${device_id}:${timestamp} not found`)
 }
 
@@ -183,122 +183,6 @@ export async function readTripEvents(params: ReadEventsQueryParams): Promise<Tri
   }
 }
 
-export async function readHistoricalEvents(params: ReadHistoricalEventsQueryParams): Promise<VehicleEvent[]> {
-  const { provider_id: query_provider_id, end_date } = params
-  const client = await getReadOnlyClient()
-  const vals = new SqlVals()
-  const values = vals.values()
-  let sql = `SELECT      e2.provider_id,
-  e2.device_id,
-  e2.event_type,
-  e2.timestamp,
-  lat,
-  lng,
-  speed,
-  heading,
-  accuracy,
-  altitude,
-  recorded
-FROM
-(
-SELECT      provider_id,
-      device_id,
-      event_type,
-      timestamp
-FROM
-(
-SELECT      provider_id,
-          device_id,
-          event_type,
-          timestamp,
-          recorded,
-          RANK() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rownum
-FROM        events
-WHERE         timestamp < '${end_date}'`
-  if (query_provider_id) {
-    sql += `\nAND         provider_id = '${query_provider_id}'`
-  }
-  sql += `) e1
-  WHERE       rownum = 1
-  AND         event_type IN ('trip_enter',
-                       'trip_start',
-                       'trip_end',
-                       'reserve',
-                       'cancel_reservation',
-                       'provider_drop_off',
-                       'service_end',
-                       'service_start')
-  ) e2
-  INNER JOIN  telemetry
-  ON          e2.device_id = telemetry.device_id
-  AND         e2.timestamp = telemetry.timestamp
-  ORDER BY    provider_id,
-    device_id,
-    event_type`
-
-  const { rows } = await client.query(sql, values)
-  const events = rows.reduce((acc: VehicleEvent[], row) => {
-    const { provider_id, device_id, event_type, timestamp, recorded, lat, lng, speed, heading, accuracy, altitude } =
-      row
-    return [
-      ...acc,
-      {
-        provider_id,
-        device_id,
-        event_type,
-        timestamp,
-        recorded,
-        telemetry: {
-          provider_id,
-          device_id,
-          timestamp,
-          gps: {
-            lat,
-            lng,
-            speed,
-            heading,
-            accuracy,
-            altitude
-          }
-        }
-      }
-    ]
-  }, [])
-  return events
-}
-
-export async function getEventCountsPerProviderSince(
-  start = yesterday(),
-  stop = now()
-): Promise<{ provider_id: UUID; event_type: string; count: number; slacount: number }[]> {
-  const thirty_sec = seconds(30)
-  const vals = new SqlVals()
-  const sql = `select provider_id, event_type, count(*), count(case when (recorded-timestamp) > ${vals.add(
-    thirty_sec
-  )} then 1 else null end) as slacount from events where recorded > ${vals.add(start)} and recorded < ${vals.add(
-    stop
-  )} group by provider_id, event_type`
-  return makeReadOnlyQuery(sql, vals)
-}
-
-export async function getEventsLast24HoursPerProvider(start = yesterday(), stop = now()): Promise<VehicleEvent[]> {
-  const vals = new SqlVals()
-  const sql = `select provider_id, device_id, event_type, recorded, timestamp from ${
-    schema.TABLE.events
-  } where recorded > ${vals.add(start)} and recorded < ${vals.add(stop)} order by "timestamp" ASC`
-  return makeReadOnlyQuery(sql, vals)
-}
-
-export async function getNumEventsLast24HoursByProvider(
-  start = yesterday(),
-  stop = now()
-): Promise<{ provider_id: UUID; count: number }[]> {
-  const vals = new SqlVals()
-  const sql = `select provider_id, count(*) from ${schema.TABLE.events} where recorded > ${vals.add(
-    start
-  )} and recorded < ${vals.add(stop)} group by provider_id`
-  return makeReadOnlyQuery(sql, vals)
-}
 export async function readEventsWithTelemetry({
   device_id,
   provider_id,
@@ -376,96 +260,4 @@ export async function readEventsWithTelemetry({
         }
       : null
   }))
-}
-
-// TODO: remove
-// heinous copypasta specifically to provide the VIN with every event, used ONLY by Native.
-// this is to be excised when we dump Native in the garbage in the 1.0 timeframe.
-export async function readEventsWithTelemetryAndVehicleId({
-  device_id,
-  provider_id,
-  start_time,
-  end_time,
-  order_by = 'id',
-  last_id = 0,
-  limit = 1000
-}: Partial<{
-  device_id: UUID
-  provider_id: UUID
-  start_time: Timestamp
-  end_time: Timestamp
-  order_by: string
-  last_id: number
-  limit: number
-}>): Promise<Recorded<VehicleEvent & Pick<Device, 'vehicle_id'>>[]> {
-  const client = await getReadOnlyClient()
-  const vals = new SqlVals()
-  const exec = SqlExecuter(client)
-
-  const conditions: string[] = last_id ? [`id > ${vals.add(last_id)}`] : []
-
-  if (provider_id) {
-    if (!isUUID(provider_id)) {
-      throw new Error(`invalid provider_id ${provider_id}`)
-    } else {
-      conditions.push(`provider_id = ${vals.add(provider_id)}`)
-    }
-  }
-
-  if (device_id) {
-    if (!isUUID(device_id)) {
-      throw new Error(`invalid device_id ${device_id}`)
-    } else {
-      conditions.push(`device_id = ${vals.add(device_id)}`)
-    }
-  }
-
-  if (start_time !== undefined) {
-    if (!isTimestamp(start_time)) {
-      throw new Error(`invalid start_time ${start_time}`)
-    } else {
-      conditions.push(`timestamp >= ${vals.add(start_time)}`)
-    }
-  }
-
-  if (end_time !== undefined) {
-    if (!isTimestamp(end_time)) {
-      throw new Error(`invalid end_time ${end_time}`)
-    } else {
-      conditions.push(`timestamp <= ${vals.add(end_time)}`)
-    }
-  }
-
-  // we can only select based on event criteria
-  const where = conditions.length ? ` WHERE ${conditions.join(' AND ')}` : ''
-
-  const { rows } = await exec(
-    `SELECT E.*, D.vehicle_id, T.lat, T.lng, T.speed, T.heading, T.accuracy, T.altitude, T.charge, T.timestamp AS telemetry_timestamp
-      FROM (SELECT * FROM ${schema.TABLE.events}${where} ORDER BY ${order_by} LIMIT ${vals.add(limit)}) AS E
-    LEFT JOIN ${schema.TABLE.devices} D ON E.device_id = D.device_id
-    LEFT JOIN ${schema.TABLE.telemetry} T ON E.device_id = T.device_id
-      AND CASE WHEN E.telemetry_timestamp IS NULL THEN E.timestamp ELSE E.telemetry_timestamp END = T.timestamp
-    ORDER BY ${order_by}`,
-    vals.values()
-  )
-
-  return rows.map(
-    ({ vehicle_id, lat, lng, speed, heading, accuracy, altitude, charge, telemetry_timestamp, ...event }) => ({
-      ...event,
-      vehicle_id,
-      telemetry: telemetry_timestamp
-        ? {
-            timestamp: telemetry_timestamp,
-            gps: { lat, lng, speed, heading, accuracy, altitude },
-            charge
-          }
-        : null
-    })
-  )
-}
-
-// TODO way too slow to be useful -- move into mds-agency-cache
-export async function getMostRecentEventByProvider(): Promise<{ provider_id: UUID; max: number }[]> {
-  const sql = `select provider_id, max(recorded) from ${schema.TABLE.events} group by provider_id`
-  return makeReadOnlyQuery(sql)
 }

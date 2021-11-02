@@ -16,8 +16,6 @@
 
 import { AccessTokenScopeValidator, ApiRequest, ApiResponse, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import logger from '@mds-core/mds-logger'
-import { geographyValidationDetails } from '@mds-core/mds-schema-validators'
 import {
   AlreadyPublishedError,
   BadParamsError,
@@ -30,6 +28,7 @@ import {
   ValidationError
 } from '@mds-core/mds-utils'
 import express, { NextFunction } from 'express'
+import { GeographyAuthorLogger } from './logger'
 import { GeographyAuthorApiVersionMiddleware } from './middleware'
 import {
   GeographyAuthorApiAccessTokenScopes,
@@ -48,6 +47,7 @@ import {
   GeographyAuthorApiPutGeographyRequest,
   GeographyAuthorApiPutGeographyResponse
 } from './types'
+import { validateGeographyDetails } from './validators'
 
 const checkGeographyAuthorApiAccess = (validator: AccessTokenScopeValidator<GeographyAuthorApiAccessTokenScopes>) =>
   checkAccess(validator)
@@ -99,7 +99,7 @@ function api(app: express.Express): express.Express {
         const geography_metadata = await db.readBulkGeographyMetadata(params)
         return res.status(200).send({ version: res.locals.version, data: { geography_metadata } })
       } catch (error) {
-        logger.error('failed to read geography metadata', error)
+        GeographyAuthorLogger.warn('failed to read geography metadata', error)
         /* This error is thrown if both get_published and get_unpublished are set.
          * To get all geos, neither parameter should be set.
          */
@@ -125,15 +125,10 @@ function api(app: express.Express): express.Express {
       const geography = req.body
 
       try {
-        const details = geographyValidationDetails(geography)
-        if (details) {
-          throw new ValidationError(JSON.stringify(details))
-        }
-
-        const recorded_geography = await db.writeGeography(geography)
+        const recorded_geography = await db.writeGeography(validateGeographyDetails(geography))
         return res.status(201).send({ version: res.locals.version, data: { geography: recorded_geography } })
       } catch (error) {
-        logger.error('POST /geographies failed', error.stack)
+        GeographyAuthorLogger.warn('POST /geographies failed', error.stack)
         if (error instanceof ConflictError) {
           return res.status(409).send({ error })
         }
@@ -157,14 +152,10 @@ function api(app: express.Express): express.Express {
     ) => {
       const geography = req.body
       try {
-        const details = geographyValidationDetails(geography)
-        if (details) {
-          throw new ValidationError(JSON.stringify(details))
-        }
-        await db.editGeography(geography)
+        await db.editGeography(validateGeographyDetails(geography))
         return res.status(201).send({ version: res.locals.version, data: { geography } })
       } catch (error) {
-        logger.error('failed to edit geography', error.stack)
+        GeographyAuthorLogger.warn('failed to edit geography', error.stack)
         if (error instanceof NotFoundError) {
           return res.status(404).send({ error })
         }
@@ -197,7 +188,7 @@ function api(app: express.Express): express.Express {
            * seems wrong to throw an error for deleting metadata when this endpoint is mainly
            * about deleting geographies.
            */
-          logger.info(`Unable to delete nonexistent metadata for ${geography_id}`)
+          GeographyAuthorLogger.debug(`Unable to delete nonexistent metadata for ${geography_id}`)
         }
         await db.deleteGeography(geography_id)
         return res.status(200).send({
@@ -205,7 +196,7 @@ function api(app: express.Express): express.Express {
           data: { geography_id }
         })
       } catch (err) {
-        logger.error('failed to delete geography', err.stack)
+        GeographyAuthorLogger.warn('failed to delete geography', err.stack)
         if (err instanceof NotFoundError) {
           return res.status(404).send({ error: err })
         }
@@ -236,7 +227,7 @@ function api(app: express.Express): express.Express {
         }
         return res.status(200).send({ version: res.locals.version, data: { geography_metadata } })
       } catch (err) {
-        logger.error('failed to read geography metadata', err.stack)
+        GeographyAuthorLogger.warn('failed to read geography metadata', err.stack)
         if (err instanceof NotFoundError) {
           return res.status(404).send({ error: err })
         }
@@ -266,7 +257,7 @@ function api(app: express.Express): express.Express {
             await db.writeGeographyMetadata(geography_metadata)
             return res.status(201).send({ version: res.locals.version, data: { geography_metadata } })
           } catch (writeErr) {
-            logger.error('failed to write geography metadata', writeErr.stack)
+            GeographyAuthorLogger.warn('failed to write geography metadata', writeErr.stack)
             if (writeErr instanceof DependencyMissingError) {
               return res.status(404).send({ error: writeErr })
             }
@@ -303,7 +294,7 @@ function api(app: express.Express): express.Express {
 
   app.use(async (error: Error, req: ApiRequest, res: ApiResponse, next: NextFunction) => {
     const { method, originalUrl } = req
-    logger.error('Fatal MDS Geography Author Error (global error handling middleware)', {
+    GeographyAuthorLogger.error('Fatal MDS Geography Author Error (global error handling middleware)', {
       method,
       originalUrl,
       error

@@ -17,10 +17,12 @@
 import { SchemaObject, SchemaValidator } from '@mds-core/mds-schema-validators'
 import { UUID } from '@mds-core/mds-types'
 import {
+  ComplianceViolationDetailsDomainModel,
   FEE_TYPE,
   ReceiptDomainModel,
   TransactionDomainModel,
   TransactionOperationDomainModel,
+  TransactionSearchParams,
   TransactionStatusDomainModel,
   TRANSACTION_OPERATION_TYPE,
   TRANSACTION_STATUS_TYPE
@@ -75,6 +77,36 @@ const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99
 //   required: ['duration', 'end_timestamp', 'geography_id', 'start_timestamp', 'trip_events', 'trip_id', 'vehicle_type']
 // })
 
+export const { validate: validateTransactionSearchParams } = SchemaValidator<TransactionSearchParams>(
+  {
+    $id: 'TransactionSearchParams',
+    type: 'object',
+    properties: {
+      provider_id: { ...uuidSchema, nullable: true, default: null },
+      start_timestamp: { type: 'number', nullable: true, default: null },
+      end_timestamp: { type: 'number', nullable: true, default: null },
+      search_text: { type: 'string', nullable: true, default: null },
+      start_amount: { type: 'number', nullable: true, default: null },
+      end_amount: { type: 'number', nullable: true, default: null },
+      fee_type: { type: 'string', enum: [...FEE_TYPE, null], nullable: true, default: null },
+      before: { type: 'string', nullable: true, default: null },
+      after: { type: 'string', nullable: true, default: null },
+      limit: { type: 'integer', minimum: 1, maximum: 1000, default: 10 }
+    }
+  },
+  { useDefaults: true }
+)
+
+const { $schema: complianceViolationDetailsSchema } = SchemaValidator<ComplianceViolationDetailsDomainModel>({
+  type: 'object',
+  description: 'Receipt details which provide a pointer to an MDS Compliance Violation.',
+  properties: {
+    violation_id: uuidSchema,
+    trip_id: { ...uuidSchema, nullable: true, default: null }
+  },
+  required: ['violation_id']
+})
+
 const {
   $schema: { $schema, ...receiptSchema }
 } = SchemaValidator<ReceiptDomainModel>(
@@ -91,7 +123,7 @@ const {
       },
       receipt_details: {
         description: 'Free-form object which describes the details of this transaction. Highly use-case dependent.',
-        type: 'object'
+        anyOf: [complianceViolationDetailsSchema, { type: 'object' }]
       }
     },
     required: ['origin_url', 'receipt_details', 'receipt_id', 'timestamp']

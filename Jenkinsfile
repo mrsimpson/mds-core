@@ -8,14 +8,22 @@ void setBuildStatus(String message, String state) {
   ]);
 }
 
+def buildNumber = env.BUILD_NUMBER as int
+if (buildNumber > 1) milestone(buildNumber - 1)
+milestone(buildNumber)
+
 pipeline {
 
   agent any
 
+  options {
+    timeout(time: 1, unit: 'HOURS') // If build hangs for an hour, kill it with a 🔫
+  }
+
   stages {
     stage('Build') {
       steps {
-        nvm('version': 'v15.11.0') {
+        nvm('version': 'v16.11.1') {
           sh '''
           pnpm clean
           pnpm lint
@@ -29,7 +37,7 @@ pipeline {
         NODE_OPTIONS = '--max_old_space_size=4096'  // fixes nodejs out-of-memory errors such as "Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory"
       }
       steps {
-        nvm('version': 'v15.11.0') {
+        nvm('version': 'v16.11.1') {
           sh '''
             # Fetch develop so we can only test the diff
             git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
@@ -50,6 +58,7 @@ pipeline {
             export REDIS_PORT=$(randport)
             export PORT=$(randport)
             export RPC_PORT=$(randport)
+            export REPL_PORT=$(randport)
             source env.jenkins
 
             export PG_ID=$(docker run -d -e POSTGRES_HOST_AUTH_METHOD=trust -p $PG_PORT:5432 postgres:11-alpine)

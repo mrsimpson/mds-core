@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import logger from '@mds-core/mds-logger'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
-import { GeographyService } from '../@types'
+import { GeographyDomainModel, GeographyService } from '../@types'
+import { GeographyServiceLogger } from '../logger'
 import { GeographyRepository } from '../repository'
 import {
   validateGeographyDomainCreateModel,
   validateGeographyMetadataDomainCreateModel,
   validateGetGeographiesOptions,
-  validateGetPublishedGeographiesOptions
+  validateGetPublishedGeographiesOptions,
+  validateUuids
 } from './validators'
 
 export const GeographyServiceProvider: ServiceProvider<GeographyService> & ProcessController = {
@@ -35,7 +36,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
       return ServiceResult(geographies)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting Geographies', error)
-      logger.error('mds-geography-service::getGeographies error', { exception, error })
+      GeographyServiceLogger.error('getGeographies error', { exception, error })
       return exception
     }
   },
@@ -48,7 +49,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
       return ServiceResult(geographies)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting Unpublished Geographies', error)
-      logger.error('mds-geography-service::getUnpublishedGeographies error', { exception, error })
+      GeographyServiceLogger.error('getUnpublishedGeographies error', { exception, error })
       return exception
     }
   },
@@ -61,7 +62,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
       return ServiceResult(geographies)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting Published Geographies', error)
-      logger.error('mds-geography-service::getPublishedGeographies error', { exception, error })
+      GeographyServiceLogger.error('getPublishedGeographies error', { exception, error })
       return exception
     }
   },
@@ -75,7 +76,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
       return ServiceResult(geography)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting Geography', error)
-      logger.error('mds-geography-service::getGeography error', { exception, error })
+      GeographyServiceLogger.error('getGeography error', { exception, error })
       return exception
     }
   },
@@ -86,7 +87,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
       return ServiceResult(geographies)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Writing Geographies', error)
-      logger.error('mds-geography-service::writeGeographies error', { exception, error })
+      GeographyServiceLogger.error('writeGeographies error', { exception, error })
       return exception
     }
   },
@@ -99,7 +100,30 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
       return ServiceResult(metadata)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Writing Geographies Metadata', error)
-      logger.error('mds-geography-service::writeGeographiesMetadata error', { exception, error })
+      GeographyServiceLogger.error('writeGeographiesMetadata error', { exception, error })
+      return exception
+    }
+  },
+
+  getGeographiesByIds: async geography_ids => {
+    try {
+      const geographies = await GeographyRepository.getGeographiesByIds(validateUuids(geography_ids))
+
+      const geographyMap = geographies.reduce<{ [k: string]: GeographyDomainModel | undefined }>((acc, geography) => {
+        acc[geography.geography_id] = geography
+        return acc
+      }, {})
+
+      // For any geography_ids which were missing in the DB, set to null in result
+      const result = geography_ids.map(geography_id => {
+        const geography = geographyMap[geography_id]
+        return geography ? geography : null
+      })
+
+      return ServiceResult(result)
+    } catch (error) /* istanbul ignore next */ {
+      const exception = ServiceException('Error Getting Geographies', error)
+      GeographyServiceLogger.error('getGeographiesByIds error', { exception, error })
       return exception
     }
   }

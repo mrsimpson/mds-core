@@ -18,13 +18,21 @@ import cache from '@mds-core/mds-agency-cache'
 import { parseRequest } from '@mds-core/mds-api-helpers'
 import db from '@mds-core/mds-db'
 import { validateDeviceDomainModel } from '@mds-core/mds-ingest-service'
-import logger from '@mds-core/mds-logger'
 import { providerName } from '@mds-core/mds-providers'
-import { validateTripMetadata } from '@mds-core/mds-schema-validators'
+import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import stream from '@mds-core/mds-stream'
-import { UUID, VEHICLE_STATE } from '@mds-core/mds-types'
+import {
+  ACCESSIBILITY_OPTIONS,
+  PAYMENT_METHODS,
+  RESERVATION_METHODS,
+  RESERVATION_TYPES,
+  TripMetadata,
+  UUID,
+  VEHICLE_STATE
+} from '@mds-core/mds-types'
 import { now, ServerError, ValidationError } from '@mds-core/mds-utils'
 import urls from 'url'
+import { AgencyLogger } from './logger'
 import {
   AgencyAipGetVehicleByIdResponse,
   AgencyApiGetVehicleByIdRequest,
@@ -85,12 +93,11 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     // DB Write is critical, and failures to write to the cache/stream should be considered non-critical (though they are likely indicative of a bug).
     await db.writeDevice(device)
     try {
-      await Promise.all([cache.writeDevice(device), stream.writeDevice(device)])
+      await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
     } catch (error) {
-      logger.error('failed to write device stream/cache', error)
+      AgencyLogger.error('failed to write device stream/cache', error)
     }
 
-    logger.info('new vehicle added', { providerName: providerName(res.locals.provider_id), device })
     return res.status(201).send({})
   } catch (error) {
     if (error instanceof ValidationError) {
@@ -105,7 +112,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
       })
     }
 
-    logger.error('register vehicle failed:', { err: error, providerName: providerName(res.locals.provider_id) })
+    AgencyLogger.error('register vehicle failed:', { err: error, providerName: providerName(res.locals.provider_id) })
     return res.status(500).send(AgencyServerError)
   }
 }
@@ -150,7 +157,7 @@ export const getVehiclesByProvider = async (
     const response = await getVehicles(skip, take, url, req.query, provider_id)
     return res.status(200).send({ ...response })
   } catch (err) {
-    logger.error('getVehicles fail', err)
+    AgencyLogger.error('getVehicles fail', err)
     return res.status(500).send(AgencyServerError)
   }
 }
@@ -172,7 +179,11 @@ export async function updateVehicleFail(
   } else if (!provider_id) {
     res.status(404).send({})
   } else {
-    logger.error(`fail PUT /vehicles/${device_id}`, { providerName: providerName(provider_id), body: req.body, error })
+    AgencyLogger.error(`fail PUT /vehicles/${device_id}`, {
+      providerName: providerName(provider_id),
+      body: req.body,
+      error
+    })
     res.status(500).send(AgencyServerError)
   }
 }
@@ -196,9 +207,9 @@ export const updateVehicle = async (req: AgencyApiUpdateVehicleRequest, res: Age
       const device = await db.updateDevice(device_id, provider_id, update)
       // TODO should we warn instead of fail if the cache/stream doesn't work?
       try {
-        await Promise.all([cache.writeDevice(device), stream.writeDevice(device)])
+        await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
       } catch (error) {
-        logger.warn(`Error writing to cache/stream ${error}`)
+        AgencyLogger.warn(`Error writing to cache/stream ${error}`)
       }
       return res.status(201).send({})
     }
@@ -206,6 +217,45 @@ export const updateVehicle = async (req: AgencyApiUpdateVehicleRequest, res: Age
     await updateVehicleFail(req, res, provider_id, device_id, 'not found')
   }
 }
+
+const uuidSchema = { type: 'string', format: 'uuid' }
+const numberSchema = { type: 'number' }
+const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
+
+export const { validate: validateTripMetadata, isValid: isValidateTripMetadata } = SchemaValidator<TripMetadata>({
+  $id: 'TripMetadata',
+  type: 'object',
+  properties: {
+    trip_id: uuidSchema,
+    provider_id: uuidSchema,
+    requested_trip_start_location: {
+      type: 'object',
+      properties: { lng: numberSchema, lat: numberSchema },
+      required: ['lat', 'lng']
+    },
+    reservation_time: timestampSchema,
+    reservation_method: { type: 'string', enum: RESERVATION_METHODS },
+    reservation_type: { type: 'string', enum: RESERVATION_TYPES },
+    quoted_trip_start_time: timestampSchema,
+    dispatch_time: timestampSchema,
+    trip_start_time: timestampSchema,
+    trip_end_time: timestampSchema,
+    cancellation_reason: { type: 'string' },
+    accessibility_options: { type: 'array', items: { type: 'string', enum: ACCESSIBILITY_OPTIONS } },
+    distance: numberSchema,
+    fare: {
+      type: 'object',
+      properties: {
+        quoted_cost: numberSchema,
+        actual_cost: numberSchema,
+        components: { type: 'object' },
+        currency: { type: 'string' },
+        payment_methods: { type: 'array', items: { type: 'string', enum: PAYMENT_METHODS } }
+      }
+    }
+  },
+  required: ['trip_id', 'provider_id']
+})
 
 /* Experimental Handler */
 export const writeTripMetadata = async (

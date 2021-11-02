@@ -1,5 +1,6 @@
+import { CountPolicy, RULE_TYPES, SpeedPolicy, TimePolicy } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, restrictedAreas, veniceSpecOps } from '@mds-core/mds-test-data'
-import { Geography, ModalityCountPolicy, ModalityPolicy, ModalitySpeedPolicy, RULE_TYPES } from '@mds-core/mds-types'
+import { Geography } from '@mds-core/mds-types'
 import { days, now } from '@mds-core/mds-utils'
 import { Polygon } from 'geojson'
 
@@ -20,7 +21,7 @@ export const RESTRICTED_GEOGRAPHY: Geography = {
 export const COUNT_POLICY_UUID = '72971a3d-876c-41ea-8e48-c9bb965bbbcc'
 export const COUNT_POLICY_UUID_2 = '37637f96-2580-475a-89e7-cfc5d2e70f84'
 export const COUNT_POLICY_UUID_3 = 'e8f9a720-6c12-41c8-a31c-715e76d65ea1'
-export const COUNT_POLICY_JSON: ModalityCountPolicy = {
+export const COUNT_POLICY_JSON: CountPolicy = {
   name: 'LADOT Mobility Caps',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: COUNT_POLICY_UUID,
@@ -29,6 +30,7 @@ export const COUNT_POLICY_JSON: ModalityCountPolicy = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
+  currency: null,
   rules: [
     {
       name: 'Greater LA',
@@ -43,7 +45,7 @@ export const COUNT_POLICY_JSON: ModalityCountPolicy = {
   ]
 }
 
-export const COUNT_POLICY_JSON_2: ModalityCountPolicy = {
+export const COUNT_POLICY_JSON_2: CountPolicy = {
   name: 'Something Mobility Caps',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: COUNT_POLICY_UUID_2,
@@ -52,6 +54,7 @@ export const COUNT_POLICY_JSON_2: ModalityCountPolicy = {
   publish_date: 1558389669540,
   prev_policies: null,
   provider_ids: [],
+  currency: null,
   rules: [
     {
       name: 'No vehicles permitted on Venice Beach on weekends',
@@ -66,7 +69,7 @@ export const COUNT_POLICY_JSON_2: ModalityCountPolicy = {
   ]
 }
 
-export const COUNT_POLICY_JSON_3: ModalityCountPolicy = {
+export const COUNT_POLICY_JSON_3: CountPolicy = {
   name: 'LADOT Mobility Caps',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: COUNT_POLICY_UUID_3,
@@ -75,6 +78,7 @@ export const COUNT_POLICY_JSON_3: ModalityCountPolicy = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
+  currency: null,
   rules: [
     {
       name: 'Greater LA',
@@ -88,7 +92,7 @@ export const COUNT_POLICY_JSON_3: ModalityCountPolicy = {
   ]
 }
 
-export const COUNT_POLICY_JSON_5: ModalityCountPolicy = {
+export const COUNT_POLICY_JSON_5: CountPolicy = {
   name: 'Prohibited Dockless Zones',
   rules: [
     {
@@ -106,6 +110,8 @@ export const COUNT_POLICY_JSON_5: ModalityCountPolicy = {
     }
   ],
   end_date: null,
+  provider_ids: [],
+  currency: null,
   policy_id: '25851571-b53f-4426-a033-f375be0e7957',
   start_date: Date.now(),
   publish_date: Date.now() - 10,
@@ -211,13 +217,16 @@ export const TANZANIA_GEO: Geography = {
   }
 }
 
-export const HIGH_COUNT_POLICY: ModalityCountPolicy = {
+export const HIGH_COUNT_POLICY: CountPolicy = {
   policy_id: '221975ef-569c-40a1-a9b0-646e6155c764',
   name: 'LADOT Pilot Caps',
   description: 'LADOT Pilot Caps (add description)',
   start_date: 1552678594428,
   end_date: null,
   prev_policies: null,
+  provider_ids: [],
+  publish_date: null,
+  currency: null,
   rules: [
     {
       name: 'Greater LA',
@@ -235,13 +244,42 @@ export const HIGH_COUNT_POLICY: ModalityCountPolicy = {
   ]
 }
 
-export const LOW_COUNT_POLICY: ModalityCountPolicy = {
+export const ARBITRARY_EVENT_TYPES_POLICY: CountPolicy = {
   policy_id: '6d7a9c7e-853c-4ff7-a86f-e17c06d3bd80',
   name: 'Very Low Count Limit',
   description: 'Very low count limit',
   start_date: 1552678594428,
   end_date: null,
   prev_policies: null,
+  provider_ids: [],
+  publish_date: null,
+  currency: null,
+  rules: [
+    {
+      name: 'Greater LA',
+      rule_id: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      rule_type: 'count',
+      geographies: ['1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'],
+      modality: 'micromobility',
+      states: {
+        available: ['battery_low', 'reservation_start']
+      },
+      vehicle_types: ['bicycle', 'scooter'],
+      maximum: 5
+    }
+  ]
+}
+
+export const LOW_COUNT_POLICY: CountPolicy = {
+  policy_id: '6d7a9c7e-853c-4ff7-a86f-e17c06d3bd80',
+  name: 'Very Low Count Limit',
+  description: 'Very low count limit',
+  start_date: 1552678594428,
+  end_date: null,
+  prev_policies: null,
+  provider_ids: [],
+  publish_date: null,
+  currency: null,
   rules: [
     {
       name: 'Greater LA',
@@ -257,13 +295,16 @@ export const LOW_COUNT_POLICY: ModalityCountPolicy = {
   ]
 }
 
-export const EXPIRED_POLICY: ModalityCountPolicy = {
+export const EXPIRED_POLICY: CountPolicy = {
   policy_id: '6d7a9c7e-853c-4ff7-a86f-e17c06d3bd80',
   name: 'i expired',
   description: 'expired',
   start_date: now() - days(7),
   end_date: now() - days(1),
   prev_policies: null,
+  provider_ids: [],
+  publish_date: null,
+  currency: null,
   rules: [
     {
       name: 'Greater LA',
@@ -279,7 +320,7 @@ export const EXPIRED_POLICY: ModalityCountPolicy = {
   ]
 }
 
-export const VENICE_OVERFLOW_POLICY: ModalityCountPolicy = {
+export const VENICE_OVERFLOW_POLICY: CountPolicy = {
   name: 'Venice Overflow Test',
   description: 'what it says on the can',
   policy_id: VENICE_POLICY_UUID,
@@ -288,6 +329,7 @@ export const VENICE_OVERFLOW_POLICY: ModalityCountPolicy = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
+  currency: null,
   rules: [
     {
       name: 'Inner geo',
@@ -310,7 +352,7 @@ export const VENICE_OVERFLOW_POLICY: ModalityCountPolicy = {
   ]
 }
 
-export const VENICE_MIXED_VIOLATIONS_POLICY: ModalityCountPolicy = {
+export const VENICE_MIXED_VIOLATIONS_POLICY: CountPolicy = {
   name: 'Venice Overflow Test',
   description: 'what it says on the can',
   policy_id: VENICE_POLICY_UUID,
@@ -319,6 +361,7 @@ export const VENICE_MIXED_VIOLATIONS_POLICY: ModalityCountPolicy = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
+  currency: null,
   rules: [
     {
       name: 'Inner geo',
@@ -342,7 +385,7 @@ export const VENICE_MIXED_VIOLATIONS_POLICY: ModalityCountPolicy = {
   ]
 }
 
-export const MANY_OVERFLOWS_POLICY: ModalityCountPolicy = {
+export const MANY_OVERFLOWS_POLICY: CountPolicy = {
   name: 'Many overflows',
   description: 'what it says on the can',
   policy_id: VENICE_POLICY_UUID,
@@ -351,6 +394,7 @@ export const MANY_OVERFLOWS_POLICY: ModalityCountPolicy = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
+  currency: null,
   rules: [
     {
       name: 'Somewhere in LA',
@@ -387,7 +431,7 @@ export const TEST_ZONE_NO_VALID_DROP_OFF_POINTS: Polygon = {
   ]
 }
 
-export const OVERLAPPING_GEOS_SPEED_POLICY: ModalitySpeedPolicy = {
+export const OVERLAPPING_GEOS_SPEED_POLICY: SpeedPolicy = {
   policy_id: 'fc9b02f0-9c0d-4b0a-85d6-7684b8e9e769',
   name: 'Multiple Speed Limits',
   description: 'LADOT Pilot Speed Limit Limitations',
@@ -395,6 +439,8 @@ export const OVERLAPPING_GEOS_SPEED_POLICY: ModalitySpeedPolicy = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
+  publish_date: null,
+  currency: null,
   rules: [
     {
       name: 'Slow Zone in Venice Beach',
@@ -423,13 +469,15 @@ export const OVERLAPPING_GEOS_SPEED_POLICY: ModalitySpeedPolicy = {
   ]
 }
 
-export const OVERLAPPING_GEOS_TIME_POLICY: ModalityPolicy = {
+export const OVERLAPPING_GEOS_TIME_POLICY: TimePolicy = {
   policy_id: 'fc9b02f0-9c0d-4b0a-85d6-7684b8e9e769',
   name: 'Multiple Speed Limits',
   description: 'LADOT Pilot Speed Limit Limitations',
   start_date: 1552678594428,
   end_date: null,
   prev_policies: null,
+  currency: null,
+  publish_date: null,
   provider_ids: [],
   rules: [
     {

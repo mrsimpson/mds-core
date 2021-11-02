@@ -116,7 +116,7 @@ export interface CoreEvent {
   device_id: UUID
   provider_id: UUID
   timestamp: Timestamp
-  telemetry?: Telemetry | null
+  telemetry: Telemetry
 }
 
 /**
@@ -127,7 +127,7 @@ export interface CoreEvent {
  */
 export interface VehicleEvent_v1_1_0 extends CoreEvent {
   event_types: VEHICLE_EVENT[]
-  telemetry_timestamp?: Timestamp | null
+  telemetry_timestamp: Timestamp
   trip_id?: UUID | null
   vehicle_state: VEHICLE_STATE
   trip_state: Nullable<TRIP_STATE>

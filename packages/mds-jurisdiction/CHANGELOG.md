@@ -1,5 +1,237 @@
 # @mds-core/mds-jurisdiction
 
+## 0.1.27
+
+### Patch Changes
+
+- @mds-core/mds-jurisdiction-service@0.3.3
+- @mds-core/mds-api-helpers@0.1.53
+
+## 0.1.26
+
+### Patch Changes
+
+- 70586f15: Meaningless bump to ensure artifacts are built properly
+- Updated dependencies [70586f15]
+- Updated dependencies [70586f15]
+  - @mds-core/mds-utils@0.2.9
+  - @mds-core/mds-api-helpers@0.1.52
+  - @mds-core/mds-api-server@0.3.11
+  - @mds-core/mds-jurisdiction-service@0.3.2
+  - @mds-core/mds-logger@0.4.3
+  - @mds-core/mds-service-helpers@0.4.2
+
+## 0.1.25
+
+### Patch Changes
+
+- Updated dependencies [1e0156d3]
+- Updated dependencies [2b3c91c4]
+  - @mds-core/mds-api-server@0.3.10
+  - @mds-core/mds-jurisdiction-service@0.3.1
+  - @mds-core/mds-api-helpers@0.1.51
+  - @mds-core/mds-service-helpers@0.4.1
+  - @mds-core/mds-utils@0.2.8
+
+## 0.1.24
+
+### Patch Changes
+
+- Updated dependencies [a1061650]
+- Updated dependencies [a1061650]
+- Updated dependencies [aa1403da]
+  - @mds-core/mds-api-server@0.3.9
+  - @mds-core/mds-jurisdiction-service@0.3.0
+  - @mds-core/mds-logger@0.4.2
+  - @mds-core/mds-service-helpers@0.4.0
+  - @mds-core/mds-utils@0.2.7
+  - @mds-core/mds-api-helpers@0.1.50
+
+## 0.1.23
+
+### Patch Changes
+
+- @mds-core/mds-jurisdiction-service@0.2.5
+- @mds-core/mds-api-helpers@0.1.49
+
+## 0.1.22
+
+### Patch Changes
+
+- Updated dependencies [0a238253]
+  - @mds-core/mds-utils@0.2.6
+  - @mds-core/mds-api-helpers@0.1.48
+  - @mds-core/mds-jurisdiction-service@0.2.4
+  - @mds-core/mds-service-helpers@0.3.10
+  - @mds-core/mds-api-server@0.3.8
+
+## 0.1.21
+
+### Patch Changes
+
+- f501924c: Bump everything due to previous bad release
+- Updated dependencies [f501924c]
+  - @mds-core/mds-api-helpers@0.1.47
+  - @mds-core/mds-api-server@0.3.7
+  - @mds-core/mds-jurisdiction-service@0.2.3
+  - @mds-core/mds-logger@0.4.1
+  - @mds-core/mds-service-helpers@0.3.9
+  - @mds-core/mds-utils@0.2.5
+
+## 0.1.20
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.1.46
+
+## 0.1.19
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.1.45
+
+## 0.1.18
+
+### Patch Changes
+
+- Updated dependencies [81220ee6]
+- Updated dependencies [71a9d1de]
+  - @mds-core/mds-jurisdiction-service@0.2.2
+  - @mds-core/mds-logger@0.4.0
+  - @mds-core/mds-api-helpers@0.1.44
+  - @mds-core/mds-service-helpers@0.3.8
+  - @mds-core/mds-utils@0.2.4
+  - @mds-core/mds-api-server@0.3.6
+
+## 0.1.17
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.1.43
+- @mds-core/mds-jurisdiction-service@0.2.1
+- @mds-core/mds-service-helpers@0.3.7
+- @mds-core/mds-utils@0.2.3
+- @mds-core/mds-api-server@0.3.5
+
+## 0.1.16
+
+### Patch Changes
+
+- 15b9d729: Upgrade dependencies
+- Updated dependencies [f5403ec3]
+- Updated dependencies [270c1665]
+- Updated dependencies [a0a29a98]
+- Updated dependencies [15b9d729]
+- Updated dependencies [d8b1387e]
+- Updated dependencies [15b9d729]
+  - @mds-core/mds-logger@0.3.0
+  - @mds-core/mds-api-server@0.3.4
+  - @mds-core/mds-jurisdiction-service@0.2.0
+  - @mds-core/mds-service-helpers@0.3.6
+  - @mds-core/mds-utils@0.2.2
+  - @mds-core/mds-api-helpers@0.1.42
+
+## 0.1.15
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.1.41
+- @mds-core/mds-jurisdiction-service@0.1.12
+- @mds-core/mds-service-helpers@0.3.5
+- @mds-core/mds-utils@0.2.1
+- @mds-core/mds-api-server@0.3.3
+
+## 0.1.14
+
+### Patch Changes
+
+- Updated dependencies [61e31276]
+- Updated dependencies [8e42a84a]
+  - @mds-core/mds-utils@0.2.0
+  - @mds-core/mds-api-server@0.3.2
+  - @mds-core/mds-api-helpers@0.1.40
+  - @mds-core/mds-jurisdiction-service@0.1.11
+  - @mds-core/mds-service-helpers@0.3.4
+
+## 0.1.13
+
+### Patch Changes
+
+- Updated dependencies [9af14cbb]
+  - @mds-core/mds-logger@0.2.4
+  - @mds-core/mds-api-server@0.3.1
+  - @mds-core/mds-jurisdiction-service@0.1.10
+  - @mds-core/mds-service-helpers@0.3.3
+  - @mds-core/mds-utils@0.1.36
+  - @mds-core/mds-api-helpers@0.1.39
+
+## 0.1.12
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.1.38
+
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies [439f92c5]
+  - @mds-core/mds-api-server@0.3.0
+  - @mds-core/mds-api-helpers@0.1.37
+  - @mds-core/mds-jurisdiction-service@0.1.9
+  - @mds-core/mds-service-helpers@0.3.2
+  - @mds-core/mds-utils@0.1.35
+
+## 0.1.10
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.1.36
+
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [b6802757]
+  - @mds-core/mds-utils@0.1.34
+  - @mds-core/mds-api-helpers@0.1.35
+  - @mds-core/mds-api-server@0.2.1
+  - @mds-core/mds-jurisdiction-service@0.1.8
+  - @mds-core/mds-service-helpers@0.3.1
+
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [e0860f5b]
+  - @mds-core/mds-api-server@0.2.0
+  - @mds-core/mds-service-helpers@0.3.0
+  - @mds-core/mds-api-helpers@0.1.34
+  - @mds-core/mds-jurisdiction-service@0.1.7
+  - @mds-core/mds-utils@0.1.33
+
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [5eb4121b]
+  - @mds-core/mds-service-helpers@0.2.0
+  - @mds-core/mds-api-server@0.1.32
+  - @mds-core/mds-jurisdiction-service@0.1.6
+  - @mds-core/mds-api-helpers@0.1.33
+  - @mds-core/mds-utils@0.1.32
+
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [93493a19]
+  - @mds-core/mds-utils@0.1.31
+  - @mds-core/mds-api-helpers@0.1.32
+  - @mds-core/mds-jurisdiction-service@0.1.5
+  - @mds-core/mds-service-helpers@0.1.5
+  - @mds-core/mds-api-server@0.1.31
+
 ## 0.1.5
 
 ### Patch Changes

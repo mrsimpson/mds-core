@@ -41,6 +41,8 @@ export const VEHICLE_EVENTS_v0_4_1 = [
 
 export type VEHICLE_EVENT_v0_4_1 = typeof VEHICLE_EVENTS_v0_4_1[number]
 
+export type Telemetry_v0_4_1 = Telemetry
+
 export interface VehicleEvent_v0_4_1 {
   device_id: UUID
   provider_id: UUID
@@ -48,7 +50,7 @@ export interface VehicleEvent_v0_4_1 {
   event_type: VEHICLE_EVENT_v0_4_1 | TRANSFORMER_VEHICLE_EVENT
   event_type_reason?: VEHICLE_REASON_v0_4_1 | null | TRANSFORMER_EVENT_TYPE_REASON
   telemetry_timestamp?: Timestamp | null
-  telemetry?: Telemetry | null
+  telemetry?: Telemetry_v0_4_1 | null
   trip_id?: UUID | null
   recorded: Timestamp
 }

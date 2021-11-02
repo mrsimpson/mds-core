@@ -1,4 +1,4 @@
-import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
+import { AccessTokenScopeValidator, ApiErrorHandlingMiddleware, checkAccess } from '@mds-core/mds-api-server'
 import { pathPrefix } from '@mds-core/mds-utils'
 import express from 'express'
 import { ComplianceApiAccessTokenScopes } from '../@types'
@@ -7,6 +7,7 @@ import {
   GetViolationDetailsSnapshotHandler,
   GetViolationPeriodsHandler
 } from '../handlers'
+import { GetViolationHandler } from '../handlers/get-violation'
 import { ComplianceApiVersionMiddleware } from '../middleware'
 
 const checkComplianceApiAccess = (validator: AccessTokenScopeValidator<ComplianceApiAccessTokenScopes>) =>
@@ -36,3 +37,11 @@ export const api = (app: express.Express): express.Express =>
       ),
       GetComplianceSnapshotIDsHandler
     )
+    .get(
+      pathPrefix('/violation/:violation_id'),
+      checkComplianceApiAccess(
+        scopes => scopes.includes('compliance:read') || scopes.includes('compliance:read:provider')
+      ),
+      GetViolationHandler
+    )
+    .use(ApiErrorHandlingMiddleware)
