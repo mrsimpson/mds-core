@@ -80,7 +80,7 @@ describe('Transaction Service Tests', () => {
 
         it('Create one good Compliance Violation transaction', async () => {
           const [transactionToPersist] = transactionsGenerator(1, {
-            receipt_details: { violation_id: uuid(), trip_id: null }
+            receipt_details: { violation_id: uuid(), trip_id: null, policy_id: uuid() }
           })
 
           const recordedTransaction = await TransactionServiceClient.createTransaction(transactionToPersist)
