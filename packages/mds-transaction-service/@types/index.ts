@@ -50,6 +50,7 @@ export interface CurbUseDetailsDomainModel {
 export interface ComplianceViolationDetailsDomainModel {
   violation_id: UUID
   trip_id: Nullable<UUID>
+  policy_id: UUID
 }
 
 export const FEE_TYPE = <const>[
