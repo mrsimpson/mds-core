@@ -1,153 +1,6 @@
 import axios from 'axios'
-
-const policies = [
-  {
-    policy_id: '4d795557-889c-401c-a376-f67be36c9f2f',
-    provider_ids: [],
-    name: 'For Dev - Equity Zone Minimum scooter deployment',
-    description:
-      'Minimum 115 scooters for every provider operating in Seattle from 9am - 7pm - Migrated from 0.4 5bcd3e11-c4f1-4d4a-a0dd-490ad4ae47ea',
-    start_date: 1635944629112,
-    end_date: null,
-    prev_policies: null,
-    rules: [
-      {
-        rule_id: '8e7a6e10-6253-4dcb-a911-ac385869a0a0',
-        name: 'Minimum 115 scooters or bikes in Equity Zones during the day',
-        rule_type: 'count',
-        geographies: ['51987827-ed21-48bc-850f-2405897401b5'],
-        vehicle_types: ['scooter', 'bicycle'],
-        minimum: 115,
-        start_time: '09:00:00',
-        end_time: '19:00:00',
-        states: {},
-        modality: 'micromobility'
-      }
-    ]
-  },
-  {
-    policy_id: 'a17f5bdb-5236-4c67-8fa2-1a1b268a87ea',
-    provider_ids: [],
-    name: "For Dev - Farmers' market every Saturday",
-    description: "No scooters allowed in the farmers' market - Migrated from 0.4 8a7b9554-18e8-4955-8e29-d2ce121f245c",
-    start_date: 1635944629112,
-    end_date: null,
-    prev_policies: null,
-    rules: [
-      {
-        rule_id: '6a6e5a1f-ecc7-4919-be00-c55cf6bb3127',
-        name: 'No vehicles allowed',
-        rule_type: 'count',
-        geographies: ['4ab51ad2-b1e0-43fe-a7f1-4dbf6e8801de'],
-        vehicle_types: [],
-        maximum: 0,
-        days: ['sun'],
-        start_time: '09:30:00',
-        end_time: '02:00:00',
-        states: {},
-        modality: 'micromobility'
-      }
-    ]
-  },
-  {
-    policy_id: 'e8b78d7c-fec5-428d-bdfe-e148445fc31d',
-    provider_ids: [],
-    name: 'For Dev - Provider drop zones for downtown',
-    description:
-      'Providers can drop a maximum of 30 vehicles in the 5 new dropoff zones - Migrated from 0.4 c9f55f2e-7fcf-4dd2-8eca-690a930c3c59',
-    start_date: 1635944629112,
-    end_date: null,
-    prev_policies: null,
-    rules: [
-      {
-        rule_id: 'b63a6c4e-ca80-4058-8d33-57398db797c9',
-        name: 'Maximum 35 vehicles deployed to downtown parking zones in the morning',
-        rule_type: 'count',
-        geographies: ['285a69fc-237d-4820-9c89-d9fdcd14d44f'],
-        vehicle_types: [],
-        maximum: 35,
-        start_time: '05:00:00',
-        end_time: '11:00:00',
-        states: {
-          available: ['provider_drop_off'],
-          elsewhere: ['provider_drop_off'],
-          non_operational: ['provider_drop_off'],
-          on_trip: ['provider_drop_off'],
-          removed: ['provider_drop_off'],
-          reserved: ['provider_drop_off'],
-          unknown: ['provider_drop_off']
-        },
-        modality: 'micromobility'
-      },
-      {
-        rule_id: 'e7ab4025-3445-48d1-9920-5eaa27b5400e',
-        name: 'No Provider dropoffs allowed here in the morning',
-        rule_type: 'count',
-        geographies: ['74b95e5a-e089-4246-a4e7-67c16026927c'],
-        vehicle_types: [],
-        maximum: 0,
-        start_time: '05:00:00',
-        end_time: '10:00:00',
-        states: {
-          available: ['provider_drop_off'],
-          elsewhere: ['provider_drop_off'],
-          non_operational: ['provider_drop_off'],
-          on_trip: ['provider_drop_off'],
-          removed: ['provider_drop_off'],
-          reserved: ['provider_drop_off'],
-          unknown: ['provider_drop_off']
-        },
-        modality: 'micromobility'
-      }
-    ]
-  },
-  {
-    policy_id: 'e82125cc-23b7-4cb7-b23e-d61f9d18b71e',
-    provider_ids: [],
-    name: 'For Dev - Slow Zone in dangerous traffic cooridor',
-    description:
-      'Throttle down to 8 mph for scooters and bikes in this area with higher density of traffic incidences - Migrated from 0.4 a29b4cc9-f0f5-4613-b629-347f3e780fb8',
-    start_date: 1635944629113,
-    end_date: null,
-    prev_policies: null,
-    rules: [
-      {
-        rule_id: 'daaa4274-fdd7-465f-863a-c082ab32591c',
-        name: '8 MPH maximum for bikes and scooters',
-        rule_type: 'speed',
-        rule_units: 'mph',
-        geographies: ['7d6d2c28-1292-41ab-ac00-60eabcd7392d'],
-        vehicle_types: ['bicycle', 'scooter'],
-        minimum: 0,
-        maximum: 8,
-        states: {},
-        modality: 'micromobility'
-      }
-    ]
-  },
-  {
-    policy_id: '4d97c64e-4095-4a18-b3ca-4997e8e341ae',
-    provider_ids: [],
-    name: 'For dev - 5 MPH speed limit around the Space Needle',
-    description: 'Limit speed to 5mph around the Space Needle - Migrated from 0.4 34e3980c-c84e-4b39-9e40-639892ff4d7b',
-    start_date: 1635944629113,
-    end_date: null,
-    prev_policies: null,
-    rules: [
-      {
-        rule_id: 'a9efcc11-2b37-4baf-ba7f-85ab22ce371f',
-        name: '5MPH limit around the Space Needle',
-        rule_type: 'speed',
-        rule_units: 'mph',
-        geographies: ['b5ea8bcf-f458-46f7-bb0c-8e4acdd88954'],
-        vehicle_types: [],
-        maximum: 5,
-        states: {},
-        modality: 'micromobility'
-      }
-    ]
-  }
-]
+const start_date = Date.now() + 1000 * 60 * 60 * 48
+console.log(start_date < Date.now())
 ///*
 const headers: any = {
   'Content-Type': 'application/json',
@@ -164,7 +17,7 @@ Promise.all(policies.map(policy => {
 //  console.log(res)
 }).catch(err => console.log(err.response))
 //*/
-
+///*
 const new_policies = [
   {
     policy_id: '4d795557-889c-401c-a376-f67be36c9f2f',
@@ -172,7 +25,7 @@ const new_policies = [
     name: 'For Dev - Equity Zone Minimum scooter deployment',
     description:
       'Minimum 115 scooters for every provider operating in Seattle from 9am - 7pm - Migrated from 0.4 5bcd3e11-c4f1-4d4a-a0dd-490ad4ae47ea',
-    start_date: 1635944629112,
+    start_date,
     end_date: null,
     prev_policies: null,
     rules: [
@@ -195,7 +48,7 @@ const new_policies = [
     provider_ids: [],
     name: "For Dev - Farmers' market every Saturday",
     description: "No scooters allowed in the farmers' market - Migrated from 0.4 8a7b9554-18e8-4955-8e29-d2ce121f245c",
-    start_date: 1635944629112,
+    start_date,
     end_date: null,
     prev_policies: null,
     rules: [
@@ -220,7 +73,7 @@ const new_policies = [
     name: 'For Dev - Provider drop zones for downtown',
     description:
       'Providers can drop a maximum of 30 vehicles in the 5 new dropoff zones - Migrated from 0.4 c9f55f2e-7fcf-4dd2-8eca-690a930c3c59',
-    start_date: 1635944629112,
+    start_date,
     end_date: null,
     prev_policies: null,
     rules: [
@@ -272,7 +125,7 @@ const new_policies = [
     name: 'For Dev - Slow Zone in dangerous traffic cooridor',
     description:
       'Throttle down to 8 mph for scooters and bikes in this area with higher density of traffic incidences - Migrated from 0.4 a29b4cc9-f0f5-4613-b629-347f3e780fb8',
-    start_date: 1635944629113,
+    start_date,
     end_date: null,
     prev_policies: null,
     rules: [
@@ -295,7 +148,7 @@ const new_policies = [
     provider_ids: [],
     name: 'For dev - 5 MPH speed limit around the Space Needle',
     description: 'Limit speed to 5mph around the Space Needle - Migrated from 0.4 34e3980c-c84e-4b39-9e40-639892ff4d7b',
-    start_date: 1635944629113,
+    start_date,
     end_date: null,
     prev_policies: null,
     rules: [
@@ -328,7 +181,9 @@ Promise.all(
     return axios.post(
       `https://city.develop.api.lacuna-tech.io/policy-author/policies/${policy.policy_id}/publish`,
       {},
-      { headers }
+      {
+        headers
+      }
     )
   })
 )
