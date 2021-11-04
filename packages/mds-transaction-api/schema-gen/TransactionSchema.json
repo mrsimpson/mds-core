@@ -72,10 +72,15 @@
                   "format": "uuid",
                   "nullable": true,
                   "default": null
+                },
+                "policy_id": {
+                  "type": "string",
+                  "format": "uuid"
                 }
               },
               "required": [
-                "violation_id"
+                "violation_id",
+                "policy_id"
               ]
             },
             {
