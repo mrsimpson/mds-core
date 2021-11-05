@@ -193,9 +193,10 @@ function processPolicy(
   policy: Policy,
   events: VehicleEvent[],
   geographies: Geography[],
-  devices: { [d: string]: Device }
+  devices: { [d: string]: Device },
+  end_time: number = now()
 ): ComplianceResponse | undefined {
-  if (isPolicyActive(policy)) {
+  if (isPolicyActive(policy, end_time)) {
     const sortedEvents = events.sort((e_1, e_2) => {
       return e_1.timestamp - e_2.timestamp
     })
