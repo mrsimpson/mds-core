@@ -211,9 +211,9 @@ export const providers: Readonly<{ [P in PROVIDER_ID]: Readonly<Provider> }> = O
   [BOAZ_BIKES_PROVIDER_ID]: Object.freeze({
     provider_id: BOAZ_BIKES_PROVIDER_ID,
     provider_name: 'Boaz Bikes',
-    url: 'https://www.veoride.com/',
-    mds_api_url: 'https://cluster-prod.veoride.com/api/shares/mds',
-    gbfs_api_url: 'https://cluster-prod.veoride.com/api/shares/gbfs'
+    url: 'https://www.boazbikes.com/',
+    mds_api_url: 'https://mds.movatic.co/',
+    gbfs_api_url: 'https://gbsf.movatic.co/en/1.1/576347857979998215'
   }),
   [LADOT_PROVIDER_ID]: Object.freeze({
     provider_id: LADOT_PROVIDER_ID,
