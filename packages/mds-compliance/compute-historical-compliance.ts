@@ -47,6 +47,8 @@ const computeHistoricalCompliance = async () => {
         geographies
       )
     }
+
+    console.log(`Processed up to: ${currentDate}`)
   }
 }
 
@@ -57,7 +59,7 @@ const computeHistoricalComplianceProvider = async (
   end: number,
   geographies: Geography[]
 ) => {
-  const iso_timestamp = DateTime.fromMillis(end).toISO()
+  const iso_timestamp = DateTime.fromMillis(end, { zone: 'America/Los_Angeles' }).toISO()
 
   const events = await db.getLatestEventPerVehicle({
     provider_ids: [provider_id],
@@ -71,9 +73,13 @@ const computeHistoricalComplianceProvider = async (
     return acc
   }, {} as { [device_id: string]: Device })
 
-  const policies: Policy[] = await db.readActivePolicies(end)
+  const policies: Policy[] = await db.readActivePolicies(end) // [await db.readPolicy('de8ba6df-4fb5-4dd6-adf3-c9a328950675')]
 
-  const complianceResults = policies.map(policy => processPolicy(policy, events, geographies, devices, end))
+  const complianceResults = policies.map(policy =>
+    !policy.provider_ids || policy.provider_ids.length === 0 || policy.provider_ids?.includes(provider_id)
+      ? processPolicy(policy, events, geographies, devices, end)
+      : undefined
+  )
 
   const thinResults = complianceResults
     .map(res => {
@@ -96,7 +102,9 @@ const computeHistoricalComplianceProvider = async (
     })
     .filter(filterDefined())
 
-  await complianceCsvWriter.writeRecords(thinResults)
+  if (thinResults.length > 0) {
+    await complianceCsvWriter.writeRecords(thinResults)
+  }
 }
 
 ProcessManager({

@@ -23,12 +23,11 @@ import {
   SpeedRule,
   TimeRule,
   VehicleEvent,
-  DAY_OF_WEEK,
   TIME_FORMAT,
-  DAYS_OF_WEEK,
   UUID
 } from '@mds-core/mds-types'
 import { pointInShape, getPolygon, isInStatesOrEvents, now, RuntimeError, RULE_UNIT_MAP } from '@mds-core/mds-utils'
+import { DateTime } from 'luxon'
 import moment from 'moment-timezone'
 import {
   MatchedVehiclePlusRule,
@@ -51,7 +50,74 @@ function isPolicyActive(policy: Policy, end_time: number = now()): boolean {
   return end_time >= policy.start_date && end_time <= policy.end_date
 }
 
-function isRuleActive(rule: Rule): boolean {
+const isOfTimeFormat = (timeString: string): timeString is any => /^\d{2}:\d{2}:\d{2}$/.test(timeString)
+
+/**
+ * Luxon has a helper method for this `weekdayShort`, but it doesn't typecheck :^)
+ */
+const numericalWeekdayToLocale = (weekdayNum: number) => {
+  if (weekdayNum < 1 || weekdayNum > 7) {
+    throw new Error(`Invalid weekday number: ${weekdayNum}`)
+  }
+
+  const weekdayList = <const>['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
+  return weekdayList[weekdayNum - 1] // subtract 1 cause arrays are 0 indexed, but luxon provides weekdays in 1 | 2 | 3 | 4 | 5 | 6 | 7 form. (1 = monday) (7 = sunday)
+}
+
+/**
+ *
+ * @param param0 Object which contains a list of days
+ * @returns If the current day is in the list of valid days
+ */
+const isCurrentDayInDays = ({ days }: Pick<Rule, 'days'>, current_time?: number) => {
+  const { TIMEZONE } = env
+
+  if (!days || days.length === 0) return true
+
+  const currentTime = (current_time ? DateTime.fromMillis(current_time) : DateTime.now()).setZone(TIMEZONE)
+
+  return days.includes(numericalWeekdayToLocale(currentTime.weekday))
+}
+
+/**
+ *
+ * @param start_time Time in HH:mm:ss format
+ * @param end_time Time in HH:mm:ss format
+ * @returns If the current local time is within the specified time range.
+ *
+ * Note: We can just do string comparison here for times, because the format should consistently be HH:mm:ss for all strings.
+ */
+const isCurrentTimeInInterval = (
+  { start_time, end_time }: Pick<Rule, 'start_time' | 'end_time'>,
+  current_time?: number
+) => {
+  const { TIMEZONE } = env
+
+  const currentTime = (current_time ? DateTime.fromMillis(current_time) : DateTime.now()).setZone(TIMEZONE)
+  const formattedCurrentTime = currentTime.toFormat(TIME_FORMAT)
+  if (!isOfTimeFormat(formattedCurrentTime))
+    throw new Error(`Current time is in invalid time format: ${formattedCurrentTime}`)
+
+  if (start_time && end_time) {
+    // The overnight use-case, e.g. if a rule starts at 7pm and ends at 5am.
+    if (start_time >= end_time) return formattedCurrentTime >= start_time || formattedCurrentTime <= end_time
+
+    // Daytime use-case, e.g. if a rule starts at 8am and ends at 5pm.
+    return formattedCurrentTime >= start_time && formattedCurrentTime <= end_time
+  }
+
+  if (start_time) return formattedCurrentTime >= start_time // we'll assume that if there's no end time, the rule is active from the start_time until the end of the day
+
+  if (end_time) return formattedCurrentTime <= end_time // we'll assume that if there's no start time, the rule is active from the beginning of the day until the end time
+
+  return true
+}
+
+export function isRuleActive(
+  { start_time, end_time, days }: Pick<Rule, 'start_time' | 'end_time' | 'days'>,
+  current_time?: number
+): boolean {
   if (!env.TIMEZONE) {
     throw new RuntimeError('TIMEZONE environment variable must be declared!')
   }
@@ -60,20 +126,15 @@ function isRuleActive(rule: Rule): boolean {
     throw new RuntimeError(`TIMEZONE environment variable ${env.TIMEZONE} is not a valid timezone!`)
   }
 
-  const local_time = moment().tz(env.TIMEZONE)
-
-  if (!rule.days || rule.days.includes(Object.values(DAYS_OF_WEEK)[local_time.day()] as DAY_OF_WEEK)) {
-    if (!rule.start_time || local_time.isAfter(moment(rule.start_time, TIME_FORMAT))) {
-      if (!rule.end_time || local_time.isBefore(moment(rule.end_time, TIME_FORMAT))) {
-        return true
-      }
-    }
-  }
-  return false
+  return isCurrentDayInDays({ days }, current_time) && isCurrentTimeInInterval({ start_time, end_time }, current_time)
 }
 
-function isInVehicleTypes(rule: Rule, device: Device): boolean {
-  return !rule.vehicle_types || (rule.vehicle_types && rule.vehicle_types.includes(device.type))
+export function isInVehicleTypes(rule: Rule, device: Device): boolean {
+  return (
+    !rule.vehicle_types ||
+    rule.vehicle_types.length === 0 ||
+    (rule.vehicle_types && rule.vehicle_types.includes(device.type))
+  )
 }
 
 function getViolationsArray(map: { [key: string]: MatchedVehiclePlusRule }) {
@@ -84,10 +145,11 @@ function processCountRule(
   rule: CountRule,
   events: VehicleEvent[],
   geographies: Geography[],
-  devices: { [d: string]: Device }
+  devices: { [d: string]: Device },
+  end_time?: number
 ): Compliance & { matches: CountMatch[] | null } {
   const maximum = rule.maximum || Number.POSITIVE_INFINITY
-  if (isRuleActive(rule)) {
+  if (isRuleActive(rule, end_time)) {
     const matches: CountMatch[] = rule.geographies.reduce(
       (matches_acc: CountMatch[], geography: string): CountMatch[] => {
         const matched_vehicles: MatchedVehicle[] = events.reduce(
@@ -124,9 +186,10 @@ function processTimeRule(
   rule: TimeRule,
   events: VehicleEvent[],
   geographies: Geography[],
-  devices: { [d: string]: Device }
+  devices: { [d: string]: Device },
+  end_time?: number
 ): Compliance & { matches: TimeMatch[] | null } {
-  if (isRuleActive(rule)) {
+  if (isRuleActive(rule, end_time)) {
     const matches: TimeMatch[] = rule.geographies.reduce((matches_acc: TimeMatch[], geography: string): TimeMatch[] => {
       events.forEach((event: VehicleEvent) => {
         const device: Device | undefined = devices[event.device_id]
@@ -160,9 +223,10 @@ function processSpeedRule(
   rule: SpeedRule,
   events: VehicleEvent[],
   geographies: Geography[],
-  devices: { [d: string]: Device }
+  devices: { [d: string]: Device },
+  end_time?: number
 ): Compliance & { matches: SpeedMatch[] | null } {
-  if (isRuleActive(rule)) {
+  if (isRuleActive(rule, end_time)) {
     const matches_result: SpeedMatch[] = rule.geographies.reduce((matches: any[], geography: string) => {
       events.forEach((event: VehicleEvent) => {
         const device: Device | undefined = devices[event.device_id]
@@ -221,7 +285,8 @@ function processPolicy(
             rule,
             sortedEvents,
             geographies,
-            devices
+            devices,
+            end_time
           )
 
           const compressedComp = {
@@ -308,7 +373,8 @@ function processPolicy(
             rule,
             sortedEvents,
             geographies,
-            devices
+            devices,
+            end_time
           )
           compliance_acc.push(comp)
 
@@ -330,7 +396,8 @@ function processPolicy(
               rule,
               sortedEvents,
               geographies,
-              devices
+              devices,
+              end_time
             )
             compliance_acc.push(comp)
             const speedingVehicles = comp.matches
