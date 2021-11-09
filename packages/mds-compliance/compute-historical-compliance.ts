@@ -5,6 +5,8 @@ import db from '@mds-core/mds-db'
 import { days, filterDefined } from '@mds-core/mds-utils'
 import { providers } from '@mds-core/mds-providers'
 import { createObjectCsvWriter } from 'csv-writer'
+import { writeFileSync, readFileSync, existsSync } from 'fs'
+import hash from 'object-hash'
 import { processPolicy } from './mds-compliance-engine'
 
 type ComplianceCsvRow = {
@@ -31,6 +33,11 @@ type MetricsCsvRow = {
   value: number
   weight: number
   timestamp: number
+}
+
+type CsvRows = {
+  complianceRows: ComplianceCsvRow[]
+  metricsRows: MetricsCsvRow[]
 }
 
 const complianceCsvWriterFactory = () =>
@@ -93,8 +100,36 @@ const complianceRowToMetricsRow = (row: ComplianceCsvRow): MetricsCsvRow => {
   }
 }
 
+const getRawInputs = () => {
+  const { START_DATE: startDate, END_DATE: endDate, INTERVAL: interval } = process.env
+
+  const inputs = { startDate, endDate, interval }
+  const inputsHashed = hash(inputs)
+
+  if (existsSync(`checkpoint-${inputsHashed}.json`)) {
+    const { checkpoint } = JSON.parse(readFileSync(`checkpoint-${inputsHashed}.json`).toString())
+
+    console.log(`Found checkpoint for: ${JSON.stringify(inputs)}, setting startDate to ${checkpoint}`)
+    return { startDate: checkpoint, endDate, interval, inputsHashed }
+  }
+
+  return { ...inputs, inputsHashed }
+}
+
+const writeCsvRows = async ({ complianceRows, metricsRows }: CsvRows) => {
+  return Promise.all([
+    ...(complianceRows.length > 0 ? [await complianceCsvWriter.writeRecords(complianceRows)] : []),
+    ...(metricsRows.length > 0 ? [await metricsCsvWriter.writeRecords(metricsRows)] : [])
+  ])
+}
+
 const computeHistoricalCompliance = async () => {
-  const { START_DATE: startDateUnparsed, END_DATE: endDateUnparsed, INTERVAL: intervalUnparsed } = process.env
+  const {
+    startDate: startDateUnparsed,
+    endDate: endDateUnparsed,
+    interval: intervalUnparsed,
+    inputsHashed
+  } = getRawInputs()
 
   if (!startDateUnparsed || !endDateUnparsed || !intervalUnparsed) {
     throw new Error('Invalid start date and/or end date')
@@ -104,19 +139,38 @@ const computeHistoricalCompliance = async () => {
   const endDate = DateTime.fromISO(endDateUnparsed, { zone: 'America/Los_Angeles' }).toMillis()
   const interval = Duration.fromISO(intervalUnparsed).toMillis()
 
-  const geographies: Geography[] = await db.readGeographies({ get_published: true }) // TODO: maybe we can only pull these once?
+  const geographies: Geography[] = await db.readGeographies({ get_published: true })
 
   for (let currentDate = startDate; currentDate <= endDate; currentDate += interval) {
+    writeFileSync(
+      `checkpoint-${inputsHashed}.json`,
+      JSON.stringify({
+        startDate: startDateUnparsed,
+        endDate: endDateUnparsed,
+        interval: intervalUnparsed,
+        checkpoint: DateTime.fromMillis(currentDate, { zone: 'America/Los_Angeles' }).toISO()
+      })
+    )
+
+    // Build a buffer so that we can write all of the results for a given date at once (to make checkpointing easier)
+    const buffer: CsvRows = { complianceRows: [], metricsRows: [] }
+
     for (const { provider_id, provider_name } of Object.values(providers)) {
       // eslint-disable-next-line no-await-in-loop
-      await computeHistoricalComplianceProvider(
+      const { complianceRows, metricsRows } = await computeHistoricalComplianceProvider(
         provider_id,
         provider_name,
         currentDate - days(2),
         currentDate,
         geographies
       )
+
+      buffer.complianceRows.push(...complianceRows)
+      buffer.metricsRows.push(...metricsRows)
     }
+
+    // eslint-disable-next-line no-await-in-loop
+    await writeCsvRows(buffer)
   }
 }
 
@@ -126,7 +180,7 @@ const computeHistoricalComplianceProvider = async (
   start: number,
   end: number,
   geographies: Geography[]
-) => {
+): Promise<CsvRows> => {
   const iso_timestamp = DateTime.fromMillis(end, { zone: 'America/Los_Angeles' }).toISO()
 
   const events = await db.getLatestEventPerVehicle({
@@ -170,10 +224,9 @@ const computeHistoricalComplianceProvider = async (
     })
     .filter(filterDefined())
 
-  if (complianceRows.length > 0) {
-    const metricsRows = complianceRows.map(complianceRowToMetricsRow)
-    await Promise.all([complianceCsvWriter.writeRecords(complianceRows), metricsCsvWriter.writeRecords(metricsRows)])
-  }
+  const metricsRows = complianceRows.map(complianceRowToMetricsRow)
+
+  return { complianceRows, metricsRows }
 }
 
 ProcessManager({
