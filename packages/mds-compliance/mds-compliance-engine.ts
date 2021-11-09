@@ -331,14 +331,20 @@ function processPolicy(
             [{ matched: [], overflowed: [] }]
           )
 
+          console.log(
+            JSON.stringify(
+              bucketMap.map(x => ({ matchedLen: x.matched.length, overflowedLen: x.overflowed.length })),
+              null,
+              2
+            )
+          )
+
           const vehiclesMatched = bucketMap.reduce((acc: MatchedVehicle[], map) => {
             return [...acc, ...map.matched]
           }, [])
           vehiclesToFilter.push(...vehiclesMatched)
 
-          const overflowVehicles = bucketMap.reduce((acc: MatchedVehiclePlusRule[], map) => {
-            return [...acc, ...map.overflowed]
-          }, [])
+          const overflowVehicles = Object.values(overflowVehiclesMap)
 
           // Add overflowed vehicles to the overall overflowVehiclesMap.
           overflowVehiclesMap = {

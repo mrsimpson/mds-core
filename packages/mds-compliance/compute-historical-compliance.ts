@@ -73,7 +73,7 @@ const computeHistoricalComplianceProvider = async (
     return acc
   }, {} as { [device_id: string]: Device })
 
-  const policies: Policy[] = await db.readActivePolicies(end) // [await db.readPolicy('de8ba6df-4fb5-4dd6-adf3-c9a328950675')]
+  const policies: Policy[] = await db.readActivePolicies(end)
 
   const complianceResults = policies.map(policy =>
     !policy.provider_ids || policy.provider_ids.length === 0 || policy.provider_ids?.includes(provider_id)
