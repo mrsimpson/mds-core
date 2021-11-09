@@ -265,7 +265,7 @@ function processPolicy(
       return e_1.timestamp - e_2.timestamp
     })
     const vehiclesToFilter: MatchedVehicle[] = []
-    let overflowVehiclesMap: { [key: string]: MatchedVehiclePlusRule } = {}
+    const overflowVehiclesMap: { [key: string]: MatchedVehiclePlusRule } = {}
     let countVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
     let countViolations = 0
     const timeVehiclesMap: { [d: string]: MatchedVehiclePlusRule } = {}
@@ -321,6 +321,10 @@ function processPolicy(
                       acc.matched.push(match_instance)
                     } else {
                       acc.overflowed.push({ ...match_instance, rule_id: rule.rule_id })
+                      overflowVehiclesMap[match_instance.device.device_id] = {
+                        ...match_instance,
+                        rule_id: rule.rule_id
+                      }
                     }
                     return acc
                   },
@@ -338,18 +342,6 @@ function processPolicy(
 
           const overflowVehicles = Object.values(overflowVehiclesMap)
 
-          // Add overflowed vehicles to the overall overflowVehiclesMap.
-          overflowVehiclesMap = {
-            ...overflowVehiclesMap,
-            ...overflowVehicles.reduce(
-              (acc: { [key: string]: MatchedVehiclePlusRule }, match: MatchedVehiclePlusRule) => {
-                acc[match.device.device_id] = match
-                return acc
-              },
-              {}
-            )
-          }
-
           // only vehicles in count maximum violation are in overflow
           // no vehicles are in violation if it's a mininimum violation,
           // but # of violations goes up
@@ -357,7 +349,6 @@ function processPolicy(
 
           if (overflowVehicles.length > 0) {
             countVehiclesMap = { ...countVehiclesMap, ...overflowVehiclesMap }
-            countViolations += overflowVehicles.length
           } else if (vehiclesMatched.length < minimum) {
             countViolations += minimum - vehiclesMatched.length
           }
@@ -420,6 +411,9 @@ function processPolicy(
     const countVehicles = getViolationsArray(countVehiclesMap)
     const timeVehicles = getViolationsArray(timeVehiclesMap)
     const speedingVehicles = getViolationsArray(speedingVehiclesMap)
+
+    const overflowVehicles = Object.values(overflowVehiclesMap)
+    countViolations += overflowVehicles.length
 
     return {
       policy,
