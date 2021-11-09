@@ -331,14 +331,6 @@ function processPolicy(
             [{ matched: [], overflowed: [] }]
           )
 
-          console.log(
-            JSON.stringify(
-              bucketMap.map(x => ({ matchedLen: x.matched.length, overflowedLen: x.overflowed.length })),
-              null,
-              2
-            )
-          )
-
           const vehiclesMatched = bucketMap.reduce((acc: MatchedVehicle[], map) => {
             return [...acc, ...map.matched]
           }, [])
