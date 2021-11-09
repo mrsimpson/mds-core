@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import { Device, Geography, Policy, UUID } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import { days, filterDefined } from '@mds-core/mds-utils'
-import { providers } from '@mds-core/mds-providers'
+import { providers, PROVIDER_ID } from '@mds-core/mds-providers'
 import { processPolicy } from '../mds-compliance-engine'
 import { complianceCsvWriterFactory, complianceRowToMetricsRow, metricsCsvWriterFactory } from './csv-writers'
 import { ComplianceCsvRow, CsvRows } from './types'
@@ -74,7 +74,7 @@ const computeHistoricalComplianceProvider = async (
 }
 
 export const computeHistoricalCompliance = async () => {
-  const { startDate, endDate, interval, writeCheckpoint } = getRawInputs()
+  const { startDate, endDate, interval, writeCheckpoint, provider_ids } = getRawInputs()
   const geographies: Geography[] = await db.readGeographies({ get_published: true })
 
   for (let currentDate = startDate; currentDate <= endDate; currentDate += interval) {
@@ -83,7 +83,8 @@ export const computeHistoricalCompliance = async () => {
     // Build a buffer so that we can write all of the results for a given date at once (to make checkpointing easier)
     const buffer: CsvRows = { complianceRows: [], metricsRows: [] }
 
-    for (const { provider_id, provider_name } of Object.values(providers)) {
+    for (const provider_id of provider_ids) {
+      const { provider_name } = providers[provider_id as PROVIDER_ID]
       // eslint-disable-next-line no-await-in-loop
       const { complianceRows, metricsRows } = await computeHistoricalComplianceProvider(
         provider_id,

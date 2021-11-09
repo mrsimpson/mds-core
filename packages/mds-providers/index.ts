@@ -64,7 +64,7 @@ const PROVIDER_IDS = [
   SUPPORT3_PROVIDER_ID
 ] as const
 
-type PROVIDER_ID = typeof PROVIDER_IDS[number]
+export type PROVIDER_ID = typeof PROVIDER_IDS[number]
 
 export const providers: Readonly<{ [P in PROVIDER_ID]: Readonly<Provider> }> = Object.freeze({
   [JUMP_PROVIDER_ID]: Object.freeze({
@@ -178,7 +178,7 @@ export const providers: Readonly<{ [P in PROVIDER_ID]: Readonly<Provider> }> = O
     provider_id: SUPERPEDESTRIAN_PROVIDER_ID,
     provider_name: 'Superpedestrian',
     url: 'https://www.superpedestrian.com',
-    mds_api_url: 'https://wrangler-mds-production.herokuapp.com/mds',
+    mds_api_url: 'https://wrangler-mds-production.herokuapp.com/mds'
   }),
   [LADOT_PROVIDER_ID]: Object.freeze({
     provider_id: LADOT_PROVIDER_ID,
