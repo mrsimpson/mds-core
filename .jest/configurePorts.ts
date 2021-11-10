@@ -6,6 +6,8 @@ const randPort = () => `${findPort({ start: 4000, end: 6000 })}`
  * Configures random ports for each API/Service
  */
 const setPorts = () => {
+  process.env.RPC_PORT = randPort()
+
   process.env.AGENCY_API_HTTP_PORT = randPort()
 
   process.env.ATTACHMENT_SERVICE_REPL_PORT = randPort()
