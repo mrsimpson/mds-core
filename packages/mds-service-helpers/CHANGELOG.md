@@ -1,5 +1,14 @@
 # @mds-core/mds-service-helpers
 
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [2cd96944]
+- Updated dependencies [add4b114]
+  - @mds-core/mds-utils@0.2.10
+  - @mds-core/mds-logger@0.4.4
+
 ## 0.4.2
 
 ### Patch Changes

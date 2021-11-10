@@ -1,5 +1,12 @@
 # @mds-core/mds-providers
 
+## 0.1.45
+
+### Patch Changes
+
+- 85158deb: Add Boaz Bikes to list of providers
+- c0c8f12f: Fix Boaz Bikes URLs
+
 ## 0.1.44
 
 ### Patch Changes
