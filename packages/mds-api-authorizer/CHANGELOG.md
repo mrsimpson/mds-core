@@ -1,5 +1,13 @@
 # @mds-core/mds-api-authorizer
 
+## 0.1.47
+
+### Patch Changes
+
+- Updated dependencies [2cd96944]
+  - @mds-core/mds-utils@0.2.10
+  - @mds-core/mds-test-data@0.4.4
+
 ## 0.1.46
 
 ### Patch Changes

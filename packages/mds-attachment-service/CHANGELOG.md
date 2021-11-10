@@ -1,5 +1,19 @@
 # @mds-core/mds-attachment-service
 
+## 0.3.4
+
+### Patch Changes
+
+- Updated dependencies [2cd96944]
+- Updated dependencies [add4b114]
+- Updated dependencies [ec904976]
+  - @mds-core/mds-utils@0.2.10
+  - @mds-core/mds-logger@0.4.4
+  - @mds-core/mds-rpc-common@0.2.4
+  - @mds-core/mds-repository@0.1.21
+  - @mds-core/mds-schema-validators@0.3.12
+  - @mds-core/mds-service-helpers@0.4.3
+
 ## 0.3.3
 
 ### Patch Changes
