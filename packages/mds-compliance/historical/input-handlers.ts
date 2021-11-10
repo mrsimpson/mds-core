@@ -3,14 +3,12 @@ import { DateTime, Duration } from 'luxon'
 import hash from 'object-hash'
 import { Timestamp } from '@mds-core/mds-types'
 import { providers } from '@mds-core/mds-providers'
+import { workerData } from 'worker_threads'
 
 export const getRawInputs = () => {
-  const {
-    START_DATE: startDateUnparsed,
-    END_DATE: endDateUnparsed,
-    INTERVAL: intervalUnparsed,
-    PROVIDER_IDS: providerIdsUnparsed
-  } = process.env
+  const { startDateUnparsed, endDateUnparsed, intervalUnparsed, provider_ids } = workerData
+
+  console.log('Inputs for thread:', workerData)
 
   if (!startDateUnparsed || !endDateUnparsed || !intervalUnparsed) {
     throw new Error('Invalid start date and/or end date')
@@ -23,7 +21,7 @@ export const getRawInputs = () => {
         startDateUnparsed,
         endDateUnparsed,
         intervalUnparsed,
-        providerIdsUnparsed,
+        provider_ids,
         checkpointUnparsed: DateTime.fromMillis(currentDate, { zone: 'America/Los_Angeles' }).toISO()
       })
     )
@@ -32,9 +30,8 @@ export const getRawInputs = () => {
   const startDate = DateTime.fromISO(startDateUnparsed, { zone: 'America/Los_Angeles' }).toMillis()
   const endDate = DateTime.fromISO(endDateUnparsed, { zone: 'America/Los_Angeles' }).toMillis()
   const interval = Duration.fromISO(intervalUnparsed).toMillis()
-  const provider_ids = providerIdsUnparsed?.split(',') ?? Object.keys(providers)
 
-  const inputs = { startDateUnparsed, endDateUnparsed, intervalUnparsed, providerIdsUnparsed }
+  const inputs = { startDateUnparsed, endDateUnparsed, intervalUnparsed, provider_ids }
   const inputsHashed = hash(inputs)
 
   if (existsSync(`checkpoint-${inputsHashed}.json`)) {

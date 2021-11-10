@@ -75,6 +75,7 @@ const computeHistoricalComplianceProvider = async (
 
 export const computeHistoricalCompliance = async () => {
   const { startDate, endDate, interval, writeCheckpoint, provider_ids } = getRawInputs()
+  console.log(provider_ids)
   const geographies: Geography[] = await db.readGeographies({ get_published: true })
 
   for (let currentDate = startDate; currentDate <= endDate; currentDate += interval) {
