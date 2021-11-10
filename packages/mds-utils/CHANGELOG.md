@@ -1,5 +1,13 @@
 # @mds-core/mds-utils
 
+## 0.2.10
+
+### Patch Changes
+
+- 2cd96944: Update pointInGeometry so it doesn't log 'cannot check point in shape...' every time it fails, unless using DEBUG mode.
+- Updated dependencies [add4b114]
+  - @mds-core/mds-logger@0.4.4
+
 ## 0.2.9
 
 ### Patch Changes

@@ -102,9 +102,10 @@ const { $schema: complianceViolationDetailsSchema } = SchemaValidator<Compliance
   description: 'Receipt details which provide a pointer to an MDS Compliance Violation.',
   properties: {
     violation_id: uuidSchema,
-    trip_id: { ...uuidSchema, nullable: true, default: null }
+    trip_id: { ...uuidSchema, nullable: true, default: null },
+    policy_id: uuidSchema
   },
-  required: ['violation_id']
+  required: ['violation_id', 'policy_id']
 })
 
 const {
@@ -123,7 +124,7 @@ const {
       },
       receipt_details: {
         description: 'Free-form object which describes the details of this transaction. Highly use-case dependent.',
-        oneOf: [complianceViolationDetailsSchema, { type: 'object' }]
+        anyOf: [complianceViolationDetailsSchema, { type: 'object' }]
       }
     },
     required: ['origin_url', 'receipt_details', 'receipt_id', 'timestamp']

@@ -1,5 +1,22 @@
 # @mds-core/mds-transaction-api
 
+## 0.1.28
+
+### Patch Changes
+
+- Updated dependencies [2cd96944]
+- Updated dependencies [f51ea149]
+- Updated dependencies [5f92a954]
+- Updated dependencies [add4b114]
+- Updated dependencies [efe135e9]
+  - @mds-core/mds-utils@0.2.10
+  - @mds-core/mds-api-server@0.3.12
+  - @mds-core/mds-transaction-service@0.3.4
+  - @mds-core/mds-logger@0.4.4
+  - @mds-core/mds-api-helpers@0.1.54
+  - @mds-core/mds-schema-validators@0.3.12
+  - @mds-core/mds-service-helpers@0.4.3
+
 ## 0.1.27
 
 ### Patch Changes

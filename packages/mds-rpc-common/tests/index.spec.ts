@@ -15,11 +15,14 @@
  */
 
 import { ServiceClient, ServiceError, ServiceResult } from '@mds-core/mds-service-helpers'
+import supertest from 'supertest'
 import test from 'unit.js'
-import { RpcServiceDefinition } from '../@types'
+import { RpcServiceDefinition, RPC_HOST } from '../@types'
 import { RpcClient, RpcRequest, RpcRequestOptions } from '../client'
 import { RpcRoute } from '../index'
 import { RpcServer } from '../server'
+
+const request = supertest(`${RPC_HOST}:${process.env.RPC_PORT}`)
 
 const TEST_WORD = 'mds-rpc-common'
 
@@ -41,7 +44,10 @@ const TestServer = RpcServer(
     length: async ([word]) =>
       word && word.length > 0 ? ServiceResult(word.length) : ServiceError({ type: 'NotFoundError', message: 'No Word' })
   },
-  { repl: { context: {} } }
+  {
+    repl: { context: {} },
+    customize: server => server.get('/ping', (_, res) => res.status(200).send('pong'))
+  }
 ).controller()
 
 const TestClient = (options: RpcRequestOptions = {}): ServiceClient<TestService> => ({
@@ -65,6 +71,11 @@ describe('Test RPC Client', () => {
     })
   })
 
+  const requestIt = (req: supertest.Test, assert: (req: supertest.Test) => Promise<void>) =>
+    it(`Testing ${req.url}`, async () => {
+      await assert(req)
+    })
+
   describe('Test Service Available', () => {
     beforeAll(async () => {
       await TestServer.start()
@@ -79,6 +90,20 @@ describe('Test RPC Client', () => {
         isServiceError: true,
         type: 'NotFoundError'
       })
+    })
+
+    requestIt(request.get('/health'), async req => {
+      const result = await req.expect(200)
+      expect(result.body).toMatchObject({ status: 'Running' })
+    })
+
+    requestIt(request.get('/not-found'), async req => {
+      await req.expect(404)
+    })
+
+    requestIt(request.get('/ping'), async req => {
+      const result = await req.expect(200)
+      expect(result.text).toEqual('pong')
     })
 
     afterAll(async () => {

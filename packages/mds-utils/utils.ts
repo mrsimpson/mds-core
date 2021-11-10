@@ -254,7 +254,7 @@ function pointInGeometry(pt: [number, number], shape: Geometry): boolean {
     }
     return false
   }
-  UtilsLogger.error(`cannot check point in shape for type ${shape.type}, returning false`)
+  UtilsLogger.debug(`cannot check point in shape for type ${shape.type}, returning false`)
 
   return false
 }

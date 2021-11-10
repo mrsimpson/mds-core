@@ -91,9 +91,11 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
       ELSE 6
     END`
 
+    const ALIAS = 'pe'
+
     try {
       const connection = await this.connect('ro')
-      const query = connection.getRepository(PolicyEntity).createQueryBuilder()
+      const query = connection.getRepository(PolicyEntity).createQueryBuilder(ALIAS)
 
       const pager = (() => {
         if (limit) {
@@ -103,7 +105,7 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
           }
           return buildPaginator({
             entity: PolicyEntity,
-            alias: 'PolicyEntity',
+            alias: ALIAS,
             paginationKeys: keys,
             query: {
               limit: limit,

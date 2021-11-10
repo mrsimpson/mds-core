@@ -27,7 +27,7 @@ import {
 } from '@mds-core/mds-api-server'
 import { ProcessManager } from '@mds-core/mds-service-helpers'
 import { Nullable } from '@mds-core/mds-types'
-import express from 'express'
+import express, { Express } from 'express'
 import http from 'http'
 import net from 'net'
 import REPL from 'repl'
@@ -40,12 +40,21 @@ export interface RpcServiceHandlers {
 }
 
 export interface RpcServerOptions {
+  // Override the default RPC port
   port: string | number
+  // Read Eval Print Loop options
   repl: Partial<{
+    // Override the default REPL port
     port: string
+    // Context (data/functions) available to the REPL
     context: unknown
   }>
+  // Override the maximum size of the request body
   maxRequestSize: RawBodyParserMiddlewareOptions['limit']
+  // This function allows the RPC server instance to be customized. Typically this is used to add
+  // custom middleware or http routes. For example, to make custom readiness/liveliness checks
+  // available via http.
+  customize: (server: Express) => Express
 }
 
 const stopServer = async (server: http.Server | net.Server): Promise<void> =>
@@ -95,13 +104,18 @@ export const RpcServer = <S>(
   let server: Nullable<http.Server> = null
   let repl: Nullable<net.Server> = null
 
+  const httpServer = (application: Express, port: number): http.Server => {
+    const { customize = s => s } = options
+    return HttpServer(customize(application), { port })
+  }
+
   return ProcessManager({
     start: async () => {
       if (!server) {
         const port = Number(options.port || process.env.RPC_PORT || RPC_PORT)
         RpcCommonLogger.info(`Starting RPC server listening for ${RPC_CONTENT_TYPE} requests on port ${port}`)
         await onStart()
-        server = HttpServer(
+        server = httpServer(
           express()
             .use(PrometheusMiddleware())
             .use(RequestLoggingMiddleware({ includeRemoteAddress: true }))
@@ -112,7 +126,7 @@ export const RpcServer = <S>(
                 codec: new ModuleRpcProtocolGrpcWebCommon.GrpcWebJsonWithGzipCodec()
               })
             ),
-          { port }
+          port
         )
         /* istanbul ignore next */
         if (options.repl && process.env.NODE_ENV !== 'test') {
