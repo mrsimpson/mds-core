@@ -71,10 +71,16 @@ ProcessManager({
         /** Range for each datetime partition */
         const range = (endDate - startDate) / threadCount
 
-        const partitions: [start_date: number, end_date: number][] = Array.from({ length: threadCount }, (_, i) => [
-          startDate + i * range,
-          startDate + (i + 1) * range
-        ])
+        const partitions: [start_date: number, end_date: number][] = Array.from({ length: threadCount }, (_, i) => {
+          const baseStartDate = startDate + i * range
+          const baseEndDate = startDate + (i + 1) * range
+
+          // adjust start date and end date to closest 5 minute interval
+          const adjustedStartDate = Math.floor(baseStartDate / 300000) * 300000
+          const adjustedEndDate = Math.floor(baseEndDate / 300000) * 300000
+
+          return [adjustedStartDate, adjustedEndDate]
+        })
 
         return partitions
       })()

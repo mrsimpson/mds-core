@@ -79,8 +79,6 @@ export const computeHistoricalCompliance = async () => {
   const geographies: Geography[] = await db.readGeographies({ get_published: true })
 
   for (let currentDate = startDate; currentDate <= endDate; currentDate += interval) {
-    writeCheckpoint(currentDate)
-
     // Build a buffer so that we can write all of the results for a given date at once (to make checkpointing easier)
     const buffer: CsvRows = { complianceRows: [], metricsRows: [] }
 
@@ -100,6 +98,6 @@ export const computeHistoricalCompliance = async () => {
     }
 
     // eslint-disable-next-line no-await-in-loop
-    await writeCsvRows(buffer)
+    await Promise.all([writeCsvRows(buffer), writeCheckpoint(currentDate + interval)])
   }
 }
