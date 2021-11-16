@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.6.5
+
+### Patch Changes
+
+- 5d78cbed: Change event query to INNER join on telemetry since it is now required for all events
+
 ## 0.6.4
 
 ### Patch Changes

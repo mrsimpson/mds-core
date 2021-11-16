@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-ingest-migration-processor",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "MDS Ingest Data Migration Processor",
   "keywords": [
     "mds"
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@mds-core/mds-agency-cache": "workspace:0.4.3",
-    "@mds-core/mds-ingest-service": "workspace:0.6.4",
+    "@mds-core/mds-ingest-service": "workspace:0.6.5",
     "@mds-core/mds-logger": "workspace:0.4.4",
     "@mds-core/mds-repository": "workspace:0.1.21",
     "@mds-core/mds-service-helpers": "workspace:0.4.3",
