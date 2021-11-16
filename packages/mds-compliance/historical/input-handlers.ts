@@ -23,7 +23,8 @@ export const getRawInputs = () => {
         endDate,
         intervalUnparsed,
         provider_ids,
-        checkpointUnparsed: DateTime.fromMillis(currentDate, { zone: 'America/Los_Angeles' }).toISO()
+        checkpointUnparsed: DateTime.fromMillis(currentDate, { zone: 'America/Los_Angeles' }).toISO(),
+        progressPct: (currentDate - startDate) / (endDate - startDate) * 100
       })
     )
   }
