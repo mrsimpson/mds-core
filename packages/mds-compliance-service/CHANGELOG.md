@@ -1,5 +1,15 @@
 # @mds-core/mds-compliance-service
 
+## 0.7.6
+
+### Patch Changes
+
+- d4bd927b: Typeorm now supports generated IDENTITY columns in Postgres
+- Updated dependencies [d4bd927b]
+  - @mds-core/mds-policy-service@0.9.1
+  - @mds-core/mds-repository@0.1.22
+  - @mds-core/mds-db@0.4.16
+
 ## 0.7.5
 
 ### Patch Changes
