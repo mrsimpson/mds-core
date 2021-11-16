@@ -1,5 +1,15 @@
 # @mds-core/mds-audit
 
+## 0.2.14
+
+### Patch Changes
+
+- Updated dependencies [d4bd927b]
+  - @mds-core/mds-attachment-service@0.3.5
+  - @mds-core/mds-ingest-service@0.6.6
+  - @mds-core/mds-db@0.4.16
+  - @mds-core/mds-api-helpers@0.1.56
+
 ## 0.2.13
 
 ### Patch Changes

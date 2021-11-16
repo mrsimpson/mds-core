@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.1.22
+
+### Patch Changes
+
+- d4bd927b: Typeorm now supports generated IDENTITY columns in Postgres
+
 ## 0.1.21
 
 ### Patch Changes
