@@ -42,7 +42,7 @@ export const complianceRowToMetricsRow = (row: ComplianceCsvRow): MetricsCsvRow 
   }
   const { timestamp, provider_id, policy_id, total_violations } = row
   return {
-    measure: 'compliance',
+    measure: 'compliance.aggregate.avg',
     time_bin_duration: INTERVAL,
     time_bin_start: timestamp,
     provider_id,
