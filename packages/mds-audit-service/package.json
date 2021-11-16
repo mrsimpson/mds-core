@@ -30,6 +30,6 @@
     "@mds-core/mds-utils": "workspace:0.2.10",
     "joi": "17.4.0",
     "pg": "8.7.1",
-    "typeorm": "0.2.38"
+    "typeorm": "0.2.40"
   }
 }

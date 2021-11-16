@@ -29,7 +29,7 @@ export const IdentityColumn = <T extends AnyConstructor>(
   options: ColumnWithWidthOptions & ColumnCommonOptions = {}
 ) => {
   abstract class IdentityColumnMixin extends EntityClass implements IdentityColumn {
-    @Column('bigint', { generated: 'increment', transformer: BigintTransformer, ...options })
+    @Column({ type: 'bigint', generated: 'identity', insert: false, transformer: BigintTransformer, ...options })
     @Index({ unique: true })
     id: number
   }

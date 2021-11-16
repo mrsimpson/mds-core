@@ -32,6 +32,6 @@
     "@mds-core/mds-utils": "workspace:0.2.10",
     "ajv": "8.6.1",
     "pg": "8.7.1",
-    "typeorm": "0.2.38"
+    "typeorm": "0.2.40"
   }
 }
