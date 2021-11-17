@@ -16,7 +16,7 @@
 
 import { BigintTransformer, IdentityColumn } from '@mds-core/mds-repository'
 import { Nullable, Timestamp, UUID } from '@mds-core/mds-types'
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 import { PolicyDomainModel } from '../../@types'
 
 export interface PolicyEntityModel extends IdentityColumn {
@@ -40,11 +40,14 @@ export class PolicyEntity extends IdentityColumn(class {}) implements PolicyEnti
   superseded_by: PolicyEntityModel['superseded_by']
 
   @Column('bigint', { transformer: BigintTransformer })
+  @Index()
   start_date: Timestamp
 
   @Column('bigint', { transformer: BigintTransformer, nullable: true })
+  @Index()
   end_date: Nullable<Timestamp>
 
   @Column('bigint', { transformer: BigintTransformer, nullable: true })
+  @Index()
   publish_date: Nullable<Timestamp>
 }
