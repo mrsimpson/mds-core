@@ -1,0 +1,1936 @@
+[
+  {
+    "name": "LADOT Mobility Caps: Jump",
+    "rules": [
+      {
+        "name": "SFV DACs",
+        "maximum": 0,
+        "rule_id": "9b3447a4-eb53-483a-b88a-589b1296e8cb",
+        "rule_type": "count",
+        "geographies": [
+          "e3ed0a0e-61d3-4887-8b6a-4af4f3769c14"
+        ],
+        "vehicle_types": [
+          "bicycle",
+          "scooter"
+        ],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      },
+      {
+        "name": "All other DACs (bikes)",
+        "maximum": 1250,
+        "rule_id": "88eb55a9-b3a4-4e1f-85ac-d44170b9dda0",
+        "rule_type": "count",
+        "geographies": [
+          "0c444869-1674-4234-b4f3-ab5685bcf0d9"
+        ],
+        "vehicle_types": [
+          "bicycle"
+        ],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      },
+      {
+        "name": "All other DACs (scooters)",
+        "maximum": 1250,
+        "rule_id": "f53ac565-2018-462e-a43d-fc95bda576b2",
+        "rule_type": "count",
+        "geographies": [
+          "0c444869-1674-4234-b4f3-ab5685bcf0d9"
+        ],
+        "vehicle_types": [
+          "scooter"
+        ],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      },
+      {
+        "name": "Non-DAC",
+        "maximum": 1500,
+        "rule_id": "d98f65ef-b88f-492a-ae3d-62f99f71b868",
+        "rule_type": "count",
+        "geographies": [
+          "1f943d59-ccc9-4d91-b6e2-0c5e771cbc49"
+        ],
+        "vehicle_types": [
+          "bicycle"
+        ],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      },
+      {
+        "name": "Non-DAC",
+        "maximum": 1500,
+        "rule_id": "d5e6154c-40e3-4dd8-aaf6-35a9effa1b8d",
+        "rule_type": "count",
+        "geographies": [
+          "1f943d59-ccc9-4d91-b6e2-0c5e771cbc49"
+        ],
+        "vehicle_types": [
+          "scooter"
+        ],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      }
+    ],
+    "end_date": null,
+    "policy_id": "8e9bfa16-9026-4a9f-8077-f42619a87854",
+    "start_date": 1558389669540,
+    "description": "Mobility caps as described in the One-Year Permit",
+    "publish_date": 1567114161017,
+    "prev_policies": null
+  },
+  {
+    "name": "dddd",
+    "rules": [
+      {
+        "name": "feaw",
+        "minimum": 0,
+        "rule_id": "af9953b4-f90b-49e2-a0d9-a5bf36dd7b72",
+        "rule_type": "count",
+        "geographies": [
+          "88476666-2c50-4ff4-9530-1758befa9319"
+        ],
+        "vehicle_types": [],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "b10a6039-b0cb-4509-bcc0-bfa044c2cdad",
+    "start_date": 1572591600000,
+    "description": "asdf",
+    "provider_ids": [],
+    "publish_date": 1572543781957,
+    "prev_policies": null
+  },
+  {
+    "name": "dddda",
+    "rules": [
+      {
+        "name": "feaw",
+        "minimum": 0,
+        "rule_id": "615f1e8a-811a-4ef7-ad33-3077a1b31fed",
+        "rule_type": "count",
+        "geographies": [
+          "88476666-2c50-4ff4-9530-1758befa9319"
+        ],
+        "vehicle_types": [],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "f2ec4a1d-35c1-42b1-93ce-eb026e797186",
+    "start_date": 1572591600000,
+    "description": "asdf",
+    "provider_ids": [],
+    "publish_date": 1572544050475,
+    "prev_policies": null
+  },
+  {
+    "name": "dddd m",
+    "rules": [
+      {
+        "name": "asdf",
+        "minimum": 0,
+        "rule_id": "e73a6aba-3deb-437a-b329-ce2e1ce3ec63",
+        "rule_type": "count",
+        "geographies": [
+          "48bd78cf-262b-44d5-83ba-3697d29e1d22"
+        ],
+        "vehicle_types": [],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "ca7f7d7e-78da-4e8e-b661-dc6137cd5215",
+    "start_date": 1572591600000,
+    "description": "asd",
+    "provider_ids": [],
+    "publish_date": 1572590929665,
+    "prev_policies": null
+  },
+  {
+    "name": "Deactivate: azeaze",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "9a053248-03a9-49b1-9719-d4f1f94e3f72",
+        "rule_type": "count",
+        "geographies": [
+          "b8064e87-08d9-448e-84df-1313caa61572"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "2fb6c8a3-8323-4588-98a1-f0bc3903ae09",
+    "start_date": 1627598093867,
+    "description": "Deactivates policy 6866a655-090f-43e6-924f-f98609fa1457",
+    "provider_ids": [
+      "07975cc8-c8c4-4544-9090-082e03477633",
+      "1239e0ad-c115-44cd-9ee3-e03ac4faa79a",
+      "7514fb21-ff10-478e-9183-6a6bfb38f9ac",
+      "9bf0b395-012a-4566-ab15-a475e35d0af2"
+    ],
+    "publish_date": 1627597994029,
+    "prev_policies": [
+      "6866a655-090f-43e6-924f-f98609fa1457"
+    ]
+  },
+  {
+    "name": "Deactivate: LADOT Mobility Caps: Bird",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "748271cb-b977-4ed5-a82d-0c8980c848b3",
+        "rule_type": "count",
+        "geographies": [
+          "e3ed0a0e-61d3-4887-8b6a-4af4f3769c14"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "9943caca-608d-4415-a35a-956878045b59",
+    "start_date": 1567119739654,
+    "description": "Deactivates policy 8de0e9fd-5686-484c-9e59-7f8223dba048",
+    "provider_ids": [
+      "2411d395-04f2-47c9-ab66-d09e9e3c3251"
+    ],
+    "publish_date": 1567119739954,
+    "prev_policies": [
+      "8de0e9fd-5686-484c-9e59-7f8223dba048"
+    ]
+  },
+  {
+    "name": "Deactivate: LADOT Mobility Caps: Bolt",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "37c8871a-5c90-4dfe-b689-5164be229cb0",
+        "rule_type": "count",
+        "geographies": [
+          "e3ed0a0e-61d3-4887-8b6a-4af4f3769c14"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "8ed3f3dc-f2ab-46e3-aae1-006cb1410cf8",
+    "start_date": 1567119784621,
+    "description": "Deactivates policy 4c1464b6-490e-4540-adbf-de7b98d8f9fd",
+    "publish_date": 1567119784918,
+    "prev_policies": [
+      "4c1464b6-490e-4540-adbf-de7b98d8f9fd"
+    ]
+  },
+  {
+    "name": "LADOT Mobility Caps: Lime",
+    "rules": [
+      {
+        "name": "SFV DACs",
+        "maximum": 0,
+        "rule_id": "75ffcef2-fce7-4e6e-8b6a-d7c718acbaf7",
+        "rule_type": "count",
+        "geographies": [
+          "e3ed0a0e-61d3-4887-8b6a-4af4f3769c14"
+        ],
+        "vehicle_types": [
+          "bicycle",
+          "scooter"
+        ],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      },
+      {
+        "name": "All other DACs (scooters)",
+        "maximum": 2500,
+        "rule_id": "8c1df54f-036d-4d7d-80b2-965cc9d7ff09",
+        "rule_type": "count",
+        "geographies": [
+          "0c444869-1674-4234-b4f3-ab5685bcf0d9"
+        ],
+        "vehicle_types": [
+          "bicycle",
+          "scooter"
+        ],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      },
+      {
+        "name": "Non-DAC",
+        "maximum": 3000,
+        "rule_id": "247d2379-1bdd-4b38-acf1-594ca05aac79",
+        "rule_type": "count",
+        "geographies": [
+          "1f943d59-ccc9-4d91-b6e2-0c5e771cbc49"
+        ],
+        "vehicle_types": [
+          "bicycle",
+          "scooter"
+        ],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      }
+    ],
+    "end_date": null,
+    "policy_id": "f2c5348a-e1dc-431e-a630-6f09f324f624",
+    "start_date": 1558389669540,
+    "description": "Mobility caps as described in the One-Year Permit",
+    "publish_date": 1568676382738,
+    "prev_policies": null
+  },
+  {
+    "name": "BLUE test: LADOT Mobility Caps: Bird",
+    "rules": [
+      {
+        "name": "SFV DACs",
+        "maximum": 0,
+        "rule_id": "456ebeab-b43c-4dbf-a2d2-b9473858d681",
+        "rule_type": "count",
+        "geographies": [
+          "e3ed0a0e-61d3-4887-8b6a-4af4f3769c14"
+        ],
+        "vehicle_types": [
+          "bicycle",
+          "scooter"
+        ],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      }
+    ],
+    "end_date": null,
+    "policy_id": "93c9d655-6263-471e-af61-45ba677284f5",
+    "start_date": 1558389669540,
+    "description": "Mobility caps as described in the One-Year Permit",
+    "provider_ids": [
+      "2411d395-04f2-47c9-ab66-d09e9e3c3251"
+    ],
+    "publish_date": 1568763364514
+  },
+  {
+    "name": "Venice Special Operations Zone: Morning Deployment Policy (Revised July 2021)",
+    "rules": [
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "fa8dcf8f-e716-4639-97a8-f42596f39c93",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "6dc968c7-19f4-421c-b9d1-683dd3cdb632"
+        ],
+        "vehicle_types": [
+          "bicycle",
+          "scooter"
+        ],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "5f4d6a02-af22-4775-aa72-27161dc93053",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "aa4dc424-09e4-48f3-8471-df5186927016"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "6eeec9af-5d82-45a2-87d7-458c064698e7",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "f5f4a15d-447f-4969-aedb-a0e94ae5b183"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "713e27e0-204c-4685-8fea-5b8d94bf4a39",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "fb411640-0220-43f4-bfc7-6f01350dadfe"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "6280d440-61e9-42ae-883d-321255680c35",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "456c25f0-a9ce-4ff3-8610-3cee919a3539"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "e0800d31-f87d-430a-9d71-a7626e3cc664",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "0a484e09-7a95-4e7d-86c7-a10a58268ee2"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "c1107a92-d6b8-4ecf-a55e-69eb84437310",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "06b4e69e-da53-4340-8354-5a2262034657"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "9b0c5227-4bf3-4031-a0eb-eb4a75630f88",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "b1fdf441-ce46-4f22-bb70-dd2e99df1001"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "ed5e45c6-a87a-406b-a124-c46761f7882e",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "2166b7dd-10ab-4219-9921-0d8c0f082308"
+        ],
+        "vehicle_types": [],
+        "states": {}
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "4319af0f-8a1c-4122-9133-71db36aeee1e",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "86f9a2bd-48c8-4447-b6eb-60916da16aa1"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "9fbba605-d934-4126-906d-8138165bdf44",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "d5d889c5-b6b9-4b83-bbcb-f5209d8dbcc3"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "f6a4e455-5076-403e-ad9f-3b13a61bafed",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "5a5b5ffa-5f9f-4db8-ba09-72c5deaac41a"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "5f7043f2-5a54-44c6-9b93-b0ce563f88cd",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "2a4fbdb9-ff76-4060-aa92-1d37e26732e8"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "fa1d5e44-be53-4164-9fa9-6d1388ce59b1",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "8ce201f3-34d7-46a2-aed3-282fcb6938ac"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "2a7a7d4f-15be-4d2e-b13c-530e249283d6",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "2d7f76f0-f45e-4563-8be1-280f77b1181a"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "967b3620-c7c5-4513-8286-86dba6824922",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "45e85d25-a1bd-4972-9871-d7762e1ffe8f"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "f0853354-95d1-4783-95c9-d812ec80e434",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "9912fa40-b594-492f-91d0-113a7568bb2b"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "73a11b71-f07e-41ee-b36a-1bfc9de38782",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "e1d54dc4-9466-4d7b-bcf2-e873716d0a7b"
+        ],
+        "vehicle_types": [],
+        "states": {}
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "5ea86d6a-0775-42ec-b499-30cfc5f668dc",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "9bb19cd1-2530-4f7f-8de0-80e7326a3e32"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "a99c10a6-2797-47ad-bf33-2758c9b69b85",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "2aa25299-514e-4b3f-9828-533649ceff2e"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "7b7089f6-f120-4d9f-a370-beaf6b6f5f5c",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "fe9c910a-7aca-4a42-9d63-e014b3c243d7"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "ae020597-9b38-40b2-bc38-9ff4849e8377",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "7beb1d83-66e7-4654-8c6b-6710fa26d1bd"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "9951377f-aaa3-41e4-84eb-efc44664be88",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "c7553640-730f-4ae1-a422-68bac4b849cc"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "ae32928d-adee-4b3b-a1ae-91fdcbae4e39",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "e42f7e97-b5e6-4ebe-8ddc-05fc806ce54e"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "a618aa76-d3fb-417d-ad56-c2607a9f48be",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "b539054b-541a-43b3-a182-58a0bd0958fd"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "6ee13e94-9354-4982-9cee-d222bc8ee5dc",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "73779ce8-e0fb-48c0-96ba-a1e7f7738279"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "f6e88384-a45d-49d9-879e-fc3c13fa1237",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "24356b34-f7b8-4f1a-9e44-c941199f3b9c"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "1ee07645-77a5-43eb-8c8f-8406c41bb51c",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "79d572a4-6333-441a-9289-d244b555c8bb"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "716c73ec-7754-45f6-b1ab-d96556142c7a",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "f8b380ad-d112-4085-8ba8-1fbd2da2729a"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "10d5c4e6-dc6e-4414-85f1-04156531b8a6",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "8c811dcf-ccb3-4da4-b821-e9e980a696ee"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "80b5a01f-e83d-4142-a4c5-db6584bcc27f",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "24d70247-fd01-4718-a169-d91b1833472c"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "973186d1-9783-49bd-92db-0caf0cd2821f",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "088838d2-614e-4a03-be3f-5151eefd5350"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "fbb80eca-997a-41e7-8c6e-8b4f0169b04f",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "fefa3f00-c35e-4394-a2a9-86a07c592c91"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "486092f1-5f32-47a3-9666-7137dc8c3999",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "52493dc9-ab29-4956-8371-bb358d1ab3cc"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "b7f78a92-ca59-47f9-bdfa-beecb2df8f6b",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "14e70eed-4828-43c0-bc4d-d7399bea9c0a"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "6e1af519-e5ae-474c-88a5-d116e119bffb",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "2febdefd-9c2f-4307-a18e-fd0748a2b940"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "Morning deployment drop off caps",
+        "maximum": 5,
+        "rule_id": "633f5d49-e767-4137-9d4b-c5a49b3fc5db",
+        "end_time": "10:00:00",
+        "rule_type": "count",
+        "start_time": "05:00:00",
+        "geographies": [
+          "e6f1c34a-2b3c-4346-89b7-dac35403f990"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      },
+      {
+        "name": "No deployments or rebalancing outside of parking zones",
+        "maximum": 0,
+        "rule_id": "344c410a-83c2-4f34-bbac-e640ac092874",
+        "rule_type": "count",
+        "geographies": [
+          "2484bca1-965a-48b0-8279-f20a9940e786"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "available": [
+            "on_hours",
+            "provider_drop_off"
+          ],
+          "elsewhere": [
+            "on_hours",
+            "provider_drop_off"
+          ],
+          "non_operational": [
+            "on_hours",
+            "provider_drop_off"
+          ],
+          "on_trip": [
+            "on_hours",
+            "provider_drop_off"
+          ],
+          "removed": [
+            "on_hours",
+            "provider_drop_off"
+          ],
+          "reserved": [
+            "on_hours",
+            "provider_drop_off"
+          ],
+          "unknown":  [
+            "on_hours",
+            "provider_drop_off"
+          ]
+        }
+      }
+    ],
+    "end_date": null,
+    "policy_id": "02445462-5d8d-4e44-9c43-bd4433a6754f",
+    "start_date": 1627671600000,
+    "description": "Operators are authorized to begin daily deployment only between the hours of 5:00 a.m. to 10:00 a.m., daily, AND are authorized to deploy up to a maximum of 5 vehicles per parking zone.",
+    "provider_ids": [],
+    "publish_date": 1627599632889,
+    "prev_policies": [
+      "fe75af8e-fb12-40fe-b85b-2c82487afadd"
+    ]
+  },
+  {
+    "name": "Deactivate: Venice Special Operating Zone: Operator Deploy and Rebalance in Parking Zones Only (Revised July 2021)",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "41537fd4-a54b-4b6f-8df1-b404075dac5e",
+        "rule_type": "count",
+        "geographies": [
+          "6dc968c7-19f4-421c-b9d1-683dd3cdb632",
+          "aa4dc424-09e4-48f3-8471-df5186927016",
+          "f5f4a15d-447f-4969-aedb-a0e94ae5b183",
+          "fb411640-0220-43f4-bfc7-6f01350dadfe",
+          "456c25f0-a9ce-4ff3-8610-3cee919a3539",
+          "0a484e09-7a95-4e7d-86c7-a10a58268ee2",
+          "06b4e69e-da53-4340-8354-5a2262034657",
+          "b1fdf441-ce46-4f22-bb70-dd2e99df1001",
+          "2166b7dd-10ab-4219-9921-0d8c0f082308",
+          "86f9a2bd-48c8-4447-b6eb-60916da16aa1",
+          "d5d889c5-b6b9-4b83-bbcb-f5209d8dbcc3",
+          "5a5b5ffa-5f9f-4db8-ba09-72c5deaac41a",
+          "2a4fbdb9-ff76-4060-aa92-1d37e26732e8",
+          "8ce201f3-34d7-46a2-aed3-282fcb6938ac",
+          "2d7f76f0-f45e-4563-8be1-280f77b1181a",
+          "45e85d25-a1bd-4972-9871-d7762e1ffe8f",
+          "9912fa40-b594-492f-91d0-113a7568bb2b",
+          "e1d54dc4-9466-4d7b-bcf2-e873716d0a7b",
+          "9bb19cd1-2530-4f7f-8de0-80e7326a3e32",
+          "2aa25299-514e-4b3f-9828-533649ceff2e",
+          "fe9c910a-7aca-4a42-9d63-e014b3c243d7",
+          "7beb1d83-66e7-4654-8c6b-6710fa26d1bd",
+          "c7553640-730f-4ae1-a422-68bac4b849cc",
+          "e42f7e97-b5e6-4ebe-8ddc-05fc806ce54e",
+          "b539054b-541a-43b3-a182-58a0bd0958fd",
+          "73779ce8-e0fb-48c0-96ba-a1e7f7738279",
+          "24356b34-f7b8-4f1a-9e44-c941199f3b9c",
+          "79d572a4-6333-441a-9289-d244b555c8bb",
+          "f8b380ad-d112-4085-8ba8-1fbd2da2729a",
+          "8c811dcf-ccb3-4da4-b821-e9e980a696ee",
+          "24d70247-fd01-4718-a169-d91b1833472c",
+          "088838d2-614e-4a03-be3f-5151eefd5350",
+          "fefa3f00-c35e-4394-a2a9-86a07c592c91",
+          "52493dc9-ab29-4956-8371-bb358d1ab3cc",
+          "14e70eed-4828-43c0-bc4d-d7399bea9c0a",
+          "2febdefd-9c2f-4307-a18e-fd0748a2b940",
+          "e6f1c34a-2b3c-4346-89b7-dac35403f990"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "cadfafd3-7a8b-4586-bbf0-c809c7eed4f3",
+    "start_date": 1627599782062,
+    "description": "Deactivates policy 9c109e0c-b8a8-451c-bb47-df889254b319",
+    "provider_ids": [],
+    "publish_date": 1627599682248,
+    "prev_policies": [
+      "9c109e0c-b8a8-451c-bb47-df889254b319"
+    ]
+  },
+  {
+    "name": "Deactivate: Venice Special Operating Zone Fleet Cap",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "2d94de35-fb12-42a6-a00c-673c3f1926f1",
+        "rule_type": "count",
+        "geographies": [
+          "e0e4a085-7a50-43e0-afa4-6792ca897c5a"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "13b25e67-5940-4d5f-935f-9052ffecd8bf",
+    "start_date": 1627600163187,
+    "description": "Deactivates policy ed3d5e2f-c036-4083-9ecc-9a277f64a743",
+    "provider_ids": [],
+    "publish_date": 1627600063561,
+    "prev_policies": [
+      "ed3d5e2f-c036-4083-9ecc-9a277f64a743"
+    ]
+  },
+  {
+    "name": "TEsting",
+    "rules": [
+      {
+        "name": "Fleet cap in downtown",
+        "maximum": 1000,
+        "rule_id": "a9b82d19-b6da-4247-80ab-5f9521959572",
+        "rule_type": "count",
+        "geographies": [
+          "2ace74a5-2233-48b2-a194-0b52f9283336",
+          "33cb3bf8-92ab-4a2f-978f-89f21fd770dc",
+          "dbceb236-36c0-469d-a6eb-c27d878e5453",
+          "aad206a0-f32e-4442-a459-6b73f5cd94bb",
+          "2484bca1-965a-48b0-8279-f20a9940e786"
+        ],
+        "vehicle_types": [
+          "scooter",
+          "bicycle"
+        ],
+        "states": {
+          "available": [
+            "trip_end"
+          ],
+          "elsewhere": [
+            "trip_end"
+          ],
+          "non_operational": [
+            "trip_end"
+          ],
+          "on_trip": [
+            "trip_end"
+          ],
+          "removed": [
+            "trip_end"
+          ],
+          "reserved": [
+            "trip_end"
+          ],
+          "unknown":  [
+            "trip_end"
+          ]
+        }
+      }
+    ],
+    "end_date": null,
+    "policy_id": "e63d78f7-08b3-4de7-9022-5fbf226ba557",
+    "start_date": 1627974000000,
+    "description": "Testing Policey creation in test",
+    "provider_ids": [
+      "c20e08cf-8488-46a6-a66c-5d8fb827f7e0",
+      "63f13c48-34ff-49d2-aca7-cf6a5b6171c3",
+      "e714f168-ce56-4b41-81b7-0b6a4bd26128",
+      "b79f8687-526d-4ae6-80bf-89b4c44dc071"
+    ],
+    "publish_date": 1627949244547,
+    "prev_policies": null
+  },
+  {
+    "name": "Tim P1",
+    "rules": [
+      {
+        "name": "rule 1",
+        "minimum": 0,
+        "rule_id": "2e127f9e-1e4c-4b67-b80f-69bcaf9e1d0d",
+        "rule_type": "count",
+        "geographies": [
+          "ca1b0365-a18b-4f3b-895e-c7e1308b4373"
+        ],
+        "vehicle_types": [],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "296b721e-cc23-4817-9e03-626ce86ec82a",
+    "start_date": 1571468400000,
+    "description": "asdf",
+    "provider_ids": [],
+    "publish_date": 1571425728620,
+    "prev_policies": null
+  },
+  {
+    "name": "test publishing",
+    "rules": [
+      {
+        "name": "test publishing",
+        "minimum": 0,
+        "rule_id": "7a28af83-3ce2-47ac-9b13-059985b88d74",
+        "rule_type": "count",
+        "geographies": [
+          "0e93f5ef-805e-4270-aab8-5a8acaf626e0"
+        ],
+        "vehicle_types": [],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "4e4928a9-6143-4e1b-b6ec-fe20e20139aa",
+    "start_date": 1573804800000,
+    "description": "test publishing of geography",
+    "provider_ids": [],
+    "publish_date": 1573759424838,
+    "prev_policies": null
+  },
+  {
+    "name": "Deactivate: Vehicle cap count for City of Miami",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "70a17291-56eb-4fb3-ad32-83843e3a7ffd",
+        "rule_type": "count",
+        "geographies": [
+          "2ace74a5-2233-48b2-a194-0b52f9283336"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "276478aa-e087-473a-96d5-ff5877d9983b",
+    "start_date": 1588375407004,
+    "description": "Deactivates policy fa7565a3-7c86-4bce-b8b5-dcba64115d32",
+    "provider_ids": [],
+    "publish_date": 1588375407113,
+    "prev_policies": [
+      "fa7565a3-7c86-4bce-b8b5-dcba64115d32"
+    ]
+  },
+  {
+    "name": "Deactivate: prohibited parking henry",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "8bd99412-6067-4810-8ca3-2f662c802855",
+        "rule_type": "count",
+        "geographies": [
+          "fa5ebc7a-b7fc-473b-bc5a-2aad642e2e64"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "445cbf33-4293-4c6b-9ff1-84393d9f5d9a",
+    "start_date": 1588377671729,
+    "description": "Deactivates policy 1f7e9f15-0a42-45bb-9cd1-9b1656452324",
+    "provider_ids": [
+      "2411d395-04f2-47c9-ab66-d09e9e3c3251",
+      "35d898bd-f2cd-4664-a2dc-d522ec1d1aa4",
+      "63f13c48-34ff-49d2-aca7-cf6a5b6171c3",
+      "74ec91e0-ba2a-4505-bbb6-f9c048cd5998",
+      "d73fcf80-22b1-450f-b535-042b4e30aac7",
+      "e714f168-ce56-4b41-81b7-0b6a4bd26128",
+      "fcc794ca-d79e-4b2b-b92d-3169688731d0"
+    ],
+    "publish_date": 1588377671844,
+    "prev_policies": [
+      "1f7e9f15-0a42-45bb-9cd1-9b1656452324"
+    ]
+  },
+  {
+    "name": "Deactivate: fghgfh",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "6904d32a-ca08-44d2-ae6f-78f9fecfed82",
+        "rule_type": "count",
+        "geographies": [
+          "bfa3395a-0197-4867-b4c1-e03f6cf064df"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "8f520df3-5fd6-4ddb-9f99-63036fe437c0",
+    "start_date": 1588377666432,
+    "description": "Deactivates policy 82c5e445-1297-48e6-809f-f7dc5bdac006",
+    "provider_ids": [
+      "2411d395-04f2-47c9-ab66-d09e9e3c3251",
+      "35d898bd-f2cd-4664-a2dc-d522ec1d1aa4",
+      "63f13c48-34ff-49d2-aca7-cf6a5b6171c3",
+      "74ec91e0-ba2a-4505-bbb6-f9c048cd5998",
+      "d73fcf80-22b1-450f-b535-042b4e30aac7",
+      "e714f168-ce56-4b41-81b7-0b6a4bd26128",
+      "fcc794ca-d79e-4b2b-b92d-3169688731d0"
+    ],
+    "publish_date": 1588377666750,
+    "prev_policies": [
+      "82c5e445-1297-48e6-809f-f7dc5bdac006"
+    ]
+  },
+  {
+    "name": "Deactivate: fleet size henry",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "b100ce29-0410-4cf4-9037-d3235c157587",
+        "rule_type": "count",
+        "geographies": [
+          "a56c29b1-7b32-478e-ac23-08cfe68db338"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "d251b19b-fa42-488c-87e5-16fd50aca838",
+    "start_date": 1588377676545,
+    "description": "Deactivates policy e12883f6-1870-4c0b-9def-bc7dd8e99241",
+    "provider_ids": [
+      "2411d395-04f2-47c9-ab66-d09e9e3c3251",
+      "35d898bd-f2cd-4664-a2dc-d522ec1d1aa4",
+      "63f13c48-34ff-49d2-aca7-cf6a5b6171c3",
+      "74ec91e0-ba2a-4505-bbb6-f9c048cd5998",
+      "d73fcf80-22b1-450f-b535-042b4e30aac7",
+      "e714f168-ce56-4b41-81b7-0b6a4bd26128",
+      "fcc794ca-d79e-4b2b-b92d-3169688731d0"
+    ],
+    "publish_date": 1588377676654,
+    "prev_policies": [
+      "e12883f6-1870-4c0b-9def-bc7dd8e99241"
+    ]
+  },
+  {
+    "name": "Deactivate: tim - publish test 1",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "d1c94c55-9575-47f5-b3d1-b80376fa377d",
+        "rule_type": "count",
+        "geographies": [
+          "88476666-2c50-4ff4-9530-1758befa9319"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "987682b6-1a1f-40b7-bd5c-a0b5af3482b8",
+    "start_date": 1588377954447,
+    "description": "Deactivates policy 256c4b13-12b7-4afd-b6ac-617568cc00c4",
+    "provider_ids": [],
+    "publish_date": 1588377954711,
+    "prev_policies": [
+      "256c4b13-12b7-4afd-b6ac-617568cc00c4"
+    ]
+  },
+  {
+    "name": "Deactivate: Hollywood Boulevard SOZ (draft 1)",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "2c3b282e-0598-4593-b18e-88aec366f01a",
+        "rule_type": "count",
+        "geographies": [
+          "15d18aea-bfd8-4fad-845e-1c2d41436c61"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "7eb4c8ac-57b8-40a4-a728-aec490561887",
+    "start_date": 1588378227477,
+    "description": "Deactivates policy 217e57c9-e78e-43d4-9bec-b7613fa2fe7a",
+    "provider_ids": [],
+    "publish_date": 1588378227729,
+    "prev_policies": [
+      "217e57c9-e78e-43d4-9bec-b7613fa2fe7a"
+    ]
+  },
+  {
+    "name": "Deactivate: Hollywood Boulevard SOZ (draft)",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "b39e4ff4-e7e8-4d56-89d4-3b8644020c65",
+        "rule_type": "count",
+        "geographies": [
+          "15d18aea-bfd8-4fad-845e-1c2d41436c61"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "8da82c00-4de3-432a-8ad9-f7e3df0aa378",
+    "start_date": 1588621162155,
+    "description": "Deactivates policy d15eb598-d328-457b-b939-fe8d8bc14296",
+    "provider_ids": [],
+    "publish_date": 1588621162278,
+    "prev_policies": [
+      "d15eb598-d328-457b-b939-fe8d8bc14296"
+    ]
+  },
+  {
+    "name": "Hollywood Boulevard SOZ (draft)",
+    "rules": [
+      {
+        "name": "Hollywould Boulevard SOZ",
+        "minimum": 0,
+        "rule_id": "ba6a4842-bd9e-411d-9661-e3e0fb4eb9fb",
+        "rule_type": "count",
+        "geographies": [
+          "15d18aea-bfd8-4fad-845e-1c2d41436c61"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "on_trip": [],
+          "removed": [],
+          "unknown": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      }
+    ],
+    "end_date": null,
+    "policy_id": "37e394d9-3903-4049-879e-e000ec5525f2",
+    "start_date": 1588575600000,
+    "description": "Hollywood Boulevard SOZ (draft)",
+    "provider_ids": [
+      "2411d395-04f2-47c9-ab66-d09e9e3c3251",
+      "3291c288-c9c8-42f1-bc3e-8502b077cd7f",
+      "c20e08cf-8488-46a6-a66c-5d8fb827f7e0",
+      "63f13c48-34ff-49d2-aca7-cf6a5b6171c3",
+      "e714f168-ce56-4b41-81b7-0b6a4bd26128",
+      "3c95765d-4da6-41c6-b61e-1954472ec6c9",
+      "70aa475d-1fcd-4504-b69c-2eeb2107f7be",
+      "b79f8687-526d-4ae6-80bf-89b4c44dc071"
+    ],
+    "publish_date": 1588632345033,
+    "prev_policies": [
+      "6624448b-3a83-430e-844f-ad530d276b54"
+    ]
+  },
+  {
+    "name": "Deactivate: Test 11",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "29baca0d-5ba1-4814-8006-29a90896722f",
+        "rule_type": "count",
+        "geographies": [
+          "15d18aea-bfd8-4fad-845e-1c2d41436c61"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "0d4969aa-0186-486d-8534-46bd441c5b0a",
+    "start_date": 1588876820035,
+    "description": "Deactivates policy 568f4aeb-b9cb-4868-ace7-dffce783865d",
+    "provider_ids": [
+      "2411d395-04f2-47c9-ab66-d09e9e3c3251",
+      "3291c288-c9c8-42f1-bc3e-8502b077cd7f",
+      "c20e08cf-8488-46a6-a66c-5d8fb827f7e0",
+      "63f13c48-34ff-49d2-aca7-cf6a5b6171c3",
+      "e714f168-ce56-4b41-81b7-0b6a4bd26128",
+      "3c95765d-4da6-41c6-b61e-1954472ec6c9",
+      "70aa475d-1fcd-4504-b69c-2eeb2107f7be",
+      "b79f8687-526d-4ae6-80bf-89b4c44dc071"
+    ],
+    "publish_date": 1588876820362,
+    "prev_policies": [
+      "568f4aeb-b9cb-4868-ace7-dffce783865d"
+    ]
+  },
+  {
+    "name": "Venice Beach Walk Streets: Ride-through only",
+    "rules": [
+      {
+        "name": "Venice Beach Walk Streets: No trip starts, ends",
+        "maximum": 0,
+        "rule_id": "4766b3e1-52e8-4a05-a416-97cddb750d0f",
+        "rule_type": "count",
+        "start_time": "12:00:00",
+        "geographies": [
+          "713ce7fa-38b9-4e4d-81d8-519e2d6cf350"
+        ],
+        "vehicle_types": [],
+        "states": {
+          "on_trip": [],
+          "reserved": [],
+          "available": [],
+          "non_operational": []
+        }
+      }
+    ],
+    "end_date": null,
+    "policy_id": "67b12503-9217-42f3-a7cc-3c0105db07e0",
+    "start_date": 1599699600000,
+    "description": "Venice Beach Walk Streets: Ride-through only,  No start/end trips, no fleet deployments",
+    "provider_ids": [],
+    "publish_date": 1599687656763,
+    "prev_policies": null
+  },
+  {
+    "name": "Venice Beach Walk Streets: 5 mph speed limit",
+    "rules": [
+      {
+        "name": "Venice Beach Walk Streets: 5 mph speed limit",
+        "maximum": 5,
+        "rule_id": "ade3bd61-7ac3-4172-889d-eaae516b62fc",
+        "rule_type": "speed",
+        "rule_units": "mph",
+        "geographies": [
+          "9a3bb779-cd3f-43ed-bc87-2c12235040f0"
+        ],
+        "vehicle_types": [],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "b80e703b-83f6-4803-b205-ae734c456c41",
+    "start_date": 1599699600000,
+    "description": "Venice Beach Walk Streets: 5 mph speed limit on certain locations",
+    "provider_ids": [],
+    "publish_date": 1599687661919,
+    "prev_policies": null
+  },
+  {
+    "name": "Venice Special Operating Zone Fleet Cap (Revised July 2021)",
+    "rules": [
+      {
+        "name": "Venice Beach SOZ: Operator Fleet Cap",
+        "maximum": 150,
+        "rule_id": "c102a9df-72ac-45be-bd3a-de08e13c88b7",
+        "rule_type": "count",
+        "geographies": [
+          "2484bca1-965a-48b0-8279-f20a9940e786"
+        ],
+        "vehicle_types": [
+          "bicycle",
+          "scooter"
+        ],
+        "states": {
+          "reserved": [],
+          "available": []
+        }
+      }
+    ],
+    "end_date": null,
+    "policy_id": "f68c66e4-dea8-4c75-8a68-8e674dccfb4e",
+    "start_date": 1627671600000,
+    "description": "Fleet caps for all providers in the Venice Special Operating Zone",
+    "provider_ids": [],
+    "publish_date": 1627595112393
+  },
+  {
+    "name": "Deactivate: azeaze",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "6e9cf4fc-2167-4eb9-b2b6-0255640031da",
+        "rule_type": "count",
+        "geographies": [
+          "e025fee3-7056-4637-a65c-81291b51fa7b"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "e44506f2-6e09-4141-9099-dfc1f7f17be7",
+    "start_date": 1629312510204,
+    "description": "Deactivates policy 20d06024-555d-4660-b577-9db72f802d30",
+    "provider_ids": [
+      "43f31426-8a9f-4ac6-8058-80fb15b8598e",
+      "63c1d0b5-5253-4495-a3c4-c4bf805e98ec",
+      "7a853ab8-340f-4751-9ff7-5845866d4699",
+      "a2bd08b8-1f84-4aa2-b34b-ad27c0f1fe02"
+    ],
+    "publish_date": 1629312410521,
+    "prev_policies": [
+      "20d06024-555d-4660-b577-9db72f802d30"
+    ]
+  },
+  {
+    "name": "Deactivate: AAA test",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "257af4b5-91f2-4b73-a5e7-bfc3c8021837",
+        "rule_type": "count",
+        "geographies": [
+          "9cb84b36-ce91-4228-b4bd-df7dbf8c672e"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "c468429d-9de2-4604-90a6-6459c6b36b96",
+    "start_date": 1600387470577,
+    "description": "Deactivates policy fb000a4f-1a9f-4515-98d3-823ec8591697",
+    "provider_ids": [],
+    "publish_date": 1600387370631,
+    "prev_policies": [
+      "fb000a4f-1a9f-4515-98d3-823ec8591697"
+    ]
+  },
+  {
+    "name": "Deactivate: Group demo",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "da1d8ccc-5a01-43c7-9d12-d67d978dfd6f",
+        "rule_type": "count",
+        "geographies": [
+          "9a793ce0-186f-4c1d-8c87-7586c88c471c"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "c96ddead-dd1e-4fcd-85a1-5b57ef23f19a",
+    "start_date": 1600387861616,
+    "description": "Deactivates policy d3216ab9-f3e5-4acc-8dfe-b68e6686b06e",
+    "provider_ids": [],
+    "publish_date": 1600387761754,
+    "prev_policies": [
+      "d3216ab9-f3e5-4acc-8dfe-b68e6686b06e"
+    ]
+  },
+  {
+    "name": "Deactivate: MICHAEL Test Policy",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "e37beee8-c340-4b42-b200-9b9534d865a8",
+        "rule_type": "count",
+        "geographies": [
+          "a9b00de9-e325-40d9-b34d-3a37c1bd54d7"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "e3aca591-88b7-45ad-b087-ec8ef556c68a",
+    "start_date": 1600387875184,
+    "description": "Deactivates policy 4110267a-fc2f-44fe-aca1-d55b23a7f486",
+    "provider_ids": [],
+    "publish_date": 1600387775323,
+    "prev_policies": [
+      "4110267a-fc2f-44fe-aca1-d55b23a7f486"
+    ]
+  },
+  {
+    "name": "Deactivate: azeaze",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "3da8de63-ed0a-43f8-a1c7-be61c0be893a",
+        "rule_type": "count",
+        "geographies": [
+          "6dc1bfc9-0226-45e9-ab03-935cd7eac360"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "3165e692-374f-4273-9cb2-9e6d3e6d452c",
+    "start_date": 1629312517650,
+    "description": "Deactivates policy 9cde69b7-ef46-4b13-856b-c91c8213afbe",
+    "provider_ids": [
+      "79b5f1e1-d415-411f-882f-0291e2bf914b",
+      "8fbf7ac6-39b2-4e80-b049-d9e0463cab41",
+      "b50a850f-eb82-4275-b72a-bb632ff302c6",
+      "e1656ef5-2ca4-485c-b4f1-7f4371b3b125"
+    ],
+    "publish_date": 1629312417801,
+    "prev_policies": [
+      "9cde69b7-ef46-4b13-856b-c91c8213afbe"
+    ]
+  },
+  {
+    "name": "Deactivate: Manual permit test",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "26d31f8e-179a-45f3-a725-da491806fa0b",
+        "rule_type": "count",
+        "geographies": [
+          "71bfbd15-fc23-47fa-9ff5-6d6f7747336a"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "b1556bc5-7147-4e25-89a2-7540f87558a5",
+    "start_date": 1600387900868,
+    "description": "Deactivates policy 431623d3-1f41-4f18-b564-855827c57cb7",
+    "provider_ids": [
+      "22f9e0ff-93b0-435b-b2ed-79e60d079838"
+    ],
+    "publish_date": 1600387801012,
+    "prev_policies": [
+      "431623d3-1f41-4f18-b564-855827c57cb7"
+    ]
+  },
+  {
+    "name": "Deactivate: aezaze",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "a858e84c-a1db-4575-8529-ae36a2070eb8",
+        "rule_type": "count",
+        "geographies": [
+          "109df213-aff6-4eb8-b9e6-8a3ffc6d55fa"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "e4bdd42c-ade7-4d04-8954-f461782f1ad7",
+    "start_date": 1600387975422,
+    "description": "Deactivates policy 8e0244c0-2608-48c3-87ba-1e4968ca4f97",
+    "provider_ids": [
+      "07975cc8-c8c4-4544-9090-082e03477633",
+      "1239e0ad-c115-44cd-9ee3-e03ac4faa79a",
+      "7514fb21-ff10-478e-9183-6a6bfb38f9ac",
+      "9bf0b395-012a-4566-ab15-a475e35d0af2"
+    ],
+    "publish_date": 1600387875562,
+    "prev_policies": [
+      "8e0244c0-2608-48c3-87ba-1e4968ca4f97"
+    ]
+  },
+  {
+    "name": "Deactivate: azeae",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "c170bab4-aae0-4aae-99e4-0351fa5f9e43",
+        "rule_type": "count",
+        "geographies": [
+          "07fafddf-05ae-4b19-92cf-e5409e1ec222"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "457bb8ad-553d-42ad-b161-c083d7989bde",
+    "start_date": 1600388003558,
+    "description": "Deactivates policy 0293d588-4c0a-4d77-bc71-3f08536532df",
+    "provider_ids": [
+      "43f31426-8a9f-4ac6-8058-80fb15b8598e",
+      "63c1d0b5-5253-4495-a3c4-c4bf805e98ec",
+      "7a853ab8-340f-4751-9ff7-5845866d4699",
+      "a2bd08b8-1f84-4aa2-b34b-ad27c0f1fe02"
+    ],
+    "publish_date": 1600387903689,
+    "prev_policies": [
+      "0293d588-4c0a-4d77-bc71-3f08536532df"
+    ]
+  },
+  {
+    "name": "Deactivate: azeaze",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "8712235b-79cb-44de-8bd3-714efac60649",
+        "rule_type": "count",
+        "geographies": [
+          "1f943d59-ccc9-4d91-b6e2-0c5e771cbc49"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "7db206dd-4b05-4b5d-945b-7e90cea29f80",
+    "start_date": 1600388012491,
+    "description": "Deactivates policy 01b1689c-ec6a-4ec9-9bc9-e368b9c42374",
+    "provider_ids": [
+      "9d6d229a-8378-44ca-b51b-f53fe239f388"
+    ],
+    "publish_date": 1600387912629,
+    "prev_policies": [
+      "01b1689c-ec6a-4ec9-9bc9-e368b9c42374"
+    ]
+  },
+  {
+    "name": "Deactivate: aaaaa",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "2a506750-04b4-4616-b5f5-155e2884e4e5",
+        "rule_type": "count",
+        "geographies": [
+          "f6377553-de9b-4280-bcc9-81443f5f9e6e"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "fbe89cc8-a4a5-4acc-9f8e-c2ce677d1af8",
+    "start_date": 1600388040931,
+    "description": "Deactivates policy 646ca071-c44d-43e3-bd0a-f4aa9374f2c5",
+    "provider_ids": [
+      "43f31426-8a9f-4ac6-8058-80fb15b8598e",
+      "63c1d0b5-5253-4495-a3c4-c4bf805e98ec",
+      "7a853ab8-340f-4751-9ff7-5845866d4699",
+      "a2bd08b8-1f84-4aa2-b34b-ad27c0f1fe02"
+    ],
+    "publish_date": 1600387941069,
+    "prev_policies": [
+      "646ca071-c44d-43e3-bd0a-f4aa9374f2c5"
+    ]
+  },
+  {
+    "name": "Deactivate: aaaaaaa",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "d09a3fdb-ebe7-4db6-9018-5c7298b25f8c",
+        "rule_type": "count",
+        "geographies": [
+          "bcb91b72-82d1-49df-9b44-23c313e4f376"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "a17eee37-5586-4562-b579-964ae9e58daa",
+    "start_date": 1600388049683,
+    "description": "Deactivates policy e84747e6-e456-4560-a7b9-ebe8505c92cb",
+    "provider_ids": [
+      "16936b4d-223c-4336-9265-f8ecc6deaf1a",
+      "332767df-d71e-4211-bc60-59197afa36bc",
+      "66618e4c-4946-4877-b8d9-6245650b8f74",
+      "73a28370-559d-45ea-acf6-8d30a37c1dbe"
+    ],
+    "publish_date": 1600387949820,
+    "prev_policies": [
+      "e84747e6-e456-4560-a7b9-ebe8505c92cb"
+    ]
+  },
+  {
+    "name": "Deactivate: aaaaa",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "40726c31-bc0a-47a2-a919-59c6b8bc0187",
+        "rule_type": "count",
+        "geographies": [
+          "604f087b-4c76-4868-8a48-df48dee405bd"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "4a6fe007-d1b3-4055-b64a-92a59c049933",
+    "start_date": 1600388067459,
+    "description": "Deactivates policy a6c46e7d-7a10-48f8-a003-eeaf00dbad10",
+    "provider_ids": [
+      "43f31426-8a9f-4ac6-8058-80fb15b8598e",
+      "63c1d0b5-5253-4495-a3c4-c4bf805e98ec",
+      "7a853ab8-340f-4751-9ff7-5845866d4699",
+      "a2bd08b8-1f84-4aa2-b34b-ad27c0f1fe02"
+    ],
+    "publish_date": 1600387967597,
+    "prev_policies": [
+      "a6c46e7d-7a10-48f8-a003-eeaf00dbad10"
+    ]
+  },
+  {
+    "name": "Deactivate: azeaze",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "b84eae93-1081-4e49-89f1-d5a44026b9c1",
+        "rule_type": "count",
+        "geographies": [
+          "681040cb-50f7-4106-a95e-28ae049b69d0"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "1946bf0e-d044-479d-b8e5-ff212ec58cd2",
+    "start_date": 1600388098959,
+    "description": "Deactivates policy 7fc47736-901c-4502-a8c9-126841e95b4a",
+    "provider_ids": [
+      "43f31426-8a9f-4ac6-8058-80fb15b8598e",
+      "63c1d0b5-5253-4495-a3c4-c4bf805e98ec",
+      "7a853ab8-340f-4751-9ff7-5845866d4699",
+      "a2bd08b8-1f84-4aa2-b34b-ad27c0f1fe02"
+    ],
+    "publish_date": 1600387999086,
+    "prev_policies": [
+      "7fc47736-901c-4502-a8c9-126841e95b4a"
+    ]
+  },
+  {
+    "name": "Deactivate: Venice Special Operating Zone Fleet Cap",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "3d10155e-bb1c-48dd-8751-b0a526ebbc74",
+        "rule_type": "count",
+        "geographies": [
+          "e0e4a085-7a50-43e0-afa4-6792ca897c5a"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "141b0174-7f5f-41c6-9df4-5cca100fedc3",
+    "start_date": 1600471697316,
+    "description": "Deactivates policy b3da82de-8126-494e-8e93-4518c6f7d91e",
+    "provider_ids": [],
+    "publish_date": 1600471597779,
+    "prev_policies": [
+      "b3da82de-8126-494e-8e93-4518c6f7d91e"
+    ]
+  },
+  {
+    "name": "Deactivate: Permit test 25/10",
+    "rules": [
+      {
+        "name": "Deactivate",
+        "minimum": 0,
+        "rule_id": "b2792936-ccca-4b67-ba53-edd776e0e686",
+        "rule_type": "count",
+        "geographies": [
+          "a9b00de9-e325-40d9-b34d-3a37c1bd54d7"
+        ],
+        "states": {}
+      }
+    ],
+    "end_date": null,
+    "policy_id": "6a8cf5a4-99d9-4f9d-8df7-5aad0c0c94f2",
+    "start_date": 1600736904863,
+    "description": "Deactivates policy e5ff3a1f-f46c-4961-a286-863901eb5e03",
+    "provider_ids": [
+      "2411d395-04f2-47c9-ab66-d09e9e3c3251",
+      "3291c288-c9c8-42f1-bc3e-8502b077cd7f",
+      "63f13c48-34ff-49d2-aca7-cf6a5b6171c3"
+    ],
+    "publish_date": 1600736805054,
+    "prev_policies": [
+      "e5ff3a1f-f46c-4961-a286-863901eb5e03"
+    ]
+  }
+]

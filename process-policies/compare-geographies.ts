@@ -1,0 +1,52 @@
+import axios from 'axios'
+const geography_ids = [
+  '285a69fc-237d-4820-9c89-d9fdcd14d44f',
+  '74b95e5a-e089-4246-a4e7-67c16026927c',
+  '7d6d2c28-1292-41ab-ac00-60eabcd7392d',
+  'c6b05565-d4a3-4952-be0b-5f7ffad36c3a',
+  '996c4f62-758a-401a-99bb-731c06e211d1',
+  'b5ea8bcf-f458-46f7-bb0c-8e4acdd88954',
+  '51987827-ed21-48bc-850f-2405897401b5',
+  'c3dbb50c-bf02-469d-8ed0-536d9dcc9808'
+]
+
+const sandbox_04_url = 'https://sandbox.ladot.io/geography/geographies/'
+const sandbox_headers: any = {
+  'Content-Type': 'application/json',
+  Authorization:
+    'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlFVWkJRVFUwT0RJNE9EbERRakl3TWpJeE0wVkZNamhHTmtaRFFUa3lSRGRGTmtSRFF6RkZOUSJ9.eyJodHRwczovL2xhZG90LmlvL3Byb3ZpZGVyX2lkIjoiNWY3MTE0ZDEtNDA5MS00NmVlLWI0OTItZTU1ODc1ZjdkZTAwIiwiaXNzIjoiaHR0cHM6Ly9hdXRoLmxhZG90LmlvLyIsInN1YiI6IjE4UmN1QVJLQzVSUHQ5ZmFON0VRNXdjRTVvUmNlbzB0QGNsaWVudHMiLCJhdWQiOiJodHRwczovL3NhbmRib3gubGFkb3QuaW8vIiwiaWF0IjoxNjM3MDk4NDc3LCJleHAiOjE2MzcxODQ4NzcsImF6cCI6IjE4UmN1QVJLQzVSUHQ5ZmFON0VRNXdjRTVvUmNlbzB0Iiwic2NvcGUiOiJhZG1pbjphbGwgYXVkaXRzOmRlbGV0ZSBhdWRpdHM6cmVhZCBhdWRpdHM6dmVoaWNsZXM6cmVhZCBhdWRpdHM6d3JpdGUgY29tcGxpYW5jZTpyZWFkIGNvbXBsaWFuY2U6cmVhZDpwcm92aWRlciBldmVudHM6cmVhZCBldmVudHM6d3JpdGU6cHJvdmlkZXIgcG9saWNpZXM6ZGVsZXRlIHBvbGljaWVzOnB1Ymxpc2ggcG9saWNpZXM6cmVhZCBwb2xpY2llczp3cml0ZSBwcm92aWRlcnM6cmVhZCBzZXJ2aWNlX2FyZWFzOnJlYWQgc3RhdHVzX2NoYW5nZXM6cmVhZCB0ZWxlbWV0cnk6d3JpdGU6cHJvdmlkZXIgdHJpcHM6cmVhZCB2ZWhpY2xlczpyZWFkIHZlaGljbGVzOnJlYWQ6cHJvdmlkZXIgdmVoaWNsZXM6d3JpdGU6cHJvdmlkZXIgZXZlbnRzOnJlYWQ6cHJvdmlkZXIgbWV0cmljczpyZWFkIG1ldHJpY3M6cmVhZDpwcm92aWRlciBwb2xpY2llczpyZWFkOnB1Ymxpc2hlZCBwb2xpY2llczpyZWFkOnVucHVibGlzaGVkIGdlb2dyYXBoaWVzOnJlYWQ6cHVibGlzaGVkIGdlb2dyYXBoaWVzOnJlYWQ6dW5wdWJsaXNoZWQgZ2VvZ3JhcGhpZXM6cHVibGlzaCBqdXJpc2RpY3Rpb25zOndyaXRlIGp1cmlzZGljdGlvbnM6cmVhZCBqdXJpc2RpY3Rpb25zOnJlYWQ6Y2xhaW0gZ2VvZ3JhcGhpZXM6d3JpdGUiLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMifQ.Gug8aEbNWrPIl7QCmdnG3UbdGdsyKN9kE96WRqMC1sFIdhyQdHyowJRbpMZHqD7CmyvKZxuVVaihBT17e4Ffk3pYcmmgIGmZVsPrYMy6CBGgrS3tgtUrOXUMklJAeMZt5LDW5SuSBQuG2ACl97mfxzxNQb30yzGJwBpfZ-1kTU6RnWKX7qoKejmA7nS5ue4ucdVRu7AqnzkNWGSxOk8PWrBtrWk9BmZlO950CyWe9_8kiLxItv_NiOyfVAc5ggFksxEKYKzCzkTC17VGF11RVigVYZ1_-cqaTkvc8NKjS0VF2Z0zLyDFJxvP80oVLyHKRwoAeTR1VwUzts1SgI3ZWw'
+}
+
+const cmm_url = 'https://city.develop.api.lacuna-tech.io/geography/geographies/'
+const cmm_headers: any = {
+  'Content-Type': 'application/json',
+  Authorization:
+    'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik9USTRRMFUyT1RnNVFrRXpNREUzTWtZNE9UWTNPRVEzUWpBNU1EWkRRMEl6UWpaRVFqa3dSUSJ9.eyJodHRwczovL2xhY3VuYS5haS9wcm92aWRlcl9pZCI6IjVmNzExNGQxLTQwOTEtNDZlZS1iNDkyLWU1NTg3NWY3ZGUwMCIsImh0dHBzOi8vbGFkb3QuaW8vcHJvdmlkZXJfaWQiOiI1ZjcxMTRkMS00MDkxLTQ2ZWUtYjQ5Mi1lNTU4NzVmN2RlMDAiLCJpc3MiOiJodHRwczovL2xhY3VuYXRlY2guYXV0aDAuY29tLyIsInN1YiI6Im5DanRzdlA1VUJTWUdrQ1dhQTZycnA3WjIzcmlwaEpzQGNsaWVudHMiLCJhdWQiOiJodHRwczovL2NpdHkuZGV2ZWxvcC5hcGkubGFjdW5hLXRlY2guaW8vIiwiaWF0IjoxNjM3MDg0MTUxLCJleHAiOjE2MzcxNzA1NTEsImF6cCI6Im5DanRzdlA1VUJTWUdrQ1dhQTZycnA3WjIzcmlwaEpzIiwic2NvcGUiOiJhZG1pbjphbGwgYXVkaXRzOmRlbGV0ZSBhdWRpdHM6cmVhZCBhdWRpdHM6dmVoaWNsZXM6cmVhZCBhdWRpdHM6d3JpdGUgY29tcGxpYW5jZTpyZWFkIGV2ZW50czpyZWFkIHBvbGljaWVzOmRlbGV0ZSBwb2xpY2llczpwdWJsaXNoIHBvbGljaWVzOnJlYWQgcG9saWNpZXM6d3JpdGUgcHJvdmlkZXJzOnJlYWQgc2VydmljZV9hcmVhczpyZWFkIHN0YXR1c19jaGFuZ2VzOnJlYWQgdHJpcHM6cmVhZCB2ZWhpY2xlczpyZWFkIGF1dGhvcml6ZWQtY2xpZW50czpyZWFkIHJlcG9ydHM6ZW1haWw6d3JpdGUgbWV0cmljczpyZWFkIHBvbGljaWVzOnJlYWQ6cHVibGlzaGVkIHBvbGljaWVzOnJlYWQ6dW5wdWJsaXNoZWQgZ2VvZ3JhcGhpZXM6cmVhZDpwdWJsaXNoZWQgZ2VvZ3JhcGhpZXM6cmVhZDp1bnB1Ymxpc2hlZCBnZW9ncmFwaGllczpwdWJsaXNoIGp1cmlzZGljdGlvbnM6d3JpdGUganVyaXNkaWN0aW9uczpyZWFkIGp1cmlzZGljdGlvbnM6cmVhZDpjbGFpbSBnZW9ncmFwaGllczp3cml0ZSBpbnZvaWNlczpyZWFkIGludm9pY2VzOndyaXRlIHN0b3BzOnJlYWQgc3RvcHM6d3JpdGUgcmVzZXJ2YXRpb25zOnJlYWQgcmVzZXJ2YXRpb25zOndyaXRlIGF1ZGl0b3JzOnJlYWQgYXVkaXRvcnM6d3JpdGUgdmlvbGF0aW9uczpyZWFkIHZpb2xhdGlvbnM6d3JpdGUgdHJhbnNhY3Rpb25zOnJlYWQgdHJhbnNhY3Rpb25zOndyaXRlIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIn0.oxP0mJpFlIVHuDTGx26Sk7s04Re2zmQQT17k3wAuOBzYHphy5aOSl9Yw1lQwiGmB4jp4-yKG9rboSW1dXl3bCVZVYP4rgXX4yJy-9DHIBj9JqlCB_xa7Orb2XESkb43JuOHI59bDjONnwltdBUewaFxpuSOh68z65-DwlLMEloNwueBA3mLYOm99bT9QdBVdfo7YSvl9eN7ZqwA8yj68V_ldIW7qNTCH7jFm5A71uQGN7fcM1s2y1qKhzmJAXsaQ-jT3w1Sd327O-xUD2YCdRLkRvHgHYWA-z-rF3R2igxUlkfETRJKbmMvNFjVG63iFj8oknKleoQk62Q-5rSe9qw'
+}
+
+const geos: any[] = []
+Promise.all(
+  geography_ids.map(id =>
+    axios.get(`${cmm_url}${id}`, {
+      validateStatus: function (status) {
+        return status < 500 // Resolve only if the status code is less than 500
+      },
+      headers: cmm_headers
+    })
+  )
+)
+  .then(res => {
+    res.forEach(result => {
+      if (result.status === 404) {
+        console.log(result.request.path)
+        geos.push(result.data)
+      }
+    })
+    return
+  })
+  .catch(err => {
+    console.log('a big fee err')
+    console.log(err)
+  })
+
+console.dir(geos, { depth: null })
