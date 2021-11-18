@@ -15,8 +15,14 @@
  */
 
 import { AccessTokenScopeValidator, ApiRequest, ApiResponse, checkAccess } from '@mds-core/mds-api-server'
-import db from '@mds-core/mds-db'
-import { InsufficientPermissionsError, NotFoundError, pathPrefix, ServerError } from '@mds-core/mds-utils'
+import { GeographyServiceClient } from '@mds-core/mds-geography-service'
+import {
+  BadParamsError,
+  InsufficientPermissionsError,
+  NotFoundError,
+  pathPrefix,
+  ServerError
+} from '@mds-core/mds-utils'
 import express, { NextFunction } from 'express'
 import { GeographyLogger } from './logger'
 import { GeographyApiVersionMiddleware } from './middleware'
@@ -45,7 +51,10 @@ function api(app: express.Express): express.Express {
     ) => {
       const { geography_id } = req.params
       try {
-        const geography = await db.readSingleGeography(geography_id)
+        const geography = await GeographyServiceClient.getGeography(geography_id)
+        if (geography === undefined) {
+          throw new NotFoundError()
+        }
         if (!geography.publish_date && !res.locals.scopes.includes('geographies:read:unpublished')) {
           throw new InsufficientPermissionsError('permission to read unpublished geographies missing')
         }
@@ -89,7 +98,22 @@ function api(app: express.Express): express.Express {
           )
         }
 
-        const geographies = summary ? await db.readGeographySummaries(params) : await db.readGeographies(params)
+        const options = { includeGeographyJSON: !summary }
+        const geographies = await (() => {
+          if (params.get_unpublished) {
+            if (params.get_published) {
+              throw new BadParamsError('cannot have get_unpublished and get_published both be true')
+            } else {
+              return GeographyServiceClient.getUnpublishedGeographies(options)
+            }
+          } else {
+            if (params.get_published) {
+              return GeographyServiceClient.getPublishedGeographies(options)
+            } else {
+              return GeographyServiceClient.getGeographies(options)
+            }
+          }
+        })()
         if (!res.locals.scopes.includes('geographies:read:unpublished')) {
           const filteredGeos = geographies.filter(geo => !!geo.publish_date)
           return res.status(200).send({ version: res.locals.version, data: { geographies: filteredGeos } })

@@ -21,6 +21,7 @@ import {
   ApiResponseLocalsClaims,
   ApiVersionedResponse
 } from '@mds-core/mds-api-server'
+import { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { Geography, GeographySummary } from '@mds-core/mds-types'
 
 export const GEOGRAPHY_API_SUPPORTED_VERSIONS = ['1.0.0'] as const
@@ -49,7 +50,7 @@ export type GeographyApiGetGeographyResponseBody = {
 export type GeographyApiGetGeographyResponse = GeographyApiResponse<GeographyApiGetGeographyResponseBody>
 
 export type GeographyApiGetGeographiesResponseBody = {
-  data: { geographies: Geography[] | GeographySummary[] }
+  data: { geographies: GeographyDomainModel[] | GeographySummary[] }
 }
 
 export type GeographyApiGetGeographiesResponse = GeographyApiResponse<GeographyApiGetGeographiesResponseBody>

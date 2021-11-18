@@ -9,14 +9,14 @@
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "start": "PATH_PREFIX=/geography pnpm watch server",
-    "test": "PATH_PREFIX=/geography DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap  ts-mocha --project ../../tsconfig.json",
+    "test": "PATH_PREFIX=/geography DOTENV_CONFIG_PATH=../../.env jest --runInBand",
     "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
     "@mds-core/mds-api-helpers": "workspace:0.1.56",
     "@mds-core/mds-api-server": "workspace:0.3.12",
-    "@mds-core/mds-db": "workspace:0.4.16",
+    "@mds-core/mds-geography-service": "workspace:0.3.5",
     "@mds-core/mds-logger": "workspace:0.4.4",
     "@mds-core/mds-providers": "workspace:0.1.45",
     "@mds-core/mds-schema-validators": "workspace:0.3.12",
