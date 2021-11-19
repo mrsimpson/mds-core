@@ -220,6 +220,9 @@ helm/tools
 # docker
 docker-compose.yml
 
+# webpack has externals declared, installs some packages in the image, so that we can boot dd-trace from a bundled app
+docker_package.json
+
 # cypress
 cypress/fixtures
 cypress/plugins
