@@ -5,3 +5,4 @@ pnpx --no-install lint-staged
 pnpm generate --filter "...[origin/develop]"
 if exec < /dev/tty; then pnpm pls-changeset-me check; fi # !Important! Ensures that the script is not run in the background (if possible), so stdin is available for pls-changeset-me.
 pre-commit
+pnpm lint:audit

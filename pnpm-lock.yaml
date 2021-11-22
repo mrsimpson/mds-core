@@ -34,7 +34,7 @@ importers:
       nodemon: 2.0.13
       nyc: 15.1.0
       pls-changeset-me: 0.0.9
-      pnpm-ci-tools: 1.0.1
+      pnpm-ci-tools: 2.0.1
       prettier: 2.4.1
       prettier-plugin-organize-imports: 2.3.4
       prettier-plugin-packagejson: 2.2.13
@@ -86,7 +86,7 @@ importers:
       nodemon: 2.0.13
       nyc: 15.1.0
       pls-changeset-me: 0.0.9
-      pnpm-ci-tools: 1.0.1
+      pnpm-ci-tools: 2.0.1
       prettier: 2.4.1
       prettier-plugin-organize-imports: 2.3.4_prettier@2.4.1+typescript@4.3.5
       prettier-plugin-packagejson: 2.2.13_prettier@2.4.1
@@ -4262,6 +4262,11 @@ packages:
     engines: {node: '>= 12'}
     dev: true
 
+  /commander/8.3.0:
+    resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
+    engines: {node: '>= 12'}
+    dev: true
+
   /common-js-file-extensions/1.0.4:
     resolution: {integrity: sha512-0l9aNyfbahES0qKEvo29u9hOwaNpVoAtQItkoqz1chHoWEhHDFnW+uKIJD1fUpr9jyemuOZhwSGttLasR8zGAA==}
     dev: true
@@ -6094,7 +6099,7 @@ packages:
       source-map: 0.6.1
       wordwrap: 1.0.0
     optionalDependencies:
-      uglify-js: 3.14.2
+      uglify-js: 3.14.3
     dev: true
 
   /har-schema/2.0.0:
@@ -8863,12 +8868,12 @@ packages:
       yargs: 17.0.1
     dev: true
 
-  /pnpm-ci-tools/1.0.1:
-    resolution: {integrity: sha512-hMbiulXarLXb0jDsyzkMAGd9AFS2pIT18C+teA65DZlk6nBN3eTC4pP9yRhDuzh6QCwawHS4M5MZFoh347F7nQ==}
+  /pnpm-ci-tools/2.0.1:
+    resolution: {integrity: sha512-bqQx8/XP73Z6CYZAsY3t0wOngRURaQF1O5XilS/jjLmWTFaGPqXAE1siyqHctm8X3Gnv/DnCsWsFtAf44Ll2Fw==}
     hasBin: true
     requiresBuild: true
     dependencies:
-      yargs: 16.2.0
+      commander: 8.3.0
     dev: true
 
   /point-in-polygon/1.1.0:
@@ -10777,8 +10782,8 @@ packages:
     hasBin: true
     dev: true
 
-  /uglify-js/3.14.2:
-    resolution: {integrity: sha512-rtPMlmcO4agTUfz10CbgJ1k6UAoXM2gWb3GoMPPZB/+/Ackf8lNWk11K4rYi2D0apgoFRLtQOZhb+/iGNJq26A==}
+  /uglify-js/3.14.3:
+    resolution: {integrity: sha512-mic3aOdiq01DuSVx0TseaEzMIVqebMZ0Z3vaeDhFEh9bsc24hV1TFvN74reA2vs08D0ZWfNjAcJ3UbVLaBss+g==}
     engines: {node: '>=0.8.0'}
     hasBin: true
     requiresBuild: true
