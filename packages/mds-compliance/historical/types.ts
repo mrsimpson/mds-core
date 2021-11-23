@@ -8,6 +8,7 @@ export type ComplianceCsvRow = {
   total_violations: number
   timestamp: number
   iso_timestamp: string
+  deployed_count: number
 }
 
 export type MetricsCsvRow = {

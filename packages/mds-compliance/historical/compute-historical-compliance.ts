@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { Device, Geography, Policy, UUID } from '@mds-core/mds-types'
+import { Device, Geography, Policy, UUID, EVENT_STATUS_MAP } from '@mds-core/mds-types'
 import db from '@mds-core/mds-db'
 import { days, filterDefined } from '@mds-core/mds-utils'
 import { providers, PROVIDER_ID } from '@mds-core/mds-providers'
@@ -39,6 +39,7 @@ const computeHistoricalComplianceProvider = async (
     return acc
   }, {} as { [device_id: string]: Device })
 
+  const deployed_count = events.filter(({event_type}) => ['available', 'unavailable', 'reserved', 'trip'].includes(EVENT_STATUS_MAP[event_type])).length
   const policies: Policy[] = await db.readActivePolicies(end)
 
   const complianceResults = policies.map(policy =>
@@ -62,7 +63,8 @@ const computeHistoricalComplianceProvider = async (
           policy_name,
           total_violations,
           timestamp: end,
-          iso_timestamp
+          iso_timestamp,
+          deployed_count
         }
       }
     })

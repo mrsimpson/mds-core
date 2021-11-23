@@ -11,7 +11,8 @@ export const complianceCsvWriterFactory = () =>
       { id: 'policy_name', title: 'POLICY_NAME' },
       { id: 'total_violations', title: 'TOTAL_VIOLATIONS' },
       { id: 'timestamp', title: 'TIMESTAMP' },
-      { id: 'iso_timestamp', title: 'ISO_TIMESTAMP' }
+      { id: 'iso_timestamp', title: 'ISO_TIMESTAMP' },
+      { id: 'deployed_count', title: 'DEPLOYED_COUNT' }
     ]
   })
 
