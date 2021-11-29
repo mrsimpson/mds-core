@@ -15,8 +15,6 @@
  */
 
 import { Device, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
-import bluebird from 'bluebird'
-import redis from 'redis'
 import { KafkaStreamConsumer, KafkaStreamProducer } from './kafka'
 import { AgencyStreamKafka } from './kafka/agency-stream-kafka'
 import { StreamLogger } from './logger'
@@ -24,16 +22,7 @@ import { AgencyStreamNats } from './nats/agency-stream-nats'
 import { NatsStreamConsumer } from './nats/stream-consumer'
 import { NatsStreamProducer } from './nats/stream-producer'
 import { mockStream } from './test-utils'
-import {
-  BadDataError,
-  DEVICE_INDEX_STREAM,
-  DEVICE_RAW_STREAM,
-  ReadStreamOptions,
-  ReadStreamResult,
-  Stream,
-  StreamItem,
-  StreamItemID
-} from './types'
+import { BadDataError } from './types'
 
 export { KafkaStreamConsumerOptions, KafkaStreamProducerOptions } from './kafka'
 export { NatsProcessorFn } from './nats/codecs'
@@ -41,78 +30,7 @@ export { StreamConsumer, StreamProducer } from './stream-interface'
 
 const { env } = process
 
-declare module 'redis' {
-  interface RedisClient {
-    dbsizeAsync: () => Promise<number>
-    flushdbAsync: () => Promise<'OK'>
-    pingAsync: <TPong extends string = 'PONG'>(response?: TPong) => Promise<TPong>
-    xaddAsync: (...args: unknown[]) => Promise<string>
-    xinfoAsync: <T extends 'STREAM' | 'GROUPS'>(
-      arg: T,
-      stream: Stream
-    ) => Promise<
-      T extends 'STREAM'
-        ? [
-            'length',
-            number,
-            'radix-tree-keys',
-            number,
-            'radix-tree-nodes',
-            number,
-            'groups',
-            number,
-            'last-generated-id',
-            string,
-            'first-entry',
-            StreamItem | null,
-            'last-entry',
-            StreamItem | null
-          ]
-        : ['name', string, 'consumers', number, 'pending', number, 'last-delivered-id', string][]
-    >
-    xreadAsync: (...args: unknown[]) => Promise<ReadStreamResult[]>
-    xgroupAsync: (...args: unknown[]) => Promise<'OK'>
-    xreadgroupAsync: (...args: unknown[]) => Promise<ReadStreamResult[]>
-  }
-
-  interface Multi {
-    xadd: (...args: unknown[]) => string
-    execAsync: () => Promise<object[]>
-  }
-}
-
-bluebird.promisifyAll(redis.RedisClient.prototype)
-bluebird.promisifyAll(redis.Multi.prototype)
-
 const { now } = Date
-
-let cachedClient: redis.RedisClient | null = null
-
-const STREAM_MAXLEN: { [S in Stream]: number } = {
-  'device:index': 10_000,
-  'device:raw': 1_000_000
-}
-
-async function getClient() {
-  if (!cachedClient) {
-    const { REDIS_HOST, REDIS_PORT, REDIS_PASS } = process.env
-    const { host = 'localhost', port = 6379, password } = { host: REDIS_HOST, port: REDIS_PORT, password: REDIS_PASS }
-    if (!REDIS_PORT) {
-      StreamLogger.info(`no redis port found, falling back to ${port}`)
-    }
-    if (!REDIS_HOST) {
-      StreamLogger.info(`no redis host found, falling back to ${host}`)
-    }
-
-    StreamLogger.info(`connecting to redis on ${host}:${port}`)
-    cachedClient = redis.createClient(Number(port), host, { password })
-    cachedClient.on('error', async err => {
-      StreamLogger.error(`redis error ${err}`)
-    })
-    await cachedClient.dbsizeAsync().then(size => StreamLogger.debug(`redis has ${size} keys`))
-  }
-  return cachedClient
-}
 
 async function initialize() {
   if (process.env.KAFKA_HOST) {
@@ -121,37 +39,10 @@ async function initialize() {
   if (process.env.NATS) {
     await AgencyStreamNats.initialize()
   }
-  await getClient()
 }
-
-async function reset() {
-  const client = await getClient()
-  await client.flushdbAsync().then(() => StreamLogger.info('redis flushed'))
-}
-
-async function startup() {
-  await getClient()
-}
-
 async function shutdown() {
-  if (cachedClient) {
-    await cachedClient.quit()
-    cachedClient = null
-  }
   await AgencyStreamKafka.shutdown()
   await AgencyStreamNats.shutdown()
-}
-
-async function writeStream(stream: Stream, field: string, value: unknown) {
-  const client = await getClient()
-  return client.xaddAsync(stream, 'MAXLEN', '~', STREAM_MAXLEN[stream], '*', field, JSON.stringify(value))
-}
-
-async function writeStreamBatch(stream: Stream, field: string, values: unknown[]) {
-  const client = await getClient()
-  const batch = client.batch()
-  values.forEach(value => batch.xadd(stream, 'MAXLEN', '~', STREAM_MAXLEN[stream], '*', field, JSON.stringify(value)))
-  await batch.execAsync()
 }
 
 // put basics of vehicle in the cache
@@ -172,7 +63,7 @@ async function writeDevice(device: Device) {
       throw err
     }
   }
-  return writeStream(DEVICE_INDEX_STREAM, 'data', device)
+  return
 }
 
 async function writeEvent(event: VehicleEvent) {
@@ -182,7 +73,7 @@ async function writeEvent(event: VehicleEvent) {
   if (env.KAFKA_HOST) {
     await AgencyStreamKafka.writeEvent(event)
   }
-  return writeStream(DEVICE_RAW_STREAM, 'event', event)
+  return
 }
 
 async function writeEventError(error: BadDataError) {
@@ -192,7 +83,7 @@ async function writeEventError(error: BadDataError) {
   if (env.KAFKA_HOST) {
     await AgencyStreamKafka.writeEventError(error)
   }
-  return writeStream(DEVICE_RAW_STREAM, 'event', error)
+  return
 }
 
 // put latest locations in the cache
@@ -214,7 +105,6 @@ async function writeTelemetry(telemetry: Telemetry[]) {
     }
   }
   const start = now()
-  await writeStreamBatch(DEVICE_RAW_STREAM, 'telemetry', telemetry)
   const delta = now() - start
   if (delta > 200) {
     StreamLogger.debug('writeTelemetry', { pointsInserted: telemetry.length, executionTime: delta })
@@ -228,100 +118,12 @@ const writeTripMetadata = async (metadata: TripMetadata) => {
   ])
 }
 
-async function readStream(
-  stream: Stream,
-  id: StreamItemID,
-  { count, block }: ReadStreamOptions
-): Promise<ReadStreamResult> {
-  const client = await getClient()
-
-  const results = await client.xreadAsync([
-    ...(typeof block === 'number' ? ['BLOCK', block] : []),
-    ...(typeof count === 'number' ? ['COUNT', count] : []),
-    'STREAMS',
-    stream,
-    id || '$'
-  ])
-
-  if (results) {
-    const [result] = results
-    return result
-  }
-
-  return [stream, []]
-}
-
-async function createStreamGroup(stream: Stream, group: string) {
-  const client = await getClient()
-  return client.xgroupAsync('CREATE', stream, `${stream}::${group}`, 0, 'MKSTREAM')
-}
-
-async function readStreamGroup(
-  stream: Stream,
-  group: string,
-  consumer: string,
-  id: StreamItemID,
-  { count, block, noack }: ReadStreamOptions
-): Promise<ReadStreamResult> {
-  const client = await getClient()
-
-  const results = await client.xreadgroupAsync(
-    'GROUP',
-    `${stream}::${group}`,
-    consumer,
-    ...[
-      ...(typeof block === 'number' ? ['BLOCK', block] : []),
-      ...(typeof count === 'number' ? ['COUNT', count] : []),
-      ...(noack ? ['NOACK'] : []),
-      'STREAMS',
-      stream,
-      id || '>'
-    ]
-  )
-
-  if (results) {
-    const [result] = results
-    return result
-  }
-
-  return [stream, []]
-}
-
-async function getStreamInfo(stream: Stream) {
-  const client = await getClient()
-  try {
-    const [, length, , radixTreeKeys, , radixTreeNodes, , groups, , lastGeneratedId, , firstEntry, , lastEntry] =
-      await client.xinfoAsync('STREAM', stream)
-    return { length, radixTreeKeys, radixTreeNodes, groups, lastGeneratedId, firstEntry, lastEntry }
-  } catch (err) {
-    return null
-  }
-}
-
-async function health() {
-  if (env.SINK) {
-    return Promise.resolve({ using: 'cloudevents-emitter', status: true, stats: {} })
-  }
-  const client = await getClient()
-  const status = await client.pingAsync('connected')
-  return { using: 'redis', status }
-}
-
 export default {
-  createStreamGroup,
-  getStreamInfo,
-  health,
   initialize,
-  readStream,
-  readStreamGroup,
-  reset,
   shutdown,
-  startup,
   writeDevice,
   writeEvent,
   writeEventError,
-  writeStream,
-  writeStreamBatch,
   writeTelemetry,
   KafkaStreamConsumer,
   KafkaStreamProducer,

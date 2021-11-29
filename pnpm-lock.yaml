@@ -1302,25 +1302,17 @@ importers:
       '@mds-core/mds-logger': workspace:0.4.4
       '@mds-core/mds-types': workspace:0.7.1
       '@mds-core/mds-utils': workspace:0.2.10
-      '@types/bluebird': 3.5.36
-      '@types/redis': 2.8.32
-      bluebird: 3.7.2
       flat: 5.0.2
       kafkajs: 1.15.0
       nats: 2.2.0
-      redis: 3.1.2
       sinon: 11.1.2
     dependencies:
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
-      '@types/bluebird': 3.5.36
-      '@types/redis': 2.8.32
-      bluebird: 3.7.2
       flat: 5.0.2
       kafkajs: 1.15.0
       nats: 2.2.0
-      redis: 3.1.2
       sinon: 11.1.2
 
   packages/mds-stream-processor:
@@ -2613,10 +2605,6 @@ packages:
       '@babel/types': 7.15.6
     dev: true
 
-  /@types/bluebird/3.5.36:
-    resolution: {integrity: sha512-HBNx4lhkxN7bx6P0++W8E289foSu8kO8GCk2unhuVggO+cE7rh9DhZUyPhUxNRG9m+5B5BTKxZQ5ZP92x/mx9Q==}
-    dev: false
-
   /@types/body-parser/1.19.1:
     resolution: {integrity: sha512-a6bTJ21vFOGIkwM0kzh9Yr89ziVxq4vYH2fQ6N8AeipEzai/cFK6aGMArIkUeIdRIgpwQa+2bXiLuUJCpSf2Cg==}
     dependencies:
@@ -2879,12 +2867,6 @@ packages:
 
   /@types/range-parser/1.2.4:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
-
-  /@types/redis/2.8.32:
-    resolution: {integrity: sha512-7jkMKxcGq9p242exlbsVzuJb57KqHRhNl4dHoQu2Y5v9bCAbtIXXH0R3HleSQW4CTOqpHIYUW3t6tpUj4BVQ+w==}
-    dependencies:
-      '@types/node': 16.10.3
-    dev: false
 
   /@types/retry/0.12.1:
     resolution: {integrity: sha512-xoDlM2S4ortawSWORYqsdU+2rxdh4LRW9ytc3zmT37RIKQh6IHyKwwtKhKis9ah8ol07DCkZxPt8BBvPjC6v4g==}
@@ -3786,6 +3768,7 @@ packages:
 
   /bluebird/3.7.2:
     resolution: {integrity: sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==}
+    dev: true
 
   /body-parser/1.19.0:
     resolution: {integrity: sha1-lrJwnlfJxOCab9Zqj9l5hE9p8Io=}
@@ -9293,16 +9276,6 @@ packages:
     engines: {node: '>=4'}
     dependencies:
       redis-errors: 1.2.0
-    dev: false
-
-  /redis/3.1.2:
-    resolution: {integrity: sha512-grn5KoZLr/qrRQVwoSkmzdbw6pwF+/rwODtrOr6vuBRiR/f3rjSTGupbF90Zpqm2oenix8Do6RV7pYEkGwlKkw==}
-    engines: {node: '>=10'}
-    dependencies:
-      denque: 1.5.1
-      redis-commands: 1.7.0
-      redis-errors: 1.2.0
-      redis-parser: 3.0.0
     dev: false
 
   /reflect-metadata/0.1.13:
