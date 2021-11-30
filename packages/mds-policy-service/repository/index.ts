@@ -373,8 +373,14 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
   }
 
   /* Only publish the policy if the geographies are successfully published first */
-  public publishPolicy = async (policy_id: UUID, publish_date = now()) => {
+  public publishPolicy = async (
+    policy_id: UUID,
+    publish_date = now(),
+    options: { beforeCommit?: (pendingPolicy: PolicyDomainModel) => Promise<void> } = {}
+  ) => {
     try {
+      const { beforeCommit = async () => undefined } = options
+
       if (await this.isPolicyPublished(policy_id)) {
         throw new ConflictError('Cannot re-publish existing policy')
       }
@@ -393,18 +399,25 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
 
       try {
         const connection = await this.connect('rw')
-        const {
-          raw: [updated]
-        } = await connection
-          .getRepository(PolicyEntity)
-          .createQueryBuilder()
-          .update()
-          .set({ publish_date })
-          .where('policy_id = :policy_id', { policy_id })
-          .andWhere('publish_date IS NULL')
-          .returning('*')
-          .execute()
-        return PolicyEntityToDomain.map(updated)
+        const publishedPolicy = await connection.transaction(async manager => {
+          const {
+            raw: [updated]
+          } = await manager
+            .getRepository(PolicyEntity)
+            .createQueryBuilder()
+            .update()
+            .set({ publish_date })
+            .where('policy_id = :policy_id', { policy_id })
+            .andWhere('publish_date IS NULL')
+            .returning('*')
+            .execute()
+          const mappedPolicy = PolicyEntityToDomain.map(updated)
+          await beforeCommit(mappedPolicy)
+
+          return mappedPolicy
+        })
+
+        return publishedPolicy
       } catch (error) {
         throw RepositoryError(error)
       }

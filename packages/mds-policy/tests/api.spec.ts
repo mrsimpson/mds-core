@@ -29,10 +29,12 @@ import {
   PolicyFactory,
   PolicyRepository,
   PolicyServiceClient,
-  PolicyServiceManager
+  PolicyServiceManager,
+  PolicyStreamKafka
 } from '@mds-core/mds-policy-service/'
 import { POLICY2_JSON, POLICY_JSON } from '@mds-core/mds-policy-service/test_data/policies'
 import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
+import stream from '@mds-core/mds-stream'
 import { PROVIDER_SCOPES, SCOPED_AUTH, venice } from '@mds-core/mds-test-data'
 import {
   clone,
@@ -51,6 +53,8 @@ import { StatusCodes } from 'http-status-codes'
 import supertest from 'supertest'
 import { api } from '../api'
 import { POLICY_API_DEFAULT_VERSION } from '../types'
+
+stream.mockStream(PolicyStreamKafka)
 
 /* eslint-disable-next-line @typescript-eslint/no-var-requires */
 

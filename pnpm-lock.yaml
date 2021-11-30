@@ -1123,6 +1123,7 @@ importers:
       '@mds-core/mds-policy-service': workspace:0.9.1
       '@mds-core/mds-providers': workspace:0.1.45
       '@mds-core/mds-schema-validators': workspace:0.3.12
+      '@mds-core/mds-stream': workspace:0.1.47
       '@mds-core/mds-test-data': workspace:0.4.4
       '@mds-core/mds-types': workspace:0.7.1
       '@mds-core/mds-utils': workspace:0.2.10
@@ -1144,6 +1145,7 @@ importers:
       http-status-codes: 2.1.4
     devDependencies:
       '@mds-core/mds-geography-service': link:../mds-geography-service
+      '@mds-core/mds-stream': link:../mds-stream
       '@mds-core/mds-test-data': link:../mds-test-data
 
   packages/mds-policy-author:
@@ -1156,6 +1158,7 @@ importers:
       '@mds-core/mds-providers': workspace:0.1.45
       '@mds-core/mds-schema-validators': workspace:0.3.12
       '@mds-core/mds-service-helpers': workspace:0.4.3
+      '@mds-core/mds-stream': workspace:0.1.47
       '@mds-core/mds-test-data': workspace:0.4.4
       '@mds-core/mds-types': workspace:0.7.1
       '@mds-core/mds-utils': workspace:0.2.10
@@ -1177,6 +1180,7 @@ importers:
       http-status-codes: 2.1.4
     devDependencies:
       '@mds-core/mds-geography-service': link:../mds-geography-service
+      '@mds-core/mds-stream': link:../mds-stream
       '@mds-core/mds-test-data': link:../mds-test-data
 
   packages/mds-policy-service:
@@ -1187,6 +1191,7 @@ importers:
       '@mds-core/mds-rpc-common': workspace:0.2.4
       '@mds-core/mds-schema-validators': workspace:0.3.12
       '@mds-core/mds-service-helpers': workspace:0.4.3
+      '@mds-core/mds-stream': workspace:0.1.47
       '@mds-core/mds-test-data': workspace:0.4.4
       '@mds-core/mds-types': workspace:0.7.1
       '@mds-core/mds-utils': workspace:0.2.10
@@ -1201,6 +1206,7 @@ importers:
       '@mds-core/mds-rpc-common': link:../mds-rpc-common
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
       '@mds-core/mds-service-helpers': link:../mds-service-helpers
+      '@mds-core/mds-stream': link:../mds-stream
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
       joi: 17.4.0

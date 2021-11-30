@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@mds-core/mds-geography-service": "workspace:0.3.5",
+    "@mds-core/mds-stream": "workspace:0.1.47",
     "@mds-core/mds-test-data": "workspace:0.4.4"
   }
 }
