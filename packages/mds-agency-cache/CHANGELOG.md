@@ -1,5 +1,16 @@
 # @mds-core/mds-agency-cache
 
+## 0.4.4
+
+### Patch Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- Updated dependencies [102aa5a0]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-cache@0.0.23
+  - @mds-core/mds-utils@0.2.11
+  - @mds-core/mds-schema-validators@0.3.13
+
 ## 0.4.3
 
 ### Patch Changes

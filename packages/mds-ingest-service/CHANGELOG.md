@@ -1,5 +1,22 @@
 # @mds-core/mds-ingest-service
 
+## 0.6.7
+
+### Patch Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- c5a51222: Fix database schema/migrations discrepancies
+- Updated dependencies [102aa5a0]
+- Updated dependencies [17dde73a]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-agency-cache@0.4.4
+  - @mds-core/mds-repository@0.1.23
+  - @mds-core/mds-rpc-common@0.2.5
+  - @mds-core/mds-service-helpers@0.4.4
+  - @mds-core/mds-stream@0.2.0
+  - @mds-core/mds-utils@0.2.11
+  - @mds-core/mds-schema-validators@0.3.13
+
 ## 0.6.6
 
 ### Patch Changes

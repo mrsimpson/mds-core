@@ -1,5 +1,23 @@
 # @mds-core/mds-geography
 
+## 0.2.0
+
+### Minor Changes
+
+- e9e3048d: Refactor mds-geography to use GeographyService for db
+
+### Patch Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- Updated dependencies [102aa5a0]
+- Updated dependencies [e9e3048d]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-api-server@0.3.13
+  - @mds-core/mds-geography-service@0.4.0
+  - @mds-core/mds-utils@0.2.11
+  - @mds-core/mds-api-helpers@0.1.57
+  - @mds-core/mds-schema-validators@0.3.13
+
 ## 0.1.15
 
 ### Patch Changes

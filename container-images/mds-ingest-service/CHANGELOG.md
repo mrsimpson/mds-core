@@ -1,5 +1,13 @@
 # @container-images/mds-ingest-service
 
+## 0.0.32
+
+### Patch Changes
+
+- Updated dependencies [102aa5a0]
+- Updated dependencies [c5a51222]
+  - @mds-core/mds-ingest-service@0.6.7
+
 ## 0.0.31
 
 ### Patch Changes

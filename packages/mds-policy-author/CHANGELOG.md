@@ -1,5 +1,22 @@
 # @mds-core/mds-policy-author
 
+## 0.6.6
+
+### Patch Changes
+
+- d63d7e8b: Add dev dependency for mds-stream
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- Updated dependencies [102aa5a0]
+- Updated dependencies [d63d7e8b]
+- Updated dependencies [c5a51222]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-api-server@0.3.13
+  - @mds-core/mds-policy-service@0.9.2
+  - @mds-core/mds-service-helpers@0.4.4
+  - @mds-core/mds-utils@0.2.11
+  - @mds-core/mds-api-helpers@0.1.57
+  - @mds-core/mds-schema-validators@0.3.13
+
 ## 0.6.5
 
 ### Patch Changes

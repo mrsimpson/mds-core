@@ -1,5 +1,24 @@
 # @mds-core/mds-compliance-api
 
+## 0.3.17
+
+### Patch Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- Updated dependencies [102aa5a0]
+- Updated dependencies [d63d7e8b]
+- Updated dependencies [c5a51222]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-api-server@0.3.13
+  - @mds-core/mds-compliance-service@0.7.7
+  - @mds-core/mds-db@0.4.17
+  - @mds-core/mds-policy-service@0.9.2
+  - @mds-core/mds-service-helpers@0.4.4
+  - @mds-core/mds-utils@0.2.11
+  - @mds-core/mds-api-helpers@0.1.57
+  - @mds-core/mds-schema-validators@0.3.13
+  - @mds-core/mds-test-data@0.4.5
+
 ## 0.3.16
 
 ### Patch Changes
