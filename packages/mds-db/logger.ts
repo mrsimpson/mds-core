@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const DbLogger = logger.createLogger('mds-db')
+export const DbLogger = createLogger('mds-db')

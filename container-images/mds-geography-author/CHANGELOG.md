@@ -1,5 +1,12 @@
 # @container-images/mds-geography-author
 
+## 0.0.32
+
+### Patch Changes
+
+- Updated dependencies [102aa5a0]
+  - @mds-core/mds-geography-author@0.2.15
+
 ## 0.0.31
 
 ### Patch Changes

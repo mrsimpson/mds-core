@@ -33,37 +33,42 @@ const getCustomProps = () => {
 }
 
 const log =
-  (level: LogLevel) =>
+  (level: LogLevel, namespace: string) =>
   (message: string, data?: Record<string, unknown> | Error): void => {
     if (process.env.QUIET !== 'true') {
       return data
-        ? logger[level]({ ...getCustomProps(), data: redact(data), message })
-        : logger[level]({ ...getCustomProps(), message })
+        ? logger[level]({ ...getCustomProps(), namespace, data: redact(data), message })
+        : logger[level]({ ...getCustomProps(), namespace, message })
     }
   }
 
+export const createLogger = (namespace = 'mds') => {
+  const ns = namespace.startsWith('mds') ? namespace : `mds:${namespace}`
+  return {
+    debug: debugLog(ns),
+    info: log('info', ns),
+    warn: log('warn', ns),
+    error: log('error', ns)
+  }
+}
+
+const { debug, info, warn, error } = createLogger()
+
 export default {
-  log: (level: LogLevel, ...args: Parameters<ReturnType<typeof log>>) => log(level)(...args),
   /** @deprecated
    * Create a namespaced logger with createLogger instead.
    */
-  debug: debugLog,
+  debug,
   /** @deprecated
    * Create a namespaced logger with createLogger instead.
    */
-  info: log('info'),
+  info,
   /** @deprecated
    * Create a namespaced logger with createLogger instead.
    */
-  warn: log('warn'),
+  warn,
   /** @deprecated
    * Create a namespaced logger with createLogger instead.
    */
-  error: log('error'),
-  createLogger: (name: string) => ({
-    debug: debugLog(name),
-    info: log('info'),
-    warn: log('warn'),
-    error: log('error')
-  })
+  error
 }

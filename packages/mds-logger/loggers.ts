@@ -23,8 +23,8 @@ export const logger = (() =>
  * with the caveat that logging function supports the mds-logger format you know and love.
  * Default namespace is mds, but if you provide a namespace arg it will appear as 'mds:${namespace}'.
  */
-export const debugLog = (namespace?: string) => {
-  const debugLogger = debug(namespace ? `mds:${namespace}` : 'mds')
+export const debugLog = (namespace: string) => {
+  const debugLogger = debug(namespace)
   return (message: string, data?: Record<string, unknown> | Error) => {
     if (process.env.QUIET !== 'true') {
       const formattedLogMessage = { log_message: message, log_data: redact(data) }

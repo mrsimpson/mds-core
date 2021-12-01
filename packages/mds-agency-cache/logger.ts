@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const AgencyCacheLogger = logger.createLogger('mds-agency-cache')
+export const AgencyCacheLogger = createLogger('mds-agency-cache')

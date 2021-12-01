@@ -1,5 +1,18 @@
 # @mds-core/mds-geography-author
 
+## 0.2.15
+
+### Patch Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- Updated dependencies [102aa5a0]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-api-server@0.3.13
+  - @mds-core/mds-db@0.4.17
+  - @mds-core/mds-utils@0.2.11
+  - @mds-core/mds-api-helpers@0.1.57
+  - @mds-core/mds-schema-validators@0.3.13
+
 ## 0.2.14
 
 ### Patch Changes

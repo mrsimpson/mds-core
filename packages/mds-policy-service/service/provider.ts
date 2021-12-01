@@ -20,6 +20,7 @@ import { BadParamsError, DependencyMissingError } from '@mds-core/mds-utils'
 import { PolicyService } from '../@types'
 import { PolicyServiceLogger } from '../logger'
 import { PolicyRepository } from '../repository'
+import { PolicyStreamKafka } from './stream'
 import { validatePolicyDomainModel, validatePolicyMetadataDomainModel, validatePresentationOptions } from './validators'
 
 const serviceErrorWrapper = async <T>(method: string, exec: () => Promise<T>) => {
@@ -33,8 +34,12 @@ const serviceErrorWrapper = async <T>(method: string, exec: () => Promise<T>) =>
 }
 
 export const PolicyServiceProvider: ServiceProvider<PolicyService> & ProcessController = {
-  start: PolicyRepository.initialize,
-  stop: PolicyRepository.shutdown,
+  start: async () => {
+    await Promise.all([PolicyRepository.initialize(), PolicyStreamKafka.initialize()])
+  },
+  stop: async () => {
+    await Promise.all([PolicyRepository.shutdown(), PolicyStreamKafka.shutdown()])
+  },
   name: async () => ServiceResult('mds-policy-service'),
   writePolicy: policy =>
     serviceErrorWrapper('writePolicy', () => PolicyRepository.writePolicy(validatePolicyDomainModel(policy))),
@@ -76,7 +81,9 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService> & ProcessCont
       if (geographies.some(geography => !geography?.publish_date))
         throw new DependencyMissingError(`some geographies not published!`)
 
-      const publishedPolicy = await PolicyRepository.publishPolicy(policy_id, publish_date)
+      const publishedPolicy = await PolicyRepository.publishPolicy(policy_id, publish_date, {
+        beforeCommit: async policy => PolicyStreamKafka.write(policy)
+      })
 
       if (prev_policies) {
         await Promise.all(

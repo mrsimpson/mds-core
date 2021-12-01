@@ -58,12 +58,16 @@ class GeographyReadWriteRepository extends ReadWriteRepository {
 
   protected findGeographies = async (
     where: FindManyOptions<GeographyEntity>['where'],
-    { includeMetadata = false }: GetGeographiesOptions = {}
+    { includeMetadata = false, includeGeographyJSON = true }: GetGeographiesOptions = {}
   ): Promise<GeographyWithMetadataDomainModel[]> => {
     try {
       const connection = await this.connect('ro')
 
-      const entities = await connection.getRepository(GeographyEntity).find({ where })
+      const select = [
+        ...(<const>['geography_id', 'name', 'description', 'effective_date', 'publish_date', 'prev_geographies']),
+        ...(includeGeographyJSON ? <const>['geography_json'] : [])
+      ]
+      const entities = await connection.getRepository(GeographyEntity).find({ select, where })
 
       const geographies = entities.map(GeographyEntityToDomain.mapper())
 

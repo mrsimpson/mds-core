@@ -6,6 +6,10 @@ RUN mkdir /mds
 
 COPY dist/* /mds/
 
+COPY docker_package.json /mds/package.json
+
 WORKDIR /mds
 
-ENTRYPOINT ["/sbin/tini", "node", "--no-deprecation", "server.js"]
+RUN npm install
+
+ENTRYPOINT ["/sbin/tini", "node", "--require", "dd-trace/init", "--no-deprecation", "server.js"]

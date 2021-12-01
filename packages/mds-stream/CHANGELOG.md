@@ -1,5 +1,18 @@
 # @mds-core/mds-stream
 
+## 0.2.0
+
+### Minor Changes
+
+- 17dde73a: Remove Redis & Bluebird from, as they are unused.
+
+### Patch Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- Updated dependencies [102aa5a0]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-utils@0.2.11
+
 ## 0.1.47
 
 ### Patch Changes

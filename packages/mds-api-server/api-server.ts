@@ -16,7 +16,6 @@
 
 import { JurisdictionsClaim, ProviderIdClaim, UserEmailClaim } from '@mds-core/mds-api-authorizer'
 import { pathPrefix } from '@mds-core/mds-utils'
-import tracer from 'dd-trace'
 import express from 'express'
 import { HealthRequestHandler } from './handlers/health'
 import { ApiServerLogger } from './logger'
@@ -28,8 +27,8 @@ import { MaintenanceModeMiddleware, MaintenanceModeMiddlewareOptions } from './m
 import { PrometheusMiddleware, PrometheusMiddlewareOptions } from './middleware/prometheus'
 import { RequestLoggingMiddleware, RequestLoggingMiddlewareOptions } from './middleware/request-logging'
 import { serverVersion } from './utils'
+import './utils/tracer'
 
-tracer.init({ enabled: !!process.env.DD_ENV })
 export interface ApiServerOptions {
   authorization: AuthorizationMiddlewareOptions
   compression: CompressionMiddlewareOptions

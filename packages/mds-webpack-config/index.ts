@@ -19,6 +19,9 @@ import { parse, resolve } from 'path'
 import { BannerPlugin, Configuration, ContextReplacementPlugin, IgnorePlugin } from 'webpack'
 import { merge as WebpackMerge } from 'webpack-merge'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const nodeExternals = require('webpack-node-externals')
+
 const gitRevisionPlugin = new GitRevisionPlugin({ commithashCommand: 'rev-parse --short HEAD' })
 
 type CustomConfiguration = Omit<Configuration, 'entry'>
@@ -115,7 +118,10 @@ const MergeConfigurations =
           symlinks: true
         },
         externals: {
-          sharp: 'commonjs sharp'
+          sharp: 'commonjs sharp',
+          express: 'commonjs express',
+          pg: 'commonjs pg',
+          pino: 'commonjs pino'
         },
         target: 'node',
         stats: {

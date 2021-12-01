@@ -1,15 +1,19 @@
 /* eslint-disable no-console */
 import { GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
+import stream from '@mds-core/mds-stream'
 import { clone, days, now, START_ONE_MONTH_AGO, START_ONE_MONTH_FROM_NOW, uuid, yesterday } from '@mds-core/mds-utils'
 import { PolicyMetadataDomainModel } from '../@types'
 import { PolicyServiceClient } from '../client'
 import { PolicyRepository } from '../repository'
 import { PolicyServiceManager } from '../service/manager'
+import { PolicyStreamKafka } from '../service/stream'
 import { POLICY2_JSON, POLICY3_JSON, POLICY_WITH_DUPE_RULE } from '../test_data/policies'
 import { createPolicyAndGeographyFactory, GeographyFactory, PolicyFactory, RulesFactory } from './helpers'
 
 const GeographyServer = GeographyServiceManager.controller()
 const PolicyServer = PolicyServiceManager.controller()
+
+const mockStream = stream.mockStream(PolicyStreamKafka)
 
 describe('spot check unit test policy functions with SimplePolicy', () => {
   describe('Policy Client Tests', () => {
@@ -397,6 +401,43 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
         const changedMetadata: PolicyMetadataDomainModel<{ name: string }> =
           await PolicyServiceClient.readSinglePolicyMetadata(p1.policy_id)
         expect(changedMetadata.policy_metadata?.name).toStrictEqual('steve')
+      })
+    })
+
+    describe('Tests Kafka publishing', () => {
+      beforeEach(() => {
+        mockStream.write.mockReset()
+      })
+
+      it('Verifies that publishing a policy results in a kafka stream write', async () => {
+        const policy = PolicyFactory()
+
+        await createPolicyAndGeographyFactory(PolicyServiceClient, GeographyServiceClient, policy, {
+          publish_date: now()
+        })
+
+        await PolicyServiceClient.publishPolicy(policy.policy_id, policy.start_date)
+
+        expect(mockStream.write).toHaveBeenCalledTimes(1)
+      })
+
+      it('Verifies that a failed kafka publish results in a failed publish', async () => {
+        const policy = PolicyFactory()
+        mockStream.write.mockImplementationOnce(() => {
+          throw new Error('kafka publish failed')
+        })
+
+        await createPolicyAndGeographyFactory(PolicyServiceClient, GeographyServiceClient, policy, {
+          publish_date: now()
+        })
+
+        await expect(PolicyServiceClient.publishPolicy(policy.policy_id, policy.start_date)).rejects.toMatchObject({
+          type: 'ServiceException'
+        })
+
+        const readPolicyResult = await PolicyServiceClient.readPolicy(policy.policy_id)
+
+        expect(readPolicyResult.publish_date).toBeNull()
       })
     })
 

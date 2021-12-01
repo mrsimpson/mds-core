@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const ComplianceBatchProcessorLogger = logger.createLogger('mds-compliance-batch-processor')
+export const ComplianceBatchProcessorLogger = createLogger('mds-compliance-batch-processor')

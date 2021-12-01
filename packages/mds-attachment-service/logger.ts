@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const AttachmentServiceLogger = logger.createLogger('mds-attachment-service')
+export const AttachmentServiceLogger = createLogger('mds-attachment-service')

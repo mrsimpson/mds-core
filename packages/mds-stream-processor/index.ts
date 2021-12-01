@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { asArray } from '@mds-core/mds-utils'
+import { asArray, ParseError } from '@mds-core/mds-utils'
 import { DeadLetterSink, StreamProcessorController, StreamSink, StreamSource, StreamTransform } from './@types'
 import { StreamProcessorLogger } from './logger'
 
@@ -23,13 +23,16 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
   source: StreamSource<TMessageIn>,
   transform: StreamTransform<TMessageIn, TMessageOut>,
   sinks: Array<StreamSink<TMessageOut>>,
-  deadLetterSinks: Array<DeadLetterSink<TMessageIn>>
+  deadLetterSinks: Array<DeadLetterSink<TMessageIn | string>>
 ): StreamProcessorController => {
   const sinkProducers = sinks.map(sink => sink())
   const deadLetterProducers = deadLetterSinks.map(sink => sink())
 
   const consumer = source(async message => {
     try {
+      if (message instanceof ParseError) {
+        throw message
+      }
       const transformed = await transform(message)
       if (transformed) {
         if (asArray(transformed).length > 0) {
@@ -53,7 +56,9 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
 
         // Use Promise.allSettled to not throw errors and wait for all promises to complete.
         const results = await Promise.allSettled(
-          deadLetterProducers.map(producer => producer.write({ error, data: message }))
+          deadLetterProducers.map(producer =>
+            producer.write({ error, data: message instanceof ParseError ? JSON.stringify(message.info) : message })
+          )
         )
         const failures = results.filter(result => result.status === 'rejected')
         const failureCount = failures.length
@@ -92,7 +97,7 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
 export const StreamForwarder = <TMessage>(
   source: StreamSource<TMessage>,
   sinks: Array<StreamSink<TMessage>>,
-  deadLetterSinks: Array<DeadLetterSink<TMessage>>
+  deadLetterSinks: Array<DeadLetterSink<TMessage | string>>
 ) => StreamProcessor(source, message => Promise.resolve(message), sinks, deadLetterSinks)
 
 const launch = async (processor: StreamProcessorController) => {

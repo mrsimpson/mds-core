@@ -16,6 +16,7 @@
 
 import stream, { KafkaStreamConsumerOptions, KafkaStreamProducerOptions } from '@mds-core/mds-stream'
 import { SingleOrArray } from '@mds-core/mds-types'
+import { ParseError } from '@mds-core/mds-utils'
 import { StreamSink, StreamSource } from '../@types'
 import { StreamProcessorLogger } from '../logger'
 
@@ -58,9 +59,15 @@ export const KafkaSource =
           message: { offset, value }
         } = payload
         if (value) {
-          const message: TMessage = JSON.parse(value.toString())
+          const message: TMessage | ParseError = (() => {
+            try {
+              return JSON.parse(value.toString())
+            } catch (err) {
+              return new ParseError('JSON.parse() failure', value)
+            }
+          })()
           StreamProcessorLogger.debug(`Processing ${topic}/${offset}`, {
-            message: (messageLogger && messageLogger(message)) ?? message
+            message: message instanceof ParseError ? message : (messageLogger && messageLogger(message)) ?? message
           })
 
           await processor(message)

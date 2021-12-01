@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const StreamProcessorLogger = logger.createLogger('mds-stream-processor')
+export const StreamProcessorLogger = createLogger('mds-stream-processor')

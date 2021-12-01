@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const JurisdictionServiceLogger = logger.createLogger('mds-jurisdiction-service')
+export const JurisdictionServiceLogger = createLogger('mds-jurisdiction-service')

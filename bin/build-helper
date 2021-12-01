@@ -21,6 +21,8 @@ buildImage() {
 
   local system_arch=$(uname -m)
 
+  $(produceDockerPackageJson)
+
   if [[ "$system_arch" == "x86_64" ]]; then
     docker build -t ${REGISTRY}${image} .
   else
@@ -90,6 +92,11 @@ templateValues() {
   mkdir -p dist
   envsubst < $BASE_DIR/values.yaml.tpl > $BASE_DIR/dist/values-mds.yaml
   echo "Wrote dist/values-mds.yaml"
+}
+
+produceDockerPackageJson() {
+  local PACKAGE_NAME=$(basename $(pwd))
+  cat package.json | jq 'del(."dependencies"."@mds-core/'${PACKAGE_NAME}'", ."dependencies"."@mds-core/mds-webpack-config")' > docker_package.json
 }
 
 CALL=$1; shift

@@ -1,3 +1,4 @@
+import { ParseError } from '@mds-core/mds-utils'
 import { StreamSink } from '../@types'
 import { GeneratorSource } from '../connectors'
 import { StreamProcessor } from '../index'
@@ -57,7 +58,7 @@ describe('Tests dead-letter handling', () => {
     expect(deadLetterSinkWrite).toBeCalledTimes(0)
   })
 
-  it('All throws should be captured by the dead letter sink', async () => {
+  it('All processing throws should be captured by the dead letter sink', async () => {
     // Dummy source that generates 2 test messages
     const source = GeneratorSource(async function* () {
       let i = 0
@@ -71,6 +72,38 @@ describe('Tests dead-letter handling', () => {
     // Always throw a generic Error from the transformer
     const transformer = async (message: string) => {
       throw new Error(message)
+    }
+
+    const {
+      mockedMethods: { write: standardSinkWrite },
+      sink: standardSink
+    } = MockSinkFactory()
+    const {
+      mockedMethods: { write: deadLetterSinkWrite, initialize: deadLetterSinkInitialize },
+      sink: deadLetterSink
+    } = MockSinkFactory()
+
+    const streamProcessor = StreamProcessor(source, transformer, [standardSink], [deadLetterSink])
+
+    await streamProcessor.start()
+
+    expect(deadLetterSinkInitialize).toBeCalledTimes(1)
+
+    expect(standardSinkWrite).toBeCalledTimes(0)
+    expect(deadLetterSinkWrite).toBeCalledTimes(2)
+  })
+
+  it('Message parsing throws should be captured by the dead letter sink', async () => {
+    // Dummy source that generates 2 test messages
+    const source = GeneratorSource(async function* () {
+      for (let i = 0; i < 2; i++) {
+        yield new ParseError('I failed :(', '{"foo": "someInvalidJSON"]')
+      }
+    })
+
+    // Always throw a generic Error from the transformer
+    const transformer = async (message: ParseError) => {
+      return 'foo' // this transformer doesn't actually do anything, but we need it to init the stream processor
     }
 
     const {

@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-stream",
-  "version": "0.1.47",
+  "version": "0.2.0",
   "description": "Mobility Data Specification stream interface",
   "keywords": [
     "mds",
@@ -18,16 +18,12 @@
     "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand"
   },
   "dependencies": {
-    "@mds-core/mds-logger": "workspace:0.4.4",
+    "@mds-core/mds-logger": "workspace:0.5.0",
     "@mds-core/mds-types": "workspace:0.7.1",
-    "@mds-core/mds-utils": "workspace:0.2.10",
-    "@types/bluebird": "3.5.36",
-    "@types/redis": "2.8.32",
-    "bluebird": "3.7.2",
+    "@mds-core/mds-utils": "workspace:0.2.11",
     "flat": "5.0.2",
     "kafkajs": "1.15.0",
     "nats": "2.2.0",
-    "redis": "3.1.2",
     "sinon": "11.1.2"
   }
 }

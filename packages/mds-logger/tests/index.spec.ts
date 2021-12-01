@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import logger from '../index'
+import { createLogger } from '../index'
 import { logger as pinoLogger } from '../loggers'
+
+const logger = createLogger()
 
 const QUIET = process.env.QUIET
 
@@ -129,7 +131,7 @@ describe('MDS Logger', () => {
     const errorLoud = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
       return
     })
-    logger.log('error', 'some message', { key1: 'key1', key2: 'key2' })
+    logger.error('some message', { key1: 'key1', key2: 'key2' })
     expect(errorLoud).toHaveBeenCalled()
 
     process.env.QUIET = 'true'
@@ -137,7 +139,7 @@ describe('MDS Logger', () => {
     const errorQuiet = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
       return
     })
-    logger.log('error', 'some message', { key1: 'key1', key2: 'key2' })
+    logger.error('some message', { key1: 'key1', key2: 'key2' })
     expect(errorQuiet).not.toHaveBeenCalled()
   })
 

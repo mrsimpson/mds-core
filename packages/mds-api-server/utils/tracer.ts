@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 City of Los Angeles
+ * Copyright 2021 City of Los Angeles
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-export * from './@types'
-export * from './client'
-export * from './repository'
-export * from './service/manager'
-export * from './service/stream'
-export * from './service/validators'
-export * from './tests/helpers'
+import tracer from 'dd-trace'
+tracer.init({ enabled: !!process.env.DD_ENV }) // initialized in a different file to avoid hoisting.
+export default tracer
