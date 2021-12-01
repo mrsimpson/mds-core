@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const ComplianceApiLogger = logger.createLogger('mds-compliance-api')
+export const ComplianceApiLogger = createLogger('mds-compliance-api')

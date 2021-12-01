@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const GeographyServiceLogger = logger.createLogger('mds-geography-service')
+export const GeographyServiceLogger = createLogger('mds-geography-service')

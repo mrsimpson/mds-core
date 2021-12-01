@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const RpcCommonLogger = logger.createLogger('mds-rpc-common')
+export const RpcCommonLogger = createLogger('mds-rpc-common')

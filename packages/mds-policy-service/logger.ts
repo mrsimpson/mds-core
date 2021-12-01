@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const PolicyServiceLogger = logger.createLogger('mds-policy-service')
+export const PolicyServiceLogger = createLogger('mds-policy-service')

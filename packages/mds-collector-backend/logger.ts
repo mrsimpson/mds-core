@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const CollectorBackendLogger = logger.createLogger('mds-collector-backend')
+export const CollectorBackendLogger = createLogger('mds-collector-backend')

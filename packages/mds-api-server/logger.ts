@@ -1,3 +1,3 @@
-import logger from '@mds-core/mds-logger'
+import { createLogger } from '@mds-core/mds-logger'
 
-export const ApiServerLogger = logger.createLogger('mds-api-server')
+export const ApiServerLogger = createLogger('mds-api-server')

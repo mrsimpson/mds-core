@@ -47,14 +47,14 @@ In reality, your usage will probably look more like this:
 
 ```typescript
 // mds-some-package/logger.ts
-import logger from "@mds-core/mds-logger";
+import { createLogger } from "@mds-core/mds-logger";
 
-export const SomePackageLogger = logger.createLogger("mds-some-package");
+export const SomePackageLogger = createLogger("mds-some-package");
 ```
 
 ```typescript
 // mds-some-package/index.ts
-import SomePackageLogger from "./logger";
+import { SomePackageLogger } from "./logger";
 
 export const someFunction = () => {
   // do some stuff
