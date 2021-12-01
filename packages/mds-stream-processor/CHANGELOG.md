@@ -1,5 +1,21 @@
 # @mds-core/mds-stream-processor
 
+## 0.3.0
+
+### Minor Changes
+
+- d7351004: Gracefully handle Kafka message parsing failures in StreamProcessor (e.g. if malformed JSON).
+
+### Patch Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- Updated dependencies [102aa5a0]
+- Updated dependencies [17dde73a]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-service-helpers@0.4.4
+  - @mds-core/mds-stream@0.2.0
+  - @mds-core/mds-utils@0.2.11
+
 ## 0.2.17
 
 ### Patch Changes

@@ -1,5 +1,22 @@
 # @mds-core/mds-db
 
+## 0.4.17
+
+### Patch Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- Updated dependencies [102aa5a0]
+- Updated dependencies [d63d7e8b]
+- Updated dependencies [e9e3048d]
+- Updated dependencies [c5a51222]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-attachment-service@0.3.6
+  - @mds-core/mds-geography-service@0.4.0
+  - @mds-core/mds-ingest-service@0.6.7
+  - @mds-core/mds-policy-service@0.9.2
+  - @mds-core/mds-utils@0.2.11
+  - @mds-core/mds-audit-service@0.3.6
+
 ## 0.4.16
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.5.0
+
+### Minor Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+
 ## 0.4.4
 
 ### Patch Changes

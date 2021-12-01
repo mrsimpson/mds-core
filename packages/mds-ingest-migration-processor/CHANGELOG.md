@@ -1,5 +1,21 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.28
+
+### Patch Changes
+
+- 102aa5a0: Add a namespace property to all info/warn/error logs
+- Updated dependencies [102aa5a0]
+- Updated dependencies [d7351004]
+- Updated dependencies [c5a51222]
+  - @mds-core/mds-logger@0.5.0
+  - @mds-core/mds-agency-cache@0.4.4
+  - @mds-core/mds-ingest-service@0.6.7
+  - @mds-core/mds-repository@0.1.23
+  - @mds-core/mds-service-helpers@0.4.4
+  - @mds-core/mds-stream-processor@0.3.0
+  - @mds-core/mds-utils@0.2.11
+
 ## 0.0.27
 
 ### Patch Changes
