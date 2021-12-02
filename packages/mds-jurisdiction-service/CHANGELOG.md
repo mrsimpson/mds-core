@@ -1,5 +1,13 @@
 # @mds-core/mds-jurisdiction-service
 
+## 0.3.8
+
+### Patch Changes
+
+- @mds-core/mds-repository@0.1.25
+- @mds-core/mds-schema-validators@0.3.15
+- @mds-core/mds-rpc-common@0.2.7
+
 ## 0.3.7
 
 ### Patch Changes

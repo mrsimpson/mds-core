@@ -38,6 +38,7 @@ export const OJO_ELECTRIC_PROVIDER_ID = '8d293326-8464-4256-8312-617ebcd0efad'
 export const CIRC_PROVIDER_ID = '03d5d605-e5c9-45a1-a1dd-144aa8649525'
 export const SUPERPEDESTRIAN_PROVIDER_ID = '420e6e94-55a6-4946-b6b3-4398fe22e912'
 export const BOAZ_BIKES_PROVIDER_ID = '7c96bc58-fb63-433a-b77f-84ccb1c9d737'
+export const HELBIZ_PROVIDER_ID = '3aece8c6-416a-4d39-bcc4-d02524cb8004'
 
 // Additional provider IDs in use (should be registered)
 export const LADOT_PROVIDER_ID = '33bbcec3-f91b-4461-bc41-61711afb9460'
@@ -75,6 +76,7 @@ const PROVIDER_IDS = [
   OJO_ELECTRIC_PROVIDER_ID,
   SUPERPEDESTRIAN_PROVIDER_ID,
   BOAZ_BIKES_PROVIDER_ID,
+  HELBIZ_PROVIDER_ID,
   BLUE_SYSTEMS_PROVIDER_ID,
   LADOT_PROVIDER_ID,
   TEST1_PROVIDER_ID,
@@ -214,6 +216,11 @@ export const providers: Readonly<{ [P in PROVIDER_ID]: Readonly<Provider> }> = O
     url: 'https://www.boazbikes.com/',
     mds_api_url: 'https://mds.movatic.co/',
     gbfs_api_url: 'https://gbsf.movatic.co/en/1.1/576347857979998215'
+  }),
+  [HELBIZ_PROVIDER_ID]: Object.freeze({
+    provider_id: HELBIZ_PROVIDER_ID,
+    provider_name: 'Helbiz',
+    url: 'https://helbiz.com/'
   }),
   [LADOT_PROVIDER_ID]: Object.freeze({
     provider_id: LADOT_PROVIDER_ID,

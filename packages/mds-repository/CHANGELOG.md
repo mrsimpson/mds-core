@@ -1,5 +1,12 @@
 # @mds-core/mds-repository
 
+## 0.1.25
+
+### Patch Changes
+
+- Updated dependencies [bb63d77f]
+  - @mds-core/mds-providers@0.2.0
+
 ## 0.1.24
 
 ### Patch Changes

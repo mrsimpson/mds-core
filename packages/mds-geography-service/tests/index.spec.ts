@@ -161,6 +161,19 @@ describe('Geography Service Tests', () => {
       const geography = await GeographyServiceClient.getGeography(uuid(), { includeMetadata: true })
       expect(geography).toBeUndefined()
     })
+
+    it('Get only non hidden geographies', async () => {
+      const geographies1 = await GeographyServiceClient.getGeographies()
+      expect(geographies1.length).toEqual(2)
+      await GeographyServiceClient.writeGeographiesMetadata([
+        {
+          geography_id,
+          geography_metadata: { hidden: true }
+        }
+      ])
+      const geographies2 = await GeographyServiceClient.getGeographies()
+      expect(geographies2.length).toEqual(1)
+    })
   })
 
   describe('Tests getGeographiesByIds', () => {
