@@ -41,6 +41,7 @@ export type GeographyMetadataDomainCreateModel = DomainModelCreate<GeographyMeta
 export type GetGeographiesOptions = Partial<{
   includeMetadata: boolean
   includeGeographyJSON: boolean
+  includeHidden: boolean
 }>
 
 export type GetPublishedGeographiesOptions = GetGeographiesOptions &

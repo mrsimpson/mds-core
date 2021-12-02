@@ -58,17 +58,38 @@ class GeographyReadWriteRepository extends ReadWriteRepository {
 
   protected findGeographies = async (
     where: FindManyOptions<GeographyEntity>['where'],
-    { includeMetadata = false, includeGeographyJSON = true }: GetGeographiesOptions = {}
+    { includeMetadata = false, includeGeographyJSON = true, includeHidden = false }: GetGeographiesOptions = {}
   ): Promise<GeographyWithMetadataDomainModel[]> => {
     try {
       const connection = await this.connect('ro')
 
       const select = [
-        ...(<const>['geography_id', 'name', 'description', 'effective_date', 'publish_date', 'prev_geographies']),
-        ...(includeGeographyJSON ? <const>['geography_json'] : [])
+        ...(<const>[
+          'g.geography_id',
+          'g.name',
+          'g.description',
+          'g.effective_date',
+          'g.publish_date',
+          'g.prev_geographies'
+        ]),
+        ...(includeGeographyJSON ? <const>['g.geography_json'] : [])
       ]
-      const entities = await connection.getRepository(GeographyEntity).find({ select, where })
 
+      const query = connection
+        .getRepository(GeographyEntity)
+        .createQueryBuilder('g')
+        .select(select)
+        .where(where ?? {})
+
+      if (!includeHidden) {
+        query
+          .leftJoinAndSelect('geography_metadata', 'gm', 'gm.geography_id = g.geography_id')
+          .andWhere(
+            "(gm.geography_metadata::json->>'hidden' is null or (gm.geography_metadata::json->'hidden' is not null and (gm.geography_metadata::json->>'hidden')::boolean = false))"
+          )
+      }
+
+      const entities = await query.getMany()
       const geographies = entities.map(GeographyEntityToDomain.mapper())
 
       if (includeMetadata) {
