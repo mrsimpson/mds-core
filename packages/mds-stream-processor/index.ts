@@ -23,7 +23,7 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
   source: StreamSource<TMessageIn>,
   transform: StreamTransform<TMessageIn, TMessageOut>,
   sinks: Array<StreamSink<TMessageOut>>,
-  deadLetterSinks: Array<DeadLetterSink<TMessageIn | string>>
+  deadLetterSinks: Array<DeadLetterSink<TMessageIn>>
 ): StreamProcessorController => {
   const sinkProducers = sinks.map(sink => sink())
   const deadLetterProducers = deadLetterSinks.map(sink => sink())
@@ -97,7 +97,7 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
 export const StreamForwarder = <TMessage>(
   source: StreamSource<TMessage>,
   sinks: Array<StreamSink<TMessage>>,
-  deadLetterSinks: Array<DeadLetterSink<TMessage | string>>
+  deadLetterSinks: Array<DeadLetterSink<TMessage>>
 ) => StreamProcessor(source, message => Promise.resolve(message), sinks, deadLetterSinks)
 
 const launch = async (processor: StreamProcessorController) => {

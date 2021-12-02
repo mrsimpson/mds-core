@@ -43,7 +43,7 @@ const log =
   }
 
 export const createLogger = (namespace = 'mds') => {
-  const ns = namespace.startsWith('mds') ? namespace : `mds:${namespace}`
+  const ns = namespace === 'mds' ? namespace : `mds:${namespace}`
   return {
     debug: debugLog(ns),
     info: log('info', ns),
