@@ -1,5 +1,11 @@
 # @mds-core/mds-rpc-common
 
+## 0.2.7
+
+### Patch Changes
+
+- @mds-core/mds-api-server@0.3.15
+
 ## 0.2.6
 
 ### Patch Changes

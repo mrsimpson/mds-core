@@ -1,5 +1,11 @@
 # @mds-core/mds-providers
 
+## 0.2.0
+
+### Minor Changes
+
+- bb63d77f: Adding Helbiz provider_id to providers
+
 ## 0.1.45
 
 ### Patch Changes
