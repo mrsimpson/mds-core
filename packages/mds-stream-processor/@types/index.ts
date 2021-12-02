@@ -19,7 +19,7 @@ import { ParseError } from '@mds-core/mds-utils'
 
 export type StreamSource<TMessage> = (processor: (message: TMessage | ParseError) => Promise<void>) => StreamConsumer
 export type StreamSink<TMessage> = () => StreamProducer<TMessage>
-export type DeadLetterSink<TMessage> = StreamSink<{ error: unknown; data: TMessage }>
+export type DeadLetterSink<TMessage> = StreamSink<{ error: unknown; data: TMessage | string }>
 
 export type StreamTransform<TMessageIn, TMessageOut> = (
   message: TMessageIn
