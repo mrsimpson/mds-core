@@ -1,5 +1,18 @@
 # @mds-core/mds-collector-backend
 
+## 0.2.7
+
+### Patch Changes
+
+- Updated dependencies [a881d6cc]
+  - @mds-core/mds-logger@0.5.1
+  - @mds-core/mds-repository@0.1.24
+  - @mds-core/mds-rpc-common@0.2.6
+  - @mds-core/mds-service-helpers@0.4.5
+  - @mds-core/mds-stream@0.2.1
+  - @mds-core/mds-utils@0.2.12
+  - @mds-core/mds-schema-validators@0.3.14
+
 ## 0.2.6
 
 ### Patch Changes

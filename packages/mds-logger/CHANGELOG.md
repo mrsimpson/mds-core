@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.5.1
+
+### Patch Changes
+
+- a881d6cc: Use proper namespace prefix for logs
+
 ## 0.5.0
 
 ### Minor Changes

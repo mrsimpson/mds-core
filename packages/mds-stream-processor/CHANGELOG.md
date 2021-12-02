@@ -1,5 +1,19 @@
 # @mds-core/mds-stream-processor
 
+## 0.4.0
+
+### Minor Changes
+
+- 736cf365: Build string handling into the DeadLetterSink type
+
+### Patch Changes
+
+- Updated dependencies [a881d6cc]
+  - @mds-core/mds-logger@0.5.1
+  - @mds-core/mds-service-helpers@0.4.5
+  - @mds-core/mds-stream@0.2.1
+  - @mds-core/mds-utils@0.2.12
+
 ## 0.3.0
 
 ### Minor Changes
