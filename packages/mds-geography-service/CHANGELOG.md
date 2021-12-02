@@ -1,5 +1,17 @@
 # @mds-core/mds-geography-service
 
+## 0.5.0
+
+### Minor Changes
+
+- 09e40cd4: Implement filtering for hidden geographies.
+
+### Patch Changes
+
+- @mds-core/mds-repository@0.1.25
+- @mds-core/mds-schema-validators@0.3.15
+- @mds-core/mds-rpc-common@0.2.7
+
 ## 0.4.1
 
 ### Patch Changes

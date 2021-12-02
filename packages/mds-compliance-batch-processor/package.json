@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-batch-processor",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "MDS Compliance Batch Processor",
   "keywords": [
     "mds",
@@ -20,12 +20,12 @@
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-agency-cache": "workspace:0.4.5",
-    "@mds-core/mds-compliance-engine": "workspace:0.6.15",
-    "@mds-core/mds-compliance-service": "workspace:0.7.8",
-    "@mds-core/mds-db": "workspace:0.4.18",
+    "@mds-core/mds-agency-cache": "workspace:0.4.6",
+    "@mds-core/mds-compliance-engine": "workspace:0.6.16",
+    "@mds-core/mds-compliance-service": "workspace:0.7.9",
+    "@mds-core/mds-db": "workspace:0.4.19",
     "@mds-core/mds-logger": "workspace:0.5.1",
-    "@mds-core/mds-policy-service": "workspace:0.9.3",
+    "@mds-core/mds-policy-service": "workspace:0.9.4",
     "@mds-core/mds-service-helpers": "workspace:0.4.5",
     "@mds-core/mds-types": "workspace:0.7.1",
     "@mds-core/mds-utils": "workspace:0.2.12",
@@ -33,7 +33,7 @@
     "yargs": "17.0.1"
   },
   "devDependencies": {
-    "@mds-core/mds-providers": "workspace:0.1.45",
-    "@mds-core/mds-test-data": "workspace:0.4.6"
+    "@mds-core/mds-providers": "workspace:0.2.0",
+    "@mds-core/mds-test-data": "workspace:0.4.7"
   }
 }

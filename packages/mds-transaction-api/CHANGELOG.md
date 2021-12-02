@@ -1,5 +1,14 @@
 # @mds-core/mds-transaction-api
 
+## 0.1.33
+
+### Patch Changes
+
+- @mds-core/mds-schema-validators@0.3.15
+- @mds-core/mds-transaction-service@0.3.8
+- @mds-core/mds-api-helpers@0.1.59
+- @mds-core/mds-api-server@0.3.15
+
 ## 0.1.32
 
 ### Patch Changes

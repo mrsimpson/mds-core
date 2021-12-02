@@ -1,5 +1,17 @@
 # @mds-core/mds-compliance-service
 
+## 0.7.9
+
+### Patch Changes
+
+- Updated dependencies [bb63d77f]
+  - @mds-core/mds-providers@0.2.0
+  - @mds-core/mds-repository@0.1.25
+  - @mds-core/mds-schema-validators@0.3.15
+  - @mds-core/mds-db@0.4.19
+  - @mds-core/mds-policy-service@0.9.4
+  - @mds-core/mds-rpc-common@0.2.7
+
 ## 0.7.8
 
 ### Patch Changes
