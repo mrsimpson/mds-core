@@ -17,7 +17,7 @@
 import { createLogger } from '../index'
 import { logger as pinoLogger } from '../loggers'
 
-const logger = createLogger()
+const logger = createLogger('mds-logger')
 
 const QUIET = process.env.QUIET
 
@@ -53,6 +53,7 @@ describe('MDS Logger', () => {
     logger.info('some message', toCensor)
     expect(info).toHaveBeenCalledWith(
       expect.objectContaining({
+        namespace: 'mds-logger',
         data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
         message: 'some message'
       })
@@ -80,6 +81,7 @@ describe('MDS Logger', () => {
     logger.warn('some message', toCensor)
     expect(warn).toHaveBeenCalledWith(
       expect.objectContaining({
+        namespace: 'mds-logger',
         data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
         message: 'some message'
       })
@@ -108,6 +110,7 @@ describe('MDS Logger', () => {
     logger.error('some message', toCensor)
     expect(error).toHaveBeenCalledWith(
       expect.objectContaining({
+        namespace: 'mds-logger',
         data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
         message: 'some message'
       })
@@ -123,7 +126,11 @@ describe('MDS Logger', () => {
     })
 
     expect(info).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { error: expect.stringContaining('evidence') }, message: 'ohai2' })
+      expect.objectContaining({
+        namespace: 'mds-logger',
+        data: { error: expect.stringContaining('evidence') },
+        message: 'ohai2'
+      })
     )
   })
 
@@ -149,6 +156,11 @@ describe('MDS Logger', () => {
     })
 
     logger.info('some message')
-    expect(info).toHaveBeenCalledWith(expect.objectContaining({ message: 'some message' }))
+    expect(info).toHaveBeenCalledWith(
+      expect.objectContaining({
+        namespace: 'mds-logger',
+        message: 'some message'
+      })
+    )
   })
 })

@@ -42,33 +42,9 @@ const log =
     }
   }
 
-export const createLogger = (namespace = 'mds') => {
-  const ns = namespace === 'mds' ? namespace : `mds:${namespace}`
-  return {
-    debug: debugLog(ns),
-    info: log('info', ns),
-    warn: log('warn', ns),
-    error: log('error', ns)
-  }
-}
-
-const { debug, info, warn, error } = createLogger()
-
-export default {
-  /** @deprecated
-   * Create a namespaced logger with createLogger instead.
-   */
-  debug,
-  /** @deprecated
-   * Create a namespaced logger with createLogger instead.
-   */
-  info,
-  /** @deprecated
-   * Create a namespaced logger with createLogger instead.
-   */
-  warn,
-  /** @deprecated
-   * Create a namespaced logger with createLogger instead.
-   */
-  error
-}
+export const createLogger = (namespace: string, options: Partial<{ debugPrefix: string }> = {}) => ({
+  debug: debugLog(`${options.debugPrefix ?? 'mds'}:${namespace}`),
+  info: log('info', namespace),
+  warn: log('warn', namespace),
+  error: log('error', namespace)
+})

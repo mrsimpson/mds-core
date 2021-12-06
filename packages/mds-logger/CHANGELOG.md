@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.5.2
+
+### Patch Changes
+
+- a4fbd91f: Remove deprecated mds-logger methods
+
 ## 0.5.1
 
 ### Patch Changes
