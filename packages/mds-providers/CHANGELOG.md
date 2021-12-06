@@ -1,5 +1,11 @@
 # @mds-core/mds-providers
 
+## 0.2.1
+
+### Patch Changes
+
+- fd6aea05: Add TukTuk to mds-providers
+
 ## 0.2.0
 
 ### Minor Changes

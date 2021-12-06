@@ -1,5 +1,15 @@
 # @mds-core/mds-repository
 
+## 0.1.26
+
+### Patch Changes
+
+- Updated dependencies [a4fbd91f]
+- Updated dependencies [fd6aea05]
+  - @mds-core/mds-logger@0.5.2
+  - @mds-core/mds-providers@0.2.1
+  - @mds-core/mds-utils@0.2.13
+
 ## 0.1.25
 
 ### Patch Changes

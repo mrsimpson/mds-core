@@ -1,5 +1,21 @@
 # @mds-core/mds-ingest-service
 
+## 0.6.10
+
+### Patch Changes
+
+- Updated dependencies [a4fbd91f]
+- Updated dependencies [fd6aea05]
+  - @mds-core/mds-logger@0.5.2
+  - @mds-core/mds-providers@0.2.1
+  - @mds-core/mds-agency-cache@0.4.7
+  - @mds-core/mds-repository@0.1.26
+  - @mds-core/mds-rpc-common@0.2.8
+  - @mds-core/mds-service-helpers@0.4.6
+  - @mds-core/mds-stream@0.2.2
+  - @mds-core/mds-utils@0.2.13
+  - @mds-core/mds-schema-validators@0.3.16
+
 ## 0.6.9
 
 ### Patch Changes
