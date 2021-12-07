@@ -1,5 +1,13 @@
 # @container-images/mds-jurisdiction-api
 
+## 0.0.36
+
+### Patch Changes
+
+- f799b3ea: Rename mds-jurisdiction to mds-jurisdiction-api
+- Updated dependencies [f799b3ea]
+  - @mds-core/mds-jurisdiction-api@0.1.35
+
 ## 0.0.35
 
 ### Patch Changes
