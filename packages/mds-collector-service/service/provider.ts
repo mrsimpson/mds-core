@@ -27,7 +27,7 @@ import { Nullable } from '@mds-core/mds-types'
 import { getEnvVar, pluralize, ServerError } from '@mds-core/mds-utils'
 import { ErrorObject } from 'ajv'
 import { CollectorService } from '../@types'
-import { CollectorBackendLogger } from '../logger'
+import { CollectorServiceLogger } from '../logger'
 import { CollectorRepository } from '../repository'
 
 const SchemaValidators = new Map<string, SchemaValidator<unknown>>()
@@ -83,7 +83,7 @@ export const CollectorServiceProvider: ServiceProvider<CollectorService> & Proce
       return ServiceResult(true)
     } catch (error) {
       const exception = ServiceException(`Error Registering Schema ${schema_id}`, error)
-      CollectorBackendLogger.error('registerMessageSchema exception', { exception, error })
+      CollectorServiceLogger.error('registerMessageSchema exception', { exception, error })
       return exception
     }
   },
@@ -94,7 +94,7 @@ export const CollectorServiceProvider: ServiceProvider<CollectorService> & Proce
       return ServiceResult($schema)
     } catch (error) {
       const exception = ServiceException(`Error Reading Schema ${schema_id}`, error)
-      CollectorBackendLogger.error('getMessageSchema exception', { exception, error })
+      CollectorServiceLogger.error('getMessageSchema exception', { exception, error })
       return exception
     }
   },
@@ -146,7 +146,7 @@ export const CollectorServiceProvider: ServiceProvider<CollectorService> & Proce
       return ServiceResult(result)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException(`Error Writing Messages for Schema ${schema_id}`, error)
-      CollectorBackendLogger.error('writeSchemaMessages exception', { exception, error })
+      CollectorServiceLogger.error('writeSchemaMessages exception', { exception, error })
       return exception
     }
   }

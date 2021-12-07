@@ -1,5 +1,12 @@
 # @container-images/mds-collector-api
 
+## 0.0.36
+
+### Patch Changes
+
+- Updated dependencies [d945b701]
+  - @mds-core/mds-collector-api@0.1.35
+
 ## 0.0.35
 
 ### Patch Changes

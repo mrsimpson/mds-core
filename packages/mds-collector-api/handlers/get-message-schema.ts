@@ -15,7 +15,7 @@
  */
 
 import { ApiRequestParams } from '@mds-core/mds-api-server'
-import { CollectorService, CollectorServiceClient } from '@mds-core/mds-collector-backend'
+import { CollectorService, CollectorServiceClient } from '@mds-core/mds-collector-service'
 import type { NextFunction } from 'express'
 import HttpStatus from 'http-status-codes'
 import { CollectorApiRequest, CollectorApiResponse } from '../@types'
