@@ -15,8 +15,8 @@
  */
 
 import { ApiServer } from '@mds-core/mds-api-server'
-import { CollectorServiceClient } from '@mds-core/mds-collector-backend'
-import { CollectorBackendController } from '@mds-core/mds-collector-backend/service/backend'
+import { CollectorServiceClient } from '@mds-core/mds-collector-service'
+import { CollectorServiceManager } from '@mds-core/mds-collector-service/service/manager'
 import { TestSchema } from '@mds-core/mds-schema-validators'
 import { UUID } from '@mds-core/mds-types'
 import { pathPrefix, uuid } from '@mds-core/mds-utils'
@@ -25,7 +25,7 @@ import supertest from 'supertest'
 import { CollectorApiAccessTokenScopes, COLLECTOR_API_DEFAULT_VERSION, COLLECTOR_API_MIME_TYPE } from '../@types'
 import { api } from '../api'
 
-const CollectorBackend = CollectorBackendController()
+const CollectorService = CollectorServiceManager.controller()
 const request = supertest(ApiServer(api))
 const [major, minor] = COLLECTOR_API_DEFAULT_VERSION.split('.')
 const CollectorApiContentType = `${COLLECTOR_API_MIME_TYPE}; charset=utf-8; version=${major}.${minor}`
@@ -78,7 +78,7 @@ const Post = (path: string, body: {}, provider_id?: UUID, ...scopes: CollectorAp
 describe('Collector API', () => {
   describe('API Endpoints', () => {
     beforeAll(async () => {
-      await CollectorBackend.start()
+      await CollectorService.start()
       await CollectorServiceClient.registerMessageSchema('test', TestSchema)
     })
 
@@ -134,7 +134,7 @@ describe('Collector API', () => {
     })
 
     afterAll(async () => {
-      await CollectorBackend.stop()
+      await CollectorService.stop()
     })
   })
 })

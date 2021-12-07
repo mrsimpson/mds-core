@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-import { CollectorBackend } from '../service/backend'
+import { CollectorServiceManager } from '../service/manager'
 
-CollectorBackend()
+CollectorServiceManager.monitor()

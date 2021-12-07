@@ -19,7 +19,7 @@ import { CollectorServiceRpcDefinition } from '../@types'
 import { CollectorServiceClient } from '../client'
 import { CollectorServiceProvider } from './provider'
 
-export const { monitor: CollectorBackend, controller: CollectorBackendController } = RpcServer(
+export const CollectorServiceManager = RpcServer(
   CollectorServiceRpcDefinition,
   {
     onStart: CollectorServiceProvider.start,
@@ -31,9 +31,9 @@ export const { monitor: CollectorBackend, controller: CollectorBackendController
     writeSchemaMessages: args => CollectorServiceProvider.writeSchemaMessages(...args)
   },
   {
-    port: process.env.COLLECTOR_BACKEND_RPC_PORT,
+    port: process.env.COLLECTOR_SERVICE_RPC_PORT,
     repl: {
-      port: process.env.COLLECTOR_BACKEND_REPL_PORT,
+      port: process.env.COLLECTOR_SERVICE_REPL_PORT,
       context: { client: CollectorServiceClient }
     }
   }

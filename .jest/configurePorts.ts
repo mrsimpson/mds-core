@@ -19,8 +19,8 @@ const setPorts = () => {
   process.env.AUDIT_SERVICE_RPC_PORT = randPort()
 
   process.env.COLLECTOR_API_HTTP_PORT = randPort()
-  process.env.COLLECTOR_BACKEND_REPL_PORT = randPort()
-  process.env.COLLECTOR_BACKEND_RPC_PORT = randPort()
+  process.env.COLLECTOR_SERVICE_REPL_PORT = randPort()
+  process.env.COLLECTOR_SERVICE_RPC_PORT = randPort()
 
   process.env.COMPLIANCE_API_HTTP_PORT = randPort()
   process.env.COMPLIANCE_SERVICE_REPL_PORT = randPort()

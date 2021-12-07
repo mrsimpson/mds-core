@@ -7,7 +7,7 @@
 - Updated dependencies [a4fbd91f]
   - @mds-core/mds-logger@0.5.2
   - @mds-core/mds-api-server@0.3.16
-  - @mds-core/mds-collector-backend@0.2.9
+  - @mds-core/mds-collector-service@0.2.9
   - @mds-core/mds-service-helpers@0.4.6
   - @mds-core/mds-utils@0.2.13
   - @mds-core/mds-api-helpers@0.1.60
@@ -16,7 +16,7 @@
 
 ### Patch Changes
 
-- @mds-core/mds-collector-backend@0.2.8
+- @mds-core/mds-collector-service@0.2.8
 - @mds-core/mds-api-helpers@0.1.59
 - @mds-core/mds-api-server@0.3.15
 
@@ -27,7 +27,7 @@
 - Updated dependencies [a881d6cc]
   - @mds-core/mds-logger@0.5.1
   - @mds-core/mds-api-server@0.3.14
-  - @mds-core/mds-collector-backend@0.2.7
+  - @mds-core/mds-collector-service@0.2.7
   - @mds-core/mds-service-helpers@0.4.5
   - @mds-core/mds-utils@0.2.12
   - @mds-core/mds-api-helpers@0.1.58
@@ -39,7 +39,7 @@
 - Updated dependencies [102aa5a0]
   - @mds-core/mds-logger@0.5.0
   - @mds-core/mds-api-server@0.3.13
-  - @mds-core/mds-collector-backend@0.2.6
+  - @mds-core/mds-collector-service@0.2.6
   - @mds-core/mds-service-helpers@0.4.4
   - @mds-core/mds-utils@0.2.11
   - @mds-core/mds-api-helpers@0.1.57
@@ -49,7 +49,7 @@
 ### Patch Changes
 
 - Updated dependencies [d4bd927b]
-  - @mds-core/mds-collector-backend@0.2.5
+  - @mds-core/mds-collector-service@0.2.5
   - @mds-core/mds-api-helpers@0.1.56
 
 ## 0.1.29
@@ -69,7 +69,7 @@
   - @mds-core/mds-api-server@0.3.12
   - @mds-core/mds-logger@0.4.4
   - @mds-core/mds-api-helpers@0.1.54
-  - @mds-core/mds-collector-backend@0.2.4
+  - @mds-core/mds-collector-service@0.2.4
   - @mds-core/mds-service-helpers@0.4.3
 
 ## 0.1.27
@@ -77,7 +77,7 @@
 ### Patch Changes
 
 - Updated dependencies [224bfc3a]
-  - @mds-core/mds-collector-backend@0.2.3
+  - @mds-core/mds-collector-service@0.2.3
   - @mds-core/mds-api-helpers@0.1.53
 
 ## 0.1.26
@@ -90,7 +90,7 @@
   - @mds-core/mds-utils@0.2.9
   - @mds-core/mds-api-helpers@0.1.52
   - @mds-core/mds-api-server@0.3.11
-  - @mds-core/mds-collector-backend@0.2.2
+  - @mds-core/mds-collector-service@0.2.2
   - @mds-core/mds-logger@0.4.3
   - @mds-core/mds-service-helpers@0.4.2
   - @mds-core/mds-types@0.7.1
@@ -103,7 +103,7 @@
 - Updated dependencies [2b3c91c4]
 - Updated dependencies [a156f493]
   - @mds-core/mds-api-server@0.3.10
-  - @mds-core/mds-collector-backend@0.2.1
+  - @mds-core/mds-collector-service@0.2.1
   - @mds-core/mds-types@0.7.0
   - @mds-core/mds-api-helpers@0.1.51
   - @mds-core/mds-service-helpers@0.4.1
@@ -119,7 +119,7 @@
 - Updated dependencies [aa1403da]
 - Updated dependencies [3f5c4358]
   - @mds-core/mds-api-server@0.3.9
-  - @mds-core/mds-collector-backend@0.2.0
+  - @mds-core/mds-collector-service@0.2.0
   - @mds-core/mds-logger@0.4.2
   - @mds-core/mds-service-helpers@0.4.0
   - @mds-core/mds-utils@0.2.7
@@ -130,7 +130,7 @@
 
 ### Patch Changes
 
-- @mds-core/mds-collector-backend@0.1.18
+- @mds-core/mds-collector-service@0.1.18
 - @mds-core/mds-api-helpers@0.1.49
 
 ## 0.1.22
@@ -143,7 +143,7 @@
   - @mds-core/mds-types@0.6.0
   - @mds-core/mds-utils@0.2.6
   - @mds-core/mds-api-helpers@0.1.48
-  - @mds-core/mds-collector-backend@0.1.17
+  - @mds-core/mds-collector-service@0.1.17
   - @mds-core/mds-service-helpers@0.3.10
   - @mds-core/mds-api-server@0.3.8
 
@@ -155,7 +155,7 @@
 - Updated dependencies [f501924c]
   - @mds-core/mds-api-helpers@0.1.47
   - @mds-core/mds-api-server@0.3.7
-  - @mds-core/mds-collector-backend@0.1.16
+  - @mds-core/mds-collector-service@0.1.16
   - @mds-core/mds-logger@0.4.1
   - @mds-core/mds-service-helpers@0.3.9
   - @mds-core/mds-types@0.5.5
@@ -181,7 +181,7 @@
 - Updated dependencies [81220ee6]
 - Updated dependencies [71a9d1de]
   - @mds-core/mds-types@0.5.4
-  - @mds-core/mds-collector-backend@0.1.15
+  - @mds-core/mds-collector-service@0.1.15
   - @mds-core/mds-logger@0.4.0
   - @mds-core/mds-api-helpers@0.1.44
   - @mds-core/mds-service-helpers@0.3.8
@@ -195,7 +195,7 @@
 - Updated dependencies [5167ec02]
   - @mds-core/mds-types@0.5.3
   - @mds-core/mds-api-helpers@0.1.43
-  - @mds-core/mds-collector-backend@0.1.14
+  - @mds-core/mds-collector-service@0.1.14
   - @mds-core/mds-service-helpers@0.3.7
   - @mds-core/mds-utils@0.2.3
   - @mds-core/mds-api-server@0.3.5
@@ -216,7 +216,7 @@
   - @mds-core/mds-api-server@0.3.4
   - @mds-core/mds-service-helpers@0.3.6
   - @mds-core/mds-utils@0.2.2
-  - @mds-core/mds-collector-backend@0.1.13
+  - @mds-core/mds-collector-service@0.1.13
   - @mds-core/mds-api-helpers@0.1.42
 
 ## 0.1.15
@@ -226,7 +226,7 @@
 - Updated dependencies [d8b10031]
   - @mds-core/mds-types@0.5.1
   - @mds-core/mds-api-helpers@0.1.41
-  - @mds-core/mds-collector-backend@0.1.12
+  - @mds-core/mds-collector-service@0.1.12
   - @mds-core/mds-service-helpers@0.3.5
   - @mds-core/mds-utils@0.2.1
   - @mds-core/mds-api-server@0.3.3
@@ -241,7 +241,7 @@
   - @mds-core/mds-utils@0.2.0
   - @mds-core/mds-api-server@0.3.2
   - @mds-core/mds-api-helpers@0.1.40
-  - @mds-core/mds-collector-backend@0.1.11
+  - @mds-core/mds-collector-service@0.1.11
   - @mds-core/mds-service-helpers@0.3.4
 
 ## 0.1.13
@@ -251,7 +251,7 @@
 - Updated dependencies [9af14cbb]
   - @mds-core/mds-logger@0.2.4
   - @mds-core/mds-api-server@0.3.1
-  - @mds-core/mds-collector-backend@0.1.10
+  - @mds-core/mds-collector-service@0.1.10
   - @mds-core/mds-service-helpers@0.3.3
   - @mds-core/mds-utils@0.1.36
   - @mds-core/mds-api-helpers@0.1.39
@@ -270,7 +270,7 @@
   - @mds-core/mds-api-server@0.3.0
   - @mds-core/mds-types@0.4.0
   - @mds-core/mds-api-helpers@0.1.37
-  - @mds-core/mds-collector-backend@0.1.9
+  - @mds-core/mds-collector-service@0.1.9
   - @mds-core/mds-service-helpers@0.3.2
   - @mds-core/mds-utils@0.1.35
 
@@ -288,7 +288,7 @@
   - @mds-core/mds-utils@0.1.34
   - @mds-core/mds-api-helpers@0.1.35
   - @mds-core/mds-api-server@0.2.1
-  - @mds-core/mds-collector-backend@0.1.8
+  - @mds-core/mds-collector-service@0.1.8
   - @mds-core/mds-service-helpers@0.3.1
 
 ## 0.1.8
@@ -301,7 +301,7 @@
   - @mds-core/mds-service-helpers@0.3.0
   - @mds-core/mds-types@0.3.2
   - @mds-core/mds-api-helpers@0.1.34
-  - @mds-core/mds-collector-backend@0.1.7
+  - @mds-core/mds-collector-service@0.1.7
   - @mds-core/mds-utils@0.1.33
 
 ## 0.1.7
@@ -313,7 +313,7 @@
   - @mds-core/mds-service-helpers@0.2.0
   - @mds-core/mds-types@0.3.1
   - @mds-core/mds-api-server@0.1.32
-  - @mds-core/mds-collector-backend@0.1.6
+  - @mds-core/mds-collector-service@0.1.6
   - @mds-core/mds-api-helpers@0.1.33
   - @mds-core/mds-utils@0.1.32
 
@@ -326,7 +326,7 @@
   - @mds-core/mds-types@0.3.0
   - @mds-core/mds-utils@0.1.31
   - @mds-core/mds-api-helpers@0.1.32
-  - @mds-core/mds-collector-backend@0.1.5
+  - @mds-core/mds-collector-service@0.1.5
   - @mds-core/mds-service-helpers@0.1.5
   - @mds-core/mds-api-server@0.1.31
 
@@ -344,7 +344,7 @@
 - Updated dependencies [8ab4569d]
   - @mds-core/mds-api-helpers@0.1.30
   - @mds-core/mds-api-server@0.1.30
-  - @mds-core/mds-collector-backend@0.1.4
+  - @mds-core/mds-collector-service@0.1.4
   - @mds-core/mds-logger@0.2.3
   - @mds-core/mds-service-helpers@0.1.4
   - @mds-core/mds-types@0.2.1
@@ -357,7 +357,7 @@
 - Updated dependencies [cc0a3bae]
   - @mds-core/mds-types@0.2.0
   - @mds-core/mds-api-helpers@0.1.29
-  - @mds-core/mds-collector-backend@0.1.3
+  - @mds-core/mds-collector-service@0.1.3
   - @mds-core/mds-service-helpers@0.1.3
   - @mds-core/mds-utils@0.1.29
   - @mds-core/mds-api-server@0.1.29

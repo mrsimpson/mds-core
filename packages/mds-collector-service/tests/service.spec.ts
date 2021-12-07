@@ -16,9 +16,9 @@ import { TestSchema } from '@mds-core/mds-schema-validators'
 import { uuid } from '@mds-core/mds-utils'
 import { CollectorServiceClient, CollectorServiceSchemaClient } from '../client'
 import { CollectorRepository } from '../repository'
-import { CollectorBackendController } from '../service/backend'
+import { CollectorServiceManager } from '../service/manager'
 
-const CollectorBackend = CollectorBackendController()
+const CollectorService = CollectorServiceManager.controller()
 const TEST_SCHEMA_ID = 'test'
 const TEST_COLLECTOR_MESSAGES: Array<TestSchema> = [
   { id: uuid(), name: 'President', country: 'US', zip: '37188' },
@@ -55,7 +55,7 @@ describe('Collector Service', () => {
 
   describe('Service Methods', () => {
     beforeAll(async () => {
-      await CollectorBackend.start()
+      await CollectorService.start()
     })
 
     it('Register Schema (OK)', async () => {
@@ -109,7 +109,7 @@ describe('Collector Service', () => {
     })
 
     afterAll(async () => {
-      await CollectorBackend.stop()
+      await CollectorService.stop()
     })
   })
 })

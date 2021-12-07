@@ -31,8 +31,8 @@ deployments:
     version: ${INGEST_SERVICE_VERSION}
   mds-collector-api:
     version: ${COLLECTOR_API_VERSION}
-  mds-collector-backend:
-    version: ${COLLECTOR_BACKEND_VERSION}
+  mds-collector-service:
+    version: ${COLLECTOR_SERVICE_VERSION}
   mds-transaction-api:
     version: ${TRANSACTION_API_VERSION}
   mds-transaction-service:

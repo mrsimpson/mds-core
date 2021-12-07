@@ -1,4 +1,4 @@
-# @mds-core/mds-collector-backend
+# @mds-core/mds-collector-service
 
 ## 0.2.9
 

@@ -1,5 +1,5 @@
 {
-  "name": "@mds-core/mds-collector-backend",
+  "name": "@mds-core/mds-collector-service",
   "version": "0.2.9",
   "description": "Mobility Data Specification Collector Backend Service",
   "keywords": [
