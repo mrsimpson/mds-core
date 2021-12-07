@@ -39,7 +39,7 @@ export const CIRC_PROVIDER_ID = '03d5d605-e5c9-45a1-a1dd-144aa8649525'
 export const SUPERPEDESTRIAN_PROVIDER_ID = '420e6e94-55a6-4946-b6b3-4398fe22e912'
 export const BOAZ_BIKES_PROVIDER_ID = '7c96bc58-fb63-433a-b77f-84ccb1c9d737'
 export const HELBIZ_PROVIDER_ID = '3aece8c6-416a-4d39-bcc4-d02524cb8004'
-export const TUKTUK_PROVIDER_ID = '1a99bf67-14a0-48a1-98d1-77147a88c3d'
+export const TUKTUK_PROVIDER_ID = '1a99bf67-14a0-48a1-98d1-77147a88c3d2'
 
 // Additional provider IDs in use (should be registered)
 export const LADOT_PROVIDER_ID = '33bbcec3-f91b-4461-bc41-61711afb9460'
