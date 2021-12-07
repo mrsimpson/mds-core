@@ -103,6 +103,7 @@ export function processCountPolicy(
 
   return {
     vehicles_found: [...matchedVehiclesArr, ...overflowedVehiclesArr],
+    violating_vehicles: overflowedVehiclesArr,
     excess_vehicles_count,
     total_violations: countMinimumViolations + excess_vehicles_count
   }

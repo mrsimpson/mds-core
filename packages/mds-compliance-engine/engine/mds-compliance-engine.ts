@@ -66,7 +66,8 @@ export function createComplianceSnapshot(
         policy_id: policy.policy_id
       },
       provider_id,
-      vehicles_found: complianceResult.vehicles_found
+      vehicles_found: complianceResult.vehicles_found,
+      violating_vehicles: complianceResult.violating_vehicles
     }
     return complianceSnapshot
   }

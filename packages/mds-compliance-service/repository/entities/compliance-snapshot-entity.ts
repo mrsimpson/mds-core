@@ -28,6 +28,7 @@ export interface ComplianceSnapshotEntityModel extends IdentityColumn, RecordedC
   excess_vehicles_count: number
   total_violations: number
   vehicles_found: MatchedVehicleInformation[]
+  violating_vehicles: MatchedVehicleInformation[]
 }
 
 @Entity('compliance_snapshots')
@@ -61,4 +62,7 @@ export class ComplianceSnapshotEntity
 
   @Column('jsonb')
   vehicles_found: ComplianceSnapshotEntityModel['vehicles_found']
+
+  @Column('jsonb')
+  violating_vehicles: MatchedVehicleInformation[]
 }

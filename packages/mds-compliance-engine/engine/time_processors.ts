@@ -75,6 +75,7 @@ export function processTimePolicy(
   const matchedVehiclesArr = annotateVehicleMap(policy, events, geographies, matchedVehicles, isTimeRuleMatch)
   return {
     vehicles_found: matchedVehiclesArr,
+    violating_vehicles: matchedVehiclesArr,
     excess_vehicles_count: 0,
     total_violations: matchedVehiclesArr.length
   }
