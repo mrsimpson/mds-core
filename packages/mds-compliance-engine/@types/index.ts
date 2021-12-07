@@ -6,7 +6,7 @@ export type MatchedVehicleWithRule = { [d: string]: { device: Device; rule_appli
 
 export type ComplianceEngineResult = Pick<
   ComplianceSnapshotDomainModel,
-  'vehicles_found' | 'excess_vehicles_count' | 'total_violations'
+  'vehicles_found' | 'excess_vehicles_count' | 'total_violations' | 'violating_vehicles'
 >
 
 export interface ProviderInputs {

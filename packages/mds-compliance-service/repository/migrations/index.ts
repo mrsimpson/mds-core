@@ -17,9 +17,11 @@
 import { CreateComplianceSnapshotsTable1590524762011 } from './1590524762011-CreateComplianceSnapshotsTable'
 import { AddComplianceViolations1632935069192 } from './1632935069192-AddComplianceViolations'
 import { CreateComplianceSnapshotFailuresTable1634323054883 } from './1634323054883-CreateComplianceSnapshotFailuresTable'
+import { AddViolatingVehiclesColumn1638812382755 } from './1638812382755-AddViolatingVehiclesColumn'
 
 export default [
   CreateComplianceSnapshotsTable1590524762011,
   AddComplianceViolations1632935069192,
-  CreateComplianceSnapshotFailuresTable1634323054883
+  CreateComplianceSnapshotFailuresTable1634323054883,
+  AddViolatingVehiclesColumn1638812382755
 ]

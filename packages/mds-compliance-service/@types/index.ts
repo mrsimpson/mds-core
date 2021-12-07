@@ -41,7 +41,15 @@ export interface ComplianceSnapshotDomainModel {
     policy_id: UUID
   }
   provider_id: UUID
+  /**
+   * All vehicles found that met the logical criteria for the policy (not necessarily vehicles that were in violation)
+   */
   vehicles_found: MatchedVehicleInformation[]
+  /**
+   * All vehicles found to be in violation of the policy. This is a subset of `vehicles_found`,
+   * and is based on which vehicle events were most recent.
+   */
+  violating_vehicles: MatchedVehicleInformation[]
   excess_vehicles_count: number
   total_violations: number
 }

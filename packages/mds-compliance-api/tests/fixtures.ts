@@ -27,107 +27,117 @@ export const TIME = 1605821758034
 
 export const COMPLIANCE_SNAPSHOT_ID = '243e1209-61ad-4d7c-8464-db551f1f8c21'
 
-export const COMPLIANCE_SNAPSHOTS_PROVIDER_1_POLICY_1: ComplianceSnapshotDomainModel[] = [
-  {
-    compliance_as_of: TIME,
-    compliance_snapshot_id: COMPLIANCE_SNAPSHOT_ID,
-    excess_vehicles_count: 1,
-    total_violations: 1,
-    policy: {
-      name: 'Very Low Count Limit',
-      policy_id: POLICY_ID_1
-    },
-    provider_id: PROVIDER_ID_1,
-    vehicles_found: [
-      {
-        device_id: 'f7cf9bbf-0f9e-4497-ab3f-d7358458f939',
-        state: 'on_trip',
-        event_types: ['trip_start'],
-        timestamp: 1605821758034,
-        rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
-        rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
-        speed: undefined,
-        gps: { lat: 34.073398166515325, lng: -118.25991238180214 }
-      }
-    ]
-  }
-]
+export const COMPLIANCE_SNAPSHOTS_PROVIDER_1_POLICY_1: ComplianceSnapshotDomainModel[] = (() => {
+  const violating_vehicles: ComplianceSnapshotDomainModel['violating_vehicles'] = [
+    {
+      device_id: 'f7cf9bbf-0f9e-4497-ab3f-d7358458f939',
+      state: 'on_trip',
+      event_types: ['trip_start'],
+      timestamp: 1605821758034,
+      rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
+      rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      speed: undefined,
+      gps: { lat: 34.073398166515325, lng: -118.25991238180214 }
+    }
+  ]
 
-export const COMPLIANCE_SNAPSHOTS_PROVIDER_2_POLICY_1: ComplianceSnapshotDomainModel[] = [
-  {
-    compliance_as_of: TIME + 2,
-    compliance_snapshot_id: '39e2171b-a9df-417c-b218-2a82b491a0cc',
-    excess_vehicles_count: 6,
-    total_violations: 6,
-    policy: {
-      name: 'Very Low Count Limit',
-      policy_id: POLICY_ID_1
+  return [
+    {
+      compliance_as_of: TIME,
+      compliance_snapshot_id: COMPLIANCE_SNAPSHOT_ID,
+      excess_vehicles_count: 1,
+      total_violations: 1,
+      policy: {
+        name: 'Very Low Count Limit',
+        policy_id: POLICY_ID_1
+      },
+      provider_id: PROVIDER_ID_1,
+      vehicles_found: violating_vehicles,
+      violating_vehicles
+    }
+  ]
+})()
+
+export const COMPLIANCE_SNAPSHOTS_PROVIDER_2_POLICY_1: ComplianceSnapshotDomainModel[] = (() => {
+  const violating_vehicles: ComplianceSnapshotDomainModel['violating_vehicles'] = [
+    {
+      device_id: 'f7cf9bbf-0f9e-4497-ab3f-d7358458f939',
+      state: 'on_trip',
+      event_types: ['trip_start'],
+      timestamp: 1605821758034,
+      rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
+      rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      speed: undefined,
+      gps: { lat: 34.073398166515325, lng: -118.25991238180214 }
     },
-    provider_id: PROVIDER_ID_2,
-    vehicles_found: [
-      {
-        device_id: 'f7cf9bbf-0f9e-4497-ab3f-d7358458f939',
-        state: 'on_trip',
-        event_types: ['trip_start'],
-        timestamp: 1605821758034,
-        rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
-        rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
-        speed: undefined,
-        gps: { lat: 34.073398166515325, lng: -118.25991238180214 }
+    {
+      device_id: '31769883-ef60-4323-8360-6b20cda01c96',
+      state: 'on_trip',
+      event_types: ['trip_start'],
+      timestamp: 1605821758044,
+      rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
+      rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      speed: undefined,
+      gps: { lat: 34.24153417305256, lng: -118.43052998931205 }
+    },
+    {
+      device_id: 'a760d84c-4f6d-433c-a436-6a3abfa6e968',
+      state: 'on_trip',
+      event_types: ['trip_start'],
+      timestamp: 1605821758054,
+      rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
+      rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      speed: undefined,
+      gps: { lat: 34.260129152395635, lng: -118.31228131867269 }
+    },
+    {
+      device_id: '1335f779-c981-4b67-b6d6-d55a74259747',
+      state: 'on_trip',
+      event_types: ['trip_start'],
+      timestamp: 1605821758064,
+      rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
+      rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      speed: undefined,
+      gps: { lat: 34.214306602581544, lng: -118.4785189578198 }
+    },
+    {
+      device_id: 'ad81ba8b-0f09-43e1-8c4b-26f2437412b0',
+      state: 'on_trip',
+      event_types: ['trip_start'],
+      timestamp: 1605821758074,
+      rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
+      rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
+      speed: undefined,
+      gps: { lat: 34.172787102332386, lng: -118.50261403617911 }
+    },
+    {
+      device_id: '40823011-0a94-41e8-91f1-99e4ddaf2973',
+      state: 'on_trip',
+      event_types: ['trip_start'],
+      timestamp: 1605821758084,
+      rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
+      rule_applied: undefined,
+      speed: undefined,
+      gps: { lat: 34.32580482727351, lng: -118.46685950142516 }
+    }
+  ]
+
+  return [
+    {
+      compliance_as_of: TIME + 2,
+      compliance_snapshot_id: '39e2171b-a9df-417c-b218-2a82b491a0cc',
+      excess_vehicles_count: 6,
+      total_violations: 6,
+      policy: {
+        name: 'Very Low Count Limit',
+        policy_id: POLICY_ID_1
       },
-      {
-        device_id: '31769883-ef60-4323-8360-6b20cda01c96',
-        state: 'on_trip',
-        event_types: ['trip_start'],
-        timestamp: 1605821758044,
-        rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
-        rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
-        speed: undefined,
-        gps: { lat: 34.24153417305256, lng: -118.43052998931205 }
-      },
-      {
-        device_id: 'a760d84c-4f6d-433c-a436-6a3abfa6e968',
-        state: 'on_trip',
-        event_types: ['trip_start'],
-        timestamp: 1605821758054,
-        rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
-        rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
-        speed: undefined,
-        gps: { lat: 34.260129152395635, lng: -118.31228131867269 }
-      },
-      {
-        device_id: '1335f779-c981-4b67-b6d6-d55a74259747',
-        state: 'on_trip',
-        event_types: ['trip_start'],
-        timestamp: 1605821758064,
-        rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
-        rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
-        speed: undefined,
-        gps: { lat: 34.214306602581544, lng: -118.4785189578198 }
-      },
-      {
-        device_id: 'ad81ba8b-0f09-43e1-8c4b-26f2437412b0',
-        state: 'on_trip',
-        event_types: ['trip_start'],
-        timestamp: 1605821758074,
-        rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
-        rule_applied: '2aa6953d-fa8f-4018-9b54-84c8b4b83c6d',
-        speed: undefined,
-        gps: { lat: 34.172787102332386, lng: -118.50261403617911 }
-      },
-      {
-        device_id: '40823011-0a94-41e8-91f1-99e4ddaf2973',
-        state: 'on_trip',
-        event_types: ['trip_start'],
-        timestamp: 1605821758084,
-        rules_matched: ['2aa6953d-fa8f-4018-9b54-84c8b4b83c6d'],
-        rule_applied: undefined,
-        speed: undefined,
-        gps: { lat: 34.32580482727351, lng: -118.46685950142516 }
-      }
-    ]
-  }
-]
+      provider_id: PROVIDER_ID_2,
+      vehicles_found: violating_vehicles,
+      violating_vehicles
+    }
+  ]
+})()
 
 export const COMPLIANCE_SNAPSHOTS_PROVIDER_1_POLICY_2: ComplianceSnapshotDomainModel[] = [
   {
@@ -140,22 +150,14 @@ export const COMPLIANCE_SNAPSHOTS_PROVIDER_1_POLICY_2: ComplianceSnapshotDomainM
       policy_id: POLICY_ID_2
     },
     provider_id: PROVIDER_ID_1,
-    vehicles_found: []
+    vehicles_found: [],
+    violating_vehicles: []
   }
 ]
 
-export const COMPLIANCE_SNAPSHOTS_PROVIDER_2_POLICY_2: ComplianceSnapshotDomainModel[] = [
-  {
-    compliance_as_of: TIME + 1,
-    compliance_snapshot_id: 'ba636406-1898-49a0-b937-6f825b789ee0',
-    excess_vehicles_count: 1,
-    total_violations: 1,
-    policy: {
-      name: 'Another Low Count Limit',
-      policy_id: POLICY_ID_2
-    },
-    provider_id: PROVIDER_ID_2,
-    vehicles_found: [
+export const COMPLIANCE_SNAPSHOTS_PROVIDER_2_POLICY_2: ComplianceSnapshotDomainModel[] = (() => {
+  const FIRST_MEASURE: ComplianceSnapshotDomainModel = (() => {
+    const violating_vehicles: ComplianceSnapshotDomainModel['violating_vehicles'] = [
       {
         device_id: 'f7cf9bbf-0f9e-4497-ab3f-d7358458f939',
         state: 'on_trip',
@@ -167,18 +169,24 @@ export const COMPLIANCE_SNAPSHOTS_PROVIDER_2_POLICY_2: ComplianceSnapshotDomainM
         gps: { lat: 34.073398166515325, lng: -118.25991238180214 }
       }
     ]
-  },
-  {
-    compliance_as_of: TIME + 2,
-    compliance_snapshot_id: '8cb4d0a8-5edc-46f6-a4e4-a40f5a5f4558',
-    excess_vehicles_count: 1,
-    total_violations: 1,
-    policy: {
-      name: 'Another Low Count Limit',
-      policy_id: POLICY_ID_2
-    },
-    provider_id: PROVIDER_ID_2,
-    vehicles_found: [
+
+    return {
+      compliance_as_of: TIME + 1,
+      compliance_snapshot_id: 'ba636406-1898-49a0-b937-6f825b789ee0',
+      excess_vehicles_count: 1,
+      total_violations: 1,
+      policy: {
+        name: 'Another Low Count Limit',
+        policy_id: POLICY_ID_2
+      },
+      provider_id: PROVIDER_ID_2,
+      vehicles_found: violating_vehicles,
+      violating_vehicles
+    }
+  })()
+
+  const SECOND_MEASURE: ComplianceSnapshotDomainModel = (() => {
+    const violating_vehicles: ComplianceSnapshotDomainModel['violating_vehicles'] = [
       {
         device_id: 'f7cf9bbf-0f9e-4497-ab3f-d7358458f939',
         state: 'on_trip',
@@ -190,8 +198,23 @@ export const COMPLIANCE_SNAPSHOTS_PROVIDER_2_POLICY_2: ComplianceSnapshotDomainM
         gps: { lat: 34.073398166515325, lng: -118.25991238180214 }
       }
     ]
-  },
-  {
+
+    return {
+      compliance_as_of: TIME + 2,
+      compliance_snapshot_id: '8cb4d0a8-5edc-46f6-a4e4-a40f5a5f4558',
+      excess_vehicles_count: 1,
+      total_violations: 1,
+      policy: {
+        name: 'Another Low Count Limit',
+        policy_id: POLICY_ID_2
+      },
+      provider_id: PROVIDER_ID_2,
+      vehicles_found: violating_vehicles,
+      violating_vehicles
+    }
+  })()
+
+  const THIRD_MEASURE: ComplianceSnapshotDomainModel = {
     compliance_as_of: TIME + 3,
     compliance_snapshot_id: '58fbefc2-f64f-4740-94a6-244c7233c7da',
     excess_vehicles_count: 0,
@@ -201,19 +224,12 @@ export const COMPLIANCE_SNAPSHOTS_PROVIDER_2_POLICY_2: ComplianceSnapshotDomainM
       policy_id: POLICY_ID_2
     },
     provider_id: PROVIDER_ID_2,
-    vehicles_found: []
-  },
-  {
-    compliance_as_of: TIME + 4,
-    compliance_snapshot_id: '3a11150b-5d64-4638-bd2d-745905ed8294',
-    excess_vehicles_count: 1,
-    total_violations: 1,
-    policy: {
-      name: 'Another Low Count Limit',
-      policy_id: POLICY_ID_2
-    },
-    provider_id: PROVIDER_ID_2,
-    vehicles_found: [
+    vehicles_found: [],
+    violating_vehicles: []
+  }
+
+  const FOURTH_MEASURE: ComplianceSnapshotDomainModel = (() => {
+    const violating_vehicles: ComplianceSnapshotDomainModel['violating_vehicles'] = [
       {
         device_id: 'f7cf9bbf-0f9e-4497-ab3f-d7358458f939',
         state: 'on_trip',
@@ -225,8 +241,24 @@ export const COMPLIANCE_SNAPSHOTS_PROVIDER_2_POLICY_2: ComplianceSnapshotDomainM
         gps: { lat: 34.073398166515325, lng: -118.25991238180214 }
       }
     ]
-  }
-]
+
+    return {
+      compliance_as_of: TIME + 4,
+      compliance_snapshot_id: '3a11150b-5d64-4638-bd2d-745905ed8294',
+      excess_vehicles_count: 1,
+      total_violations: 1,
+      policy: {
+        name: 'Another Low Count Limit',
+        policy_id: POLICY_ID_2
+      },
+      provider_id: PROVIDER_ID_2,
+      vehicles_found: violating_vehicles,
+      violating_vehicles
+    }
+  })()
+
+  return [FIRST_MEASURE, SECOND_MEASURE, THIRD_MEASURE, FOURTH_MEASURE]
+})()
 
 export const COMPLIANCE_AGGREGATE_PROVIDER_1_POLICY_1: ComplianceAggregateDomainModel[] = [
   {

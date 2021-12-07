@@ -1,5 +1,13 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.32
+
+### Patch Changes
+
+- @mds-core/mds-ingest-service@0.6.11
+- @mds-core/mds-repository@0.1.27
+- @mds-core/mds-agency-cache@0.4.8
+
 ## 0.0.31
 
 ### Patch Changes

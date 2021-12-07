@@ -1,5 +1,13 @@
 # @mds-core/mds-attachment-service
 
+## 0.3.10
+
+### Patch Changes
+
+- @mds-core/mds-repository@0.1.27
+- @mds-core/mds-schema-validators@0.3.17
+- @mds-core/mds-rpc-common@0.2.9
+
 ## 0.3.9
 
 ### Patch Changes

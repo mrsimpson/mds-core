@@ -1,5 +1,12 @@
 # @mds-core/mds-test-data
 
+## 0.4.9
+
+### Patch Changes
+
+- Updated dependencies [3fcddef9]
+  - @mds-core/mds-providers@0.2.2
+
 ## 0.4.8
 
 ### Patch Changes
