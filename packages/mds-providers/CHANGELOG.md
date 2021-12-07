@@ -1,5 +1,11 @@
 # @mds-core/mds-providers
 
+## 0.2.2
+
+### Patch Changes
+
+- 3fcddef9: Fix TukTuk provider_id
+
 ## 0.2.1
 
 ### Patch Changes

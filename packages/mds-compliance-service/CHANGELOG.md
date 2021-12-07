@@ -1,5 +1,21 @@
 # @mds-core/mds-compliance-service
 
+## 0.8.0
+
+### Minor Changes
+
+- 601de511: Add violating_vehicles column/property to compliance snapshots
+
+### Patch Changes
+
+- Updated dependencies [3fcddef9]
+  - @mds-core/mds-providers@0.2.2
+  - @mds-core/mds-repository@0.1.27
+  - @mds-core/mds-schema-validators@0.3.17
+  - @mds-core/mds-db@0.4.21
+  - @mds-core/mds-policy-service@0.9.6
+  - @mds-core/mds-rpc-common@0.2.9
+
 ## 0.7.10
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @mds-core/mds-jurisdiction-api
 
+## 0.1.35
+
+### Patch Changes
+
+- f799b3ea: Rename mds-jurisdiction to mds-jurisdiction-api
+  - @mds-core/mds-jurisdiction-service@0.3.10
+  - @mds-core/mds-api-helpers@0.1.61
+  - @mds-core/mds-api-server@0.3.17
+
 ## 0.1.34
 
 ### Patch Changes
