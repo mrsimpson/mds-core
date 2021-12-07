@@ -1,5 +1,11 @@
 # @mds-core/mds-collector-service
 
+## 0.2.10
+
+### Patch Changes
+
+- d945b701: Rename mds-collector-backend to mds-collector-service
+
 ## 0.2.9
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @container-images/mds-collector-service
 
+## 0.0.30
+
+### Patch Changes
+
+- d945b701: Rename mds-collector-backend to mds-collector-service
+- Updated dependencies [d945b701]
+  - @mds-core/mds-collector-service@0.2.10
+
 ## 0.0.29
 
 ### Patch Changes
