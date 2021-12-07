@@ -1,4 +1,4 @@
-# @mds-core/mds-jurisdiction
+# @mds-core/mds-jurisdiction-api
 
 ## 0.1.34
 

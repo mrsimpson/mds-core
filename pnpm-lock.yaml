@@ -316,16 +316,16 @@ importers:
       pg: 8.7.1
       pino: 6.13.3
 
-  container-images/mds-jurisdiction:
+  container-images/mds-jurisdiction-api:
     specifiers:
-      '@mds-core/mds-jurisdiction': workspace:0.1.34
+      '@mds-core/mds-jurisdiction-api': workspace:0.1.34
       '@mds-core/mds-webpack-config': workspace:0.1.7
       dd-trace: 1.5.1
       express: 4.17.1
       pg: 8.7.1
       pino: 6.13.3
     dependencies:
-      '@mds-core/mds-jurisdiction': link:../../packages/mds-jurisdiction
+      '@mds-core/mds-jurisdiction-api': link:../../packages/mds-jurisdiction-api
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
       dd-trace: 1.5.1
       express: 4.17.1
@@ -1052,7 +1052,7 @@ importers:
       typeorm: 0.2.40_pg@8.7.1
       typeorm-cursor-pagination: 0.6.1_typeorm@0.2.40
 
-  packages/mds-jurisdiction:
+  packages/mds-jurisdiction-api:
     specifiers:
       '@mds-core/mds-api-helpers': workspace:0.1.60
       '@mds-core/mds-api-server': workspace:0.3.16

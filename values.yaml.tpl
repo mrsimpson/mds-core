@@ -15,8 +15,8 @@ deployments:
     version: ${COMPLIANCE_API_VERSION}
   mds-compliance-service:
     version: ${COMPLIANCE_SERVICE_VERSION}
-  mds-jurisdiction:
-    version: ${JURISDICTION_VERSION}
+  mds-jurisdiction-api:
+    version: ${JURISDICTION_API_VERSION}
   mds-jurisdiction-service:
     version: ${JURISDICTION_SERVICE_VERSION}
   mds-policy-author:

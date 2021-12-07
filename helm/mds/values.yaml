@@ -112,7 +112,7 @@ deployments:
     enabled: false
   mds-ingest-service:
     enabled: false
-  mds-jurisdiction:
+  mds-jurisdiction-api:
     enabled: false
     pathPrefix: /jurisdiction
   mds-jurisdiction-service:
