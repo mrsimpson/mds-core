@@ -254,14 +254,14 @@ importers:
 
   container-images/mds-geography-author-api:
     specifiers:
-      '@mds-core/mds-geography-author': workspace:0.2.19
+      '@mds-core/mds-geography-author-api': workspace:0.2.19
       '@mds-core/mds-webpack-config': workspace:0.1.7
       dd-trace: 1.5.1
       express: 4.17.1
       pg: 8.7.1
       pino: 6.13.3
     dependencies:
-      '@mds-core/mds-geography-author': link:../../packages/mds-geography-author-api
+      '@mds-core/mds-geography-author-api': link:../../packages/mds-geography-author-api
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
       dd-trace: 1.5.1
       express: 4.17.1

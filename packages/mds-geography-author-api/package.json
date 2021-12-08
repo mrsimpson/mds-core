@@ -1,5 +1,5 @@
 {
-  "name": "@mds-core/mds-geography-author",
+  "name": "@mds-core/mds-geography-author-api",
   "version": "0.2.19",
   "description": "MDS Geography Author API",
   "license": "Apache-2.0",
