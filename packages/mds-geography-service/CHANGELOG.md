@@ -48,7 +48,7 @@
 
 ### Minor Changes
 
-- e9e3048d: Refactor mds-geography to use GeographyService for db
+- e9e3048d: Refactor mds-geography-api to use GeographyService for db
 
 ### Patch Changes
 

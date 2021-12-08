@@ -1,17 +1,17 @@
-# @mds-core/mds-geography-author
+# @mds-core/mds-geography-api
 
-## 0.2.19
+## 0.2.4
 
 ### Patch Changes
 
 - Updated dependencies [3fcddef9]
   - @mds-core/mds-providers@0.2.2
   - @mds-core/mds-schema-validators@0.3.17
-  - @mds-core/mds-db@0.4.21
+  - @mds-core/mds-geography-service@0.5.2
   - @mds-core/mds-api-helpers@0.1.61
   - @mds-core/mds-api-server@0.3.17
 
-## 0.2.18
+## 0.2.3
 
 ### Patch Changes
 
@@ -20,62 +20,68 @@
   - @mds-core/mds-logger@0.5.2
   - @mds-core/mds-providers@0.2.1
   - @mds-core/mds-api-server@0.3.16
-  - @mds-core/mds-db@0.4.20
+  - @mds-core/mds-geography-service@0.5.1
   - @mds-core/mds-utils@0.2.13
   - @mds-core/mds-schema-validators@0.3.16
   - @mds-core/mds-api-helpers@0.1.60
 
-## 0.2.17
+## 0.2.2
 
 ### Patch Changes
 
 - Updated dependencies [bb63d77f]
+- Updated dependencies [09e40cd4]
   - @mds-core/mds-providers@0.2.0
+  - @mds-core/mds-geography-service@0.5.0
   - @mds-core/mds-schema-validators@0.3.15
-  - @mds-core/mds-db@0.4.19
   - @mds-core/mds-api-helpers@0.1.59
   - @mds-core/mds-api-server@0.3.15
 
-## 0.2.16
+## 0.2.1
 
 ### Patch Changes
 
 - Updated dependencies [a881d6cc]
   - @mds-core/mds-logger@0.5.1
   - @mds-core/mds-api-server@0.3.14
-  - @mds-core/mds-db@0.4.18
+  - @mds-core/mds-geography-service@0.4.1
   - @mds-core/mds-utils@0.2.12
   - @mds-core/mds-api-helpers@0.1.58
   - @mds-core/mds-schema-validators@0.3.14
 
-## 0.2.15
+## 0.2.0
+
+### Minor Changes
+
+- e9e3048d: Refactor mds-geography-api to use GeographyService for db
 
 ### Patch Changes
 
 - 102aa5a0: Add a namespace property to all info/warn/error logs
 - Updated dependencies [102aa5a0]
+- Updated dependencies [e9e3048d]
   - @mds-core/mds-logger@0.5.0
   - @mds-core/mds-api-server@0.3.13
-  - @mds-core/mds-db@0.4.17
+  - @mds-core/mds-geography-service@0.4.0
   - @mds-core/mds-utils@0.2.11
   - @mds-core/mds-api-helpers@0.1.57
   - @mds-core/mds-schema-validators@0.3.13
 
-## 0.2.14
+## 0.1.15
 
 ### Patch Changes
 
 - @mds-core/mds-db@0.4.16
 - @mds-core/mds-api-helpers@0.1.56
 
-## 0.2.13
+## 0.1.14
 
 ### Patch Changes
 
 - @mds-core/mds-db@0.4.15
 - @mds-core/mds-api-helpers@0.1.55
 
-## 0.2.12
+## 0.1.13
 
 ### Patch Changes
 
@@ -92,14 +98,14 @@
   - @mds-core/mds-db@0.4.14
   - @mds-core/mds-schema-validators@0.3.12
 
-## 0.2.11
+## 0.1.12
 
 ### Patch Changes
 
 - @mds-core/mds-db@0.4.13
 - @mds-core/mds-api-helpers@0.1.53
 
-## 0.2.10
+## 0.1.11
 
 ### Patch Changes
 
@@ -115,7 +121,7 @@
   - @mds-core/mds-schema-validators@0.3.11
   - @mds-core/mds-types@0.7.1
 
-## 0.2.9
+## 0.1.10
 
 ### Patch Changes
 
@@ -129,7 +135,7 @@
   - @mds-core/mds-schema-validators@0.3.10
   - @mds-core/mds-utils@0.2.8
 
-## 0.2.8
+## 0.1.9
 
 ### Patch Changes
 
@@ -146,14 +152,14 @@
   - @mds-core/mds-schema-validators@0.3.9
   - @mds-core/mds-providers@0.1.42
 
-## 0.2.7
+## 0.1.8
 
 ### Patch Changes
 
 - @mds-core/mds-db@0.4.9
 - @mds-core/mds-api-helpers@0.1.49
 
-## 0.2.6
+## 0.1.7
 
 ### Patch Changes
 
@@ -169,7 +175,7 @@
   - @mds-core/mds-schema-validators@0.3.8
   - @mds-core/mds-api-server@0.3.8
 
-## 0.2.5
+## 0.1.6
 
 ### Patch Changes
 
@@ -184,21 +190,21 @@
   - @mds-core/mds-types@0.5.5
   - @mds-core/mds-utils@0.2.5
 
-## 0.2.4
+## 0.1.5
 
 ### Patch Changes
 
 - @mds-core/mds-db@0.4.6
 - @mds-core/mds-api-helpers@0.1.46
 
-## 0.2.3
+## 0.1.4
 
 ### Patch Changes
 
 - @mds-core/mds-db@0.4.5
 - @mds-core/mds-api-helpers@0.1.45
 
-## 0.2.2
+## 0.1.3
 
 ### Patch Changes
 
@@ -213,7 +219,7 @@
   - @mds-core/mds-utils@0.2.4
   - @mds-core/mds-api-server@0.3.6
 
-## 0.2.1
+## 0.1.2
 
 ### Patch Changes
 
@@ -226,11 +232,7 @@
   - @mds-core/mds-utils@0.2.3
   - @mds-core/mds-api-server@0.3.5
 
-## 0.2.0
-
-### Minor Changes
-
-- d8b1387e: migrated all validators from Joi to AJV, error output may be slightly different text or shape in some cases
+## 0.1.1
 
 ### Patch Changes
 
@@ -257,6 +259,7 @@
 ### Minor Changes
 
 - b393c66a: Updating version number for geography and policy apis from 0.4 to 1.0
+- eaf48174: Update geography and policy to match spec
 
 ### Patch Changes
 
