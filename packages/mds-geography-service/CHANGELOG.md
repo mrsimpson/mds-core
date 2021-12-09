@@ -1,5 +1,11 @@
 # @mds-core/mds-geography-service
 
+## 0.6.0
+
+### Minor Changes
+
+- afd5f021: Fixed to not use select on hidden geography filter.
+
 ## 0.5.2
 
 ### Patch Changes

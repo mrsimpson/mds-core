@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-agency",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "MDS Agency API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -18,9 +18,9 @@
   },
   "dependencies": {
     "@mds-core/mds-agency-cache": "workspace:0.4.8",
-    "@mds-core/mds-api-helpers": "workspace:0.1.61",
+    "@mds-core/mds-api-helpers": "workspace:0.1.62",
     "@mds-core/mds-api-server": "workspace:0.3.17",
-    "@mds-core/mds-db": "workspace:0.4.21",
+    "@mds-core/mds-db": "workspace:0.4.22",
     "@mds-core/mds-ingest-service": "workspace:0.6.11",
     "@mds-core/mds-logger": "workspace:0.5.2",
     "@mds-core/mds-providers": "workspace:0.2.2",

@@ -1,5 +1,14 @@
 # @mds-core/mds-geography-api
 
+## 0.2.5
+
+### Patch Changes
+
+- eb763f6f: Rename mds-geography to mds-geography-api
+- Updated dependencies [afd5f021]
+  - @mds-core/mds-geography-service@0.6.0
+  - @mds-core/mds-api-helpers@0.1.62
+
 ## 0.2.4
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @container-images/mds-geography-author-api
 
+## 0.0.37
+
+### Patch Changes
+
+- 05a28473: Fix geography-author dependency
+- eb763f6f: Rename mds-geography-author to mds-geography-author-api
+- Updated dependencies [05a28473]
+- Updated dependencies [eb763f6f]
+  - @mds-core/mds-geography-author-api@0.2.20
+
 ## 0.0.36
 
 ### Patch Changes
