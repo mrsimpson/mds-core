@@ -1,5 +1,11 @@
 # @mds-core/mds-geography-service
 
+## 0.6.0
+
+### Minor Changes
+
+- afd5f021: Fixed to not use select on hidden geography filter.
+
 ## 0.5.2
 
 ### Patch Changes
@@ -48,7 +54,7 @@
 
 ### Minor Changes
 
-- e9e3048d: Refactor mds-geography to use GeographyService for db
+- e9e3048d: Refactor mds-geography-api to use GeographyService for db
 
 ### Patch Changes
 

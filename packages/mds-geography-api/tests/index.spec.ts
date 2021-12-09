@@ -34,7 +34,7 @@ const GeographyServer = GeographyServiceManager.controller()
 
 const request = supertest(ApiServer(api))
 
-const APP_JSON = 'application/vnd.mds-geography+json; charset=utf-8; version=1.0'
+const APP_JSON = 'application/vnd.mds-geography-api+json; charset=utf-8; version=1.0'
 const EMPTY_SCOPE = SCOPED_AUTH([], '')
 const EVENTS_READ_SCOPE = SCOPED_AUTH(['events:read'])
 const GEOGRAPHIES_READ_PUBLISHED_SCOPE = SCOPED_AUTH(['geographies:read:published'])

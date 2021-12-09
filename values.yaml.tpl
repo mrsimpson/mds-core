@@ -21,10 +21,10 @@ deployments:
     version: ${JURISDICTION_SERVICE_VERSION}
   mds-policy-author:
     version: ${POLICY_AUTHOR_VERSION}
-  mds-geography:
-    version: ${GEOGRAPHY_VERSION}
-  mds-geography-author:
-    version: ${GEOGRAPHY_AUTHOR_VERSION}
+  mds-geography-api:
+    version: ${GEOGRAPHY_API_VERSION}
+  mds-geography-author-api:
+    version: ${GEOGRAPHY_AUTHOR_API_VERSION}
   mds-geography-service:
     version: ${GEOGRAPHY_SERVICE_VERSION}
   mds-ingest-service:

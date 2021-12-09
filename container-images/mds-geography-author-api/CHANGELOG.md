@@ -1,4 +1,14 @@
-# @container-images/mds-geography-author
+# @container-images/mds-geography-author-api
+
+## 0.0.37
+
+### Patch Changes
+
+- 05a28473: Fix geography-author dependency
+- eb763f6f: Rename mds-geography-author to mds-geography-author-api
+- Updated dependencies [05a28473]
+- Updated dependencies [eb763f6f]
+  - @mds-core/mds-geography-author-api@0.2.20
 
 ## 0.0.36
 
@@ -10,50 +20,50 @@
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.18
+- @mds-core/mds-geography-author-api@0.2.18
 
 ## 0.0.34
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.17
+- @mds-core/mds-geography-author-api@0.2.17
 
 ## 0.0.33
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.16
+- @mds-core/mds-geography-author-api@0.2.16
 
 ## 0.0.32
 
 ### Patch Changes
 
 - Updated dependencies [102aa5a0]
-  - @mds-core/mds-geography-author@0.2.15
+  - @mds-core/mds-geography-author-api@0.2.15
 
 ## 0.0.31
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.14
+- @mds-core/mds-geography-author-api@0.2.14
 
 ## 0.0.30
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.13
+- @mds-core/mds-geography-author-api@0.2.13
 
 ## 0.0.29
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.12
+- @mds-core/mds-geography-author-api@0.2.12
 
 ## 0.0.28
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.11
+- @mds-core/mds-geography-author-api@0.2.11
 
 ## 0.0.27
 
@@ -61,34 +71,34 @@
 
 - 70586f15: Meaningless bump to ensure artifacts are built properly
 - Updated dependencies [70586f15]
-  - @mds-core/mds-geography-author@0.2.10
+  - @mds-core/mds-geography-author-api@0.2.10
   - @mds-core/mds-webpack-config@0.1.7
 
 ## 0.0.26
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.9
+- @mds-core/mds-geography-author-api@0.2.9
 
 ## 0.0.25
 
 ### Patch Changes
 
 - Updated dependencies [a1061650]
-  - @mds-core/mds-geography-author@0.2.8
+  - @mds-core/mds-geography-author-api@0.2.8
 
 ## 0.0.24
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.7
+- @mds-core/mds-geography-author-api@0.2.7
 
 ## 0.0.23
 
 ### Patch Changes
 
 - 5321cca0: Upgrade to node:16.11.1-alpine
-  - @mds-core/mds-geography-author@0.2.6
+  - @mds-core/mds-geography-author-api@0.2.6
 
 ## 0.0.22
 
@@ -96,7 +106,7 @@
 
 - f501924c: Bump everything due to previous bad release
 - Updated dependencies [f501924c]
-  - @mds-core/mds-geography-author@0.2.5
+  - @mds-core/mds-geography-author-api@0.2.5
   - @mds-core/mds-webpack-config@0.1.6
 
 ## 0.0.21
@@ -111,25 +121,25 @@
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.4
+- @mds-core/mds-geography-author-api@0.2.4
 
 ## 0.0.19
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.3
+- @mds-core/mds-geography-author-api@0.2.3
 
 ## 0.0.18
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.2
+- @mds-core/mds-geography-author-api@0.2.2
 
 ## 0.0.17
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.2.1
+- @mds-core/mds-geography-author-api@0.2.1
 
 ## 0.0.16
 
@@ -137,7 +147,7 @@
 
 - Updated dependencies [d8b1387e]
 - Updated dependencies [15b9d729]
-  - @mds-core/mds-geography-author@0.2.0
+  - @mds-core/mds-geography-author-api@0.2.0
   - @mds-core/mds-webpack-config@0.1.4
 
 ## 0.0.15
@@ -145,67 +155,67 @@
 ### Patch Changes
 
 - Updated dependencies [b393c66a]
-  - @mds-core/mds-geography-author@0.1.0
+  - @mds-core/mds-geography-author-api@0.1.0
 
 ## 0.0.14
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.15
+- @mds-core/mds-geography-author-api@0.0.15
 
 ## 0.0.13
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.14
+- @mds-core/mds-geography-author-api@0.0.14
 
 ## 0.0.12
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.13
+- @mds-core/mds-geography-author-api@0.0.13
 
 ## 0.0.11
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.12
+- @mds-core/mds-geography-author-api@0.0.12
 
 ## 0.0.10
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.11
+- @mds-core/mds-geography-author-api@0.0.11
 
 ## 0.0.9
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.10
+- @mds-core/mds-geography-author-api@0.0.10
 
 ## 0.0.8
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.9
+- @mds-core/mds-geography-author-api@0.0.9
 
 ## 0.0.7
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.8
+- @mds-core/mds-geography-author-api@0.0.8
 
 ## 0.0.6
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.7
+- @mds-core/mds-geography-author-api@0.0.7
 
 ## 0.0.5
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.6
+- @mds-core/mds-geography-author-api@0.0.6
 
 ## 0.0.4
 
@@ -213,11 +223,11 @@
 
 - 8ab4569d: Minor patch change for every package to get versioning aligned with changeset workflows
 - Updated dependencies [8ab4569d]
-  - @mds-core/mds-geography-author@0.0.5
+  - @mds-core/mds-geography-author-api@0.0.5
   - @mds-core/mds-webpack-config@0.1.3
 
 ## 0.0.3
 
 ### Patch Changes
 
-- @mds-core/mds-geography-author@0.0.4
+- @mds-core/mds-geography-author-api@0.0.4

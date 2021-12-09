@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-geography-service",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Mobility Data Specification Geography Service",
   "keywords": [
     "mds",

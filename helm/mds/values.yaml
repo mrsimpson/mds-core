@@ -102,10 +102,10 @@ deployments:
     pathPrefix: /compliance
   mds-compliance-service:
     enabled: false
-  mds-geography:
+  mds-geography-api:
     enabled: false
     pathPrefix: /geography
-  mds-geography-author:
+  mds-geography-author-api:
     enabled: false
     pathPrefix: /geography-author
   mds-geography-service:
