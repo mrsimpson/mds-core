@@ -83,7 +83,7 @@ class GeographyReadWriteRepository extends ReadWriteRepository {
 
       if (!includeHidden) {
         query
-          .leftJoinAndSelect('geography_metadata', 'gm', 'gm.geography_id = g.geography_id')
+          .leftJoin('geography_metadata', 'gm', 'gm.geography_id = g.geography_id')
           .andWhere(
             "(gm.geography_metadata::json->>'hidden' is null or (gm.geography_metadata::json->'hidden' is not null and (gm.geography_metadata::json->>'hidden')::boolean = false))"
           )

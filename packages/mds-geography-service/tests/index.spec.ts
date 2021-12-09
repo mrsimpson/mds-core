@@ -173,6 +173,8 @@ describe('Geography Service Tests', () => {
       ])
       const geographies2 = await GeographyServiceClient.getGeographies()
       expect(geographies2.length).toEqual(1)
+      const geographies3 = await GeographyServiceClient.getGeographies({ includeHidden: true })
+      expect(geographies3.length).toEqual(2)
     })
   })
 
