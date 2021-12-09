@@ -1,5 +1,14 @@
 # @mds-core/mds-geography-author-api
 
+## 0.2.20
+
+### Patch Changes
+
+- 05a28473: Fix geography-author dependency
+- eb763f6f: Rename mds-geography-author to mds-geography-author-api
+  - @mds-core/mds-db@0.4.22
+  - @mds-core/mds-api-helpers@0.1.62
+
 ## 0.2.19
 
 ### Patch Changes

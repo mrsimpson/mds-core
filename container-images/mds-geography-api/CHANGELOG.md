@@ -1,5 +1,13 @@
 # @container-images/mds-geography-api
 
+## 0.0.38
+
+### Patch Changes
+
+- eb763f6f: Rename mds-geography to mds-geography-api
+- Updated dependencies [eb763f6f]
+  - @mds-core/mds-geography-api@0.2.5
+
 ## 0.0.37
 
 ### Patch Changes
