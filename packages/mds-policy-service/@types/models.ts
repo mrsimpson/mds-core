@@ -23,6 +23,7 @@ import {
   MICRO_MOBILITY_VEHICLE_STATE,
   MODALITY,
   Nullable,
+  PROPULSION_TYPE,
   SERVICE_TYPE,
   TAXI_VEHICLE_EVENT,
   TAXI_VEHICLE_STATE,
@@ -83,6 +84,7 @@ export interface BaseRule<StatesToEventsMap extends GenericStatesToEvents, RuleT
   vehicle_types?: Nullable<VEHICLE_TYPE[]>
   transaction_types?: Nullable<TRANSACTION_TYPE[]>
   service_types?: Nullable<SERVICE_TYPE[]>
+  propulsion_types?: Nullable<PROPULSION_TYPE[]>
 }
 
 export interface MicroMobilityRule<RuleType extends RULE_TYPE = RULE_TYPE>

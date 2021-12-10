@@ -48,4 +48,19 @@ describe('Tests Policy Validator', () => {
 
     expect(() => validatePolicyDomainModel(policy)).toThrowError(ValidationError)
   })
+
+  it('Tests that policy with invalid propulsion types rejects', () => {
+    const policyShell = PolicyFactory()
+
+    const { rules } = policyShell
+    const policy = {
+      ...policyShell,
+      rules: rules.map(r => ({
+        ...r,
+        propulsion_types: ['centipede'] // this is invalid because it's not a valid propulsion type
+      }))
+    }
+
+    expect(() => validatePolicyDomainModel(policy)).toThrowError(ValidationError)
+  })
 })

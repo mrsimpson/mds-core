@@ -22,6 +22,7 @@ import {
   MICRO_MOBILITY_VEHICLE_STATE,
   MICRO_MOBILITY_VEHICLE_STATES,
   MODALITIES,
+  PROPULSION_TYPES,
   SERVICE_TYPE,
   TAXI_VEHICLE_EVENTS,
   TAXI_VEHICLE_STATE,
@@ -158,6 +159,7 @@ export const {
           value_url: stringSchema({ nullable: true }),
           vehicle_types: arraySchema(enumSchema([...VEHICLE_TYPES]), { nullable: true }),
           service_types: arraySchema(enumSchema([...SERVICE_TYPE]), { nullable: true, default: null }),
+          propulsion_types: arraySchema(enumSchema([...PROPULSION_TYPES]), { nullable: true, default: null }),
           transaction_types: arraySchema(enumSchema([...TRANSACTION_TYPE]), { nullable: true, default: null })
         },
         allOf: [
