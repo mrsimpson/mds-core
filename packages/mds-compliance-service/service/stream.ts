@@ -24,7 +24,7 @@ const { TENANT_ID } = getEnvVar({
 
 const complianceEventTopic = [TENANT_ID, 'compliance', 'snapshot'].join('.')
 
-export type KafkaComplianceSnapshot = Omit<ComplianceSnapshotDomainModel, 'vehicles_found'>
+export type KafkaComplianceSnapshot = Omit<ComplianceSnapshotDomainModel, 'vehicles_found' | 'violating_vehicles'>
 
 export const ComplianceSnapshotStreamKafka: StreamProducer<KafkaComplianceSnapshot> =
   stream.KafkaStreamProducer<KafkaComplianceSnapshot>(complianceEventTopic)
