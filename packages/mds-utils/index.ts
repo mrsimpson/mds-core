@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { UUID } from '@mds-core/mds-types'
+import type { UUID } from '@mds-core/mds-types'
 import { v4 } from 'uuid'
 
 export * from './exceptions/exception-messages'
