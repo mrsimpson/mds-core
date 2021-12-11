@@ -11,7 +11,7 @@ import {
 const receipt: ReceiptDomainModel = {
   receipt_id: uuid(),
   timestamp: Date.now(),
-  receipt_details: {},
+  receipt_details: { custom_description: 'something cool' },
   origin_url: 'https://mds.coruscant.com/compliance/snapshot/c78280ff-4e58-4e30-afa9-d72673037799'
 }
 
@@ -21,11 +21,21 @@ const receipt: ReceiptDomainModel = {
  */
 export function* transactionsGenerator(
   length = 20,
-  options: { provider_id?: UUID; receipt_details?: {}; amount?: number; fee_type?: FEE_TYPE } = {}
+  options: {
+    provider_id?: UUID
+    receipt_details?: ReceiptDomainModel['receipt_details']
+    amount?: number
+    fee_type?: FEE_TYPE
+  } = {}
 ): Generator<TransactionDomainModel> {
   const start_timestamp = Date.now() - length * 1000
 
-  const { provider_id, receipt_details = {}, amount = 100, fee_type = 'base_fee' } = options
+  const {
+    provider_id,
+    receipt_details = { violation_id: uuid(), trip_id: null, policy_id: uuid() },
+    amount = 100,
+    fee_type = 'base_fee'
+  } = options
 
   for (let i = 0; i < length; i++) {
     const timestamp = start_timestamp + i * 1000

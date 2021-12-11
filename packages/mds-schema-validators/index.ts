@@ -15,19 +15,21 @@
  */
 
 import { ValidationError } from '@mds-core/mds-utils'
-import Ajv, { JSONSchemaType, Options, SchemaObject, ValidateFunction } from 'ajv'
+import Ajv, { JSONSchemaType, Options, ValidateFunction } from 'ajv'
 import withErrors from 'ajv-errors'
 import withFormats from 'ajv-formats'
-import ajvKeywords from 'ajv-keywords'
+import dynamicDefaults from 'ajv-keywords/dist/definitions/dynamicDefaults'
+import transform from 'ajv-keywords/dist/definitions/transform'
 import Joi from 'joi'
-export type { SchemaObject } from 'ajv'
+
+export type { JSONSchemaType, SchemaObject } from 'ajv'
 export * from './generators'
 // Export an example schema for testing purposes
 export * from './tests/test.schema'
 export * from './v0_4_1'
 export * from './validators'
 
-export type Schema<T> = SchemaObject | JSONSchemaType<T>
+export type Schema<T> = JSONSchemaType<T>
 
 export type SchemaValidator<T> = {
   validate: (input: unknown) => T
@@ -46,8 +48,10 @@ export const SchemaValidator = <T>(
   if (options.allErrors === true) {
     ajvInstance = withErrors(ajvInstance)
   }
-  ajvKeywords(ajvInstance, ['transform', 'dynamicDefaults'])
-  const validator: ValidateFunction<T> = withFormats(ajvInstance).compile($schema)
+  ajvInstance.addKeyword(dynamicDefaults())
+  ajvInstance.addKeyword(transform())
+
+  const validator: ValidateFunction<T> = withFormats(ajvInstance, ['uuid', 'uri', 'email', 'float']).compile($schema)
   return {
     validate: (input: unknown) => {
       if (!validator(input)) {

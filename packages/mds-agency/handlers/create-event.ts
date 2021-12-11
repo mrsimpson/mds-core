@@ -111,7 +111,7 @@ export const createEventHandler = async (
     ...req.body,
     device_id,
     provider_id,
-    telemetry: { ...req.body.telemetry, provider_id },
+    telemetry: { ...req.body.telemetry, provider_id, recorded },
     recorded
   }
 

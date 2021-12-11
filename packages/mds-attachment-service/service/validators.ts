@@ -17,7 +17,7 @@
 import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import { AttachmentDomainModel } from '../@types'
 
-const uuidSchema = { type: 'string', format: 'uuid' }
+const uuidSchema = <const>{ type: 'string', format: 'uuid' }
 
 export const { validate: validateAttachmentDomainModel, isValid: isValidAttachmentDomainModel } =
   SchemaValidator<AttachmentDomainModel>({
@@ -29,7 +29,8 @@ export const { validate: validateAttachmentDomainModel, isValid: isValidAttachme
       base_url: { type: 'string' },
       mimetype: { type: 'string' },
       thumbnail_filename: { type: 'string', nullable: true, default: null },
-      thumbnail_mimetype: { type: 'string', nullable: true, default: null }
+      thumbnail_mimetype: { type: 'string', nullable: true, default: null },
+      attachment_list_id: { type: 'string', format: 'uuid', nullable: true, default: null }
     },
     required: ['attachment_id', 'attachment_filename', 'base_url', 'mimetype']
   })

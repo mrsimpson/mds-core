@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { TelemetrySchema } from '@mds-core/mds-ingest-service'
+import { TelemetryCreateSchema } from '@mds-core/mds-ingest-service'
 import { providers } from '@mds-core/mds-providers'
 import { SchemaValidator } from '@mds-core/mds-schema-validators'
-import { AUDIT_EVENT_TYPES, Telemetry, VEHICLE_EVENTS } from '@mds-core/mds-types'
+import { AUDIT_EVENT_TYPES, VEHICLE_EVENTS } from '@mds-core/mds-types'
 import {
   AuditApiAuditEndRequest,
   AuditApiAuditNoteRequest,
@@ -25,8 +25,8 @@ import {
   AuditApiVehicleEventRequest
 } from './types'
 
-const uuidSchema = { type: 'string', format: 'uuid' }
-const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
+const uuidSchema = <const>{ type: 'string', format: 'uuid' }
+const timestampSchema = <const>{ type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
 
 export const { validate: validateAuditApiAuditStartRequest } = SchemaValidator<AuditApiAuditStartRequest['body']>(
   {
@@ -38,7 +38,7 @@ export const { validate: validateAuditApiAuditStartRequest } = SchemaValidator<A
       provider_vehicle_id: { type: 'string', maxLength: 255 },
       audit_event_id: uuidSchema,
       audit_device_id: uuidSchema,
-      telemetry: { ...TelemetrySchema, nullable: true, default: null }
+      telemetry: { ...TelemetryCreateSchema, nullable: true, default: null }
     },
     required: ['audit_event_id', 'audit_device_id', 'provider_id', 'provider_vehicle_id', 'timestamp']
   },
@@ -54,13 +54,12 @@ export const { validate: validateAuditApiVehicleEventRequest } = SchemaValidator
   properties: {
     event_type: { type: 'string', enum: VEHICLE_EVENTS },
     timestamp: timestampSchema,
-    telemetry: { ...TelemetrySchema, nullable: true, default: null },
-    audit_event_id: { ...uuidSchema, nullable: true, default: null }
+    telemetry: { ...TelemetryCreateSchema, nullable: true, default: null },
+    audit_event_id: uuidSchema,
+    trip_id: uuidSchema
   },
   required: ['event_type', 'timestamp']
 })
-
-export const { validate: validateTelemetry } = SchemaValidator<Telemetry>(TelemetrySchema)
 
 export const { validate: validateAuditApiAuditNoteRequest } = SchemaValidator<AuditApiAuditNoteRequest['body']>({
   $id: 'AuditApiAuditNoteRequest',
@@ -72,11 +71,11 @@ export const { validate: validateAuditApiAuditNoteRequest } = SchemaValidator<Au
       enum: [AUDIT_EVENT_TYPES.issue, AUDIT_EVENT_TYPES.note, AUDIT_EVENT_TYPES.summary]
     },
     timestamp: timestampSchema,
-    telemetry: TelemetrySchema,
+    telemetry: { ...TelemetryCreateSchema, nullable: true, default: null },
     audit_issue_code: { type: 'string', maxLength: 31, nullable: true, default: null },
     note: { type: 'string', maxLength: 255, nullable: true, default: null }
   },
-  required: ['audit_event_id', 'audit_event_type', 'timestamp', 'telemetry'],
+  required: ['audit_event_id', 'audit_event_type', 'timestamp'],
   if: {
     properties: {
       audit_event_type: { enum: [AUDIT_EVENT_TYPES.note, AUDIT_EVENT_TYPES.summary] }
@@ -95,8 +94,9 @@ export const { validate: validateAuditApiAuditEndRequest, isValid: isValidAuditA
   type: 'object',
   properties: {
     audit_event_id: uuidSchema,
+    audit_event_type: { type: 'string' },
     timestamp: timestampSchema,
-    telemetry: TelemetrySchema
+    telemetry: { ...TelemetryCreateSchema, nullable: true, default: null }
   },
-  required: ['audit_event_id', 'timestamp', 'telemetry']
+  required: ['audit_event_id', 'timestamp', 'audit_event_type']
 })

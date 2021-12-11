@@ -36,6 +36,7 @@ import {
 } from '@mds-core/mds-types'
 
 export const RULE_TYPES = Enum('count', 'speed', 'time', 'user', 'rate')
+export const RULE_TYPE_LIST = <const>['count', 'speed', 'time', 'user', 'rate']
 export type RULE_TYPE = keyof typeof RULE_TYPES
 export interface PolicyMessage {
   [key: string]: string
@@ -155,7 +156,7 @@ export type SpeedPolicy = PolicyDomainModel & { rules: SpeedRule[] }
 export type TimePolicy = PolicyDomainModel & { rules: TimeRule[] }
 export type RatePolicy = PolicyDomainModel & { rules: RateRule[] }
 
-export type PolicyDomainCreateModel = DomainModelCreate<PolicyDomainModel>
+export type PolicyDomainCreateModel = DomainModelCreate<Omit<PolicyDomainModel, 'status'>>
 
 export interface PolicyMetadataDomainModel<M extends {} = {}> {
   policy_id: UUID

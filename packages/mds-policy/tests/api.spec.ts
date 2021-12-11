@@ -22,7 +22,8 @@
 /* eslint-disable prefer-destructuring */
 
 import { ApiServer } from '@mds-core/mds-api-server'
-import { GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
+import { GeographyServiceManager } from '@mds-core/mds-geography-service'
+import { GeographyFactory, writePublishedGeography } from '@mds-core/mds-geography-service/tests/helpers'
 import {
   PolicyDomainCreateModel,
   PolicyDomainModel,
@@ -82,14 +83,14 @@ const createPolicy = async (policy?: PolicyDomainCreateModel) =>
 
 const createPolicyAndGeographyFactory = async (policy?: PolicyDomainCreateModel, geography_overrides = {}) => {
   const createdPolicy = await createPolicy(policy)
-  await GeographyServiceClient.writeGeographies([
-    {
+  await writePublishedGeography(
+    GeographyFactory({
       name: 'VENICE',
       geography_id: createdPolicy.rules[0].geographies[0],
       geography_json: venice,
       ...geography_overrides
-    }
-  ])
+    })
+  )
   return createdPolicy
 }
 

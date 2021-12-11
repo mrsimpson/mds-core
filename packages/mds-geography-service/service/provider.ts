@@ -92,6 +92,17 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     }
   },
 
+  publishGeography: async geography_id => {
+    try {
+      const geography = await GeographyRepository.publishGeography(geography_id)
+      return ServiceResult(geography)
+    } catch (error) /* istanbul ignore next */ {
+      const exception = ServiceException('Error Publishing Geography', error)
+      GeographyServiceLogger.error('publishGeography error', { exception, error })
+      return exception
+    }
+  },
+
   writeGeographiesMetadata: async models => {
     try {
       const metadata = await GeographyRepository.writeGeographiesMetadata(
@@ -101,6 +112,17 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Writing Geographies Metadata', error)
       GeographyServiceLogger.error('writeGeographiesMetadata error', { exception, error })
+      return exception
+    }
+  },
+
+  editGeography: async model => {
+    try {
+      const geography = await GeographyRepository.editGeography(validateGeographyDomainCreateModel(model))
+      return ServiceResult(geography)
+    } catch (error) /* istanbul ignore next */ {
+      const exception = ServiceException('Error Editing Geographies', error)
+      GeographyServiceLogger.error('editGeography error', { exception, error })
       return exception
     }
   },

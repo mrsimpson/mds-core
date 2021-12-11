@@ -24,11 +24,11 @@
 /* eslint-reason extends object.prototype */
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import should from 'should'
 /* eslint-enable prettier/prettier */
 /* eslint-enable @typescript-eslint/no-unused-vars */
 import { ApiServer } from '@mds-core/mds-api-server'
 import { GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
+import { GeographyFactory } from '@mds-core/mds-geography-service/tests/helpers'
 // eslint-disable-next-line prettier/prettier
 import { PolicyDomainCreateModel, PolicyMetadataDomainModel, PolicyServiceClient, PolicyStreamKafka } from '@mds-core/mds-policy-service'
 import { PolicyRepository } from '@mds-core/mds-policy-service/repository'
@@ -36,6 +36,7 @@ import { PolicyServiceManager } from '@mds-core/mds-policy-service/service/manag
 import { PolicyFactory } from '@mds-core/mds-policy-service/tests/helpers'
 import stream from '@mds-core/mds-stream'
 import { SCOPED_AUTH, venice } from '@mds-core/mds-test-data'
+import { Timestamp } from '@mds-core/mds-types'
 import { days, isUUID, now, pathPrefix, uuid } from '@mds-core/mds-utils'
 import { StatusCodes } from 'http-status-codes'
 import supertest from 'supertest'
@@ -73,23 +74,25 @@ const POLICIES_DELETE_SCOPE = SCOPED_AUTH(['policies:delete'])
 const createPolicy = async (policy?: PolicyDomainCreateModel) =>
   await PolicyServiceClient.writePolicy(policy || PolicyFactory())
 
-const createPolicyAndGeographyFactory = async (policy?: PolicyDomainCreateModel, geography_overrides = {}) => {
-  const createdPolicy = await PolicyServiceClient.writePolicy(policy || PolicyFactory())
-  await GeographyServiceClient.writeGeographies([
-    {
-      name: 'VENICE',
-      geography_id: createdPolicy.rules[0].geographies[0],
-      geography_json: venice,
-      ...geography_overrides
-    }
-  ])
+const createPolicyAndGeographyFactory = async (policy?: PolicyDomainCreateModel, publish_date?: Timestamp) => {
+  const newPolicy = policy || PolicyFactory()
+  const { publish_date: _publish_date, ...newGeography } = GeographyFactory({
+    name: 'VENICE',
+    geography_id: newPolicy.rules[0].geographies[0],
+    geography_json: venice
+  })
+  await GeographyServiceClient.writeGeographies([newGeography])
+  if (publish_date) {
+    GeographyServiceClient.publishGeography({ geography_id: newPolicy.rules[0].geographies[0], publish_date })
+  }
+  const createdPolicy = await PolicyServiceClient.writePolicy(newPolicy)
+
   return createdPolicy
 }
 
 const createPublishedPolicy = async (policy?: PolicyDomainCreateModel) => {
-  const policyContent = policy || PolicyFactory()
-  const newPolicy = await createPolicyAndGeographyFactory(policyContent, { publish_date: now() })
-  return await PolicyServiceClient.publishPolicy(newPolicy?.policy_id, policyContent.start_date)
+  const createdPolicy = await createPolicyAndGeographyFactory(policy, now())
+  return await PolicyServiceClient.publishPolicy(createdPolicy?.policy_id, createdPolicy.start_date)
 }
 
 const createPolicyMetadata = async (policy: PolicyDomainCreateModel, policy_metadata = {}) => {
@@ -288,16 +291,16 @@ describe('Tests app', () => {
     })
 
     it('can publish a policy if the geo is published', async () => {
-      const policy = await createPolicyAndGeographyFactory(PolicyFactory(), { publish_date: now() })
+      const policy = await createPolicyAndGeographyFactory(PolicyFactory(), now())
       const result = await request
-        .post(pathPrefix(`/policies/${policy.policy_id}/publish`))
+        .post(pathPrefix(`/policies/${policy?.policy_id}/publish`))
         .set('Authorization', POLICIES_PUBLISH_SCOPE)
         .expect(StatusCodes.OK)
       test.value(result).hasHeader('content-type', APP_JSON)
     })
 
     it('cannot double-publish a policy', async () => {
-      const policy = await createPolicyAndGeographyFactory(PolicyFactory(), { publish_date: now() })
+      const policy = await createPolicyAndGeographyFactory(PolicyFactory(), now())
       await request
         .post(pathPrefix(`/policies/${policy.policy_id}/publish`))
         .set('Authorization', POLICIES_PUBLISH_SCOPE)
@@ -365,11 +368,12 @@ describe('Tests app', () => {
       log('read back nonexistent policy response:', body)
       test.value(result).hasHeader('content-type', APP_JSON)
       test.value(result.body.version).is(POLICY_AUTHOR_API_DEFAULT_VERSION)
-      await PolicyServiceClient.readPolicies({
+      const policies = await PolicyServiceClient.readPolicies({
         policy_ids: [policy.policy_id],
         get_published: null,
         get_unpublished: null
-      }).should.be.fulfilledWith({ policies: [] })
+      })
+      expect(policies).toStrictEqual({ policies: [] })
     })
 
     it('cannot delete a published policy', async () => {
@@ -381,9 +385,7 @@ describe('Tests app', () => {
     })
 
     it('cannot publish a policy if the start_date would precede the publish_date', async () => {
-      const policy = await createPolicyAndGeographyFactory(PolicyFactory({ start_date: now() - days(30) }), {
-        publish_date: now()
-      })
+      const policy = await createPolicyAndGeographyFactory(PolicyFactory({ start_date: now() - days(30) }), now())
       const result = await request
         .post(pathPrefix(`/policies/${policy.policy_id}/publish`))
         .set('Authorization', POLICIES_PUBLISH_SCOPE)

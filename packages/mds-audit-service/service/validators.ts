@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { SchemaValidator } from '@mds-core/mds-schema-validators'
-import { AUDIT_EVENT_TYPES, VEHICLE_EVENTS } from '@mds-core/mds-types'
+import { JSONSchemaType, SchemaValidator } from '@mds-core/mds-schema-validators'
+import { AUDIT_EVENTS, Telemetry, VEHICLE_EVENTS } from '@mds-core/mds-types'
 import { AuditAttachmentDomainModel, AuditDomainModel, AuditEventDomainModel } from '../@types'
 
-const uuidSchema = { type: 'string', format: 'uuid' }
-const enumSchema = <T>(enumType: T[]) => ({ type: 'string', enum: enumType })
+const uuidSchema = <const>{ type: 'string', format: 'uuid' }
+const enumSchema = <T>(enumType: T[]) => <const>{ type: 'string', enum: enumType }
+const timestampSchema = <const>{ type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
 
 export const { validate: validateAuditDomainModel, isValid: isValidAuditDomainModel } =
   SchemaValidator<AuditDomainModel>({
@@ -32,7 +33,8 @@ export const { validate: validateAuditDomainModel, isValid: isValidAuditDomainMo
       provider_id: uuidSchema,
       provider_name: { type: 'string' },
       provider_vehicle_id: { type: 'string' },
-      provider_device_id: { ...uuidSchema, nullable: true, default: null }
+      provider_device_id: { ...uuidSchema, nullable: true, default: null },
+      timestamp: timestampSchema
     },
     required: [
       'audit_trip_id',
@@ -45,6 +47,37 @@ export const { validate: validateAuditDomainModel, isValid: isValidAuditDomainMo
     ]
   })
 
+const nullableFloat = <const>{ type: 'number', format: 'float', nullable: true, default: null }
+const nullableInteger = <const>{ type: 'integer', nullable: true, default: null }
+
+const telemetryDomainCreateModelSchema: JSONSchemaType<
+  Omit<Telemetry, 'provider_id' | 'device_id' | 'timestamp' | 'recorded'>
+> = <const>{
+  $id: 'Telemetry',
+  type: 'object',
+  properties: {
+    gps: {
+      type: 'object',
+      properties: {
+        lat: { type: 'number', format: 'float' },
+        lng: { type: 'number', format: 'float' },
+        // ⬇⬇⬇ NULLABLE/OPTIONAL PROPERTIES ⬇⬇⬇
+        altitude: nullableFloat,
+        heading: { ...nullableFloat, minimum: 0, exclusiveMaximum: 360 },
+        speed: nullableFloat,
+        accuracy: nullableFloat,
+        hdop: nullableFloat,
+        satellites: nullableInteger
+      },
+      required: ['lat', 'lng']
+    },
+    // ⬇⬇⬇ NULLABLE/OPTIONAL PROPERTIES ⬇⬇⬇
+    charge: { ...nullableFloat, minimum: 0, maximum: 1.0 },
+    stop_id: { ...uuidSchema, nullable: true, default: null }
+  },
+  required: ['gps']
+}
+
 export const { validate: validateAuditEventDomainModel, isValid: isValidAuditEventDomainModel } =
   SchemaValidator<AuditEventDomainModel>({
     $id: 'AuditEvent',
@@ -53,32 +86,11 @@ export const { validate: validateAuditEventDomainModel, isValid: isValidAuditEve
       audit_trip_id: uuidSchema,
       timestamp: { type: 'integer' },
       audit_event_id: uuidSchema,
-      audit_event_type: enumSchema(Object.keys(AUDIT_EVENT_TYPES).concat(Object.keys(VEHICLE_EVENTS))),
+      audit_event_type: enumSchema([...AUDIT_EVENTS, ...VEHICLE_EVENTS]),
       audit_issue_code: { type: 'string', nullable: true, default: null },
       audit_subject_id: { type: 'string' },
       note: { type: 'string', nullable: true, default: null },
-      telemetry: {
-        $id: 'Telemetry',
-        type: 'object',
-        nullable: true,
-        default: null,
-        properties: {
-          charge: { type: 'number', nullable: true, default: null },
-          gps: {
-            type: 'object',
-            properties: {
-              lat: { type: 'number' },
-              lng: { type: 'number' },
-              speed: { type: 'number', nullable: true, default: null },
-              heading: { type: 'number', nullable: true, default: null },
-              accuracy: { type: 'number', nullable: true, default: null },
-              altitude: { type: 'number', nullable: true, default: null }
-            },
-            required: ['lat', 'lng']
-          }
-        },
-        required: ['gps']
-      }
+      telemetry: telemetryDomainCreateModelSchema
     },
     required: ['audit_trip_id', 'timestamp', 'audit_event_id', 'audit_event_type', 'audit_subject_id']
   })

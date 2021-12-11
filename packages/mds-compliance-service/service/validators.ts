@@ -23,13 +23,12 @@ import {
   MatchedVehicleInformation
 } from '../@types'
 
-const uuidSchema = { type: 'string', format: 'uuid' }
-const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
-const vehicleStatusSchema = { type: 'string', enum: VEHICLE_STATES }
-const vehicleEventTypeSchema = { type: 'string', enum: VEHICLE_EVENTS }
+const uuidSchema = <const>{ type: 'string', format: 'uuid' }
+const timestampSchema = <const>{ type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
+const vehicleStatusSchema = <const>{ type: 'string', enum: VEHICLE_STATES }
+const vehicleEventTypeSchema = <const>{ type: 'string', enum: VEHICLE_EVENTS }
 
 export const { $schema: matchedVehicleInformationSchema } = SchemaValidator<MatchedVehicleInformation>({
-  $id: 'MatchedVehicleInformation',
   type: 'object',
   properties: {
     device_id: uuidSchema,
@@ -66,7 +65,8 @@ export const { validate: validateComplianceSnapshotDomainModel } = SchemaValidat
     },
     vehicles_found: { type: 'array', items: matchedVehicleInformationSchema },
     excess_vehicles_count: { type: 'integer' },
-    total_violations: { type: 'integer' }
+    total_violations: { type: 'integer' },
+    violating_vehicles: { type: 'array', items: matchedVehicleInformationSchema }
   },
   required: [
     'compliance_as_of',
@@ -75,7 +75,8 @@ export const { validate: validateComplianceSnapshotDomainModel } = SchemaValidat
     'policy',
     'provider_id',
     'total_violations',
-    'vehicles_found'
+    'vehicles_found',
+    'violating_vehicles'
   ]
 })
 
@@ -96,10 +97,14 @@ export const { validate: validateGetComplianceSnapshotsByTimeIntervalOptions } =
       required: ['start_time'],
       allOf: [
         {
-          if: { properties: { end_time: { type: 'number' } } },
+          if: { properties: { end_time: { type: 'number' } }, required: ['end_time'] },
           then: {
             properties: {
-              start_time: { maximum: { $data: '1/end_time' }, errorMessage: 'should be less than end_time' }
+              start_time: {
+                ...timestampSchema,
+                maximum: { $data: '1/end_time' },
+                errorMessage: 'should be less than end_time'
+              }
             }
           }
         }

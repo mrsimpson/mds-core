@@ -28,7 +28,7 @@ export const TransactionApiVersionMiddleware: RequestHandler = ApiVersionMiddlew
   TRANSACTION_API_SUPPORTED_VERSIONS
 ).withDefaultVersion(TRANSACTION_API_DEFAULT_VERSION)
 
-export const { $schema: TransactionApiVersionSchema } = SchemaValidator<{ version: TRANSACTION_API_SUPPORTED_VERSION }>(
+export const { $schema: TransactionApiVersionSchema } = SchemaValidator<TRANSACTION_API_SUPPORTED_VERSION>(
   {
     $id: 'TransactionApiVersion',
     description: 'API version in SemVer',

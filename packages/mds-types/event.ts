@@ -111,6 +111,7 @@ export type VEHICLE_EVENT = VEHICLE_EVENT_v1_1_0
 
 export const AUDIT_EVENT_TYPES = Enum('start', 'note', 'summary', 'issue', 'telemetry', 'end')
 export type AUDIT_EVENT_TYPE = keyof typeof AUDIT_EVENT_TYPES
+export const AUDIT_EVENTS = <const>['start', 'note', 'summary', 'issue', 'telemetry', 'end']
 
 export interface CoreEvent {
   device_id: UUID

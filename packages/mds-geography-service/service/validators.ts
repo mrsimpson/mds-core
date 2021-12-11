@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SchemaValidator } from '@mds-core/mds-schema-validators'
+import { SchemaValidator, ValidationError } from '@mds-core/mds-schema-validators'
 import { UUID } from '@mds-core/mds-types'
 import Ajv from 'ajv'
 import gjv from 'geojson-validation'
@@ -24,20 +24,29 @@ import {
   GetGeographiesOptions,
   GetPublishedGeographiesOptions
 } from '../@types'
+import { GeographyServiceLogger } from '../logger'
 
 const ajvWithGeoJSON = new Ajv({ allErrors: true }).addKeyword({
-  keyword: 'valid-geojson',
+  keyword: 'valid_geojson',
   schema: false,
-  validate: (geography_json: unknown) => {
+  type: 'object',
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  validate: (geography_json: any) => {
     try {
-      return gjv.valid(geography_json, false)
+      const messageOrResponse = gjv.valid(geography_json, true)
+      if (messageOrResponse.length < 1) {
+        return true
+      } else {
+        throw new ValidationError(messageOrResponse.join(','))
+      }
     } catch (error) {
+      GeographyServiceLogger.error(`geojson-validation error is ${JSON.stringify(error.reason)}`)
       return false
     }
   }
 })
 
-const uuidSchema = { type: 'string', format: 'uuid' }
+const uuidSchema = <const>{ type: 'string', format: 'uuid' }
 
 export const { validate: validateGeographyDomainCreateModel, isValid: isValidGeographyDomainCreateModel } =
   SchemaValidator<GeographyDomainCreateModel>(
@@ -49,10 +58,14 @@ export const { validate: validateGeographyDomainCreateModel, isValid: isValidGeo
         name: { type: 'string', maxLength: 255, nullable: true, default: null },
         description: { type: 'string', maxLength: 255, nullable: true, default: null },
         effective_date: { type: 'integer', nullable: true, default: null },
-        publish_date: { type: 'integer', nullable: true, default: null },
         prev_geographies: { type: 'array', items: uuidSchema, nullable: true, default: null },
-        geography_json: { 'valid-geojson': true }
+        geography_json: {
+          type: 'object',
+          required: ['features', 'type'],
+          valid_geojson: true
+        }
       },
+      additionalProperties: false,
       required: ['geography_id', 'geography_json']
     },
     { allErrors: true },
@@ -77,7 +90,9 @@ export const { validate: validateGetGeographiesOptions, isValid: isValidGetGeogr
     $id: 'GetGeographyOptions',
     type: 'object',
     properties: {
-      includeMetadata: { type: 'boolean', default: false }
+      includeMetadata: { type: 'boolean', nullable: true, default: false },
+      includeGeographyJSON: { type: 'boolean', nullable: true, default: true },
+      includeHidden: { type: 'boolean', nullable: true, default: true }
     }
   })
 
@@ -86,8 +101,10 @@ export const { validate: validateGetPublishedGeographiesOptions, isValid: isVali
     $id: 'GetPublishedGeographiesOptions',
     type: 'object',
     properties: {
-      includeMetadata: { type: 'boolean', default: false },
-      publishedAfter: { type: 'integer' }
+      includeMetadata: { type: 'boolean', nullable: true, default: false },
+      includeGeographyJSON: { type: 'boolean', nullable: true, default: true },
+      includeHidden: { type: 'boolean', nullable: true, default: true },
+      publishedAfter: { type: 'integer', nullable: true }
     }
   })
 

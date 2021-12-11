@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
+import { EventDomainModel } from '@mds-core/mds-ingest-service'
 import { DomainModelCreate } from '@mds-core/mds-repository'
 import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
-import { Nullable, Timestamp, UUID, VehicleEvent, VEHICLE_TYPE } from '@mds-core/mds-types'
+import { Nullable, Timestamp, UUID, VEHICLE_TYPE } from '@mds-core/mds-types'
 import { Cursor } from 'typeorm-cursor-pagination'
 
 export interface PaginationLinks {
@@ -34,7 +35,7 @@ export interface TripReceiptDetailsDomainModel {
   end_geography_id: Nullable<UUID>
   duration: number // seconds
   distance: number // meters
-  trip_events: VehicleEvent[]
+  trip_events: EventDomainModel[]
 }
 
 export interface CurbUseDetailsDomainModel {
@@ -44,13 +45,17 @@ export interface CurbUseDetailsDomainModel {
   vehicle_type: VEHICLE_TYPE
   geography_id: Nullable<UUID>
   duration: number // seconds
-  trip_events: VehicleEvent[]
+  trip_events: EventDomainModel[]
 }
 
 export interface ComplianceViolationDetailsDomainModel {
   violation_id: UUID
   trip_id: Nullable<UUID>
   policy_id: UUID
+}
+
+export interface CustomReceiptDetailsDomainModel {
+  custom_description: string
 }
 
 export const FEE_TYPE = <const>[
@@ -78,7 +83,7 @@ export interface ReceiptDomainModel {
     | TripReceiptDetailsDomainModel
     | CurbUseDetailsDomainModel
     | ComplianceViolationDetailsDomainModel
-    | object // JSON blob with free-form supporting evidence, DO NOT INCLUDE PII
+    | CustomReceiptDetailsDomainModel
 }
 
 export interface TransactionDomainModel {

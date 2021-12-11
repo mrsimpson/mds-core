@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { AccessTokenScopeValidator, ApiRequest, ApiResponse, checkAccess } from '@mds-core/mds-api-server'
+import { AccessTokenScopeValidator, ApiErrorHandlingMiddleware, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
+import { GeographyServiceClient } from '@mds-core/mds-geography-service'
 import {
   AlreadyPublishedError,
   BadParamsError,
@@ -27,7 +28,7 @@ import {
   ServerError,
   ValidationError
 } from '@mds-core/mds-utils'
-import express, { NextFunction } from 'express'
+import express from 'express'
 import { GeographyAuthorLogger } from './logger'
 import { GeographyAuthorApiVersionMiddleware } from './middleware'
 import {
@@ -47,7 +48,6 @@ import {
   GeographyAuthorApiPutGeographyRequest,
   GeographyAuthorApiPutGeographyResponse
 } from './types'
-import { validateGeographyDetails } from './validators'
 
 const checkGeographyAuthorApiAccess = (validator: AccessTokenScopeValidator<GeographyAuthorApiAccessTokenScopes>) =>
   checkAccess(validator)
@@ -109,7 +109,7 @@ function api(app: express.Express): express.Express {
         if (error instanceof InsufficientPermissionsError) {
           return res.status(403).send({ error })
         }
-        return next(new ServerError())
+        return next(error)
       }
     }
   )
@@ -125,7 +125,7 @@ function api(app: express.Express): express.Express {
       const geography = req.body
 
       try {
-        const recorded_geography = await db.writeGeography(validateGeographyDetails(geography))
+        const [recorded_geography] = await GeographyServiceClient.writeGeographies([geography])
         return res.status(201).send({ version: res.locals.version, data: { geography: recorded_geography } })
       } catch (error) {
         GeographyAuthorLogger.warn('POST /geographies failed', error.stack)
@@ -137,7 +137,7 @@ function api(app: express.Express): express.Express {
         }
         /* istanbul ignore next */
         /* istanbul ignore next */
-        return next(new ServerError(error))
+        return next(error)
       }
     }
   )
@@ -152,7 +152,7 @@ function api(app: express.Express): express.Express {
     ) => {
       const geography = req.body
       try {
-        await db.editGeography(validateGeographyDetails(geography))
+        await GeographyServiceClient.editGeography(geography)
         return res.status(201).send({ version: res.locals.version, data: { geography } })
       } catch (error) {
         GeographyAuthorLogger.warn('failed to edit geography', error.stack)
@@ -162,7 +162,7 @@ function api(app: express.Express): express.Express {
         if (error instanceof ValidationError) {
           return res.status(400).send({ error })
         }
-        return next(new ServerError())
+        return next(error)
       }
     }
   )
@@ -203,7 +203,7 @@ function api(app: express.Express): express.Express {
         if (err instanceof AlreadyPublishedError) {
           return res.status(405).send({ error: err })
         }
-        return next(new ServerError())
+        return next(err)
       }
     }
   )
@@ -261,46 +261,38 @@ function api(app: express.Express): express.Express {
             if (writeErr instanceof DependencyMissingError) {
               return res.status(404).send({ error: writeErr })
             }
-            return next(new ServerError())
+            return next(writeErr)
           }
         } else {
+          return next(updateErr)
+        }
+      }
+    }
+  )
+
+  app
+    .put(
+      pathPrefix('/geographies/:geography_id/publish'),
+      checkGeographyAuthorApiAccess(scopes => scopes.includes('geographies:publish')),
+      async (
+        req: GeographyAuthorApiPublishGeographyRequest,
+        res: GeographyAuthorApiPublishGeographyResponse,
+        next: express.NextFunction
+      ) => {
+        const { geography_id } = req.params
+        try {
+          await db.publishGeography({ geography_id })
+          const published_geo = await db.readSingleGeography(geography_id)
+          return res.status(200).send({ version: res.locals.version, data: { geography: published_geo } })
+        } catch (updateErr) {
+          if (updateErr instanceof NotFoundError) {
+            return res.status(404).send({ error: `unable to find geography of ${geography_id}` })
+          }
           return next(new ServerError(updateErr))
         }
       }
-    }
-  )
-
-  app.put(
-    pathPrefix('/geographies/:geography_id/publish'),
-    checkGeographyAuthorApiAccess(scopes => scopes.includes('geographies:publish')),
-    async (
-      req: GeographyAuthorApiPublishGeographyRequest,
-      res: GeographyAuthorApiPublishGeographyResponse,
-      next: express.NextFunction
-    ) => {
-      const { geography_id } = req.params
-      try {
-        await db.publishGeography({ geography_id })
-        const published_geo = await db.readSingleGeography(geography_id)
-        return res.status(200).send({ version: res.locals.version, data: { geography: published_geo } })
-      } catch (updateErr) {
-        if (updateErr instanceof NotFoundError) {
-          return res.status(404).send({ error: `unable to find geography of ${geography_id}` })
-        }
-        return next(new ServerError(updateErr))
-      }
-    }
-  )
-
-  app.use(async (error: Error, req: ApiRequest, res: ApiResponse, next: NextFunction) => {
-    const { method, originalUrl } = req
-    GeographyAuthorLogger.error('Fatal MDS Geography Author Error (global error handling middleware)', {
-      method,
-      originalUrl,
-      error
-    })
-    return res.status(500).send({ error })
-  })
+    )
+    .use(ApiErrorHandlingMiddleware)
 
   return app
 }

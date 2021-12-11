@@ -317,6 +317,7 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH(['audits:write'], audit_subject_id))
       .send({
         audit_event_id: uuid(),
+        audit_event_type: AUDIT_EVENT_TYPES.end,
         timestamp: Date.now(),
         telemetry: telemetry()
       })

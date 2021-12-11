@@ -17,6 +17,7 @@
 import { asJsonApiLinks, parsePagingQueryParams, parseRequest } from '@mds-core/mds-api-helpers'
 import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
+import { TelemetryDomainModel, validateTelemetryDomainCreateModel } from '@mds-core/mds-ingest-service'
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import { ValidationError } from '@mds-core/mds-schema-validators'
 import { isError } from '@mds-core/mds-service-helpers'
@@ -87,11 +88,11 @@ import {
   validateAuditApiAuditNoteRequest,
   validateAuditApiAuditStartRequest,
   validateAuditApiVehicleEventRequest,
-  validateTelemetry,
   validateTimestamp,
   validateUUID
 } from './validators'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const logGenericAuditError = (req: AuditApiRequest<any>, res: AuditApiResponse<any>, err: any) =>
   AuditLogger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
 
@@ -313,7 +314,7 @@ function api(app: express.Express): express.Express {
           const { telemetry, audit_event_id = uuid(), timestamp } = req.body
 
           // Validate input params
-          validateTelemetry(telemetry)
+          validateTelemetryDomainCreateModel(telemetry)
           validateTimestamp(timestamp)
           // Create the telemetry event
           await writeAuditEvent({
@@ -417,10 +418,10 @@ function api(app: express.Express): express.Express {
       try {
         const { audit_trip_id, audit, audit_subject_id, recorded } = res.locals
         if (audit) {
-          const { audit_event_id = uuid(), timestamp, telemetry } = req.body
+          const { audit_event_id = uuid(), timestamp, telemetry, audit_event_type } = req.body
 
           // Validate input params
-          validateAuditApiAuditEndRequest({ audit_event_id, timestamp, telemetry })
+          validateAuditApiAuditEndRequest({ audit_event_id, audit_event_type, timestamp, telemetry })
 
           // Create the audit end event
           await writeAuditEvent({
@@ -442,6 +443,7 @@ function api(app: express.Express): express.Express {
       } catch (err) /* istanbul ignore next */ {
         if (err instanceof ValidationError) {
           // 400 Bad Request
+          AuditLogger.error(`/end error was ${JSON.stringify(err)}`)
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
@@ -527,7 +529,7 @@ function api(app: express.Express): express.Express {
                 provider_vehicle_id: device.vehicle_id,
                 provider_event_types: providerEvent.event_types,
                 provider_vehicle_state: providerEvent.vehicle_state,
-                provider_telemetry: providerEvent.telemetry,
+                provider_telemetry: providerEvent.telemetry as TelemetryDomainModel,
                 provider_event_time: providerEvent.timestamp,
                 events: auditEvents.map(withGpsProperty),
                 attachments: attachments.map(attachmentSummary),

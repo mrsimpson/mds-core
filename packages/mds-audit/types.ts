@@ -22,6 +22,7 @@ import {
   ApiResponseLocalsClaims,
   ApiVersionedResponse
 } from '@mds-core/mds-api-server'
+import { TelemetryDomainCreateModel, TelemetryDomainModel } from '@mds-core/mds-ingest-service'
 import {
   AttachmentSummary,
   Audit,
@@ -29,7 +30,6 @@ import {
   AUDIT_EVENT_TYPE,
   Device,
   Nullable,
-  Telemetry,
   Timestamp,
   UUID,
   VehicleEvent,
@@ -52,21 +52,21 @@ export type AuditApiAuditStartRequest = AuditApiTripRequest<{
   audit_event_id: UUID
   provider_id: UUID
   provider_vehicle_id: string
-  telemetry?: Telemetry
+  telemetry?: TelemetryDomainCreateModel
   timestamp: Timestamp
 }>
 
 export type AuditApiVehicleEventRequest = AuditApiTripRequest<{
   audit_event_id: UUID
   event_type: VEHICLE_EVENT
-  telemetry?: Telemetry
+  telemetry?: TelemetryDomainCreateModel
   trip_id: UUID
   timestamp: Timestamp
 }>
 
 export type AuditApiVehicleTelemetryRequest = AuditApiTripRequest<{
   audit_event_id: UUID
-  telemetry: Telemetry
+  telemetry: TelemetryDomainCreateModel
   timestamp: Timestamp
 }>
 
@@ -75,7 +75,7 @@ export type AuditApiAuditNoteRequest = AuditApiTripRequest<{
   audit_event_type: AUDIT_EVENT_TYPE
   audit_issue_code?: string
   note?: string
-  telemetry?: Telemetry
+  telemetry?: TelemetryDomainCreateModel
   timestamp: Timestamp
 }>
 
@@ -83,7 +83,7 @@ export interface AuditApiAuditEndRequest extends AuditApiTripRequest {
   body: {
     audit_event_id: UUID
     audit_event_type: string
-    telemetry?: Telemetry
+    telemetry?: TelemetryDomainCreateModel
     timestamp: Timestamp
   }
 }
@@ -149,14 +149,14 @@ export type GetAuditTripDetailsResponse = AuditApiResponse<
     attachments: AttachmentSummary[]
     provider_event_types?: VEHICLE_EVENT[]
     provider_vehicle_state?: VEHICLE_STATE // any
-    provider_telemetry?: Telemetry | null //  providerEvent[0]?.telemetry,
+    provider_telemetry?: TelemetryDomainModel | null //  providerEvent[0]?.telemetry,
     provider_event_time?: Timestamp // providerEvent[0]?.timestamp,
     provider: {
       device: AuditedDevice
       events: ReadOnlyVehicleEvent[] | never[]
       telemetry: Readonly<
         Required<
-          Telemetry & {
+          TelemetryDomainModel & {
             id: number
           }
         >

@@ -29,7 +29,7 @@ export interface GeographyDomainModel {
   geography_json: FeatureCollection
 }
 
-export type GeographyDomainCreateModel = DomainModelCreate<GeographyDomainModel>
+export type GeographyDomainCreateModel = DomainModelCreate<Omit<GeographyDomainModel, 'publish_date'>>
 
 export interface GeographyMetadataDomainModel<M extends {} = {}> {
   geography_id: UUID
@@ -43,6 +43,11 @@ export type GetGeographiesOptions = Partial<{
   includeGeographyJSON: boolean
   includeHidden: boolean
 }>
+
+export interface PublishGeographyParams {
+  publish_date?: Timestamp
+  geography_id: UUID
+}
 
 export type GetPublishedGeographiesOptions = GetGeographiesOptions &
   Partial<{
@@ -62,6 +67,8 @@ export interface GeographyService {
   getPublishedGeographies: (options?: GetPublishedGeographiesOptions) => GeographyWithMetadataDomainModel[]
   writeGeographies: (geographies: GeographyDomainCreateModel[]) => GeographyDomainModel[]
   writeGeographiesMetadata: (metadata: GeographyMetadataDomainCreateModel[]) => GeographyMetadataDomainModel[]
+  editGeography: (geography: GeographyDomainCreateModel) => GeographyDomainModel
+  publishGeography: (params: PublishGeographyParams) => GeographyDomainModel
   getGeographiesByIds: (geography_ids: UUID[]) => Nullable<GeographyDomainModel>[]
 }
 
@@ -72,5 +79,7 @@ export const GeographyServiceDefinition: RpcServiceDefinition<GeographyService> 
   getPublishedGeographies: RpcRoute<GeographyService['getPublishedGeographies']>(),
   writeGeographies: RpcRoute<GeographyService['writeGeographies']>(),
   writeGeographiesMetadata: RpcRoute<GeographyService['writeGeographiesMetadata']>(),
+  editGeography: RpcRoute<GeographyService['editGeography']>(),
+  publishGeography: RpcRoute<GeographyService['publishGeography']>(),
   getGeographiesByIds: RpcRoute<GeographyService['getGeographiesByIds']>()
 }

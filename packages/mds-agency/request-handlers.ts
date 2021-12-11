@@ -218,9 +218,16 @@ export const updateVehicle = async (req: AgencyApiUpdateVehicleRequest, res: Age
   }
 }
 
-const uuidSchema = { type: 'string', format: 'uuid' }
-const numberSchema = { type: 'number' }
-const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
+const uuidSchema = <const>{ type: 'string', format: 'uuid' }
+const numberSchema = <const>{ type: 'number' }
+const nullableNumberSchema = <const>{ type: 'number', nullable: true, default: null }
+const nullableTimestampSchema = <const>{
+  type: 'integer',
+  minimum: 100_000_000_000,
+  maximum: 99_999_999_999_999,
+  nullable: true,
+  default: null
+}
 
 export const { validate: validateTripMetadata, isValid: isValidateTripMetadata } = SchemaValidator<TripMetadata>({
   $id: 'TripMetadata',
@@ -231,27 +238,41 @@ export const { validate: validateTripMetadata, isValid: isValidateTripMetadata }
     requested_trip_start_location: {
       type: 'object',
       properties: { lng: numberSchema, lat: numberSchema },
-      required: ['lat', 'lng']
+      required: ['lat', 'lng'],
+      nullable: true,
+      default: null
     },
-    reservation_time: timestampSchema,
-    reservation_method: { type: 'string', enum: RESERVATION_METHODS },
-    reservation_type: { type: 'string', enum: RESERVATION_TYPES },
-    quoted_trip_start_time: timestampSchema,
-    dispatch_time: timestampSchema,
-    trip_start_time: timestampSchema,
-    trip_end_time: timestampSchema,
-    cancellation_reason: { type: 'string' },
-    accessibility_options: { type: 'array', items: { type: 'string', enum: ACCESSIBILITY_OPTIONS } },
-    distance: numberSchema,
+    reservation_time: nullableTimestampSchema,
+    reservation_method: { type: 'string', enum: RESERVATION_METHODS, nullable: true, default: null },
+    reservation_type: { type: 'string', enum: RESERVATION_TYPES, nullable: true, default: null },
+    quoted_trip_start_time: nullableTimestampSchema,
+    dispatch_time: nullableTimestampSchema,
+    trip_start_time: nullableTimestampSchema,
+    trip_end_time: nullableTimestampSchema,
+    cancellation_reason: { type: 'string', nullable: true, default: null },
+    accessibility_options: {
+      type: 'array',
+      items: { type: 'string', enum: ACCESSIBILITY_OPTIONS },
+      nullable: true,
+      default: null
+    },
+    distance: nullableNumberSchema,
     fare: {
       type: 'object',
       properties: {
-        quoted_cost: numberSchema,
-        actual_cost: numberSchema,
-        components: { type: 'object' },
-        currency: { type: 'string' },
-        payment_methods: { type: 'array', items: { type: 'string', enum: PAYMENT_METHODS } }
-      }
+        quoted_cost: nullableNumberSchema,
+        actual_cost: nullableNumberSchema,
+        components: { type: 'object', nullable: true, default: null, required: [] },
+        currency: { type: 'string', nullable: true, default: null },
+        payment_methods: {
+          type: 'array',
+          items: { type: 'string', enum: PAYMENT_METHODS },
+          nullable: true,
+          default: null
+        }
+      },
+      nullable: true,
+      default: null
     }
   },
   required: ['trip_id', 'provider_id']

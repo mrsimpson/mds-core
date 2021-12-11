@@ -47,13 +47,12 @@ describe('Geography Service Tests', () => {
     await GeographyServer.start()
   })
 
-  // FIXME: This should not need to be in its own describe block. Our tests should be more discrete, or logically blocked.
+  // FIXME: These tests should clean up data after each test.
   describe('Side-effect-y tests', () => {
     it('Write Geographies', async () => {
       const geographies = await GeographyServiceClient.writeGeographies([
         {
           geography_id,
-          publish_date: now(),
           geography_json: { type: 'FeatureCollection', features: [] }
         },
         { geography_id: uuid(), geography_json: { type: 'FeatureCollection', features: [] } }
@@ -61,11 +60,16 @@ describe('Geography Service Tests', () => {
       expect(geographies).toHaveLength(2)
     })
 
+    it('Publishes that geography', async () => {
+      await GeographyServiceClient.publishGeography({ geography_id, publish_date: now() })
+      const [geo] = await GeographyServiceClient.getGeographiesByIds([geography_id])
+      expect(geo?.publish_date).toBeTruthy()
+    })
+
     it('Write Invalid Geographies - throws errors', async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const badGeoJSON: any = {
         geography_id,
-        publish_date: now(),
         geography_json: { type: 'FeatureCollection', features: [{ funky: 'business' }] }
       }
 
@@ -178,48 +182,72 @@ describe('Geography Service Tests', () => {
     })
   })
 
-  describe('Tests getGeographiesByIds', () => {
-    const geographiesToWrite: GeographyDomainCreateModel[] = Array.from({ length: 100 }, () => ({
-      geography_id: uuid(),
-      geography_json: { type: 'FeatureCollection', features: [] }
-    }))
-
+  describe('Tests that cleanup after themselves', () => {
     beforeAll(async () => {
       await GeographyRepository.initialize()
+    })
+
+    beforeEach(async () => {
       await GeographyRepository.deleteAll()
-      await GeographyRepository.shutdown()
-
-      await GeographyServiceClient.writeGeographies(geographiesToWrite)
-    })
-
-    it('Get Geographies (all existing)', async () => {
-      const ids = geographiesToWrite.map(g => g.geography_id)
-      const geographies = await GeographyServiceClient.getGeographiesByIds(ids)
-      expect(geographies).toHaveLength(100)
-
-      // expect order is retained from the ids list
-      geographies.forEach((geography, i) => expect(geography?.geography_id).toEqual(ids[i]))
-    })
-
-    it('Get Geographies (some missing)', async () => {
-      const ids = [...geographiesToWrite.map(g => g.geography_id), uuid()] // note: last entry is a random uuid, so expected to be missing
-      const geographies = await GeographyServiceClient.getGeographiesByIds(ids)
-      expect(geographies).toHaveLength(101)
-
-      // all geographies except last
-      const resultsExceptLast = geographies.slice(0, -1)
-      // expect order is retained from the ids list
-      resultsExceptLast.forEach((geography, i) => expect(geography?.geography_id).toEqual(ids[i]))
-
-      // last entry should be null because it's not in the db
-      const lastEntry = geographies[geographies.length - 1]
-      expect(lastEntry).toStrictEqual(null)
     })
 
     afterAll(async () => {
-      await GeographyRepository.initialize()
-      await GeographyRepository.deleteAll()
       await GeographyRepository.shutdown()
+    })
+
+    it('Edits Geography works if unpublished', async () => {
+      const [geography] = await GeographyServiceClient.writeGeographies([
+        { geography_id: uuid(), geography_json: { type: 'FeatureCollection', features: [] } }
+      ])
+      const updated = await GeographyServiceClient.editGeography({
+        geography_json: geography.geography_json,
+        geography_id: geography.geography_id,
+        description: 'end of universe'
+      })
+      expect(updated.description).toStrictEqual('end of universe')
+      await GeographyServiceClient.publishGeography({ geography_id: geography.geography_id })
+      await expect(
+        GeographyServiceClient.editGeography({
+          geography_json: geography.geography_json,
+          geography_id: geography.geography_id,
+          description: 'end of universe'
+        })
+      ).rejects.toMatchObject({ details: 'Cannot edit published Geography', message: 'Error Editing Geographies' })
+    })
+
+    describe('Tests getGeographiesByIds', () => {
+      const geographiesToWrite: GeographyDomainCreateModel[] = Array.from({ length: 100 }, () => ({
+        geography_id: uuid(),
+        geography_json: { type: 'FeatureCollection', features: [] }
+      }))
+
+      it('Get Geographies (all existing)', async () => {
+        await GeographyServiceClient.writeGeographies(geographiesToWrite)
+
+        const ids = geographiesToWrite.map(g => g.geography_id)
+        const geographies = await GeographyServiceClient.getGeographiesByIds(ids)
+        expect(geographies).toHaveLength(100)
+
+        // expect order is retained from the ids list
+        geographies.forEach((geography, i) => expect(geography?.geography_id).toEqual(ids[i]))
+      })
+
+      it('Get Geographies (some missing)', async () => {
+        await GeographyServiceClient.writeGeographies(geographiesToWrite)
+
+        const ids = [...geographiesToWrite.map(g => g.geography_id), uuid()] // note: last entry is a random uuid, so expected to be missing
+        const geographies = await GeographyServiceClient.getGeographiesByIds(ids)
+        expect(geographies).toHaveLength(101)
+
+        // all geographies except last
+        const resultsExceptLast = geographies.slice(0, -1)
+        // expect order is retained from the ids list
+        resultsExceptLast.forEach((geography, i) => expect(geography?.geography_id).toEqual(ids[i]))
+
+        // last entry should be null because it's not in the db
+        const lastEntry = geographies[geographies.length - 1]
+        expect(lastEntry).toStrictEqual(null)
+      })
     })
   })
 
