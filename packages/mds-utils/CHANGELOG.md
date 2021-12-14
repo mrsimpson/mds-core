@@ -1,5 +1,14 @@
 # @mds-core/mds-utils
 
+## 0.2.14
+
+### Patch Changes
+
+- cf4b0ecc: Remove Node.js dependencies
+- Updated dependencies [c6956072]
+- Updated dependencies [ad126757]
+  - @mds-core/mds-types@0.8.0
+
 ## 0.2.13
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-stream",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Mobility Data Specification stream interface",
   "keywords": [
     "mds",
@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@mds-core/mds-logger": "workspace:0.5.2",
-    "@mds-core/mds-types": "workspace:0.7.1",
-    "@mds-core/mds-utils": "workspace:0.2.13",
+    "@mds-core/mds-types": "workspace:0.8.0",
+    "@mds-core/mds-utils": "workspace:0.2.14",
     "flat": "5.0.2",
     "kafkajs": "1.15.0",
     "nats": "2.2.0",

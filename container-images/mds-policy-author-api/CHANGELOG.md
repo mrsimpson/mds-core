@@ -1,5 +1,14 @@
 # @container-images/mds-policy-author-api
 
+## 0.1.63
+
+### Patch Changes
+
+- 83557fbf: Rename mds-policy-author -> mds-policy-author-api
+- Updated dependencies [83557fbf]
+- Updated dependencies [c6956072]
+  - @mds-core/mds-policy-author-api@0.7.0
+
 ## 0.1.62
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @mds-core/mds-types
 
+## 0.8.0
+
+### Minor Changes
+
+- c6956072: Refactor the JSONSchema used by AJV, to strictly include all attributes and validation rules that match the properties described by the type to be validated
+
+### Patch Changes
+
+- ad126757: Improve documentation for utility types.
+
 ## 0.7.1
 
 ### Patch Changes

@@ -1,5 +1,25 @@
 # @mds-core/mds-geography-api
 
+## 0.3.0
+
+### Minor Changes
+
+- c6956072: Refactor the JSONSchema used by AJV, to strictly include all attributes and validation rules that match the properties described by the type to be validated
+
+### Patch Changes
+
+- Updated dependencies [cf4b0ecc]
+- Updated dependencies [c6956072]
+- Updated dependencies [ad126757]
+- Updated dependencies [c6956072]
+  - @mds-core/mds-utils@0.2.14
+  - @mds-core/mds-geography-service@0.7.0
+  - @mds-core/mds-types@0.8.0
+  - @mds-core/mds-schema-validators@0.4.0
+  - @mds-core/mds-api-helpers@0.1.63
+  - @mds-core/mds-api-server@0.3.18
+  - @mds-core/mds-providers@0.2.3
+
 ## 0.2.5
 
 ### Patch Changes
