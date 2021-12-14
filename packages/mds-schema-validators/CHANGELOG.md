@@ -1,5 +1,21 @@
 # @mds-core/mds-schema-validators
 
+## 0.4.0
+
+### Minor Changes
+
+- c6956072: exported type Schema is no longer a union of SchemaObject and JSONSchemaType
+
+### Patch Changes
+
+- Updated dependencies [cf4b0ecc]
+- Updated dependencies [c6956072]
+- Updated dependencies [ad126757]
+  - @mds-core/mds-utils@0.2.14
+  - @mds-core/mds-types@0.8.0
+  - @mds-core/mds-test-data@0.4.10
+  - @mds-core/mds-providers@0.2.3
+
 ## 0.3.17
 
 ### Patch Changes

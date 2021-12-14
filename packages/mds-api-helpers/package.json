@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-api-helpers",
-  "version": "0.1.62",
+  "version": "0.1.63",
   "description": "Mobility Data Specification helper functions",
   "keywords": [
     "mds",
@@ -18,10 +18,10 @@
     "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap --lines 40  ts-mocha --project ../../tsconfig.json"
   },
   "dependencies": {
-    "@mds-core/mds-agency-cache": "workspace:0.4.8",
-    "@mds-core/mds-api-server": "workspace:0.3.17",
-    "@mds-core/mds-db": "workspace:0.4.22",
-    "@mds-core/mds-types": "workspace:0.7.1",
-    "@mds-core/mds-utils": "workspace:0.2.13"
+    "@mds-core/mds-agency-cache": "workspace:0.4.9",
+    "@mds-core/mds-api-server": "workspace:0.3.18",
+    "@mds-core/mds-db": "workspace:0.4.23",
+    "@mds-core/mds-types": "workspace:0.8.0",
+    "@mds-core/mds-utils": "workspace:0.2.14"
   }
 }

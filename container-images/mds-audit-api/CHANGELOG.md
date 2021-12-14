@@ -1,5 +1,14 @@
 # @container-images/mds-audit-api
 
+## 0.1.64
+
+### Patch Changes
+
+- 125922b1: Rename mds-audit to mds-audit-api
+- Updated dependencies [125922b1]
+- Updated dependencies [c6956072]
+  - @mds-core/mds-audit-api@0.3.0
+
 ## 0.1.63
 
 ### Patch Changes

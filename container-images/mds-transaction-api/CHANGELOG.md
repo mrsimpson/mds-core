@@ -1,5 +1,12 @@
 # @container-images/mds-transaction-api
 
+## 0.0.38
+
+### Patch Changes
+
+- Updated dependencies [c6956072]
+  - @mds-core/mds-transaction-api@0.2.0
+
 ## 0.0.37
 
 ### Patch Changes
