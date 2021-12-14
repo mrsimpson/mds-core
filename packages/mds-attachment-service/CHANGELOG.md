@@ -1,5 +1,24 @@
 # @mds-core/mds-attachment-service
 
+## 0.4.0
+
+### Minor Changes
+
+- c6956072: Refactor the JSONSchema used by AJV, to strictly include all attributes and validation rules that match the properties described by the type to be validated
+
+### Patch Changes
+
+- Updated dependencies [cf4b0ecc]
+- Updated dependencies [c6956072]
+- Updated dependencies [ad126757]
+- Updated dependencies [c6956072]
+  - @mds-core/mds-utils@0.2.14
+  - @mds-core/mds-types@0.8.0
+  - @mds-core/mds-schema-validators@0.4.0
+  - @mds-core/mds-repository@0.1.28
+  - @mds-core/mds-rpc-common@0.2.10
+  - @mds-core/mds-service-helpers@0.4.7
+
 ## 0.3.10
 
 ### Patch Changes

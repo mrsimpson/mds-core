@@ -64,7 +64,7 @@ describe('ComplianceSnapshots Service Tests', () => {
     expect(complianceSnapshot.compliance_snapshot_id).toEqual(COMPLIANCE_SNAPSHOT_ID)
     expect(complianceSnapshot.vehicles_found.length).toEqual(3)
     expect(mockStream.write).toHaveBeenCalledTimes(1)
-    const { vehicles_found, ...kafkaSnapshot } = COMPLIANCE_SNAPSHOT
+    const { vehicles_found, violating_vehicles, ...kafkaSnapshot } = COMPLIANCE_SNAPSHOT
     expect(mockStream.write).toHaveBeenCalledWith(kafkaSnapshot)
   })
 
@@ -182,7 +182,7 @@ describe('ComplianceSnapshots Service Tests', () => {
     const complianceSnapshots = await ComplianceServiceClient.createComplianceSnapshots(COMPLIANCE_SNAPSHOTS)
     expect(complianceSnapshots.length).toEqual(7)
     const kafkaSnapshots = complianceSnapshots.map(snapshot => {
-      const { vehicles_found, ...kafkaSnapshot } = snapshot
+      const { vehicles_found, violating_vehicles, ...kafkaSnapshot } = snapshot
       return kafkaSnapshot
     })
     expect(mockStream.write).toHaveBeenCalledWith(kafkaSnapshots)

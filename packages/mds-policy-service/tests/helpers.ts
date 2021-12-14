@@ -1,18 +1,10 @@
 import { GeographyService } from '@mds-core/mds-geography-service'
+import { GeographyFactory } from '@mds-core/mds-geography-service/tests/helpers'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { venice } from '@mds-core/mds-test-data'
-import { Geography } from '@mds-core/mds-types'
-import { START_ONE_MONTH_FROM_NOW, uuid, yesterday } from '@mds-core/mds-utils'
-import { FeatureCollection } from 'geojson'
+import { Timestamp } from '@mds-core/mds-types'
+import { now, START_ONE_MONTH_FROM_NOW, uuid } from '@mds-core/mds-utils'
 import { PolicyDomainCreateModel, PolicyService, Rule } from '../@types'
-
-export const GeographyFactory = (overrides = {}): Geography => ({
-  name: 'random geo',
-  geography_id: uuid(),
-  geography_json: venice as FeatureCollection,
-  publish_date: yesterday(),
-  ...overrides
-})
 
 export const RulesFactory = (overrides = {}): Rule[] => [
   {
@@ -47,16 +39,20 @@ export const createPolicyAndGeographyFactory = async (
   policyServiceClient: ServiceClient<PolicyService>,
   geographyServiceClient: ServiceClient<GeographyService>,
   policy?: PolicyDomainCreateModel,
-  geography_overrides = {}
+  geography_overrides?: { publish_date: Timestamp }
 ) => {
   const createdPolicy = await policyServiceClient.writePolicy(policy || PolicyFactory())
+  const { publish_date } = geography_overrides || { publish_date: now() }
   await geographyServiceClient.writeGeographies([
     {
       name: 'VENICE',
       geography_id: createdPolicy.rules[0].geographies[0],
-      geography_json: venice,
-      ...geography_overrides
+      geography_json: venice
     }
   ])
+  await geographyServiceClient.publishGeography({
+    publish_date: publish_date,
+    geography_id: createdPolicy.rules[0].geographies[0]
+  })
   return createdPolicy
 }

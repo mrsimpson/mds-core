@@ -25,6 +25,7 @@
 
 import { ApiServer } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
+import { GeographyServiceManager } from '@mds-core/mds-geography-service'
 import {
   DISTRICT_SEVEN,
   GEOGRAPHY2_UUID,
@@ -53,6 +54,8 @@ const GEOGRAPHIES_BOTH_READ_SCOPES = SCOPED_AUTH(['geographies:read:published', 
 const GEOGRAPHIES_PUBLISH_SCOPE = SCOPED_AUTH(['geographies:publish'])
 const sandbox = sinon.createSandbox()
 
+const GeographyServer = GeographyServiceManager.controller()
+
 describe('Tests app', () => {
   describe('Geography endpoint tests', () => {
     afterEach(() => {
@@ -61,9 +64,11 @@ describe('Tests app', () => {
 
     before(async () => {
       await db.reinitialize()
+      await GeographyServer.start()
     })
 
     after(async () => {
+      await GeographyServer.stop()
       await db.shutdown()
     })
 
@@ -80,27 +85,15 @@ describe('Tests app', () => {
         })
     })
 
-    it('cannot POST one current geography (wrong auth)', done => {
-      const geography = { geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY }
-      request
-        .post(pathPrefix(`/geographies`))
-        .set('Authorization', EVENTS_READ_SCOPE)
-        .send(geography)
-        .expect(403)
-        .end(err => {
-          done(err)
-        })
-    })
-
     it('creates one current geography', done => {
       const geography = { name: 'LA', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY }
+
       request
         .post(pathPrefix(`/geographies`))
         .set('Authorization', GEOGRAPHIES_WRITE_SCOPE)
         .send(geography)
         .expect(201)
-        .end((err, result) => {
-          test.value(result).hasHeader('content-type', APP_JSON)
+        .end(err => {
           done(err)
         })
     })
@@ -117,18 +110,6 @@ describe('Tests app', () => {
         })
     })
 
-    it('cannot update one geography (wrong auth)', done => {
-      const geography = { geography_id: GEOGRAPHY_UUID, geography_json: DISTRICT_SEVEN }
-      request
-        .put(pathPrefix(`/geographies/${GEOGRAPHY_UUID}`))
-        .set('Authorization', EVENTS_READ_SCOPE)
-        .send(geography)
-        .expect(403)
-        .end(err => {
-          done(err)
-        })
-    })
-
     it('verifies updating one geography', done => {
       const geography = { name: 'LA', geography_id: GEOGRAPHY_UUID, geography_json: DISTRICT_SEVEN }
       request
@@ -138,30 +119,6 @@ describe('Tests app', () => {
         .expect(201)
         .end((err, result) => {
           test.value(result).hasHeader('content-type', APP_JSON)
-          done(err)
-        })
-    })
-
-    it('cannot PUT geography (no auth)', done => {
-      const geography = { geography_id: GEOGRAPHY_UUID, geography_json: 'garbage_json' }
-      request
-        .put(pathPrefix(`/geographies/${GEOGRAPHY_UUID}`))
-        .set('Authorization', EMPTY_SCOPE)
-        .send(geography)
-        .expect(403)
-        .end(err => {
-          done(err)
-        })
-    })
-
-    it('cannot PUT geography (wrong auth)', done => {
-      const geography = { geography_id: GEOGRAPHY_UUID, geography_json: 'garbage_json' }
-      request
-        .put(pathPrefix(`/geographies/${GEOGRAPHY_UUID}`))
-        .set('Authorization', EVENTS_READ_SCOPE)
-        .send(geography)
-        .expect(403)
-        .end(err => {
           done(err)
         })
     })
@@ -293,12 +250,14 @@ describe('Tests app', () => {
 
     before(async () => {
       await db.reinitialize()
+      await GeographyServer.start()
       await db.writeGeography({ name: 'Geography 1', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY })
       await db.writeGeography({ name: 'Geography 2', geography_id: GEOGRAPHY2_UUID, geography_json: DISTRICT_SEVEN })
       await db.publishGeography({ geography_id: GEOGRAPHY2_UUID })
     })
 
     after(async () => {
+      await GeographyServer.stop()
       await db.shutdown()
     })
 
@@ -512,8 +471,7 @@ describe('Tests app', () => {
         .send(geography)
         .expect(400)
         .end((err, result) => {
-          test.assert(result.body.error.name === `ValidationError`)
-          test.assert(result.body.error.info[0].params.additionalProperty.includes('publish_date'))
+          test.assert(result.body.error.type === `ValidationError`)
           test.value(result).hasHeader('content-type', APP_JSON)
           done(err)
         })
@@ -532,8 +490,7 @@ describe('Tests app', () => {
         .send(geography)
         .expect(400)
         .end((err, result) => {
-          test.assert(result.body.error.name === `ValidationError`)
-          test.assert(result.body.error.info[0].params.additionalProperty.includes('publish_date'))
+          test.assert(result.body.error.type === `ValidationError`)
           test.value(result).hasHeader('content-type', APP_JSON)
           done(err)
         })

@@ -16,6 +16,7 @@
 
 import { ApiServer } from '@mds-core/mds-api-server'
 import { GeographyRepository, GeographyServiceManager } from '@mds-core/mds-geography-service'
+import { GeographyFactory, writePublishedGeography } from '@mds-core/mds-geography-service/tests/helpers'
 import {
   DISTRICT_SEVEN,
   GEOGRAPHY2_UUID,
@@ -50,9 +51,14 @@ describe('Tests app', () => {
       await GeographyRepository.writeGeographies([
         { name: 'LA', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY }
       ])
-      await GeographyRepository.writeGeographies([
-        { name: 'Geography 2', geography_id: GEOGRAPHY2_UUID, geography_json: DISTRICT_SEVEN, publish_date: now() }
-      ])
+      await writePublishedGeography(
+        GeographyFactory({
+          name: 'Geography 2',
+          geography_id: GEOGRAPHY2_UUID,
+          geography_json: DISTRICT_SEVEN,
+          publish_date: now()
+        })
+      )
     })
 
     it('GETs one unpublished geography with unpublished scope', async () => {

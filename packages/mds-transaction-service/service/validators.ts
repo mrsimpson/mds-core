@@ -14,68 +14,86 @@
  * limitations under the License.
  */
 
-import { SchemaObject, SchemaValidator } from '@mds-core/mds-schema-validators'
-import { UUID } from '@mds-core/mds-types'
+import { EventSchema } from '@mds-core/mds-ingest-service'
+import { JSONSchemaType, SchemaObject, SchemaValidator } from '@mds-core/mds-schema-validators'
+import { UUID, VEHICLE_TYPES } from '@mds-core/mds-types'
 import {
   ComplianceViolationDetailsDomainModel,
+  CurbUseDetailsDomainModel,
+  CustomReceiptDetailsDomainModel,
   FEE_TYPE,
   ReceiptDomainModel,
+  SORTABLE_COLUMN,
+  SORT_DIRECTION,
   TransactionDomainModel,
   TransactionOperationDomainModel,
   TransactionSearchParams,
   TransactionStatusDomainModel,
   TRANSACTION_OPERATION_TYPE,
-  TRANSACTION_STATUS_TYPE
+  TRANSACTION_STATUS_TYPE,
+  TripReceiptDetailsDomainModel
 } from '../@types'
 
-const uuidSchema = { type: 'string', format: 'uuid' }
+const uuidSchema = <const>{ type: 'string', format: 'uuid' }
 
-const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
+const timestampSchema = <const>{
+  type: 'integer',
+  minimum: 100_000_000_000,
+  maximum: 99_999_999_999_999
+}
+
+const nullableTimestamp = <const>{ ...timestampSchema, nullable: true, default: null }
+const nullableString = <const>{ type: 'string', nullable: true, default: null }
+const nullableNumber = <const>{ type: 'number', nullable: true, default: null }
+const { $id, ...TelemetrySchemaNoId } = EventSchema.properties.telemetry
+const { $id: tId, ...EventSchemaNoId } = EventSchema
+const usableEventSchema = {
+  ...EventSchemaNoId,
+  properties: { ...EventSchemaNoId.properties, telemetry: TelemetrySchemaNoId }
+}
+
+const tripReceiptSchema: JSONSchemaType<TripReceiptDetailsDomainModel> = {
+  type: 'object',
+  properties: {
+    trip_id: uuidSchema,
+    start_timestamp: timestampSchema,
+    end_timestamp: timestampSchema,
+    vehicle_type: { type: 'string', enum: [...VEHICLE_TYPES] },
+    start_geography_id: uuidSchema,
+    end_geography_id: { ...uuidSchema, nullable: true },
+    duration: { type: 'integer' }, // duration of the trip in seconds
+    distance: { type: 'integer' }, // distance traveled in trip, in meters
+    trip_events: { type: 'array', items: usableEventSchema }
+  },
+  required: [
+    'distance',
+    'duration',
+    'end_geography_id',
+    'end_timestamp',
+    'start_geography_id',
+    'start_timestamp',
+    'trip_events',
+    'trip_id',
+    'vehicle_type'
+  ]
+}
 
 /**
  * Currently unused, but could be!
  */
-// const { $schema: tripReceiptSchema } = SchemaValidator<TripReceiptDetailsDomainModel>({
-//   type: 'object',
-//   properties: {
-//     trip_id: uuidSchema,
-//     start_timestamp: timestampSchema,
-//     end_timestamp: timestampSchema,
-//     vehicle_type: { type: 'string', enum: [...VEHICLE_TYPES] },
-//     start_geography_id: uuidSchema,
-//     end_geography_id: { ...uuidSchema, nullable: true },
-//     duration: { type: 'integer' }, // duration of the trip in seconds
-//     distance: { type: 'integer' } // distance traveled in trip, in meters
-//   },
-//   required: [
-//     'distance',
-//     'duration',
-//     'end_geography_id',
-//     'end_timestamp',
-//     'start_geography_id',
-//     'start_timestamp',
-//     'trip_events',
-//     'trip_id',
-//     'vehicle_type'
-//   ]
-// })
-
-/**
- * Currently unused, but could be!
- */
-// const { $schema: curbUseSchema } = SchemaValidator<CurbUseDetailsDomainModel>({
-//   type: 'object',
-//   properties: {
-//     trip_id: uuidSchema,
-//     start_timestamp: timestampSchema,
-//     end_timestamp: timestampSchema,
-//     vehicle_type: { type: 'string', enum: [...VEHICLE_TYPES] },
-//     geography_id: { ...uuidSchema, nullable: true },
-//     duration: { type: 'integer' }, // duration of the trip in seconds
-//     trip_events: { type: 'array' } // Events which occurred in the trip, FIXME: add VehicleEvent schema
-//   },
-//   required: ['duration', 'end_timestamp', 'geography_id', 'start_timestamp', 'trip_events', 'trip_id', 'vehicle_type']
-// })
+const curbUseSchema: JSONSchemaType<CurbUseDetailsDomainModel> = {
+  type: 'object',
+  properties: {
+    trip_id: uuidSchema,
+    start_timestamp: timestampSchema,
+    end_timestamp: timestampSchema,
+    vehicle_type: { type: 'string', enum: [...VEHICLE_TYPES] },
+    geography_id: { ...uuidSchema, nullable: true },
+    duration: { type: 'integer' }, // duration of the trip in seconds
+    trip_events: { type: 'array', items: usableEventSchema } // Events which occurred in the trip
+  },
+  required: ['duration', 'end_timestamp', 'geography_id', 'start_timestamp', 'trip_events', 'trip_id', 'vehicle_type']
+}
 
 export const { validate: validateTransactionSearchParams } = SchemaValidator<TransactionSearchParams>(
   {
@@ -83,21 +101,30 @@ export const { validate: validateTransactionSearchParams } = SchemaValidator<Tra
     type: 'object',
     properties: {
       provider_id: { ...uuidSchema, nullable: true, default: null },
-      start_timestamp: { type: 'number', nullable: true, default: null },
-      end_timestamp: { type: 'number', nullable: true, default: null },
-      search_text: { type: 'string', nullable: true, default: null },
-      start_amount: { type: 'number', nullable: true, default: null },
-      end_amount: { type: 'number', nullable: true, default: null },
+      start_timestamp: nullableTimestamp,
+      end_timestamp: nullableTimestamp,
+      search_text: nullableString,
+      start_amount: nullableNumber,
+      end_amount: nullableNumber,
       fee_type: { type: 'string', enum: [...FEE_TYPE, null], nullable: true, default: null },
-      before: { type: 'string', nullable: true, default: null },
-      after: { type: 'string', nullable: true, default: null },
-      limit: { type: 'integer', minimum: 1, maximum: 1000, default: 10 }
+      before: nullableString,
+      after: nullableString,
+      limit: { type: 'integer', nullable: true, minimum: 1, maximum: 1000, default: 10 },
+      order: {
+        type: 'object',
+        nullable: true,
+        properties: {
+          column: { type: 'string', enum: SORTABLE_COLUMN },
+          direction: { type: 'string', enum: SORT_DIRECTION }
+        },
+        required: ['column', 'direction']
+      }
     }
   },
   { useDefaults: true }
 )
 
-const { $schema: complianceViolationDetailsSchema } = SchemaValidator<ComplianceViolationDetailsDomainModel>({
+const complianceViolationDetailsSchema: JSONSchemaType<ComplianceViolationDetailsDomainModel> = {
   type: 'object',
   description: 'Receipt details which provide a pointer to an MDS Compliance Violation.',
   properties: {
@@ -105,32 +132,38 @@ const { $schema: complianceViolationDetailsSchema } = SchemaValidator<Compliance
     trip_id: { ...uuidSchema, nullable: true, default: null },
     policy_id: uuidSchema
   },
-  required: ['violation_id', 'policy_id']
-})
+  required: ['violation_id']
+}
+
+const customReceiptDetailsSchema: JSONSchemaType<CustomReceiptDetailsDomainModel> = {
+  type: 'object',
+  properties: {
+    custom_description: { type: 'string' }
+  },
+  required: ['custom_description']
+}
+
+const receiptDomainSchema = <const>{
+  type: 'object',
+  properties: {
+    receipt_id: uuidSchema,
+    timestamp: timestampSchema,
+    origin_url: {
+      description: 'Where did this transaction originate?',
+      type: 'string',
+      format: 'uri',
+      example: 'https://mds.coruscant.com/compliance/snapshot/c78280ff-4e58-4e30-afa9-d72673037799'
+    },
+    receipt_details: {
+      anyOf: [tripReceiptSchema, complianceViolationDetailsSchema, curbUseSchema, customReceiptDetailsSchema]
+    }
+  },
+  required: ['origin_url', 'receipt_details', 'receipt_id', 'timestamp']
+}
 
 const {
   $schema: { $schema, ...receiptSchema }
-} = SchemaValidator<ReceiptDomainModel>(
-  {
-    type: 'object',
-    properties: {
-      receipt_id: uuidSchema,
-      timestamp: timestampSchema,
-      origin_url: {
-        description: 'Where did this transaction originate?',
-        type: 'string',
-        format: 'uri',
-        example: 'https://mds.coruscant.com/compliance/snapshot/c78280ff-4e58-4e30-afa9-d72673037799'
-      },
-      receipt_details: {
-        description: 'Free-form object which describes the details of this transaction. Highly use-case dependent.',
-        anyOf: [complianceViolationDetailsSchema, { type: 'object' }]
-      }
-    },
-    required: ['origin_url', 'receipt_details', 'receipt_id', 'timestamp']
-  },
-  { keywords: ['example'] }
-)
+} = SchemaValidator<ReceiptDomainModel>(receiptDomainSchema, { keywords: ['example'] })
 
 export const { validate: validateTransactionDomainModel, $schema: TransactionSchema } =
   SchemaValidator<TransactionDomainModel>(

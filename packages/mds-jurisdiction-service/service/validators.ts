@@ -17,9 +17,9 @@
 import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import { CreateJurisdictionDomainModel } from '../@types'
 
-const uuidSchema = { type: 'string', format: 'uuid' }
-const stringSchema = { type: 'string', transform: ['trim'], minLength: 1 }
-const timestampSchema = { type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
+const uuidSchema = <const>{ type: 'string', format: 'uuid' }
+const stringSchema = <const>{ type: 'string', transform: ['trim'], minLength: 1 }
+const timestampSchema = <const>{ type: 'integer', minimum: 100_000_000_000, maximum: 99_999_999_999_999 }
 
 export const { validate: ValidateJurisdictionForCreate } = SchemaValidator<CreateJurisdictionDomainModel>({
   $id: 'Jurisdiction',

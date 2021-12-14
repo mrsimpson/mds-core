@@ -16,7 +16,7 @@
 
 import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
 import { PolicyDomainModel } from '@mds-core/mds-policy-service'
-import { Device, Geography, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { Device, Geography, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { filterDefined, now, uuid } from '@mds-core/mds-utils'
 import { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
 import { ComplianceEngineLogger } from '../logger'
@@ -46,9 +46,9 @@ export function createComplianceSnapshot(
   policy: PolicyDomainModel,
   geographies: Geography[],
   filteredEvents: VehicleEvent[],
-  deviceMap: { [d: string]: Device }
+  deviceMap: { [d: string]: Device },
+  compliance_as_of: Timestamp = now()
 ): ComplianceSnapshotDomainModel | undefined {
-  const compliance_as_of = now()
   const complianceResult = computeComplianceSnapshot(
     policy,
     filteredEvents as VehicleEventWithTelemetry[],
@@ -77,12 +77,17 @@ export function createComplianceSnapshot(
  * The geographies should be the result of calling
  * `await readGeographies({ get_published: true })`
  */
-export function processPolicy(policy: PolicyDomainModel, geographies: Geography[], providerInputs: ProviderInputs) {
+export function processPolicy(
+  policy: PolicyDomainModel,
+  geographies: Geography[],
+  providerInputs: ProviderInputs,
+  compliance_as_of?: Timestamp
+) {
   if (isPolicyActive(policy)) {
     const provider_ids = getProviderIDs(policy.provider_ids)
     const results = provider_ids.map(provider_id => {
       const { filteredEvents, deviceMap } = providerInputs[provider_id]
-      return createComplianceSnapshot(provider_id, policy, geographies, filteredEvents, deviceMap)
+      return createComplianceSnapshot(provider_id, policy, geographies, filteredEvents, deviceMap, compliance_as_of)
     })
     // filter out undefined results
     return results.filter(filterDefined())

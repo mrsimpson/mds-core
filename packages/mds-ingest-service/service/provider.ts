@@ -31,8 +31,8 @@ import { IngestServiceLogger } from '../logger'
 import { IngestRepository } from '../repository'
 import { MigratedEntityModel } from '../repository/mixins/migrated-entity'
 import {
-  validateEventAnnotationDomainCreateModels,
-  validateEventDomainModel,
+  validateEventAnnotationDomainCreateModel,
+  validateEventDomainCreateModel,
   validateGetDevicesOptions,
   validateGetEventsWithDeviceAndTelemetryInfoOptions,
   validateGetVehicleEventsFilterParams,
@@ -143,7 +143,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
           throw new NotFoundError('Some device(s) in event payload not registered')
       })()
 
-      return ServiceResult(await IngestRepository.createEvents(events.map(validateEventDomainModel)))
+      return ServiceResult(await IngestRepository.createEvents(events.map(validateEventDomainCreateModel)))
     } catch (error) {
       const exception = ServiceException('Error in writeEvents', error)
       IngestServiceLogger.error('writeEvents exception', { exception, error })
@@ -154,7 +154,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
   writeEventAnnotations: async (eventAnnotations: EventAnnotationDomainCreateModel[]) => {
     try {
       return ServiceResult(
-        await IngestRepository.createEventAnnotations(validateEventAnnotationDomainCreateModels(eventAnnotations))
+        await IngestRepository.createEventAnnotations(eventAnnotations.map(validateEventAnnotationDomainCreateModel))
       )
     } catch (error) {
       const exception = ServiceException('Error in writeEventAnnotations', error)

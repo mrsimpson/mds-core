@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-import { SchemaObject, SchemaValidator } from '@mds-core/mds-schema-validators'
+import { JSONSchemaType, SchemaValidator } from '@mds-core/mds-schema-validators'
 import {
   ACCESSIBILITY_OPTIONS,
   DAYS_OF_WEEK,
+  MICRO_MOBILITY_VEHICLE_EVENT,
   MICRO_MOBILITY_VEHICLE_EVENTS,
   MICRO_MOBILITY_VEHICLE_STATE,
   MICRO_MOBILITY_VEHICLE_STATES,
-  MODALITIES,
+  PROPULSION_TYPES,
   SERVICE_TYPE,
+  TAXI_VEHICLE_EVENT,
   TAXI_VEHICLE_EVENTS,
   TAXI_VEHICLE_STATE,
   TAXI_VEHICLE_STATES,
@@ -32,63 +34,44 @@ import {
   VEHICLE_TYPES
 } from '@mds-core/mds-types'
 import {
-  PolicyDomainModel,
+  PolicyDomainCreateModel,
   PolicyMetadataDomainModel,
   PresentationOptions,
   RATE_RECURRENCE_VALUES,
-  RULE_TYPES,
-  SortPolicyColumn,
-  SortPolicyDirection
+  Rule,
+  RULE_TYPE_LIST
 } from '../@types'
 
-const stringSchema = (options = {}) => ({ type: 'string', ...options })
-const uuidSchema = { type: 'string', format: 'uuid' }
+const uuidSchema = <const>{ type: 'string', format: 'uuid' }
+
 // Timestamp Schema that ensures milliseconds
-const TimestampSchema = (options = {}) => ({
+
+const timestampSchema = <const>{
   type: 'integer',
   minimum: 100_000_000_000,
-  maximum: 99_999_999_999_999,
-  ...options
-})
+  maximum: 99_999_999_999_999
+}
 
-const arraySchema = (items = {}, options = {}) => ({
-  type: 'array',
-  items,
-  ...options
-})
+const enumSchema = <T>(enumType: T) => <const>{ type: 'string', enum: enumType }
 
-const enumSchema = <T>(enumType: T[]) => ({ type: 'string', enum: enumType })
+/**
+ * `modality` can be null, and defaults to 'micromobility'. The way to express this in AJV / JSONSChema
+ * is to only specify `required:` in the other cases.
+ */
 
-const micromobilityStateMap = MICRO_MOBILITY_VEHICLE_STATES.reduce<{
-  [k in MICRO_MOBILITY_VEHICLE_STATE]?: SchemaObject
-}>((acc, state) => {
-  acc[state] = {
-    type: 'array',
-    items: { type: 'string', enum: [...MICRO_MOBILITY_VEHICLE_EVENTS] }
-  }
-  return acc
-}, {})
-
-const tncStateMap = TNC_VEHICLE_STATE.reduce<{ [k in TNC_VEHICLE_STATE]?: SchemaObject }>((acc, state) => {
-  acc[state] = arraySchema(enumSchema([...TNC_VEHICLE_EVENT]))
-  return acc
-}, {})
-
-const taxiStateMap = TAXI_VEHICLE_STATES.reduce<{ [k in TAXI_VEHICLE_STATE]?: SchemaObject }>((acc, state) => {
-  acc[state] = arraySchema(enumSchema([...TAXI_VEHICLE_EVENTS]))
-  return acc
-}, {})
-
-const stateModalityIfConditionSchema = (constString: string, props: {}) => ({
-  if: { properties: { modality: { type: 'string', const: constString } }, required: ['modality'] },
-  then: {
+const stateModalitySchema = <T extends string, P>(constString: T, props: P) =>
+  <const>{
     properties: {
+      modality: {
+        type: 'string',
+        enum: [constString]
+      },
       states: { type: 'object', properties: props, nullable: true }
-    }
+    },
+    ...(constString === 'micromobility' ? {} : { required: ['modality'] })
   }
-})
 
-const checkRateFieldsIfConditionSchema = () => ({
+const checkRateFieldsIfConditionSchema = <const>{
   if: {
     properties: {
       rules: {
@@ -104,74 +87,129 @@ const checkRateFieldsIfConditionSchema = () => ({
   },
   then: {
     properties: {
-      currency: stringSchema()
+      currency: { type: 'string' }
     },
     required: ['currency']
   }
-})
+}
+
+type MICRO_MOBILITY_VEHICLE_EVENT_ARRAY_ENUM = {
+  type: 'array'
+  items: { type: 'string'; enum: MICRO_MOBILITY_VEHICLE_EVENT[] | [] }
+  nullable: true
+}
+
+const micromobilityStateMap = MICRO_MOBILITY_VEHICLE_STATES.reduce<{
+  [k in MICRO_MOBILITY_VEHICLE_STATE]?: MICRO_MOBILITY_VEHICLE_EVENT_ARRAY_ENUM
+}>((acc, state) => {
+  acc[state] = {
+    type: 'array',
+    items: enumSchema([...MICRO_MOBILITY_VEHICLE_EVENTS]),
+    nullable: true
+  }
+  return acc
+}, {})
+
+type TNC_VEHICLE_EVENT_ARRAY_ENUM = {
+  type: 'array'
+  items: { type: 'string'; enum: TNC_VEHICLE_EVENT[] | [] }
+  nullable: true
+}
+
+const tncStateMap = TNC_VEHICLE_STATE.reduce<{
+  [k in TNC_VEHICLE_STATE]?: TNC_VEHICLE_EVENT_ARRAY_ENUM
+}>((acc, state) => {
+  acc[state] = { type: 'array', items: enumSchema([...TNC_VEHICLE_EVENT]), nullable: true }
+  return acc
+}, {})
+
+type TAXI_VEHICLE_EVENT_ARRAY_ENUM = {
+  type: 'array'
+  items: { type: 'string'; enum: TAXI_VEHICLE_EVENT[] | [] }
+  nullable: true
+}
+
+const taxiStateMap = TAXI_VEHICLE_STATES.reduce<{ [k in TAXI_VEHICLE_STATE]?: TAXI_VEHICLE_EVENT_ARRAY_ENUM }>(
+  (acc, state) => {
+    acc[state] = { type: 'array', items: enumSchema([...TAXI_VEHICLE_EVENTS]), nullable: true }
+    return acc
+  },
+  {}
+)
+
+export const ruleSchema: JSONSchemaType<Rule> = <const>{
+  $id: 'BaseRule',
+  type: 'object',
+  properties: {
+    accessibility_options: { type: 'array', items: { type: 'string', enum: ACCESSIBILITY_OPTIONS }, nullable: true },
+    days: { type: 'array', items: { type: 'string', enum: Object.values(DAYS_OF_WEEK) }, nullable: true },
+    end_time: { type: 'string', nullable: true, pattern: '^\\d{2}:\\d{2}:\\d{2}$' },
+    geographies: { type: 'array', items: uuidSchema },
+    maximum: { type: 'number', nullable: true },
+    messages: {
+      $id: 'PolicyMessage',
+      type: 'object',
+      required: [],
+      nullable: true,
+      default: null
+    },
+    minimum: { type: 'number', nullable: true },
+    modality: { type: 'string', nullable: true, default: 'micromobility' },
+    name: { type: 'string' },
+    rule_id: uuidSchema,
+    rule_type: {
+      type: 'string',
+      enum: RULE_TYPE_LIST
+    },
+    rule_units: { type: 'string', nullable: true, default: null },
+    rate_amount: { type: 'number', nullable: true, default: null },
+    rate_recurrence: { type: 'string', enum: [null, ...RATE_RECURRENCE_VALUES], nullable: true, default: null },
+    states: { type: 'object', nullable: true, default: null }, // default to micromobility state map
+    start_time: { type: 'string', nullable: true, pattern: '^\\d{2}:\\d{2}:\\d{2}$' },
+    value_url: { type: 'string', nullable: true },
+    vehicle_types: { type: 'array', items: enumSchema(VEHICLE_TYPES), nullable: true },
+    service_types: { type: 'array', items: enumSchema(SERVICE_TYPE), nullable: true, default: null },
+    transaction_types: { type: 'array', items: enumSchema(TRANSACTION_TYPE), nullable: true, default: null },
+    propulsion_types: { type: 'array', items: enumSchema(PROPULSION_TYPES), nullable: true, default: null }
+  },
+  oneOf: [
+    stateModalitySchema('micromobility', micromobilityStateMap),
+    stateModalitySchema('tnc', tncStateMap),
+    stateModalitySchema('taxi', taxiStateMap)
+  ],
+  required: ['geographies', 'name', 'rule_id', 'rule_type', 'states']
+}
+
+export const { validate: validateRuleSchema } = SchemaValidator<Rule>(ruleSchema)
 
 export const {
   validate: validatePolicyDomainModel,
   isValid: isValidPolicyDomainModel,
   $schema: PolicyDomainModelSchema
-} = SchemaValidator<PolicyDomainModel>({
-  $id: 'PolicyDomainModel',
-  type: 'object',
-
-  properties: {
-    policy_id: uuidSchema,
-    name: stringSchema(),
-    currency: stringSchema({ nullable: true }),
-    description: stringSchema(),
-    provider_ids: arraySchema(uuidSchema, { nullable: true }),
-    start_date: TimestampSchema(),
-    end_date: TimestampSchema({ nullable: true }),
-    prev_policies: arraySchema(uuidSchema, { nullable: true }),
-    publish_date: TimestampSchema({ nullable: true }),
-    rules: {
-      type: 'array',
-      items: {
-        $id: 'BaseRule',
-        type: 'object',
-        properties: {
-          accessibility_options: arraySchema(enumSchema([...ACCESSIBILITY_OPTIONS]), { nullable: true }),
-          days: arraySchema(enumSchema(Object.keys(DAYS_OF_WEEK)), { nullable: true }),
-          end_time: stringSchema({ nullable: true, pattern: '^\\d{2}:\\d{2}:\\d{2}$' }),
-          geographies: arraySchema(uuidSchema),
-          maximum: { type: 'number', nullable: true },
-          messages: {
-            $id: 'PolicyMessage',
-            type: 'object'
-          },
-          minimum: { type: 'number', nullable: true },
-          modality: enumSchema([...MODALITIES]),
-          name: stringSchema(),
-          rule_id: uuidSchema,
-          rule_type: enumSchema(Object.keys(RULE_TYPES)),
-          rule_units: stringSchema(),
-          rate_amount: { type: 'number', nullable: true, default: null },
-          rate_recurrence: {
-            oneOf: [{ type: 'null' }, { type: 'string', enum: RATE_RECURRENCE_VALUES }]
-          },
-          states: { type: 'object', properties: micromobilityStateMap }, // default to micromobility state map
-          start_time: stringSchema({ nullable: true, pattern: '^\\d{2}:\\d{2}:\\d{2}$' }),
-          value_url: stringSchema({ nullable: true }),
-          vehicle_types: arraySchema(enumSchema([...VEHICLE_TYPES]), { nullable: true }),
-          service_types: arraySchema(enumSchema([...SERVICE_TYPE]), { nullable: true, default: null }),
-          transaction_types: arraySchema(enumSchema([...TRANSACTION_TYPE]), { nullable: true, default: null })
-        },
-        allOf: [
-          stateModalityIfConditionSchema('micromobility', micromobilityStateMap),
-          stateModalityIfConditionSchema('taxi', taxiStateMap),
-          stateModalityIfConditionSchema('tnc', tncStateMap)
-        ],
-        required: ['geographies', 'name', 'rule_id', 'rule_type', 'states']
+} = SchemaValidator<PolicyDomainCreateModel>(
+  {
+    $id: 'PolicyDomainCreateModel',
+    type: 'object',
+    properties: {
+      policy_id: uuidSchema,
+      name: { type: 'string' },
+      currency: { type: 'string', nullable: true, default: null },
+      description: { type: 'string' },
+      provider_ids: { type: 'array', items: uuidSchema, nullable: true, default: null },
+      start_date: timestampSchema,
+      end_date: { ...timestampSchema, nullable: true, default: null },
+      prev_policies: { type: 'array', items: uuidSchema, nullable: true, default: null },
+      publish_date: { ...timestampSchema, nullable: true, default: null },
+      rules: {
+        type: 'array',
+        items: ruleSchema
       }
-    }
+    },
+    oneOf: [checkRateFieldsIfConditionSchema],
+    required: ['policy_id', 'name', 'description', 'start_date', 'rules']
   },
-  allOf: [checkRateFieldsIfConditionSchema()],
-  required: ['policy_id', 'name', 'description', 'start_date', 'rules']
-})
+  { allErrors: true, useDefaults: true }
+)
 
 export const { validate: validatePolicyMetadataDomainModel, isValid: isValidPolicyMetadataDomainModel } =
   SchemaValidator<PolicyMetadataDomainModel>({
@@ -180,7 +218,8 @@ export const { validate: validatePolicyMetadataDomainModel, isValid: isValidPoli
     properties: {
       policy_id: { type: 'string', format: 'uuid' },
       policy_metadata: { type: 'object' }
-    }
+    },
+    required: ['policy_id']
   })
 
 export const { validate: validatePresentationOptions, isValid: isValidPresentationOptions } =
@@ -188,12 +227,7 @@ export const { validate: validatePresentationOptions, isValid: isValidPresentati
     $id: 'PresentationOptions',
     type: 'object',
     properties: {
-      withStatus: { type: 'boolean' },
-      limit: { type: 'number', nullable: true },
-      sort: { type: 'string', enum: SortPolicyColumn, nullable: true },
-      direction: { type: 'string', enum: SortPolicyDirection, nullable: true },
-      afterCursor: { type: 'string', nullable: true, default: null },
-      beforeCursor: { type: 'string', nullable: true, default: null }
+      withStatus: { type: 'boolean', nullable: true, default: null }
     }
   })
 

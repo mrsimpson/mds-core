@@ -43,14 +43,9 @@ export const GeographyDomainToEntityCreate = ModelMapper<
   GeographyDomainCreateModel,
   GeographyEntityCreateModel,
   GeographyEntityCreateOptions
->(
-  (
-    { name = null, description = null, effective_date = null, publish_date = null, prev_geographies = null, ...domain },
-    options
-  ) => {
-    return { name, description, effective_date, publish_date, prev_geographies, ...domain }
-  }
-)
+>(({ name = null, description = null, effective_date = null, prev_geographies = null, ...domain }, options) => {
+  return { name, description, effective_date, publish_date: null, prev_geographies, ...domain }
+})
 
 type GeographyMetadataEntityToDomainOptions = Partial<{}>
 

@@ -50,7 +50,7 @@
       }
     },
     {
-      "name": "Server: mds-audit",
+      "name": "Server: mds-audit-api",
       "type": "node",
       "request": "launch",
       "runtimeArgs": [
@@ -65,10 +65,10 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
-      "cwd": "${workspaceFolder}/packages/mds-audit",
+      "cwd": "${workspaceFolder}/packages/mds-audit-api",
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-audit",
+        "npm_package_name": "@mds-core/mds-audit-api",
         "PATH_PREFIX": "/audit"
       }
     },
@@ -321,7 +321,7 @@
       }
     },
     {
-      "name": "Server: mds-policy-author",
+      "name": "Server: mds-policy-author-api",
       "type": "node",
       "request": "launch",
       "runtimeArgs": [
@@ -336,10 +336,10 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
-      "cwd": "${workspaceFolder}/packages/mds-policy-author",
+      "cwd": "${workspaceFolder}/packages/mds-policy-author-api",
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-policy-author",
+        "npm_package_name": "@mds-core/mds-policy-author-api",
         "PATH_PREFIX": "/policy-author"
       }
     },
@@ -498,7 +498,7 @@
       }
     },
     {
-      "name": "Tests: mds-audit",
+      "name": "Tests: mds-audit-api",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
@@ -513,10 +513,10 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
-      "cwd": "${workspaceFolder}/packages/mds-audit",
+      "cwd": "${workspaceFolder}/packages/mds-audit-api",
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-audit",
+        "npm_package_name": "@mds-core/mds-audit-api",
         "PATH_PREFIX": "/audit"
       }
     },
@@ -797,7 +797,7 @@
       }
     },
     {
-      "name": "Tests: mds-policy-author",
+      "name": "Tests: mds-policy-author-api",
       "type": "node",
       "request": "launch",
       "runtimeArgs": [
@@ -810,10 +810,10 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
-      "cwd": "${workspaceFolder}/packages/mds-policy-author",
+      "cwd": "${workspaceFolder}/packages/mds-policy-author-api",
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-policy-author"
+        "npm_package_name": "@mds-core/mds-policy-author-api"
       }
     },
     {

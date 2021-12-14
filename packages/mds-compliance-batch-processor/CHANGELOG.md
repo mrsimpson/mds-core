@@ -1,5 +1,25 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.1.21
+
+### Patch Changes
+
+- a20fcc7b: Fix compliance_as_of to be consistent around a single batch-process invocation, and based upon when the _data_ is fetched, as opposed to based upon once the _computation_ has computed.
+- Updated dependencies [cf4b0ecc]
+- Updated dependencies [3de5e02e]
+- Updated dependencies [af8871e6]
+- Updated dependencies [c6956072]
+- Updated dependencies [ad126757]
+- Updated dependencies [a20fcc7b]
+  - @mds-core/mds-utils@0.2.14
+  - @mds-core/mds-policy-service@0.10.0
+  - @mds-core/mds-compliance-service@0.9.0
+  - @mds-core/mds-types@0.8.0
+  - @mds-core/mds-compliance-engine@0.7.2
+  - @mds-core/mds-agency-cache@0.4.9
+  - @mds-core/mds-db@0.4.23
+  - @mds-core/mds-service-helpers@0.4.7
+
 ## 0.1.20
 
 ### Patch Changes

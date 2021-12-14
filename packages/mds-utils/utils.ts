@@ -20,7 +20,6 @@ import { BBox, BoundingBox, Geography, SingleOrArray, Telemetry, Timestamp, UUID
 import circleToPolygon from 'circle-to-polygon'
 import { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson'
 import pointInPoly from 'point-in-polygon'
-import { isArray, isString } from 'util'
 import { getCurrentDate, parseRelative } from './date-time-utils'
 import { UtilsLogger } from './logger'
 import { getNextStates, isEventSequenceValid } from './state-machine'
@@ -30,7 +29,7 @@ const NUMBER_OF_EDGES = 32 // Number of edges to add, geojson doesn't support re
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
 
 /* Is `as` a subset of `bs`? */
-export const isSubset = <T extends Array<string>, U extends Readonly<Array<string>>>(as: T, bs: U) => {
+const isSubset = <T extends Array<string>, U extends Readonly<Array<string>>>(as: T, bs: U) => {
   return as.every(a => bs.includes(a))
 }
 
@@ -86,7 +85,7 @@ function days(n: number) {
   return hours(n) * 24
 }
 
-export const RULE_UNIT_MAP = {
+const RULE_UNIT_MAP = {
   minutes: minutes(1),
   hours: hours(1)
 }
@@ -550,15 +549,7 @@ function moved(latA: number, lngA: number, latB: number, lngB: number) {
   return lngDiff > limit || latDiff > limit // very computational efficient basic check (better than sqrts & trig)
 }
 
-function normalizeToArray<T>(elementToNormalize: T | T[] | undefined): T[] {
-  if (elementToNormalize === undefined) {
-    return []
-  }
-  if (isArray(elementToNormalize)) {
-    return elementToNormalize
-  }
-  return [elementToNormalize]
-}
+const normalizeToArray = <T>(elementToNormalize: T | T[] | undefined): T[] => asArray(elementToNormalize ?? [])
 
 const getEnvVar = <TProps extends { [name: string]: string }>(props: TProps): TProps =>
   Object.keys(props).reduce((env, key) => {
@@ -568,14 +559,16 @@ const getEnvVar = <TProps extends { [name: string]: string }>(props: TProps): TP
     }
   }, {} as TProps)
 
-export const isTArray = <T>(arr: unknown, isT: (t: unknown) => t is T): arr is T[] => {
+const isTArray = <T>(arr: unknown, isT: (t: unknown) => t is T): arr is T[] => {
   if (arr instanceof Array) {
     return arr.filter(t => isT(t)).length === arr.length
   }
   return false
 }
 
-export const isStringArray = (arr: unknown): arr is string[] => isTArray<string>(arr, isString)
+const isString = (arg: unknown): arg is string => typeof arg === 'string'
+
+const isStringArray = (arr: unknown): arr is string[] => isTArray<string>(arr, isString)
 
 const asArray = <T>(value: SingleOrArray<T>): T[] => (Array.isArray(value) ? value : [value])
 
@@ -590,12 +583,12 @@ const testEnvSafeguard = () => {
   }
 }
 
-export const START_ONE_MONTH_AGO = now() - (now() % days(1)) - days(30)
-export const START_ONE_WEEK_AGO = now() - (now() % days(1)) - days(7)
-export const START_YESTERDAY = now() - (now() % days(1))
-export const START_NOW = now()
-export const START_TOMORROW = now() + (now() % days(1))
-export const START_ONE_MONTH_FROM_NOW = now() - (now() % days(1)) + days(30)
+const START_ONE_MONTH_AGO = now() - (now() % days(1)) - days(30)
+const START_ONE_WEEK_AGO = now() - (now() % days(1)) - days(7)
+const START_YESTERDAY = now() - (now() % days(1))
+const START_NOW = now()
+const START_TOMORROW = now() + (now() % days(1))
+const START_ONE_MONTH_FROM_NOW = now() - (now() % days(1)) + days(30)
 
 /**
  *
@@ -614,55 +607,64 @@ const zip = <T, U, R>(arr1: T[], arr2: U[], mapper: (x: T, y: U) => R) => {
 }
 
 export {
+  RULE_UNIT_MAP,
+  START_NOW,
+  START_ONE_MONTH_AGO,
+  START_ONE_MONTH_FROM_NOW,
+  START_ONE_WEEK_AGO,
+  START_TOMORROW,
+  START_YESTERDAY,
   UUID_REGEX,
-  isUUID,
-  isPct,
-  isTimestamp,
-  rangeRandom,
-  rangeRandomInt,
-  randomElement,
   addDistanceBearing,
-  pointInShape,
-  makePointInShape,
-  getRandomSubarray,
-  round,
-  parseBBox,
+  areThereCommonElements,
+  asArray,
   capitalizeFirst,
-  nullKeys,
-  stripNulls,
-  isFloat,
-  now,
-  range,
-  nonNegInt,
-  days,
-  hours,
-  minutes,
-  seconds,
-  timeframe,
-  yesterday,
-  csv,
-  inc,
-  pathPrefix,
-  isInsideBoundingBox,
-  head,
-  tail,
-  isEventSequenceValid,
-  getNextStates,
-  pointInGeometry,
-  getPolygon,
-  routeDistance,
   clone,
-  isDefined,
-  moved,
-  normalizeToArray,
-  parseRelative,
+  csv,
+  days,
+  filterDefined,
   getCurrentDate,
   getEnvVar,
-  asArray,
+  getNextStates,
+  getPolygon,
+  getRandomSubarray,
+  head,
+  hours,
+  inc,
+  isDefined,
+  isEventSequenceValid,
+  isFloat,
+  isInsideBoundingBox,
+  isPct,
+  isStringArray,
+  isSubset,
+  isTimestamp,
+  isUUID,
+  makePointInShape,
+  minutes,
+  moved,
+  nonNegInt,
+  normalizeToArray,
+  now,
+  nullKeys,
+  parseBBox,
+  parseRelative,
+  pathPrefix,
   pluralize,
-  filterDefined,
-  areThereCommonElements,
+  pointInGeometry,
+  pointInShape,
+  randomElement,
+  range,
+  rangeRandom,
+  rangeRandomInt,
+  round,
+  routeDistance,
+  seconds,
   setEmptyArraysToUndefined,
+  stripNulls,
+  tail,
   testEnvSafeguard,
+  timeframe,
+  yesterday,
   zip
 }

@@ -15,7 +15,7 @@
  */
 
 import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
-import { testEnvSafeguard } from '@mds-core/mds-utils'
+import { NotFoundError, testEnvSafeguard } from '@mds-core/mds-utils'
 import { FindManyOptions, In, IsNull, MoreThan, Not } from 'typeorm'
 import {
   GeographyDomainCreateModel,
@@ -24,7 +24,8 @@ import {
   GeographyMetadataDomainModel,
   GeographyWithMetadataDomainModel,
   GetGeographiesOptions,
-  GetPublishedGeographiesOptions
+  GetPublishedGeographiesOptions,
+  PublishGeographyParams
 } from '../@types'
 import { GeographyEntity } from './entities/geography-entity'
 import { GeographyMetadataEntity } from './entities/geography-metadata-entity'
@@ -165,6 +166,62 @@ class GeographyReadWriteRepository extends ReadWriteRepository {
       }
     }
     return []
+  }
+
+  public publishGeography = async (params: PublishGeographyParams) => {
+    const { geography_id, publish_date = Date.now() } = params
+    const existingGeo = await this.getGeography(geography_id, {})
+    if (!existingGeo) {
+      throw new NotFoundError('cannot find Geography')
+    }
+    if (!!existingGeo.publish_date) {
+      throw new Error('Cannot edit published Geography')
+    }
+    try {
+      const connection = await this.connect('rw')
+      const {
+        raw: [updated]
+      } = await connection
+        .getRepository(GeographyEntity)
+        .createQueryBuilder()
+        .update()
+        .set({ publish_date })
+        .where({ geography_id })
+        .andWhere('publish_date IS NULL')
+        .returning('*')
+        .execute()
+      return GeographyEntityToDomain.map(updated)
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public editGeography = async (geography: GeographyDomainCreateModel) => {
+    const existingGeo = await this.getGeography(geography.geography_id, {})
+    if (!existingGeo) {
+      throw new NotFoundError('cannot find Geography')
+    }
+    if (!!existingGeo.publish_date) {
+      throw new Error('Cannot edit published Geography')
+    }
+    try {
+      const { geography_id } = geography
+      const connection = await this.connect('rw')
+      const {
+        raw: [updated]
+      } = await connection
+        .getRepository(GeographyEntity)
+        .createQueryBuilder()
+        .update()
+        .set(GeographyDomainToEntityCreate.map(geography))
+        .where({ geography_id })
+        .andWhere('publish_date IS NULL')
+        .returning('*')
+        .execute()
+      return GeographyEntityToDomain.map(updated)
+    } catch (error) {
+      throw RepositoryError(error)
+    }
   }
 
   /**

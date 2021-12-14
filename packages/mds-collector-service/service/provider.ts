@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SchemaValidator } from '@mds-core/mds-schema-validators'
+import { Schema, SchemaValidator } from '@mds-core/mds-schema-validators'
 import {
   ProcessController,
   ServiceError,
@@ -40,7 +40,7 @@ const { TENANT_ID } = getEnvVar({
 
 const createSchemaValidator = async (schema_id: string): Promise<SchemaValidator<unknown>> => {
   const { schema } = await CollectorRepository.getCollectorSchema(schema_id)
-  return SchemaValidator(schema)
+  return SchemaValidator<unknown>(schema as Schema<unknown>)
 }
 
 const getSchemaValidator = async (schema_id: string) => {
@@ -77,7 +77,8 @@ export const CollectorServiceProvider: ServiceProvider<CollectorService> & Proce
 
   registerMessageSchema: async (schema_id, schema) => {
     try {
-      const validator = SchemaValidator(schema)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const validator = SchemaValidator(schema as any)
       await CollectorRepository.insertCollectorSchema({ schema_id, schema })
       SchemaValidators.set(schema_id, validator)
       return ServiceResult(true)

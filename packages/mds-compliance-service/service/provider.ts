@@ -60,7 +60,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
         validateComplianceSnapshotDomainModel(complianceSnapshot),
         async snapshot => {
           // send to Kafka
-          const { vehicles_found, ...kafkaSnapshot } = snapshot
+          const { vehicles_found, violating_vehicles, ...kafkaSnapshot } = snapshot
           try {
             await ComplianceSnapshotStreamKafka.write(kafkaSnapshot)
           } catch (err) {
@@ -83,7 +83,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
         async snapshots => {
           // send to Kafka
           const kafkaSnapshots = snapshots.map(snapshot => {
-            const { vehicles_found, ...kafkaSnapshot } = snapshot
+            const { vehicles_found, violating_vehicles, ...kafkaSnapshot } = snapshot
             return kafkaSnapshot
           })
           try {
