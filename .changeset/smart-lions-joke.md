@@ -1,7 +1,7 @@
 ---
 "@mds-core/mds-agency": minor
 "@mds-core/mds-attachment-service": minor
-"@mds-core/mds-audit": minor
+"@mds-core/mds-audit-api": minor
 "@mds-core/mds-audit-service": minor
 "@mds-core/mds-collector-service": minor
 "@mds-core/mds-compliance-service": minor

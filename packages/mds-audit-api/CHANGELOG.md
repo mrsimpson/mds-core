@@ -1,4 +1,4 @@
-# @mds-core/mds-audit
+# @mds-core/mds-audit-api
 
 ## 0.2.20
 

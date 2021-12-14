@@ -5,8 +5,8 @@ deployments:
     version: ${ATTACHMENT_SERVICE_VERSION}
   mds-audit-service:
     version: ${AUDIT_SERVICE_VERSION}
-  mds-audit:
-    version: ${AUDIT_VERSION}
+  mds-audit-api:
+    version: ${AUDIT_API_VERSION}
   mds-policy:
     version: ${POLICY_VERSION}
   mds-policy-service:

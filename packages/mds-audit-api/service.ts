@@ -31,7 +31,7 @@ import {
 } from '@mds-core/mds-types'
 import { now, tail } from '@mds-core/mds-utils'
 import { Query } from 'express-serve-static-core'
-import { AuditLogger } from './logger'
+import { AuditApiLogger } from './logger'
 
 export async function deleteAudit(audit_trip_id: UUID): Promise<number> {
   const result: number = await db.deleteAudit(audit_trip_id)
@@ -39,7 +39,7 @@ export async function deleteAudit(audit_trip_id: UUID): Promise<number> {
 }
 
 // Currently, many of the database methods are a little heavy handed in the way they throw exceptions on read (not found)
-// requests. In mds-audit, there are valid scenarios where a particular audit or device may not exist. These service methods
+// requests. In mds-audit-api, there are valid scenarios where a particular audit or device may not exist. These service methods
 // exist to wrap the database calls and return null rather than forcing the caller to catch and handle exceptions for expected
 // scenarios.
 //
@@ -102,7 +102,7 @@ export async function readDevicesByVehicleId(provider_id: UUID, vehicle_id: stri
     )
     const finish = now()
     const timeElapsed = finish - start
-    AuditLogger.debug(`db.readDevicesByVehicleId ${provider_id} ${vehicle_id} time elapsed: ${timeElapsed}ms`)
+    AuditApiLogger.debug(`db.readDevicesByVehicleId ${provider_id} ${vehicle_id} time elapsed: ${timeElapsed}ms`)
     return results
   } catch (err) {
     return []
@@ -180,7 +180,7 @@ export async function getVehicle(provider_id: UUID, vehicle_id: string) {
       const deviceStatus = (await cache.readDeviceStatus(device.device_id)) as (VehicleEvent & Device) | null
       if (deviceStatus === null || (deviceStatus.event_types && tail(deviceStatus.event_types) === 'decommissioned')) {
         const { device_id } = device
-        AuditLogger.debug('Bad vehicle status', { deviceStatus, provider_id, vehicle_id, device_id })
+        AuditApiLogger.debug('Bad vehicle status', { deviceStatus, provider_id, vehicle_id, device_id })
         deviceStatusMap.inactive.push(device)
       } else {
         const state = deviceStatus.vehicle_state
@@ -226,7 +226,7 @@ export async function getVehicles(
     return [...acc, { ...item, status, updated }]
   }, [])
   const finish = now()
-  AuditLogger.debug(
+  AuditApiLogger.debug(
     `getVehicles processing ${JSON.stringify(bbox)} provider ${provider_id} time elapsed: ${finish - start}ms`
   )
 

@@ -24,7 +24,7 @@ The [Mobility Data Specification](https://github.com/openmobilityfoundation/mobi
 The included code represents what is currently up and running for Los Angeles as well as new features under development. Includes the following:
 
 - A current LADOT implementation of all MDS endpoints
-- Development versions of mds-audit, mds-policy, and mds-compliance
+- Development versions of mds-audit-api, mds-policy, and mds-compliance-api
 - MDS logging (mds-logger).
 
 ![Applications Overview](https://i.imgur.com/AGRubjE.png)
@@ -112,7 +112,7 @@ pnpm install
 Now you can work with each package
 
 ```sh
-cd packages/mds-audit
+cd packages/mds-audit-api
 pnpm test
 pnpm start
 ```

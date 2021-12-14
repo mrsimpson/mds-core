@@ -87,7 +87,7 @@ deployments:
     pathPrefix: /agency
   mds-attachment-service:
     enabled: false
-  mds-audit:
+  mds-audit-api:
     enabled: false
     pathPrefix: /audit
   mds-audit-service:

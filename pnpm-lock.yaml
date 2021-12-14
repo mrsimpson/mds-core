@@ -140,16 +140,16 @@ importers:
       pg: 8.7.1
       pino: 6.13.3
 
-  container-images/mds-audit:
+  container-images/mds-audit-api:
     specifiers:
-      '@mds-core/mds-audit': workspace:0.2.20
+      '@mds-core/mds-audit-api': workspace:0.2.20
       '@mds-core/mds-webpack-config': workspace:0.1.7
       dd-trace: 1.5.1
       express: 4.17.1
       pg: 8.7.1
       pino: 6.13.3
     dependencies:
-      '@mds-core/mds-audit': link:../../packages/mds-audit
+      '@mds-core/mds-audit-api': link:../../packages/mds-audit-api
       '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
       dd-trace: 1.5.1
       express: 4.17.1
@@ -603,7 +603,7 @@ importers:
       sharp: 0.29.1
       typeorm: 0.2.40_pg@8.7.1
 
-  packages/mds-audit:
+  packages/mds-audit-api:
     specifiers:
       '@mds-core/mds-agency-cache': workspace:0.4.8
       '@mds-core/mds-api-helpers': workspace:0.1.62

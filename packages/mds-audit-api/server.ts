@@ -17,7 +17,7 @@
 import cache from '@mds-core/mds-agency-cache'
 import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
 import { api } from './api'
-import { AuditLogger } from './logger'
+import { AuditApiLogger } from './logger'
 
 cache
   .startup()
@@ -26,5 +26,5 @@ cache
   })
   // eslint-disable-next-line promise/prefer-await-to-callbacks
   .catch(err => {
-    AuditLogger.error('mds-audit startup failure', err)
+    AuditApiLogger.error('startup failure', err)
   })

@@ -41,7 +41,7 @@ import {
   readAttachments,
   writeAttachment
 } from './attachments'
-import { AuditLogger } from './logger'
+import { AuditApiLogger } from './logger'
 import { AuditApiVersionMiddleware } from './middleware'
 import {
   deleteAudit,
@@ -94,7 +94,7 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const logGenericAuditError = (req: AuditApiRequest<any>, res: AuditApiResponse<any>, err: any) =>
-  AuditLogger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
+  AuditApiLogger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
 
 // TODO lib
 function flattenTelemetry(telemetry?: Telemetry): TelemetryData {
@@ -138,7 +138,7 @@ function api(app: express.Express): express.Express {
           return next()
         }
       }
-      AuditLogger.warn('Missing subject_id', { method: req.method, originalUrl: req.originalUrl })
+      AuditApiLogger.warn('Missing subject_id', { method: req.method, originalUrl: req.originalUrl })
       // 403 Forbidden
       return res.status(403).send({ error: new AuthorizationError('missing_subject_id') })
     }
@@ -443,7 +443,7 @@ function api(app: express.Express): express.Express {
       } catch (err) /* istanbul ignore next */ {
         if (err instanceof ValidationError) {
           // 400 Bad Request
-          AuditLogger.error(`/end error was ${JSON.stringify(err)}`)
+          AuditApiLogger.error(`/end error was ${JSON.stringify(err)}`)
           return res.status(400).send({ error: err })
         }
         // 500 Internal Server Error
@@ -687,7 +687,7 @@ function api(app: express.Express): express.Express {
         const response = await getVehicles(skip, take, url, req.query, bbox, strict, provider_id)
         return res.status(200).send({ version: res.locals.version, ...response })
       } catch (err) {
-        AuditLogger.error('getVehicles fail', err)
+        AuditApiLogger.error('getVehicles fail', err)
         return res.status(500).send({
           error: 'internal_server_error'
         })
@@ -710,7 +710,7 @@ function api(app: express.Express): express.Express {
           res.status(404).send({ error: new NotFoundError('vehicle not found', { provider_id, vin }) })
         }
       } catch (err) {
-        AuditLogger.error('getVehicle fail', err)
+        AuditApiLogger.error('getVehicle fail', err)
         res.status(500).send({
           error: 'internal_server_error'
         })
@@ -744,7 +744,7 @@ function api(app: express.Express): express.Express {
 
         if (isError(err, UnsupportedTypeError)) return res.status(415).send({ error: err })
 
-        AuditLogger.error('post attachment fail', err)
+        AuditApiLogger.error('post attachment fail', err)
         return res.status(500).send({ error: new ServerError(err) })
       }
     }
@@ -759,7 +759,7 @@ function api(app: express.Express): express.Express {
       await deleteAuditAttachment(audit_trip_id, attachment_id)
       res.status(200).send({ version: res.locals.version })
     } catch (err) {
-      AuditLogger.error('delete attachment error', err)
+      AuditApiLogger.error('delete attachment error', err)
       if (err instanceof NotFoundError) {
         return res.status(404).send({ error: err })
       }

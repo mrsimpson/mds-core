@@ -1,7 +1,7 @@
 # MDS Audit API
 
 Endpoints for auditing compliance with MDS. See
-[Audit API Spec](mds-audit.md).
+[Audit API Spec](mds-audit-api.md).
 
 ## Quick Start
 
@@ -17,5 +17,6 @@ Endpoints for auditing compliance with MDS. See
 2. `pnpm test`
 
 ## Build Deployment Package
+
 1. Make sure the API passes all tests as per [Run Tests](#run-tests) above.
 2. `pnpm build`

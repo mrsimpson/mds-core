@@ -1,5 +1,5 @@
 {
-  "name": "@mds-core/mds-audit",
+  "name": "@mds-core/mds-audit-api",
   "version": "0.2.20",
   "description": "Endpoint for auditing compliance with MDS",
   "keywords": [

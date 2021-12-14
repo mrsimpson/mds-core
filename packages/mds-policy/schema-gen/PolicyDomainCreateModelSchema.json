@@ -207,6 +207,21 @@
             },
             "nullable": true,
             "default": null
+          },
+          "propulsion_types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "human",
+                "electric",
+                "electric_assist",
+                "hybrid",
+                "combustion"
+              ]
+            },
+            "nullable": true,
+            "default": null
           }
         },
         "oneOf": [
