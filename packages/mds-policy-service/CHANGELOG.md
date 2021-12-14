@@ -356,7 +356,7 @@
 
 ### Patch Changes
 
-- e0860f5b: refactored mds-policy-author to use PolicyServiceClient instead of mds-db
+- e0860f5b: refactored mds-policy-author-api to use PolicyServiceClient instead of mds-db
 - 6609400b: `vehicle_types` field in BaseRule should be restricted to `VEHICLE_TYPE[]`, not `string[]`
 - Updated dependencies [e0860f5b]
 - Updated dependencies [6609400b]

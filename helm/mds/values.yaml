@@ -120,7 +120,7 @@ deployments:
   mds-policy:
     enabled: false
     pathPrefix: /policy
-  mds-policy-author:
+  mds-policy-author-api:
     enabled: false
     pathPrefix: /policy-author
   mds-policy-service:

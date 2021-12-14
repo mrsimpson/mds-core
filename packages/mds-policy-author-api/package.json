@@ -1,5 +1,5 @@
 {
-  "name": "@mds-core/mds-policy-author",
+  "name": "@mds-core/mds-policy-author-api",
   "version": "0.6.11",
   "description": "MDS Policy Author API",
   "license": "Apache-2.0",

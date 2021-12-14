@@ -11,7 +11,7 @@
 "@mds-core/mds-ingest-service": minor
 "@mds-core/mds-jurisdiction-service": minor
 "@mds-core/mds-policy": minor
-"@mds-core/mds-policy-author": minor
+"@mds-core/mds-policy-author-api": minor
 "@mds-core/mds-policy-service": minor
 "@mds-core/mds-transaction-api": minor
 "@mds-core/mds-transaction-service": minor

@@ -17,7 +17,7 @@
 import { PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { now } from '@mds-core/mds-utils'
 import express from 'express'
-import { PolicyAuthorLogger } from '../logger'
+import { PolicyAuthorApiLogger } from '../logger'
 import { PolicyAuthorApiPublishPolicyRequest, PolicyAuthorApiPublishPolicyResponse } from '../types'
 
 export const PublishPolicyHandler = async (
@@ -31,7 +31,7 @@ export const PublishPolicyHandler = async (
     return res.status(200).send({ version: res.locals.version, data: { policy } })
   } catch (error) {
     /* istanbul ignore next */
-    PolicyAuthorLogger.error('failed to publish policy', error.stack)
+    PolicyAuthorApiLogger.error('failed to publish policy', error.stack)
     /* istanbul ignore next */
     return next(error)
   }

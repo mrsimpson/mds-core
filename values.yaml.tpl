@@ -19,8 +19,8 @@ deployments:
     version: ${JURISDICTION_API_VERSION}
   mds-jurisdiction-service:
     version: ${JURISDICTION_SERVICE_VERSION}
-  mds-policy-author:
-    version: ${POLICY_AUTHOR_VERSION}
+  mds-policy-author-api:
+    version: ${POLICY_AUTHOR_API_VERSION}
   mds-geography-api:
     version: ${GEOGRAPHY_API_VERSION}
   mds-geography-author-api:

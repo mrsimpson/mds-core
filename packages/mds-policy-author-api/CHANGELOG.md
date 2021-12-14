@@ -1,4 +1,4 @@
-# @mds-core/mds-policy-author
+# @mds-core/mds-policy-author-api
 
 ## 0.6.11
 
@@ -388,7 +388,7 @@
 
 ### Minor Changes
 
-- e0860f5b: refactored mds-policy-author to use PolicyServiceClient instead of mds-db
+- e0860f5b: refactored mds-policy-author-api to use PolicyServiceClient instead of mds-db
 
 ### Patch Changes
 

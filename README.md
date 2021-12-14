@@ -51,7 +51,7 @@ Read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) document for rules and guide
 1. MDS-Audit [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
 2. MDS-Compliance [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
 3. MDS-Geography-Author
-4. MDS-Policy-Author
+4. mds-policy-author-api
 5. MDS-Transaction
 
 ## Installation
