@@ -42,8 +42,9 @@ export async function computeSnapshot() {
   const policies: PolicyDomainModel[] = getSupersedingPolicies(await PolicyServiceClient.readActivePolicies(now()))
   const geographies = await db.readGeographies({ get_published: true })
   const deviceEventInputs = await getAllInputs()
+  const compliance_as_of = now() // The timestamp right after we fetch the inputs (latest state as of that time)
 
-  const results = policies.map(policy => processPolicy(policy, geographies, deviceEventInputs))
+  const results = policies.map(policy => processPolicy(policy, geographies, deviceEventInputs, compliance_as_of))
   const snapshots = results.flat()
 
   await batchComplianceSnapshots(snapshots)
