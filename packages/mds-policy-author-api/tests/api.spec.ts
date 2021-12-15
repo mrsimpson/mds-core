@@ -27,8 +27,7 @@
 /* eslint-enable prettier/prettier */
 /* eslint-enable @typescript-eslint/no-unused-vars */
 import { ApiServer } from '@mds-core/mds-api-server'
-import { GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
-import { GeographyFactory } from '@mds-core/mds-geography-service/tests/helpers'
+import { GeographyFactory, GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
 // eslint-disable-next-line prettier/prettier
 import { PolicyDomainCreateModel, PolicyMetadataDomainModel, PolicyServiceClient, PolicyStreamKafka } from '@mds-core/mds-policy-service'
 import { PolicyRepository } from '@mds-core/mds-policy-service/repository'

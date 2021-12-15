@@ -15,8 +15,12 @@
  */
 
 import { ApiServer } from '@mds-core/mds-api-server'
-import { GeographyRepository, GeographyServiceManager } from '@mds-core/mds-geography-service'
-import { GeographyFactory, writePublishedGeography } from '@mds-core/mds-geography-service/tests/helpers'
+import {
+  GeographyFactory,
+  GeographyRepository,
+  GeographyServiceManager,
+  writePublishedGeography
+} from '@mds-core/mds-geography-service'
 import {
   DISTRICT_SEVEN,
   GEOGRAPHY2_UUID,
