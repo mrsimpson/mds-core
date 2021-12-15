@@ -1,5 +1,14 @@
 # @mds-core/mds-policy
 
+## 0.7.1
+
+### Patch Changes
+
+- Updated dependencies [d434c404]
+  - @mds-core/mds-policy-service@0.10.1
+  - @mds-core/mds-db@0.4.24
+  - @mds-core/mds-api-helpers@0.1.64
+
 ## 0.7.0
 
 ### Minor Changes
