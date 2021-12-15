@@ -1,5 +1,4 @@
-import { GeographyService } from '@mds-core/mds-geography-service'
-import { GeographyFactory } from '@mds-core/mds-geography-service/tests/helpers'
+import { GeographyFactory, GeographyService } from '@mds-core/mds-geography-service'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
 import { venice } from '@mds-core/mds-test-data'
 import { Timestamp } from '@mds-core/mds-types'

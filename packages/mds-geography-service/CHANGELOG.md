@@ -1,5 +1,11 @@
 # @mds-core/mds-geography-service
 
+## 0.7.1
+
+### Patch Changes
+
+- d434c404: Export test helpers
+
 ## 0.7.0
 
 ### Minor Changes

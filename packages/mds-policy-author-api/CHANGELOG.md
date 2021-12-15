@@ -1,5 +1,14 @@
 # @mds-core/mds-policy-author-api
 
+## 0.7.1
+
+### Patch Changes
+
+- d434c404: Import Geography helper methods from a real package, instead of a sub-module
+- Updated dependencies [d434c404]
+  - @mds-core/mds-policy-service@0.10.1
+  - @mds-core/mds-api-helpers@0.1.64
+
 ## 0.7.0
 
 ### Minor Changes
