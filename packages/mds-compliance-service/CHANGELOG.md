@@ -1,5 +1,15 @@
 # @mds-core/mds-compliance-service
 
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies [1dd4db6c]
+  - @mds-core/mds-service-helpers@0.4.8
+  - @mds-core/mds-policy-service@0.10.2
+  - @mds-core/mds-rpc-common@0.2.11
+  - @mds-core/mds-db@0.4.25
+
 ## 0.9.1
 
 ### Patch Changes
