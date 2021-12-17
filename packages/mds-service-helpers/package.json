@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-service-helpers",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "Mobility Data Specification Service Helpers",
   "keywords": [
     "mds"
