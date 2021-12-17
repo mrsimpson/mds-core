@@ -56,10 +56,41 @@ const ProcessMonitor = async (
 
   const version = `${npm_package_name} v${npm_package_version} (${npm_package_git_commit ?? 'local'})`
 
+  /**
+   * Maintains state for if this process was stopped or not.
+   * This is useful if there's a long running async call as part of the `start` that hasn't completed.
+   * If a SIGINT is received, this is used to abort from the startup retry loop once the promise times out.
+   */
+  let stopped = false
+
+  // Keep NodeJS process alive
+  ServiceHelpersLogger.info(`Monitoring process ${version} for ${signals.join(', ')}`)
+  const timeout = setInterval(() => undefined, interval)
+
+  const terminate = async (signal: NodeJS.Signals) => {
+    clearInterval(timeout)
+    ServiceHelpersLogger.info(`Terminating process ${version} on ${signal}`)
+    stopped = true
+    await controller.stop()
+  }
+
+  // Monitor process for signals
+  signals.forEach(signal =>
+    process.on(signal, async () => {
+      await terminate(signal)
+    })
+  )
+
   // Initialize the service
   try {
     await retry(
       async () => {
+        if (stopped) {
+          ServiceHelpersLogger.error(`Process ${version} has been stopped during initialization, Exiting...`)
+          await controller.stop()
+          process.exit(1)
+        }
+
         ServiceHelpersLogger.info(`Initializing process ${version}`)
         await controller.start()
       },
@@ -67,7 +98,6 @@ const ProcessMonitor = async (
         retries,
         minTimeout,
         maxTimeout,
-
         ...retryOptions,
         onRetry: (error, attempt) => {
           /* istanbul ignore next */
@@ -82,23 +112,6 @@ const ProcessMonitor = async (
     await controller.stop()
     process.exit(1)
   }
-
-  // Keep NodeJS process alive
-  ServiceHelpersLogger.info(`Monitoring process ${version} for ${signals.join(', ')}`)
-  const timeout = setInterval(() => undefined, interval)
-
-  const terminate = async (signal: NodeJS.Signals) => {
-    clearInterval(timeout)
-    ServiceHelpersLogger.info(`Terminating process ${version} on ${signal}`)
-    await controller.stop()
-  }
-
-  // Monitor process for signals
-  signals.forEach(signal =>
-    process.on(signal, async () => {
-      await terminate(signal)
-    })
-  )
 
   return {
     start: async () => undefined,

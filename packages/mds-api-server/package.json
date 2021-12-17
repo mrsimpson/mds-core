@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-api-server",
-  "version": "0.3.18",
+  "version": "0.3.19",
   "description": "MDS API Server",
   "keywords": [
     "mds"
@@ -19,7 +19,7 @@
   "dependencies": {
     "@mds-core/mds-api-authorizer": "workspace:0.1.53",
     "@mds-core/mds-logger": "workspace:0.5.2",
-    "@mds-core/mds-service-helpers": "workspace:0.4.7",
+    "@mds-core/mds-service-helpers": "workspace:0.4.8",
     "@mds-core/mds-utils": "workspace:0.2.14",
     "@moebius/http-graceful-shutdown": "1.1.0",
     "@types/body-parser": "1.19.1",
