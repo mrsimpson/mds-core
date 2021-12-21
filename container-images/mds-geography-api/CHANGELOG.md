@@ -1,5 +1,11 @@
 # @container-images/mds-geography-api
 
+## 0.0.42
+
+### Patch Changes
+
+- @mds-core/mds-geography-api@0.3.3
+
 ## 0.0.41
 
 ### Patch Changes

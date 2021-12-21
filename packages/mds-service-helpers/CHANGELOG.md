@@ -1,5 +1,11 @@
 # @mds-core/mds-service-helpers
 
+## 0.5.0
+
+### Minor Changes
+
+- c3d2215d: Add support for RPC request contexts
+
 ## 0.4.8
 
 ### Patch Changes
