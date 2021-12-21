@@ -16,16 +16,21 @@
 
 import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
-import { AuditService, AuditServiceDefinition } from '../@types'
-
-const AuditServiceRpcClient = RpcClient(AuditServiceDefinition, {
-  host: process.env.AUDIT_SERVICE_RPC_HOST,
-  port: process.env.AUDIT_SERVICE_RPC_PORT
-})
+import { AuditService, AuditServiceDefinition, AuditServiceRequestContext } from '../@types'
 
 // What the API layer, and any other clients, will invoke.
-export const AuditServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<AuditService> => ({
-  name: (...args) => RpcRequest(options, AuditServiceRpcClient.name, args)
-})
+export const AuditServiceClientFactory = (
+  context: AuditServiceRequestContext,
+  options: RpcRequestOptions = {}
+): ServiceClient<AuditService> => {
+  const AuditServiceRpcClient = RpcClient(AuditServiceDefinition, {
+    context,
+    host: process.env.AUDIT_SERVICE_RPC_HOST,
+    port: process.env.AUDIT_SERVICE_RPC_PORT
+  })
+  return {
+    name: (...args) => RpcRequest(options, AuditServiceRpcClient.name, args)
+  }
+}
 
-export const AuditServiceClient = AuditServiceClientFactory()
+export const AuditServiceClient = AuditServiceClientFactory({})

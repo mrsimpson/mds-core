@@ -15,29 +15,32 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { ComplianceServiceDefinition } from '../@types'
+import { ComplianceService, ComplianceServiceDefinition, ComplianceServiceRequestContext } from '../@types'
 import { ComplianceServiceClient } from '../client'
 import { ComplianceServiceProvider } from './provider'
 
-export const ComplianceServiceManager = RpcServer(
+export const ComplianceServiceManager = RpcServer<ComplianceService, ComplianceServiceRequestContext>(
   ComplianceServiceDefinition,
   {
     onStart: ComplianceServiceProvider.start,
     onStop: ComplianceServiceProvider.stop
   },
   {
-    createComplianceSnapshot: args => ComplianceServiceProvider.createComplianceSnapshot(...args),
-    createComplianceSnapshots: args => ComplianceServiceProvider.createComplianceSnapshots(...args),
-    createComplianceViolation: args => ComplianceServiceProvider.createComplianceViolation(...args),
-    createComplianceViolations: args => ComplianceServiceProvider.createComplianceViolations(...args),
-    getComplianceSnapshot: args => ComplianceServiceProvider.getComplianceSnapshot(...args),
-    getComplianceSnapshotsByTimeInterval: args =>
-      ComplianceServiceProvider.getComplianceSnapshotsByTimeInterval(...args),
-    getComplianceSnapshotsByIDs: args => ComplianceServiceProvider.getComplianceSnapshotsByIDs(...args),
-    getComplianceViolationPeriods: args => ComplianceServiceProvider.getComplianceViolationPeriods(...args),
-    getComplianceViolation: args => ComplianceServiceProvider.getComplianceViolation(...args),
-    getComplianceViolationsByTimeInterval: args =>
-      ComplianceServiceProvider.getComplianceViolationsByTimeInterval(...args)
+    createComplianceSnapshot: (args, context) => ComplianceServiceProvider.createComplianceSnapshot(context, ...args),
+    createComplianceSnapshots: (args, context) => ComplianceServiceProvider.createComplianceSnapshots(context, ...args),
+    createComplianceViolation: (args, context) => ComplianceServiceProvider.createComplianceViolation(context, ...args),
+    createComplianceViolations: (args, context) =>
+      ComplianceServiceProvider.createComplianceViolations(context, ...args),
+    getComplianceSnapshot: (args, context) => ComplianceServiceProvider.getComplianceSnapshot(context, ...args),
+    getComplianceSnapshotsByTimeInterval: (args, context) =>
+      ComplianceServiceProvider.getComplianceSnapshotsByTimeInterval(context, ...args),
+    getComplianceSnapshotsByIDs: (args, context) =>
+      ComplianceServiceProvider.getComplianceSnapshotsByIDs(context, ...args),
+    getComplianceViolationPeriods: (args, context) =>
+      ComplianceServiceProvider.getComplianceViolationPeriods(context, ...args),
+    getComplianceViolation: (args, context) => ComplianceServiceProvider.getComplianceViolation(context, ...args),
+    getComplianceViolationsByTimeInterval: (args, context) =>
+      ComplianceServiceProvider.getComplianceViolationsByTimeInterval(context, ...args)
   },
   {
     port: process.env.COMPLIANCE_SERVICE_RPC_PORT,

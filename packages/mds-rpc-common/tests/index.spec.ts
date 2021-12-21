@@ -17,7 +17,7 @@
 import { ServiceClient, ServiceError, ServiceResult } from '@mds-core/mds-service-helpers'
 import supertest from 'supertest'
 import test from 'unit.js'
-import { RpcServiceDefinition, RPC_HOST } from '../@types'
+import { RpcEmptyRequestContext, RpcServiceDefinition, RPC_HOST } from '../@types'
 import { RpcClient, RpcRequest, RpcRequestOptions } from '../client'
 import { RpcRoute } from '../index'
 import { RpcServer } from '../server'
@@ -34,7 +34,7 @@ export const TestServiceRpcDefinition: RpcServiceDefinition<TestService> = {
   length: RpcRoute<TestService['length']>()
 }
 
-const TestServer = RpcServer(
+const TestServer = RpcServer<TestService, RpcEmptyRequestContext>(
   TestServiceRpcDefinition,
   {
     onStart: async () => undefined,
@@ -51,7 +51,7 @@ const TestServer = RpcServer(
 ).controller()
 
 const TestClient = (options: RpcRequestOptions = {}): ServiceClient<TestService> => ({
-  length: word => RpcRequest(options, RpcClient(TestServiceRpcDefinition).length, [word])
+  length: word => RpcRequest(options, RpcClient(TestServiceRpcDefinition, { context: {} }).length, [word])
 })
 
 describe('Test RPC Client', () => {

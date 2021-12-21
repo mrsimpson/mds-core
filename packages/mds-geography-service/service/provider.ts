@@ -15,7 +15,7 @@
  */
 
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
-import { GeographyDomainModel, GeographyService } from '../@types'
+import { GeographyDomainModel, GeographyService, GeographyServiceRequestContext } from '../@types'
 import { GeographyServiceLogger } from '../logger'
 import { GeographyRepository } from '../repository'
 import {
@@ -26,11 +26,12 @@ import {
   validateUuids
 } from './validators'
 
-export const GeographyServiceProvider: ServiceProvider<GeographyService> & ProcessController = {
+export const GeographyServiceProvider: ServiceProvider<GeographyService, GeographyServiceRequestContext> &
+  ProcessController = {
   start: GeographyRepository.initialize,
   stop: GeographyRepository.shutdown,
 
-  getGeographies: async options => {
+  getGeographies: async (context, options) => {
     try {
       const geographies = await GeographyRepository.getGeographies(validateGetGeographiesOptions(options ?? {}))
       return ServiceResult(geographies)
@@ -41,7 +42,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     }
   },
 
-  getUnpublishedGeographies: async options => {
+  getUnpublishedGeographies: async (context, options) => {
     try {
       const geographies = await GeographyRepository.getUnpublishedGeographies(
         validateGetGeographiesOptions(options ?? {})
@@ -54,7 +55,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     }
   },
 
-  getPublishedGeographies: async options => {
+  getPublishedGeographies: async (context, options) => {
     try {
       const geographies = await GeographyRepository.getPublishedGeographies(
         validateGetPublishedGeographiesOptions(options ?? {})
@@ -67,7 +68,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     }
   },
 
-  getGeography: async (geography_id, options) => {
+  getGeography: async (context, geography_id, options) => {
     try {
       const geography = await GeographyRepository.getGeography(
         geography_id,
@@ -81,7 +82,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     }
   },
 
-  writeGeographies: async models => {
+  writeGeographies: async (context, models) => {
     try {
       const geographies = await GeographyRepository.writeGeographies(models.map(validateGeographyDomainCreateModel))
       return ServiceResult(geographies)
@@ -92,7 +93,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     }
   },
 
-  publishGeography: async geography_id => {
+  publishGeography: async (context, geography_id) => {
     try {
       const geography = await GeographyRepository.publishGeography(geography_id)
       return ServiceResult(geography)
@@ -103,7 +104,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     }
   },
 
-  writeGeographiesMetadata: async models => {
+  writeGeographiesMetadata: async (context, models) => {
     try {
       const metadata = await GeographyRepository.writeGeographiesMetadata(
         models.map(validateGeographyMetadataDomainCreateModel)
@@ -116,7 +117,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     }
   },
 
-  editGeography: async model => {
+  editGeography: async (context, model) => {
     try {
       const geography = await GeographyRepository.editGeography(validateGeographyDomainCreateModel(model))
       return ServiceResult(geography)
@@ -127,7 +128,7 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService> & Proce
     }
   },
 
-  getGeographiesByIds: async geography_ids => {
+  getGeographiesByIds: async (context, geography_ids) => {
     try {
       const geographies = await GeographyRepository.getGeographiesByIds(validateUuids(geography_ids))
 

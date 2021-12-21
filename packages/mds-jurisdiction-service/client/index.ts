@@ -16,22 +16,26 @@
 
 import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
-import { JurisdictionService, JurisdictionServiceDefinition } from '../@types'
-
-const JurisdictionServiceRpcClient = RpcClient(JurisdictionServiceDefinition, {
-  host: process.env.JURISDICTION_SERVICE_RPC_HOST,
-  port: process.env.JURISDICTION_SERVICE_RPC_PORT
-})
+import { JurisdictionService, JurisdictionServiceDefinition, JurisdictionServiceRequestContext } from '../@types'
 
 export const JurisdictionServiceClientFactory = (
+  context: JurisdictionServiceRequestContext,
   options: RpcRequestOptions = {}
-): ServiceClient<JurisdictionService> => ({
-  createJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.createJurisdiction, args),
-  createJurisdictions: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.createJurisdictions, args),
-  deleteJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.deleteJurisdiction, args),
-  getJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.getJurisdiction, args),
-  getJurisdictions: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.getJurisdictions, args),
-  updateJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.updateJurisdiction, args)
-})
+): ServiceClient<JurisdictionService> => {
+  const JurisdictionServiceRpcClient = RpcClient(JurisdictionServiceDefinition, {
+    context,
+    host: process.env.JURISDICTION_SERVICE_RPC_HOST,
+    port: process.env.JURISDICTION_SERVICE_RPC_PORT
+  })
 
-export const JurisdictionServiceClient = JurisdictionServiceClientFactory()
+  return {
+    createJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.createJurisdiction, args),
+    createJurisdictions: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.createJurisdictions, args),
+    deleteJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.deleteJurisdiction, args),
+    getJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.getJurisdiction, args),
+    getJurisdictions: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.getJurisdictions, args),
+    updateJurisdiction: (...args) => RpcRequest(options, JurisdictionServiceRpcClient.updateJurisdiction, args)
+  }
+}
+
+export const JurisdictionServiceClient = JurisdictionServiceClientFactory({})

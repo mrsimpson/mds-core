@@ -20,13 +20,7 @@ import { ProcessController, ServiceException, ServiceProvider, ServiceResult } f
 import stream from '@mds-core/mds-stream'
 import { Telemetry } from '@mds-core/mds-types'
 import { NotFoundError } from '@mds-core/mds-utils'
-import {
-  EventAnnotationDomainCreateModel,
-  EventDomainCreateModel,
-  IngestMigrationService,
-  IngestService,
-  TelemetryDomainModel
-} from '../@types'
+import { IngestMigrationService, IngestService, IngestServiceRequestContext, TelemetryDomainModel } from '../@types'
 import { IngestServiceLogger } from '../logger'
 import { IngestRepository } from '../repository'
 import { MigratedEntityModel } from '../repository/mixins/migrated-entity'
@@ -63,7 +57,11 @@ const writeMigratedTelemetry = async (
   return model
 }
 
-export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrationService> & ProcessController = {
+export const IngestServiceProvider: ServiceProvider<
+  IngestService & IngestMigrationService,
+  IngestServiceRequestContext
+> &
+  ProcessController = {
   start: async () => {
     await Promise.all([IngestRepository.initialize(), cache.startup(), stream.initialize()])
   },
@@ -72,7 +70,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     await Promise.all([IngestRepository.shutdown(), cache.shutdown(), stream.shutdown()])
   },
 
-  getDevicesUsingOptions: async options => {
+  getDevicesUsingOptions: async (context, options) => {
     try {
       return ServiceResult(await IngestRepository.getDevicesUsingOptions(validateGetDevicesOptions(options)))
     } catch (error) {
@@ -82,7 +80,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  getDevicesUsingCursor: async cursor => {
+  getDevicesUsingCursor: async (context, cursor) => {
     try {
       return ServiceResult(await IngestRepository.getDevicesUsingCursor(cursor))
     } catch (error) {
@@ -92,7 +90,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  getEventsUsingOptions: async params => {
+  getEventsUsingOptions: async (context, params) => {
     try {
       return ServiceResult(await IngestRepository.getEventsUsingOptions(validateGetVehicleEventsFilterParams(params)))
     } catch (error) {
@@ -102,7 +100,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  getEventsUsingCursor: async cursor => {
+  getEventsUsingCursor: async (context, cursor) => {
     try {
       return ServiceResult(await IngestRepository.getEventsUsingCursor(cursor))
     } catch (error) {
@@ -112,7 +110,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  getDevices: async device_ids => {
+  getDevices: async (context, device_ids) => {
     try {
       return ServiceResult(await IngestRepository.getDevices(validateUUIDs(device_ids)))
     } catch (error) {
@@ -122,7 +120,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  getLatestTelemetryForDevices: async device_ids => {
+  getLatestTelemetryForDevices: async (context, device_ids) => {
     try {
       return ServiceResult(await IngestRepository.getLatestTelemetryForDevices(device_ids))
     } catch (error) {
@@ -132,7 +130,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  writeEvents: async (events: EventDomainCreateModel[]) => {
+  writeEvents: async (context, events) => {
     try {
       // Check to see if the devices references in the events exist in the db. This is in a closure to keep the code pretty boxed off, but I didn't feel the need to make a named function elsewhere :)
       // FIXME: Move this check to the cache (once we have a cache manged by the ingest service)
@@ -151,7 +149,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  writeEventAnnotations: async (eventAnnotations: EventAnnotationDomainCreateModel[]) => {
+  writeEventAnnotations: async (context, eventAnnotations) => {
     try {
       return ServiceResult(
         await IngestRepository.createEventAnnotations(eventAnnotations.map(validateEventAnnotationDomainCreateModel))
@@ -163,7 +161,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  writeMigratedDevice: async (device, migrated_from) => {
+  writeMigratedDevice: async (context, device, migrated_from) => {
     try {
       const [model = null] = await IngestRepository.writeMigratedDevice([device], migrated_from)
       if (model) {
@@ -183,7 +181,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  writeMigratedVehicleEvent: async ({ telemetry, ...event }, migrated_from) => {
+  writeMigratedVehicleEvent: async (context, { telemetry, ...event }, migrated_from) => {
     // TODO: All this splitting apart and recombining of telemetry should be handled by the repository.
     // The fact that event/telemetry data is split between tables should not be something the service
     // need be aware of. The repository should split them apart for writes and join them togehter for reads.
@@ -237,7 +235,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  writeMigratedTelemetry: async (telemetry, migrated_from) => {
+  writeMigratedTelemetry: async (context, telemetry, migrated_from) => {
     try {
       const model = await writeMigratedTelemetry(telemetry, migrated_from)
 
@@ -249,7 +247,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  getTripEvents: async options => {
+  getTripEvents: async (context, options) => {
     try {
       return ServiceResult(await IngestRepository.getTripEvents(options))
     } catch (error) {
@@ -259,7 +257,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  getEventsWithDeviceAndTelemetryInfoUsingOptions: async options => {
+  getEventsWithDeviceAndTelemetryInfoUsingOptions: async (context, options) => {
     try {
       return ServiceResult(
         await IngestRepository.getEventsWithDeviceAndTelemetryInfoUsingOptions(
@@ -273,7 +271,7 @@ export const IngestServiceProvider: ServiceProvider<IngestService & IngestMigrat
     }
   },
 
-  getEventsWithDeviceAndTelemetryInfoUsingCursor: async cursor => {
+  getEventsWithDeviceAndTelemetryInfoUsingCursor: async (context, cursor) => {
     try {
       return ServiceResult(await IngestRepository.getEventsWithDeviceAndTelemetryInfoUsingCursor(cursor))
     } catch (error) {

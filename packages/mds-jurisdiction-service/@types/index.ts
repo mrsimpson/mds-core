@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { Optional, Timestamp, UUID } from '@mds-core/mds-types'
 
 export interface JurisdictionDomainModel {
@@ -55,3 +55,5 @@ export const JurisdictionServiceDefinition: RpcServiceDefinition<JurisdictionSer
   getJurisdiction: RpcRoute<JurisdictionService['getJurisdiction']>(),
   getJurisdictions: RpcRoute<JurisdictionService['getJurisdictions']>()
 }
+
+export type JurisdictionServiceRequestContext = RpcEmptyRequestContext

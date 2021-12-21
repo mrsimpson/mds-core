@@ -15,7 +15,7 @@
  */
 
 import { DomainModelCreate } from '@mds-core/mds-repository'
-import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { Nullable, Timestamp, UUID } from '@mds-core/mds-types'
 import { FeatureCollection } from 'geojson'
 
@@ -83,3 +83,5 @@ export const GeographyServiceDefinition: RpcServiceDefinition<GeographyService> 
   publishGeography: RpcRoute<GeographyService['publishGeography']>(),
   getGeographiesByIds: RpcRoute<GeographyService['getGeographiesByIds']>()
 }
+
+export type GeographyServiceRequestContext = RpcEmptyRequestContext

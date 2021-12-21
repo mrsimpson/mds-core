@@ -15,29 +15,29 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { PolicyServiceDefinition } from '../@types'
+import { PolicyService, PolicyServiceDefinition, PolicyServiceRequestContext } from '../@types'
 import { PolicyServiceClient } from '../client'
 import { PolicyServiceProvider } from './provider'
 
-export const PolicyServiceManager = RpcServer(
+export const PolicyServiceManager = RpcServer<PolicyService, PolicyServiceRequestContext>(
   PolicyServiceDefinition,
   {
     onStart: PolicyServiceProvider.start,
     onStop: PolicyServiceProvider.stop
   },
   {
-    name: args => PolicyServiceProvider.name(...args),
-    writePolicy: args => PolicyServiceProvider.writePolicy(...args),
-    readPolicies: args => PolicyServiceProvider.readPolicies(...args),
-    readActivePolicies: args => PolicyServiceProvider.readActivePolicies(...args),
-    deletePolicy: args => PolicyServiceProvider.deletePolicy(...args),
-    editPolicy: args => PolicyServiceProvider.editPolicy(...args),
-    publishPolicy: args => PolicyServiceProvider.publishPolicy(...args),
-    readBulkPolicyMetadata: args => PolicyServiceProvider.readBulkPolicyMetadata(...args),
-    readPolicy: args => PolicyServiceProvider.readPolicy(...args),
-    readSinglePolicyMetadata: args => PolicyServiceProvider.readSinglePolicyMetadata(...args),
-    updatePolicyMetadata: args => PolicyServiceProvider.updatePolicyMetadata(...args),
-    writePolicyMetadata: args => PolicyServiceProvider.writePolicyMetadata(...args)
+    name: (args, context) => PolicyServiceProvider.name(context, ...args),
+    writePolicy: (args, context) => PolicyServiceProvider.writePolicy(context, ...args),
+    readPolicies: (args, context) => PolicyServiceProvider.readPolicies(context, ...args),
+    readActivePolicies: (args, context) => PolicyServiceProvider.readActivePolicies(context, ...args),
+    deletePolicy: (args, context) => PolicyServiceProvider.deletePolicy(context, ...args),
+    editPolicy: (args, context) => PolicyServiceProvider.editPolicy(context, ...args),
+    publishPolicy: (args, context) => PolicyServiceProvider.publishPolicy(context, ...args),
+    readBulkPolicyMetadata: (args, context) => PolicyServiceProvider.readBulkPolicyMetadata(context, ...args),
+    readPolicy: (args, context) => PolicyServiceProvider.readPolicy(context, ...args),
+    readSinglePolicyMetadata: (args, context) => PolicyServiceProvider.readSinglePolicyMetadata(context, ...args),
+    updatePolicyMetadata: (args, context) => PolicyServiceProvider.updatePolicyMetadata(context, ...args),
+    writePolicyMetadata: (args, context) => PolicyServiceProvider.writePolicyMetadata(context, ...args)
   },
   {
     port: process.env.POLICY_SERVICE_RPC_PORT,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { Nullable, TimeRange, Timestamp, UUID } from '@mds-core/mds-types'
 import { PolicyDomainCreateModel, PolicyDomainModel, PolicyMetadataDomainModel, POLICY_STATUS } from './models'
 
@@ -85,3 +85,5 @@ export const PolicyServiceDefinition: RpcServiceDefinition<PolicyService> = {
   updatePolicyMetadata: RpcRoute<PolicyService['updatePolicyMetadata']>(),
   writePolicyMetadata: RpcRoute<PolicyService['writePolicyMetadata']>()
 }
+
+export type PolicyServiceRequestContext = RpcEmptyRequestContext

@@ -16,19 +16,25 @@
 
 import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
-import { AttachmentService, AttachmentServiceDefinition } from '../@types'
-
-const AttachmentServiceRpcClient = RpcClient(AttachmentServiceDefinition, {
-  host: process.env.ATTACHMENT_SERVICE_RPC_HOST,
-  port: process.env.ATTACHMENT_SERVICE_RPC_PORT
-})
+import { AttachmentService, AttachmentServiceDefinition, AttachmentServiceRequestContext } from '../@types'
 
 // What the API layer, and any other clients, will invoke.
-export const AttachmentServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<AttachmentService> => ({
-  deleteAttachment: (...args) => RpcRequest(options, AttachmentServiceRpcClient.deleteAttachment, args),
-  writeAttachment: (...args) => RpcRequest(options, AttachmentServiceRpcClient.writeAttachment, args),
-  readAttachment: (...args) => RpcRequest(options, AttachmentServiceRpcClient.readAttachment, args),
-  readAttachments: (...args) => RpcRequest(options, AttachmentServiceRpcClient.readAttachments, args)
-})
+export const AttachmentServiceClientFactory = (
+  context: AttachmentServiceRequestContext,
+  options: RpcRequestOptions = {}
+): ServiceClient<AttachmentService> => {
+  const AttachmentServiceRpcClient = RpcClient(AttachmentServiceDefinition, {
+    context,
+    host: process.env.ATTACHMENT_SERVICE_RPC_HOST,
+    port: process.env.ATTACHMENT_SERVICE_RPC_PORT
+  })
 
-export const AttachmentServiceClient = AttachmentServiceClientFactory()
+  return {
+    deleteAttachment: (...args) => RpcRequest(options, AttachmentServiceRpcClient.deleteAttachment, args),
+    writeAttachment: (...args) => RpcRequest(options, AttachmentServiceRpcClient.writeAttachment, args),
+    readAttachment: (...args) => RpcRequest(options, AttachmentServiceRpcClient.readAttachment, args),
+    readAttachments: (...args) => RpcRequest(options, AttachmentServiceRpcClient.readAttachments, args)
+  }
+}
+
+export const AttachmentServiceClient = AttachmentServiceClientFactory({})

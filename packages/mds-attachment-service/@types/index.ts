@@ -15,7 +15,7 @@
  */
 
 import { DomainModelCreate } from '@mds-core/mds-repository'
-import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { SerializedBuffers } from '@mds-core/mds-service-helpers'
 import { Nullable, UUID } from '@mds-core/mds-types'
 
@@ -56,3 +56,5 @@ export const AttachmentServiceDefinition: RpcServiceDefinition<AttachmentService
   readAttachment: RpcRoute<AttachmentService['readAttachment']>(),
   readAttachments: RpcRoute<AttachmentService['readAttachments']>()
 }
+
+export type AttachmentServiceRequestContext = RpcEmptyRequestContext

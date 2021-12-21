@@ -24,9 +24,9 @@ import {
 } from '@mds-core/mds-service-helpers'
 import stream, { StreamProducer } from '@mds-core/mds-stream'
 import { Nullable } from '@mds-core/mds-types'
-import { getEnvVar, pluralize, ServerError } from '@mds-core/mds-utils'
+import { getEnvVar, isUUID, pluralize, ServerError } from '@mds-core/mds-utils'
 import { ErrorObject } from 'ajv'
-import { CollectorService } from '../@types'
+import { CollectorService, CollectorServiceRequestContext } from '../@types'
 import { CollectorServiceLogger } from '../logger'
 import { CollectorRepository } from '../repository'
 
@@ -70,12 +70,13 @@ const getStreamProducer = async (schema_id: string): Promise<CollectorStreamProd
   return producer
 }
 
-export const CollectorServiceProvider: ServiceProvider<CollectorService> & ProcessController = {
+export const CollectorServiceProvider: ServiceProvider<CollectorService, CollectorServiceRequestContext> &
+  ProcessController = {
   start: CollectorRepository.initialize,
 
   stop: CollectorRepository.shutdown,
 
-  registerMessageSchema: async (schema_id, schema) => {
+  registerMessageSchema: async (context, schema_id, schema) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const validator = SchemaValidator(schema as any)
@@ -89,7 +90,7 @@ export const CollectorServiceProvider: ServiceProvider<CollectorService> & Proce
     }
   },
 
-  getMessageSchema: async schema_id => {
+  getMessageSchema: async (context, schema_id) => {
     try {
       const { $schema } = await getSchemaValidator(schema_id)
       return ServiceResult($schema)
@@ -100,7 +101,15 @@ export const CollectorServiceProvider: ServiceProvider<CollectorService> & Proce
     }
   },
 
-  writeSchemaMessages: async (schema_id, provider_id, messages) => {
+  writeSchemaMessages: async (context, schema_id, provider_id, messages) => {
+    if (!isUUID(provider_id)) {
+      return ServiceError({
+        type: 'ValidationError',
+        message: `Invalid provider_id for schema ${schema_id}; must be a UUID`,
+        details: { provider_id }
+      })
+    }
+
     if (messages.length === 0) {
       return ServiceResult([])
     }

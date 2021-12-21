@@ -16,27 +16,33 @@
 
 import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
-import { PolicyService, PolicyServiceDefinition } from '../@types'
-
-const PolicyServiceRpcClient = RpcClient(PolicyServiceDefinition, {
-  host: process.env.POLICY_SERVICE_RPC_HOST,
-  port: process.env.POLICY_SERVICE_RPC_PORT
-})
+import { PolicyService, PolicyServiceDefinition, PolicyServiceRequestContext } from '../@types'
 
 // What the API layer, and any other clients, will invoke.
-export const PolicyServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<PolicyService> => ({
-  name: (...args) => RpcRequest(options, PolicyServiceRpcClient.name, args),
-  writePolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.writePolicy, args),
-  readPolicies: (...args) => RpcRequest(options, PolicyServiceRpcClient.readPolicies, args),
-  readActivePolicies: (...args) => RpcRequest(options, PolicyServiceRpcClient.readActivePolicies, args),
-  deletePolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.deletePolicy, args),
-  editPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.editPolicy, args),
-  publishPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.publishPolicy, args),
-  readBulkPolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.readBulkPolicyMetadata, args),
-  readPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.readPolicy, args),
-  readSinglePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.readSinglePolicyMetadata, args),
-  updatePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.updatePolicyMetadata, args),
-  writePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.writePolicyMetadata, args)
-})
+export const PolicyServiceClientFactory = (
+  context: PolicyServiceRequestContext,
+  options: RpcRequestOptions = {}
+): ServiceClient<PolicyService> => {
+  const PolicyServiceRpcClient = RpcClient(PolicyServiceDefinition, {
+    context,
+    host: process.env.POLICY_SERVICE_RPC_HOST,
+    port: process.env.POLICY_SERVICE_RPC_PORT
+  })
 
-export const PolicyServiceClient = PolicyServiceClientFactory()
+  return {
+    name: (...args) => RpcRequest(options, PolicyServiceRpcClient.name, args),
+    writePolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.writePolicy, args),
+    readPolicies: (...args) => RpcRequest(options, PolicyServiceRpcClient.readPolicies, args),
+    readActivePolicies: (...args) => RpcRequest(options, PolicyServiceRpcClient.readActivePolicies, args),
+    deletePolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.deletePolicy, args),
+    editPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.editPolicy, args),
+    publishPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.publishPolicy, args),
+    readBulkPolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.readBulkPolicyMetadata, args),
+    readPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.readPolicy, args),
+    readSinglePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.readSinglePolicyMetadata, args),
+    updatePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.updatePolicyMetadata, args),
+    writePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.writePolicyMetadata, args)
+  }
+}
+
+export const PolicyServiceClient = PolicyServiceClientFactory({})

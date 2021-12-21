@@ -15,7 +15,7 @@
  */
 
 import { DomainModelCreate } from '@mds-core/mds-repository'
-import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { AUDIT_EVENT_TYPE, Nullable, Telemetry, Timestamp, UUID, VEHICLE_EVENT } from '@mds-core/mds-types'
 
 export interface AuditDomainModel {
@@ -58,3 +58,5 @@ export interface AuditService {
 export const AuditServiceDefinition: RpcServiceDefinition<AuditService> = {
   name: RpcRoute<AuditService['name']>()
 }
+
+export type AuditServiceRequestContext = RpcEmptyRequestContext

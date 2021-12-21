@@ -16,16 +16,12 @@
 
 import { providerName } from '@mds-core/mds-providers'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
-import { UUID } from '@mds-core/mds-types'
 import { isDefined } from '@mds-core/mds-utils'
 import {
   ComplianceAggregateDomainModel,
   ComplianceService,
-  ComplianceViolationPeriodDomainModel,
-  GetComplianceSnapshotsByTimeIntervalOptions,
-  GetComplianceViolationOptions,
-  GetComplianceViolationPeriodsOptions,
-  GetComplianceViolationsByTimeIntervalOptions
+  ComplianceServiceRequestContext,
+  ComplianceViolationPeriodDomainModel
 } from '../@types'
 import { ComplianceServiceLogger } from '../logger'
 import { ComplianceRepository } from '../repository'
@@ -47,14 +43,15 @@ const serviceErrorWrapper = async <T>(method: string, exec: () => Promise<T>) =>
   }
 }
 
-export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & ProcessController = {
+export const ComplianceServiceProvider: ServiceProvider<ComplianceService, ComplianceServiceRequestContext> &
+  ProcessController = {
   start: async () => {
     await Promise.all([ComplianceRepository.initialize(), ComplianceSnapshotStreamKafka.initialize()])
   },
   stop: async () => {
     await Promise.all([ComplianceRepository.shutdown(), ComplianceSnapshotStreamKafka.shutdown()])
   },
-  createComplianceSnapshot: async complianceSnapshot => {
+  createComplianceSnapshot: async (context, complianceSnapshot) => {
     try {
       const snapshot = await ComplianceRepository.createComplianceSnapshot(
         validateComplianceSnapshotDomainModel(complianceSnapshot),
@@ -76,7 +73,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return exception
     }
   },
-  createComplianceSnapshots: async complianceSnapshots => {
+  createComplianceSnapshots: async (context, complianceSnapshots) => {
     try {
       const snapshots = await ComplianceRepository.createComplianceSnapshots(
         complianceSnapshots.map(validateComplianceSnapshotDomainModel),
@@ -103,15 +100,15 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return exception
     }
   },
-  createComplianceViolation: async complianceViolation =>
+  createComplianceViolation: async (context, complianceViolation) =>
     serviceErrorWrapper('createComplianceViolation', () =>
       ComplianceRepository.createComplianceViolation(validateComplianceViolationDomainModel(complianceViolation))
     ),
-  createComplianceViolations: async complianceViolations =>
+  createComplianceViolations: async (context, complianceViolations) =>
     serviceErrorWrapper('createComplianceViolations', () =>
       ComplianceRepository.createComplianceViolations(complianceViolations.map(validateComplianceViolationDomainModel))
     ),
-  getComplianceSnapshot: async options => {
+  getComplianceSnapshot: async (context, options) => {
     try {
       return ServiceResult(await ComplianceRepository.getComplianceSnapshot(options))
     } catch (error) /* istanbul ignore next */ {
@@ -123,7 +120,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return exception
     }
   },
-  getComplianceSnapshotsByTimeInterval: async (options: GetComplianceSnapshotsByTimeIntervalOptions) => {
+  getComplianceSnapshotsByTimeInterval: async (context, options) => {
     try {
       return ServiceResult(
         await ComplianceRepository.getComplianceSnapshotsByTimeInterval(
@@ -136,7 +133,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
       return exception
     }
   },
-  getComplianceSnapshotsByIDs: async (ids: UUID[]) => {
+  getComplianceSnapshotsByIDs: async (context, ids) => {
     try {
       return ServiceResult(await ComplianceRepository.getComplianceSnapshotsByIDs(ids))
     } catch (error) /* istanbul ignore next */ {
@@ -146,15 +143,15 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService> & Pro
     }
   },
 
-  getComplianceViolation: async (options: GetComplianceViolationOptions) =>
+  getComplianceViolation: async (context, options) =>
     serviceErrorWrapper('getComplianceViolation', () => ComplianceRepository.getComplianceViolation(options)),
 
-  getComplianceViolationsByTimeInterval: (options: GetComplianceViolationsByTimeIntervalOptions) =>
+  getComplianceViolationsByTimeInterval: (context, options) =>
     serviceErrorWrapper('getComplianceViolationsByTimeInterval', () =>
       ComplianceRepository.getComplianceViolationsByTimeInterval(options)
     ),
 
-  getComplianceViolationPeriods: async (options: GetComplianceViolationPeriodsOptions) => {
+  getComplianceViolationPeriods: async (context, options) => {
     try {
       const violationPeriodEntities = await ComplianceRepository.getComplianceViolationPeriods(options)
       const complianceAggregateMap = violationPeriodEntities.reduce((acc, violationPeriodEntity) => {

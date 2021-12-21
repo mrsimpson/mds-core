@@ -16,27 +16,33 @@
 
 import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
-import { TransactionService, TransactionServiceDefinition } from '../@types'
-
-const TransactionServiceRpcClient = RpcClient(TransactionServiceDefinition, {
-  host: process.env.TRANSACTION_SERVICE_RPC_HOST,
-  port: process.env.TRANSACTION_SERVICE_RPC_PORT
-})
+import { TransactionService, TransactionServiceDefinition, TransactionServiceRequestContext } from '../@types'
 
 // What the API layer, and any other clients, will invoke.
 export const TransactionServiceClientFactory = (
+  context: TransactionServiceRequestContext,
   options: RpcRequestOptions = {}
-): ServiceClient<TransactionService> => ({
-  createTransaction: (...args) => RpcRequest(options, TransactionServiceRpcClient.createTransaction, args),
-  createTransactions: (...args) => RpcRequest(options, TransactionServiceRpcClient.createTransactions, args),
-  getTransaction: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransaction, args),
-  getTransactions: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransactions, args),
-  addTransactionOperation: (...args) => RpcRequest(options, TransactionServiceRpcClient.addTransactionOperation, args),
-  getTransactionOperations: (...args) =>
-    RpcRequest(options, TransactionServiceRpcClient.getTransactionOperations, args),
-  setTransactionStatus: (...args) => RpcRequest(options, TransactionServiceRpcClient.setTransactionStatus, args),
-  getTransactionsStatuses: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransactionsStatuses, args),
-  getTransactionStatuses: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransactionStatuses, args)
-})
+): ServiceClient<TransactionService> => {
+  const TransactionServiceRpcClient = RpcClient(TransactionServiceDefinition, {
+    context,
+    host: process.env.TRANSACTION_SERVICE_RPC_HOST,
+    port: process.env.TRANSACTION_SERVICE_RPC_PORT
+  })
 
-export const TransactionServiceClient = TransactionServiceClientFactory()
+  return {
+    createTransaction: (...args) => RpcRequest(options, TransactionServiceRpcClient.createTransaction, args),
+    createTransactions: (...args) => RpcRequest(options, TransactionServiceRpcClient.createTransactions, args),
+    getTransaction: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransaction, args),
+    getTransactions: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransactions, args),
+    addTransactionOperation: (...args) =>
+      RpcRequest(options, TransactionServiceRpcClient.addTransactionOperation, args),
+    getTransactionOperations: (...args) =>
+      RpcRequest(options, TransactionServiceRpcClient.getTransactionOperations, args),
+    setTransactionStatus: (...args) => RpcRequest(options, TransactionServiceRpcClient.setTransactionStatus, args),
+    getTransactionsStatuses: (...args) =>
+      RpcRequest(options, TransactionServiceRpcClient.getTransactionsStatuses, args),
+    getTransactionStatuses: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransactionStatuses, args)
+  }
+}
+
+export const TransactionServiceClient = TransactionServiceClientFactory({})

@@ -15,7 +15,7 @@
  */
 
 import { DomainModelCreate, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
-import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import {
   ACCESSIBILITY_OPTION,
   Device,
@@ -265,3 +265,5 @@ export const IngestServiceDefinition: RpcServiceDefinition<IngestService & Inges
   getEventsWithDeviceAndTelemetryInfoUsingCursor:
     RpcRoute<IngestService['getEventsWithDeviceAndTelemetryInfoUsingCursor']>()
 }
+
+export type IngestServiceRequestContext = RpcEmptyRequestContext
