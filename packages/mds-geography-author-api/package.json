@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-geography-author-api",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "MDS Geography Author API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -14,10 +14,10 @@
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-helpers": "workspace:0.1.65",
-    "@mds-core/mds-api-server": "workspace:0.3.19",
-    "@mds-core/mds-db": "workspace:0.4.25",
-    "@mds-core/mds-geography-service": "workspace:0.7.2",
+    "@mds-core/mds-api-helpers": "workspace:0.1.66",
+    "@mds-core/mds-api-server": "workspace:0.3.20",
+    "@mds-core/mds-db": "workspace:0.4.26",
+    "@mds-core/mds-geography-service": "workspace:0.8.0",
     "@mds-core/mds-logger": "workspace:0.5.2",
     "@mds-core/mds-providers": "workspace:0.2.3",
     "@mds-core/mds-schema-validators": "workspace:0.4.0",
