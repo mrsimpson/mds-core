@@ -15,7 +15,7 @@
  */
 
 import { DomainModelCreate } from '@mds-core/mds-repository'
-import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { Timestamp, UUID } from '@mds-core/mds-types'
 import { SchemaObject } from 'ajv'
 
@@ -53,3 +53,5 @@ export const CollectorServiceRpcDefinition: RpcServiceDefinition<CollectorServic
   getMessageSchema: RpcRoute<CollectorService['getMessageSchema']>(),
   writeSchemaMessages: RpcRoute<CollectorService['writeSchemaMessages']>()
 }
+
+export type CollectorServiceRequestContext = RpcEmptyRequestContext

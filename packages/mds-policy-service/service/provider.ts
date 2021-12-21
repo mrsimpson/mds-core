@@ -17,7 +17,7 @@
 import { GeographyServiceClient } from '@mds-core/mds-geography-service'
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
 import { BadParamsError, DependencyMissingError } from '@mds-core/mds-utils'
-import { PolicyService } from '../@types'
+import { PolicyService, PolicyServiceRequestContext } from '../@types'
 import { PolicyServiceLogger } from '../logger'
 import { PolicyRepository } from '../repository'
 import { PolicyStreamKafka } from './stream'
@@ -33,47 +33,48 @@ const serviceErrorWrapper = async <T>(method: string, exec: () => Promise<T>) =>
   }
 }
 
-export const PolicyServiceProvider: ServiceProvider<PolicyService> & ProcessController = {
+export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyServiceRequestContext> & ProcessController = {
   start: async () => {
     await Promise.all([PolicyRepository.initialize(), PolicyStreamKafka.initialize()])
   },
   stop: async () => {
     await Promise.all([PolicyRepository.shutdown(), PolicyStreamKafka.shutdown()])
   },
-  name: async () => ServiceResult('mds-policy-service'),
-  writePolicy: policy =>
+  name: async context => ServiceResult('mds-policy-service'),
+  writePolicy: (context, policy) =>
     serviceErrorWrapper('writePolicy', () => PolicyRepository.writePolicy(validatePolicyDomainModel(policy))),
-  readPolicies: (params, presentationOptions) =>
+  readPolicies: (context, params, presentationOptions) =>
     serviceErrorWrapper('readPolicies', () =>
       PolicyRepository.readPolicies(params, validatePresentationOptions(presentationOptions ?? {}))
     ),
-  readActivePolicies: timestamp =>
+  readActivePolicies: (context, timestamp) =>
     serviceErrorWrapper('readActivePolicies', () => PolicyRepository.readActivePolicies(timestamp)),
-  deletePolicy: policy_id => serviceErrorWrapper('deletePolicy', () => PolicyRepository.deletePolicy(policy_id)),
-  editPolicy: policy =>
+  deletePolicy: (context, policy_id) =>
+    serviceErrorWrapper('deletePolicy', () => PolicyRepository.deletePolicy(policy_id)),
+  editPolicy: (context, policy) =>
     serviceErrorWrapper('editPolicy', () => PolicyRepository.editPolicy(validatePolicyDomainModel(policy))),
-  readPolicy: (policy_id, presentationOptions) =>
+  readPolicy: (context, policy_id, presentationOptions) =>
     serviceErrorWrapper('readPolicy', () =>
       PolicyRepository.readPolicy(policy_id, validatePresentationOptions(presentationOptions ?? {}))
     ),
-  readSinglePolicyMetadata: policy_id =>
+  readSinglePolicyMetadata: (context, policy_id) =>
     serviceErrorWrapper('readSinglePolicyMetadata', () => PolicyRepository.readSinglePolicyMetadata(policy_id)),
-  readBulkPolicyMetadata: params =>
+  readBulkPolicyMetadata: (context, params) =>
     serviceErrorWrapper('readBulkPolicyMetadata', () => {
       if (params.get_unpublished && params.get_published)
         throw new BadParamsError('cannot have get_unpublished and get_published both be true')
 
       return PolicyRepository.readBulkPolicyMetadata(params)
     }),
-  updatePolicyMetadata: policy_metadata =>
+  updatePolicyMetadata: (context, policy_metadata) =>
     serviceErrorWrapper('updatePolicyMetadata', () =>
       PolicyRepository.updatePolicyMetadata(validatePolicyMetadataDomainModel(policy_metadata))
     ),
-  writePolicyMetadata: policy_metadata =>
+  writePolicyMetadata: (context, policy_metadata) =>
     serviceErrorWrapper('writePolicyMetadata', () =>
       PolicyRepository.writePolicyMetadata(validatePolicyMetadataDomainModel(policy_metadata))
     ),
-  publishPolicy: (policy_id, publish_date) =>
+  publishPolicy: (context, policy_id, publish_date) =>
     serviceErrorWrapper('publishPolicy', async () => {
       const { rules, prev_policies } = await PolicyRepository.readPolicy(policy_id)
       const geographies = await GeographyServiceClient.getGeographiesByIds(rules.map(r => r.geographies).flat())

@@ -16,25 +16,31 @@
 
 import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
 import { ServiceClient } from '@mds-core/mds-service-helpers'
-import { GeographyService, GeographyServiceDefinition } from '../@types'
-
-const GeographyServiceRpcClient = RpcClient(GeographyServiceDefinition, {
-  host: process.env.GEOGRAPHY_SERVICE_RPC_HOST,
-  port: process.env.GEOGRAPHY_SERVICE_RPC_PORT
-})
-
+import { GeographyService, GeographyServiceDefinition, GeographyServiceRequestContext } from '../@types'
 // What the API layer, and any other clients, will invoke.
-export const GeographyServiceClientFactory = (options: RpcRequestOptions = {}): ServiceClient<GeographyService> => ({
-  getGeography: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeography, args),
-  getGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeographies, args),
-  getUnpublishedGeographies: (...args) =>
-    RpcRequest(options, GeographyServiceRpcClient.getUnpublishedGeographies, args),
-  getPublishedGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.getPublishedGeographies, args),
-  writeGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.writeGeographies, args),
-  writeGeographiesMetadata: (...args) => RpcRequest(options, GeographyServiceRpcClient.writeGeographiesMetadata, args),
-  editGeography: (...args) => RpcRequest(options, GeographyServiceRpcClient.editGeography, args),
-  publishGeography: (...args) => RpcRequest(options, GeographyServiceRpcClient.publishGeography, args),
-  getGeographiesByIds: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeographiesByIds, args)
-})
+export const GeographyServiceClientFactory = (
+  context: GeographyServiceRequestContext,
+  options: RpcRequestOptions = {}
+): ServiceClient<GeographyService> => {
+  const GeographyServiceRpcClient = RpcClient(GeographyServiceDefinition, {
+    context,
+    host: process.env.GEOGRAPHY_SERVICE_RPC_HOST,
+    port: process.env.GEOGRAPHY_SERVICE_RPC_PORT
+  })
 
-export const GeographyServiceClient = GeographyServiceClientFactory()
+  return {
+    getGeography: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeography, args),
+    getGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeographies, args),
+    getUnpublishedGeographies: (...args) =>
+      RpcRequest(options, GeographyServiceRpcClient.getUnpublishedGeographies, args),
+    getPublishedGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.getPublishedGeographies, args),
+    writeGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.writeGeographies, args),
+    writeGeographiesMetadata: (...args) =>
+      RpcRequest(options, GeographyServiceRpcClient.writeGeographiesMetadata, args),
+    editGeography: (...args) => RpcRequest(options, GeographyServiceRpcClient.editGeography, args),
+    publishGeography: (...args) => RpcRequest(options, GeographyServiceRpcClient.publishGeography, args),
+    getGeographiesByIds: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeographiesByIds, args)
+  }
+}
+
+export const GeographyServiceClient = GeographyServiceClientFactory({})

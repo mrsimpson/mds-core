@@ -1,5 +1,15 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [c3d2215d]
+  - @mds-core/mds-service-helpers@0.5.0
+  - @mds-core/mds-transaction-service@0.5.0
+  - @mds-core/mds-api-server@0.3.20
+  - @mds-core/mds-api-helpers@0.1.66
+
 ## 0.2.2
 
 ### Patch Changes

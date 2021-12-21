@@ -15,33 +15,34 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { IngestServiceDefinition } from '../@types'
+import { IngestMigrationService, IngestService, IngestServiceDefinition, IngestServiceRequestContext } from '../@types'
 import { IngestServiceClient } from '../client'
 import { IngestServiceProvider } from './provider'
 
-export const IngestServiceManager = RpcServer(
+export const IngestServiceManager = RpcServer<IngestService & IngestMigrationService, IngestServiceRequestContext>(
   IngestServiceDefinition,
   {
     onStart: IngestServiceProvider.start,
     onStop: IngestServiceProvider.stop
   },
   {
-    getDevicesUsingOptions: args => IngestServiceProvider.getDevicesUsingOptions(...args),
-    getDevicesUsingCursor: args => IngestServiceProvider.getDevicesUsingCursor(...args),
-    getEventsUsingOptions: args => IngestServiceProvider.getEventsUsingOptions(...args),
-    getEventsUsingCursor: args => IngestServiceProvider.getEventsUsingCursor(...args),
-    getDevices: args => IngestServiceProvider.getDevices(...args),
-    getLatestTelemetryForDevices: args => IngestServiceProvider.getLatestTelemetryForDevices(...args),
-    writeEvents: args => IngestServiceProvider.writeEvents(...args),
-    writeEventAnnotations: args => IngestServiceProvider.writeEventAnnotations(...args),
-    writeMigratedDevice: args => IngestServiceProvider.writeMigratedDevice(...args),
-    writeMigratedVehicleEvent: args => IngestServiceProvider.writeMigratedVehicleEvent(...args),
-    writeMigratedTelemetry: args => IngestServiceProvider.writeMigratedTelemetry(...args),
-    getTripEvents: args => IngestServiceProvider.getTripEvents(...args),
-    getEventsWithDeviceAndTelemetryInfoUsingOptions: args =>
-      IngestServiceProvider.getEventsWithDeviceAndTelemetryInfoUsingOptions(...args),
-    getEventsWithDeviceAndTelemetryInfoUsingCursor: args =>
-      IngestServiceProvider.getEventsWithDeviceAndTelemetryInfoUsingCursor(...args)
+    getDevicesUsingOptions: (args, context) => IngestServiceProvider.getDevicesUsingOptions(context, ...args),
+    getDevicesUsingCursor: (args, context) => IngestServiceProvider.getDevicesUsingCursor(context, ...args),
+    getEventsUsingOptions: (args, context) => IngestServiceProvider.getEventsUsingOptions(context, ...args),
+    getEventsUsingCursor: (args, context) => IngestServiceProvider.getEventsUsingCursor(context, ...args),
+    getDevices: (args, context) => IngestServiceProvider.getDevices(context, ...args),
+    getLatestTelemetryForDevices: (args, context) =>
+      IngestServiceProvider.getLatestTelemetryForDevices(context, ...args),
+    writeEvents: (args, context) => IngestServiceProvider.writeEvents(context, ...args),
+    writeEventAnnotations: (args, context) => IngestServiceProvider.writeEventAnnotations(context, ...args),
+    writeMigratedDevice: (args, context) => IngestServiceProvider.writeMigratedDevice(context, ...args),
+    writeMigratedVehicleEvent: (args, context) => IngestServiceProvider.writeMigratedVehicleEvent(context, ...args),
+    writeMigratedTelemetry: (args, context) => IngestServiceProvider.writeMigratedTelemetry(context, ...args),
+    getTripEvents: (args, context) => IngestServiceProvider.getTripEvents(context, ...args),
+    getEventsWithDeviceAndTelemetryInfoUsingOptions: (args, context) =>
+      IngestServiceProvider.getEventsWithDeviceAndTelemetryInfoUsingOptions(context, ...args),
+    getEventsWithDeviceAndTelemetryInfoUsingCursor: (args, context) =>
+      IngestServiceProvider.getEventsWithDeviceAndTelemetryInfoUsingCursor(context, ...args)
   },
   {
     port: process.env.INGEST_SERVICE_RPC_PORT,

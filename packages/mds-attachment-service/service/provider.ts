@@ -15,16 +15,16 @@
  */
 
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
-import { UUID } from '@mds-core/mds-types'
-import { AttachmentService, ReadAttachmentsOptions } from '../@types'
+import { AttachmentService, AttachmentServiceRequestContext } from '../@types'
 import { AttachmentServiceLogger } from '../logger'
 import { AttachmentRepository } from '../repository'
 import { deleteAttachmentS3, validateFile, writeAttachmentS3 } from './helpers'
 
-export const AttachmentServiceProvider: ServiceProvider<AttachmentService> & ProcessController = {
+export const AttachmentServiceProvider: ServiceProvider<AttachmentService, AttachmentServiceRequestContext> &
+  ProcessController = {
   start: AttachmentRepository.initialize,
   stop: AttachmentRepository.shutdown,
-  writeAttachment: async (rpc_file, attachment_list_id) => {
+  writeAttachment: async (context, rpc_file, attachment_list_id) => {
     try {
       const file = validateFile(rpc_file)
       const attachment = { ...(await writeAttachmentS3(file)), attachment_list_id }
@@ -36,7 +36,7 @@ export const AttachmentServiceProvider: ServiceProvider<AttachmentService> & Pro
       return exception
     }
   },
-  deleteAttachment: async (attachment_id: UUID) => {
+  deleteAttachment: async (context, attachment_id) => {
     try {
       const attachment = await AttachmentRepository.deleteAttachment(attachment_id)
       if (attachment) {
@@ -49,7 +49,7 @@ export const AttachmentServiceProvider: ServiceProvider<AttachmentService> & Pro
       return exception
     }
   },
-  readAttachment: async (attachment_id: UUID) => {
+  readAttachment: async (context, attachment_id) => {
     try {
       const attachment = await AttachmentRepository.readAttachment(attachment_id)
       return ServiceResult(attachment)
@@ -59,7 +59,7 @@ export const AttachmentServiceProvider: ServiceProvider<AttachmentService> & Pro
       return exception
     }
   },
-  readAttachments: async (options: ReadAttachmentsOptions) => {
+  readAttachments: async (context, options) => {
     try {
       const attachments = await AttachmentRepository.readAttachments(options)
       return ServiceResult(attachments)

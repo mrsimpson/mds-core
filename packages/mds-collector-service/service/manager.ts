@@ -15,20 +15,20 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { CollectorServiceRpcDefinition } from '../@types'
+import { CollectorService, CollectorServiceRequestContext, CollectorServiceRpcDefinition } from '../@types'
 import { CollectorServiceClient } from '../client'
 import { CollectorServiceProvider } from './provider'
 
-export const CollectorServiceManager = RpcServer(
+export const CollectorServiceManager = RpcServer<CollectorService, CollectorServiceRequestContext>(
   CollectorServiceRpcDefinition,
   {
     onStart: CollectorServiceProvider.start,
     onStop: CollectorServiceProvider.stop
   },
   {
-    registerMessageSchema: args => CollectorServiceProvider.registerMessageSchema(...args),
-    getMessageSchema: args => CollectorServiceProvider.getMessageSchema(...args),
-    writeSchemaMessages: args => CollectorServiceProvider.writeSchemaMessages(...args)
+    registerMessageSchema: (args, context) => CollectorServiceProvider.registerMessageSchema(context, ...args),
+    getMessageSchema: (args, context) => CollectorServiceProvider.getMessageSchema(context, ...args),
+    writeSchemaMessages: (args, context) => CollectorServiceProvider.writeSchemaMessages(context, ...args)
   },
   {
     port: process.env.COLLECTOR_SERVICE_RPC_PORT,

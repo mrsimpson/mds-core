@@ -15,16 +15,17 @@
  */
 
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
-import { JurisdictionService } from '../@types'
+import { JurisdictionService, JurisdictionServiceRequestContext } from '../@types'
 import { JurisdictionServiceLogger } from '../logger'
 import { JurisdictionRepository } from '../repository'
 import { ValidateJurisdictionForCreate } from './validators'
 
-export const JurisdictionServiceProvider: ServiceProvider<JurisdictionService> & ProcessController = {
+export const JurisdictionServiceProvider: ServiceProvider<JurisdictionService, JurisdictionServiceRequestContext> &
+  ProcessController = {
   start: JurisdictionRepository.initialize,
   stop: JurisdictionRepository.shutdown,
 
-  createJurisdiction: async model => {
+  createJurisdiction: async (context, model) => {
     try {
       const [jurisdiction] = await JurisdictionRepository.createJurisdictions(
         [model].map(ValidateJurisdictionForCreate)
@@ -37,7 +38,7 @@ export const JurisdictionServiceProvider: ServiceProvider<JurisdictionService> &
     }
   },
 
-  createJurisdictions: async models => {
+  createJurisdictions: async (context, models) => {
     try {
       const jurisdictions = await JurisdictionRepository.createJurisdictions(models.map(ValidateJurisdictionForCreate))
       return ServiceResult(jurisdictions)
@@ -48,7 +49,7 @@ export const JurisdictionServiceProvider: ServiceProvider<JurisdictionService> &
     }
   },
 
-  deleteJurisdiction: async jurisdiction_id => {
+  deleteJurisdiction: async (context, jurisdiction_id) => {
     try {
       const deleted = await JurisdictionRepository.deleteJurisdiction(jurisdiction_id)
       return ServiceResult(deleted)
@@ -59,7 +60,7 @@ export const JurisdictionServiceProvider: ServiceProvider<JurisdictionService> &
     }
   },
 
-  getJurisdiction: async (jurisdiction_id, options) => {
+  getJurisdiction: async (context, jurisdiction_id, options) => {
     try {
       const jurisdiction = await JurisdictionRepository.readJurisdiction(jurisdiction_id, options ?? {})
       return ServiceResult(jurisdiction)
@@ -70,7 +71,7 @@ export const JurisdictionServiceProvider: ServiceProvider<JurisdictionService> &
     }
   },
 
-  getJurisdictions: async options => {
+  getJurisdictions: async (context, options) => {
     try {
       const jurisdicitons = await JurisdictionRepository.readJurisdictions(options ?? {})
       return ServiceResult(jurisdicitons)
@@ -81,7 +82,7 @@ export const JurisdictionServiceProvider: ServiceProvider<JurisdictionService> &
     }
   },
 
-  updateJurisdiction: async (jurisdiction_id, jurisdiction) => {
+  updateJurisdiction: async (context, jurisdiction_id, jurisdiction) => {
     try {
       const updated = await JurisdictionRepository.updateJurisdiction(jurisdiction_id, jurisdiction)
       return ServiceResult(updated)

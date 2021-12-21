@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { Nullable, Timestamp, UUID, VEHICLE_EVENT, VEHICLE_STATE } from '@mds-core/mds-types'
 
 export interface MatchedVehicleInformation {
@@ -187,3 +187,5 @@ export const ComplianceServiceDefinition: RpcServiceDefinition<ComplianceService
   getComplianceViolation: RpcRoute<ComplianceService['getComplianceViolation']>(),
   getComplianceViolationsByTimeInterval: RpcRoute<ComplianceService['getComplianceViolationsByTimeInterval']>()
 }
+
+export type ComplianceServiceRequestContext = RpcEmptyRequestContext

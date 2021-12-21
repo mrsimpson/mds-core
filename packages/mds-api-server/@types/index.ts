@@ -40,7 +40,7 @@ export type ApiRequestQuery<S extends string, M extends string[] = never> = {
 /**
  * Standard format for API errors
  */
-export type ApiError = { error: unknown; error_description?: string; error_details?: any[] } | { errors: unknown[] }
+export type ApiError = { error: unknown; error_description?: string; error_details?: unknown[] } | { errors: unknown[] }
 
 /**
  * B: Type of response body (res.send)

@@ -15,23 +15,23 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { JurisdictionServiceDefinition } from '../@types'
+import { JurisdictionService, JurisdictionServiceDefinition, JurisdictionServiceRequestContext } from '../@types'
 import { JurisdictionServiceClient } from '../client'
 import { JurisdictionServiceProvider } from './provider'
 
-export const JurisdictionServiceManager = RpcServer(
+export const JurisdictionServiceManager = RpcServer<JurisdictionService, JurisdictionServiceRequestContext>(
   JurisdictionServiceDefinition,
   {
     onStart: JurisdictionServiceProvider.start,
     onStop: JurisdictionServiceProvider.stop
   },
   {
-    createJurisdiction: args => JurisdictionServiceProvider.createJurisdiction(...args),
-    createJurisdictions: args => JurisdictionServiceProvider.createJurisdictions(...args),
-    deleteJurisdiction: args => JurisdictionServiceProvider.deleteJurisdiction(...args),
-    getJurisdiction: args => JurisdictionServiceProvider.getJurisdiction(...args),
-    getJurisdictions: args => JurisdictionServiceProvider.getJurisdictions(...args),
-    updateJurisdiction: args => JurisdictionServiceProvider.updateJurisdiction(...args)
+    createJurisdiction: (args, context) => JurisdictionServiceProvider.createJurisdiction(context, ...args),
+    createJurisdictions: (args, context) => JurisdictionServiceProvider.createJurisdictions(context, ...args),
+    deleteJurisdiction: (args, context) => JurisdictionServiceProvider.deleteJurisdiction(context, ...args),
+    getJurisdiction: (args, context) => JurisdictionServiceProvider.getJurisdiction(context, ...args),
+    getJurisdictions: (args, context) => JurisdictionServiceProvider.getJurisdictions(context, ...args),
+    updateJurisdiction: (args, context) => JurisdictionServiceProvider.updateJurisdiction(context, ...args)
   },
   {
     port: process.env.JURISDICTION_SERVICE_RPC_PORT,

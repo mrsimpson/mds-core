@@ -1,5 +1,14 @@
 # @mds-core/mds-geography-api
 
+## 0.3.3
+
+### Patch Changes
+
+- Updated dependencies [c3d2215d]
+  - @mds-core/mds-geography-service@0.8.0
+  - @mds-core/mds-api-server@0.3.20
+  - @mds-core/mds-api-helpers@0.1.66
+
 ## 0.3.2
 
 ### Patch Changes

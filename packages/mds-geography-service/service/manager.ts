@@ -15,26 +15,26 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { GeographyServiceDefinition } from '../@types'
+import { GeographyService, GeographyServiceDefinition, GeographyServiceRequestContext } from '../@types'
 import { GeographyServiceClient } from '../client'
 import { GeographyServiceProvider } from './provider'
 
-export const GeographyServiceManager = RpcServer(
+export const GeographyServiceManager = RpcServer<GeographyService, GeographyServiceRequestContext>(
   GeographyServiceDefinition,
   {
     onStart: GeographyServiceProvider.start,
     onStop: GeographyServiceProvider.stop
   },
   {
-    getGeography: args => GeographyServiceProvider.getGeography(...args),
-    getGeographies: args => GeographyServiceProvider.getGeographies(...args),
-    getUnpublishedGeographies: args => GeographyServiceProvider.getUnpublishedGeographies(...args),
-    getPublishedGeographies: args => GeographyServiceProvider.getPublishedGeographies(...args),
-    writeGeographies: args => GeographyServiceProvider.writeGeographies(...args),
-    writeGeographiesMetadata: args => GeographyServiceProvider.writeGeographiesMetadata(...args),
-    editGeography: args => GeographyServiceProvider.editGeography(...args),
-    publishGeography: args => GeographyServiceProvider.publishGeography(...args),
-    getGeographiesByIds: args => GeographyServiceProvider.getGeographiesByIds(...args)
+    getGeography: (args, context) => GeographyServiceProvider.getGeography(context, ...args),
+    getGeographies: (args, context) => GeographyServiceProvider.getGeographies(context, ...args),
+    getUnpublishedGeographies: (args, context) => GeographyServiceProvider.getUnpublishedGeographies(context, ...args),
+    getPublishedGeographies: (args, context) => GeographyServiceProvider.getPublishedGeographies(context, ...args),
+    writeGeographies: (args, context) => GeographyServiceProvider.writeGeographies(context, ...args),
+    writeGeographiesMetadata: (args, context) => GeographyServiceProvider.writeGeographiesMetadata(context, ...args),
+    editGeography: (args, context) => GeographyServiceProvider.editGeography(context, ...args),
+    publishGeography: (args, context) => GeographyServiceProvider.publishGeography(context, ...args),
+    getGeographiesByIds: (args, context) => GeographyServiceProvider.getGeographiesByIds(context, ...args)
   },
   {
     port: process.env.GEOGRAPHY_SERVICE_RPC_PORT,

@@ -15,21 +15,21 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { AttachmentServiceDefinition } from '../@types'
+import { AttachmentService, AttachmentServiceDefinition, AttachmentServiceRequestContext } from '../@types'
 import { AttachmentServiceClient } from '../client'
 import { AttachmentServiceProvider } from './provider'
 
-export const AttachmentServiceManager = RpcServer(
+export const AttachmentServiceManager = RpcServer<AttachmentService, AttachmentServiceRequestContext>(
   AttachmentServiceDefinition,
   {
     onStart: AttachmentServiceProvider.start,
     onStop: AttachmentServiceProvider.stop
   },
   {
-    writeAttachment: args => AttachmentServiceProvider.writeAttachment(...args),
-    deleteAttachment: args => AttachmentServiceProvider.deleteAttachment(...args),
-    readAttachment: args => AttachmentServiceProvider.readAttachment(...args),
-    readAttachments: args => AttachmentServiceProvider.readAttachments(...args)
+    writeAttachment: (args, context) => AttachmentServiceProvider.writeAttachment(context, ...args),
+    deleteAttachment: (args, context) => AttachmentServiceProvider.deleteAttachment(context, ...args),
+    readAttachment: (args, context) => AttachmentServiceProvider.readAttachment(context, ...args),
+    readAttachments: (args, context) => AttachmentServiceProvider.readAttachments(context, ...args)
   },
   {
     port: process.env.ATTACHMENT_SERVICE_RPC_PORT,

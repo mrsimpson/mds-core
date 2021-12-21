@@ -15,26 +15,26 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { TransactionServiceDefinition } from '../@types'
+import { TransactionService, TransactionServiceDefinition, TransactionServiceRequestContext } from '../@types'
 import { TransactionServiceClient } from '../client'
 import { TransactionServiceProvider } from './provider'
 
-export const TransactionServiceManager = RpcServer(
+export const TransactionServiceManager = RpcServer<TransactionService, TransactionServiceRequestContext>(
   TransactionServiceDefinition,
   {
     onStart: TransactionServiceProvider.start,
     onStop: TransactionServiceProvider.stop
   },
   {
-    createTransaction: args => TransactionServiceProvider.createTransaction(...args),
-    createTransactions: args => TransactionServiceProvider.createTransactions(...args),
-    getTransaction: args => TransactionServiceProvider.getTransaction(...args),
-    getTransactions: args => TransactionServiceProvider.getTransactions(...args),
-    addTransactionOperation: args => TransactionServiceProvider.addTransactionOperation(...args),
-    getTransactionOperations: args => TransactionServiceProvider.getTransactionOperations(...args),
-    setTransactionStatus: args => TransactionServiceProvider.setTransactionStatus(...args),
-    getTransactionStatuses: args => TransactionServiceProvider.getTransactionStatuses(...args),
-    getTransactionsStatuses: args => TransactionServiceProvider.getTransactionsStatuses(...args)
+    createTransaction: (args, context) => TransactionServiceProvider.createTransaction(context, ...args),
+    createTransactions: (args, context) => TransactionServiceProvider.createTransactions(context, ...args),
+    getTransaction: (args, context) => TransactionServiceProvider.getTransaction(context, ...args),
+    getTransactions: (args, context) => TransactionServiceProvider.getTransactions(context, ...args),
+    addTransactionOperation: (args, context) => TransactionServiceProvider.addTransactionOperation(context, ...args),
+    getTransactionOperations: (args, context) => TransactionServiceProvider.getTransactionOperations(context, ...args),
+    setTransactionStatus: (args, context) => TransactionServiceProvider.setTransactionStatus(context, ...args),
+    getTransactionStatuses: (args, context) => TransactionServiceProvider.getTransactionStatuses(context, ...args),
+    getTransactionsStatuses: (args, context) => TransactionServiceProvider.getTransactionsStatuses(context, ...args)
   },
   {
     port: process.env.TRANSACTION_SERVICE_RPC_PORT,

@@ -15,18 +15,18 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { AuditServiceDefinition } from '../@types'
+import { AuditService, AuditServiceDefinition, AuditServiceRequestContext } from '../@types'
 import { AuditServiceClient } from '../client'
 import { AuditServiceProvider } from './provider'
 
-export const AuditServiceManager = RpcServer(
+export const AuditServiceManager = RpcServer<AuditService, AuditServiceRequestContext>(
   AuditServiceDefinition,
   {
     onStart: AuditServiceProvider.start,
     onStop: AuditServiceProvider.stop
   },
   {
-    name: args => AuditServiceProvider.name(...args)
+    name: (args, context) => AuditServiceProvider.name(context, ...args)
   },
   {
     port: process.env.AUDIT_SERVICE_RPC_PORT,

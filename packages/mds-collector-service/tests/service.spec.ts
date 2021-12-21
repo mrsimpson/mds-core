@@ -14,7 +14,7 @@
 
 import { TestSchema } from '@mds-core/mds-schema-validators'
 import { uuid } from '@mds-core/mds-utils'
-import { CollectorServiceClient, CollectorServiceSchemaClient } from '../client'
+import { CollectorServiceClient } from '../client'
 import { CollectorRepository } from '../repository'
 import { CollectorServiceManager } from '../service/manager'
 
@@ -25,11 +25,9 @@ const TEST_COLLECTOR_MESSAGES: Array<TestSchema> = [
   { id: uuid(), name: 'Prime Minister', country: 'CA', zip: 'K1M 1M4' }
 ]
 
-const TestSchemaCollectorClient = CollectorServiceSchemaClient(TEST_SCHEMA_ID, TestSchema)
-
 describe('Collector Service', () => {
   it('Service Unavailable', async () => {
-    await expect(TestSchemaCollectorClient.getMessageSchema()).rejects.toMatchObject({
+    await expect(CollectorServiceClient.getMessageSchema(TEST_SCHEMA_ID)).rejects.toMatchObject({
       isServiceError: true,
       type: 'ServiceUnavailable'
     })
@@ -59,7 +57,7 @@ describe('Collector Service', () => {
     })
 
     it('Register Schema (OK)', async () => {
-      await expect(TestSchemaCollectorClient.registerMessageSchema()).resolves.toEqual(true)
+      await expect(CollectorServiceClient.registerMessageSchema(TEST_SCHEMA_ID, TestSchema)).resolves.toEqual(true)
     })
 
     it('Register Schema (Error)', async () => {
@@ -69,12 +67,12 @@ describe('Collector Service', () => {
     })
 
     it('Get Schema (OK)', async () => {
-      const schema = await TestSchemaCollectorClient.getMessageSchema()
+      const schema = await CollectorServiceClient.getMessageSchema(TEST_SCHEMA_ID)
       expect(schema).toMatchObject({ $schema: 'http://json-schema.org/draft-07/schema#', ...TestSchema })
     })
 
-    it('Get Schema (Error)', async () => {
-      await expect(CollectorServiceClient.getMessageSchema('notfound')).rejects.toMatchObject({
+    it('Get Schema (Invalid schema_id)', async () => {
+      await expect(CollectorServiceClient.getMessageSchema('invalid')).rejects.toMatchObject({
         isServiceError: true,
         type: 'NotFoundError'
       })
@@ -82,26 +80,38 @@ describe('Collector Service', () => {
 
     it('Write Schema Messages (OK)', async () => {
       const provider_id = uuid()
-      const written = await TestSchemaCollectorClient.writeSchemaMessages(provider_id, TEST_COLLECTOR_MESSAGES)
+      const written = await CollectorServiceClient.writeSchemaMessages(
+        TEST_SCHEMA_ID,
+        provider_id,
+        TEST_COLLECTOR_MESSAGES
+      )
       expect(written).toMatchObject(
         TEST_COLLECTOR_MESSAGES.map(message => ({ schema_id: TEST_SCHEMA_ID, provider_id, message }))
       )
     })
 
-    it('Write Schema Messages (Error)', async () => {
-      const [message] = TEST_COLLECTOR_MESSAGES
+    it('Write Schema Messages (Invalid schema_id)', async () => {
       await expect(
-        TestSchemaCollectorClient.writeSchemaMessages(uuid(), [{ ...message, email: 'invalid' }])
+        CollectorServiceClient.writeSchemaMessages('invalid', uuid(), TEST_COLLECTOR_MESSAGES)
+      ).rejects.toMatchObject({
+        isServiceError: true,
+        type: 'NotFoundError'
+      })
+    })
+
+    it('Write Schema Messages (Invalid provider_id)', async () => {
+      await expect(
+        CollectorServiceClient.writeSchemaMessages(TEST_SCHEMA_ID, 'invalid', TEST_COLLECTOR_MESSAGES)
       ).rejects.toMatchObject({
         isServiceError: true,
         type: 'ValidationError'
       })
     })
 
-    it('Write Schema Messages (Error)', async () => {
+    it('Write Schema Messages (Invalid message)', async () => {
       const [message] = TEST_COLLECTOR_MESSAGES
       await expect(
-        TestSchemaCollectorClient.writeSchemaMessages(uuid(), [{ ...message, email: 'invalid' }])
+        CollectorServiceClient.writeSchemaMessages(TEST_SCHEMA_ID, uuid(), [{ ...message, email: 'invalid' }])
       ).rejects.toMatchObject({
         isServiceError: true,
         type: 'ValidationError'

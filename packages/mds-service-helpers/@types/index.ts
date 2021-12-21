@@ -71,15 +71,16 @@ export type SerializedBuffers<T> = {
 
 export type ServiceResponse<R> = ServiceErrorType | ServiceResultType<R>
 
-export type ServiceClient<S> = {
-  [M in keyof S]: S[M] extends AnyFunction<infer R>
-    ? (...args: Parameters<S[M]>) => Promise<SerializedBuffers<R>>
+export type ServiceClient<Service> = {
+  [Method in keyof Service]: Service[Method] extends AnyFunction<infer R>
+    ? (...args: Parameters<Service[Method]>) => Promise<SerializedBuffers<R>>
     : never
 }
 
-export type ServiceProvider<S> = {
-  [M in keyof S]: S[M] extends (...args: infer P) => infer R
+export type ServiceProvider<Service, RequestContext extends {}> = {
+  [Method in keyof Service]: Service[Method] extends (...args: infer P) => infer R
     ? (
+        context: RequestContext,
         ...args: {
           [K in keyof P]: undefined extends P[K] ? Nullable<SerializedBuffers<P[K]>> : SerializedBuffers<P[K]>
         }
@@ -87,7 +88,9 @@ export type ServiceProvider<S> = {
     : never
 }
 
-export type ServiceProviderResponse<S, M extends keyof S> = ReturnType<ServiceProvider<S>[M]>
+export type ServiceProviderResponse<Service, RequestContext extends {}, Method extends keyof Service> = ReturnType<
+  ServiceProvider<Service, RequestContext>[Method]
+>
 
 export interface ProcessController {
   start: () => Promise<void>

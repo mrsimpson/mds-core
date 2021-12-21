@@ -15,11 +15,11 @@
  */
 
 import { ProcessController, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
-import { AuditService } from '../@types'
+import { AuditService, AuditServiceRequestContext } from '../@types'
 import { AuditRepository } from '../repository'
 
-export const AuditServiceProvider: ServiceProvider<AuditService> & ProcessController = {
+export const AuditServiceProvider: ServiceProvider<AuditService, AuditServiceRequestContext> & ProcessController = {
   start: AuditRepository.initialize,
   stop: AuditRepository.shutdown,
-  name: async () => ServiceResult('mds-audit-service')
+  name: async context => ServiceResult('mds-audit-service')
 }

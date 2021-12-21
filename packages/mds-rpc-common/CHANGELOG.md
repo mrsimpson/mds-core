@@ -1,5 +1,17 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.0
+
+### Minor Changes
+
+- c3d2215d: Add support for RPC request contexts
+
+### Patch Changes
+
+- Updated dependencies [c3d2215d]
+  - @mds-core/mds-service-helpers@0.5.0
+  - @mds-core/mds-api-server@0.3.20
+
 ## 0.2.11
 
 ### Patch Changes

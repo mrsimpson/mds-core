@@ -1,5 +1,18 @@
 # @mds-core/mds-transaction-service
 
+## 0.5.0
+
+### Minor Changes
+
+- c3d2215d: Add support for RPC request contexts
+
+### Patch Changes
+
+- Updated dependencies [c3d2215d]
+  - @mds-core/mds-rpc-common@0.3.0
+  - @mds-core/mds-ingest-service@0.8.0
+  - @mds-core/mds-service-helpers@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes

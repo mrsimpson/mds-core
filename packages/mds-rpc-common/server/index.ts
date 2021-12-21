@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { ModuleRpcCommon } from '@lacuna-tech/rpc_ts/lib/common'
 import { ModuleRpcProtocolGrpcWebCommon } from '@lacuna-tech/rpc_ts/lib/protocol/grpc_web/common'
 import { ModuleRpcProtocolServer } from '@lacuna-tech/rpc_ts/lib/protocol/server'
 import { ServiceHandlerFor } from '@lacuna-tech/rpc_ts/lib/server/server'
@@ -31,7 +32,7 @@ import express, { Express } from 'express'
 import http from 'http'
 import net from 'net'
 import REPL from 'repl'
-import { REPL_PORT, RpcServiceDefinition, RPC_CONTENT_TYPE, RPC_PORT } from '../@types'
+import { REPL_PORT, RpcServiceDefinition, RPC_CONTENT_TYPE, RPC_CONTEXT_KEY, RPC_PORT } from '../@types'
 import { RpcCommonLogger } from '../logger'
 
 export interface RpcServiceHandlers {
@@ -95,10 +96,10 @@ const startRepl = (options: RpcServerOptions['repl']): Promise<net.Server> =>
     })
   })
 
-export const RpcServer = <S>(
-  definition: RpcServiceDefinition<S>,
+export const RpcServer = <Service, RequestContext extends {}>(
+  definition: RpcServiceDefinition<Service>,
   { onStart, onStop }: RpcServiceHandlers,
-  routes: ServiceHandlerFor<RpcServiceDefinition<S>>,
+  routes: ServiceHandlerFor<RpcServiceDefinition<Service>, RequestContext>,
   options: Partial<RpcServerOptions> = {}
 ): ProcessManager => {
   let server: Nullable<http.Server> = null
@@ -123,7 +124,13 @@ export const RpcServer = <S>(
             .get('/health', HealthRequestHandler)
             .use(
               ModuleRpcProtocolServer.registerRpcRoutes(definition, routes, {
-                codec: new ModuleRpcProtocolGrpcWebCommon.GrpcWebJsonWithGzipCodec()
+                codec: new ModuleRpcProtocolGrpcWebCommon.GrpcWebJsonWithGzipCodec(),
+                serverContextConnector: {
+                  // Not using response contexts
+                  provideResponseContext: async () => ({}),
+                  decodeRequestContext: async (encoded: ModuleRpcCommon.EncodedContext) =>
+                    JSON.parse(Buffer.from(encoded[RPC_CONTEXT_KEY], 'base64').toString('utf-8'))
+                }
               })
             ),
           port
