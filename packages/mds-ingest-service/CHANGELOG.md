@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.9.0
+
+### Minor Changes
+
+- e19f42db: Allow bypassing RPC when calling the getTripEvents method.
+
 ## 0.8.0
 
 ### Minor Changes

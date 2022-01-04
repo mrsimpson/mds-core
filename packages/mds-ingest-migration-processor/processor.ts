@@ -15,6 +15,7 @@
  */
 
 import cache from '@mds-core/mds-agency-cache'
+import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
 import { DeviceDomainModel, IngestServiceClient, MigratedEntityModel } from '@mds-core/mds-ingest-service'
 import { IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import { ProcessManager } from '@mds-core/mds-service-helpers'
@@ -43,6 +44,7 @@ import {
 } from '@mds-core/mds-types'
 import { asArray, filterDefined, ServerError } from '@mds-core/mds-utils'
 import { bool, cleanEnv, num, str } from 'envalid'
+import express from 'express'
 import { IngestMigrationProcessorLogger } from './logger'
 
 const { KAFKA_HOST, SOURCE_TENANT_ID, TENANT_ID, MIGRATION_BLOCK_SIZE_LIMIT, MIGRATION_INITIALIZE_CACHE } = cleanEnv(
@@ -272,6 +274,10 @@ export const IngestMigrationProcessor = (): StreamProcessorController => {
   const processors = [DevicesMigrationProcessor, EventsMigrationProcessor, TelemetryMigrationProcessor]
   return ProcessManager({
     start: async () => {
+      HttpServer(
+        ApiServer((app: express.Express): express.Express => app),
+        { port: process.env.MDS_INGEST_MIGRATION_PROCESSOR_HTTP_PORT }
+      )
       await initializeCacheForMigration()
       await Promise.all(processors.map(processor => processor.start()))
     },

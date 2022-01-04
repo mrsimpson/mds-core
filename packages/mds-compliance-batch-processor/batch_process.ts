@@ -15,12 +15,14 @@
  */
 
 import cache from '@mds-core/mds-agency-cache'
+import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
 import { getAllInputs, getSupersedingPolicies, processPolicy } from '@mds-core/mds-compliance-engine'
 import { ComplianceServiceClient, ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
 import db from '@mds-core/mds-db'
 import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { ProcessManager, SerializedBuffers } from '@mds-core/mds-service-helpers'
 import { minutes, now } from '@mds-core/mds-utils'
+import express from 'express'
 import { ComplianceBatchProcessorLogger } from './logger'
 
 const BATCH_SIZE = Number(process.env.BATCH_SIZE) || 5
@@ -59,6 +61,10 @@ export async function computeSnapshot() {
 ProcessManager(
   {
     start: async () => {
+      HttpServer(
+        ApiServer((app: express.Express): express.Express => app),
+        { port: process.env.MDS_COMPLIANCE_BATCH_PROCESSOR_HTTP_PORT }
+      )
       try {
         const start = now()
         await computeSnapshot()
@@ -71,7 +77,7 @@ ProcessManager(
 
         process.exit(0)
       } catch (error) {
-        ComplianceBatchProcessorLogger.error('mds-compliance-engine ran into an error, retrying', error)
+        ComplianceBatchProcessorLogger.error('mds-compliance-engine ran into an error, retrying', { error })
         throw error
       }
     },
