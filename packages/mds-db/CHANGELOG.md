@@ -1,5 +1,12 @@
 # @mds-core/mds-db
 
+## 0.4.27
+
+### Patch Changes
+
+- Updated dependencies [e19f42db]
+  - @mds-core/mds-ingest-service@0.9.0
+
 ## 0.4.26
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.36
+
+### Patch Changes
+
+- c4c4f324: Adding mds-api-server server start invocation to enable health checks
+- Updated dependencies [e19f42db]
+  - @mds-core/mds-ingest-service@0.9.0
+
 ## 0.0.35
 
 ### Patch Changes
