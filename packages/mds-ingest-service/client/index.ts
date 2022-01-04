@@ -49,7 +49,10 @@ export const IngestServiceClientFactory = (
     writeMigratedDevice: (...args) => RpcRequest(options, IngestServiceRpcClient.writeMigratedDevice, args),
     writeMigratedVehicleEvent: (...args) => RpcRequest(options, IngestServiceRpcClient.writeMigratedVehicleEvent, args),
     writeMigratedTelemetry: (...args) => RpcRequest(options, IngestServiceRpcClient.writeMigratedTelemetry, args),
-    getTripEvents: (...args) => RpcRequest(options, IngestServiceRpcClient.getTripEvents, args),
+    getTripEvents: (...args) =>
+      process.env.ENABLE_RPC === 'true'
+        ? RpcRequest(options, IngestServiceRpcClient.getTripEvents, args)
+        : UnwrapServiceResult(IngestServiceProvider.getTripEvents)(context, ...args),
     getEventsWithDeviceAndTelemetryInfoUsingOptions: (...args) =>
       RpcRequest(options, IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingOptions, args),
     getEventsWithDeviceAndTelemetryInfoUsingCursor: (...args) =>
