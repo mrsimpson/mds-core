@@ -1,5 +1,14 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.1.25
+
+### Patch Changes
+
+- c4c4f324: Adding mds-api-server server start invocation to enable health checks
+  - @mds-core/mds-db@0.4.27
+  - @mds-core/mds-compliance-engine@0.7.6
+  - @mds-core/mds-compliance-service@0.10.1
+
 ## 0.1.24
 
 ### Patch Changes
