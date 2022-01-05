@@ -1,5 +1,13 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.1.26
+
+### Patch Changes
+
+- 99d6f920: Remove dependency on mds-cache, and use mds-ingest-service's getEventsUsingOptions query instead for fetching provider inputs.
+- Updated dependencies [99d6f920]
+  - @mds-core/mds-compliance-engine@0.7.7
+
 ## 0.1.25
 
 ### Patch Changes
