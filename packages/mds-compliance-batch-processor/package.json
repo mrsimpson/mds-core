@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-batch-processor",
-  "version": "0.1.25",
+  "version": "0.1.26",
   "description": "MDS Compliance Batch Processor",
   "keywords": [
     "mds",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@mds-core/mds-api-server": "workspace:0.3.20",
-    "@mds-core/mds-compliance-engine": "workspace:0.7.6",
+    "@mds-core/mds-compliance-engine": "workspace:0.7.7",
     "@mds-core/mds-compliance-service": "workspace:0.10.1",
     "@mds-core/mds-db": "workspace:0.4.27",
     "@mds-core/mds-logger": "workspace:0.5.2",
