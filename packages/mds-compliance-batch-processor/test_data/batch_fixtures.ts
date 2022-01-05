@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
 import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { providers } from '@mds-core/mds-providers'
@@ -37,7 +36,7 @@ process.env.TIMEZONE = 'America/Los_Angeles'
 
 /**
  * Generate fixtures for the top-level batch_process.ts script to run against
- * and populates the cache and db. It didn't feel worth the effort to make
+ * and populates the db. It didn't feel worth the effort to make
  * a proper test that mocked out the ComplianceSnapshotService.
  */
 async function main() {
@@ -46,7 +45,6 @@ async function main() {
   await db.reinitialize()
   await db.writeGeography(geographies[0])
   await db.publishGeography(geographies[0])
-  await cache.startup()
 
   const providerIDs = Object.keys(providers).slice(0, 4)
   const devices = providerIDs.reduce((acc: Device_v1_1_0[], providerID) => {
@@ -60,14 +58,12 @@ async function main() {
     speed: 2000
   })
 
-  await cache.seed({ devices, events, telemetry: [] })
-  await Promise.all(devices.map(device => db.writeDevice(device)))
+  await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
   await Promise.all(policies.map(PolicyServiceClient.writePolicy))
   await Promise.all(policies.map(policy => PolicyServiceClient.publishPolicy(policy.policy_id, policy.start_date)))
 }
 
 main()
-  .then(res => cache.shutdown())
   .then(res => db.shutdown())
   // eslint-disable-next-line no-console
   .catch(err => console.log(err))

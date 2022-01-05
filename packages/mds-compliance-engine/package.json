@@ -20,11 +20,11 @@
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-agency-cache": "workspace:0.4.9",
     "@mds-core/mds-api-helpers": "workspace:0.1.67",
     "@mds-core/mds-api-server": "workspace:0.3.20",
     "@mds-core/mds-compliance-service": "workspace:0.10.1",
     "@mds-core/mds-db": "workspace:0.4.27",
+    "@mds-core/mds-ingest-service": "0.9.0",
     "@mds-core/mds-logger": "workspace:0.5.2",
     "@mds-core/mds-policy-service": "workspace:0.11.0",
     "@mds-core/mds-providers": "workspace:0.2.3",

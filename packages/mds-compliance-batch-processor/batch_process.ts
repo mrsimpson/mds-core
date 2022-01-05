@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import cache from '@mds-core/mds-agency-cache'
 import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
-import { getAllInputs, getSupersedingPolicies, processPolicy } from '@mds-core/mds-compliance-engine'
+import { getProviderInputs, getSupersedingPolicies, processPolicy } from '@mds-core/mds-compliance-engine'
 import { ComplianceServiceClient, ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
 import db from '@mds-core/mds-db'
 import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
+import { providers } from '@mds-core/mds-providers'
 import { ProcessManager, SerializedBuffers } from '@mds-core/mds-service-helpers'
 import { minutes, now } from '@mds-core/mds-utils'
 import express from 'express'
@@ -39,17 +39,27 @@ async function batchComplianceSnapshots(snapshots: ComplianceSnapshotDomainModel
 }
 
 export async function computeSnapshot() {
-  // mds-db does a lazy init, so only the cache start is needed
-  await cache.startup()
   const policies: PolicyDomainModel[] = getSupersedingPolicies(await PolicyServiceClient.readActivePolicies(now()))
   const geographies = await db.readGeographies({ get_published: true })
-  const deviceEventInputs = await getAllInputs()
   const compliance_as_of = now() // The timestamp right after we fetch the inputs (latest state as of that time)
 
-  const results = policies.map(policy => processPolicy(policy, geographies, deviceEventInputs, compliance_as_of))
-  const snapshots = results.flat()
+  const provider_ids = Object.keys(providers)
 
-  await batchComplianceSnapshots(snapshots)
+  /**
+   * This is intentionally an async (for) loop, as opposed to being concurrent (Promise.all()).
+   * This is to avoid potential memory overflows if multiple providers' data is loaded into memory simultaneously.
+   */
+  for (const provider_id of provider_ids) {
+    const providerInputs = {
+      [provider_id]: await getProviderInputs(provider_id, compliance_as_of)
+    }
+    const snapshots = policies
+      .map(policy => processPolicy(policy, geographies, providerInputs, compliance_as_of))
+      .flat()
+
+    await batchComplianceSnapshots(snapshots)
+  }
+
   ComplianceBatchProcessorLogger.info(
     'mds-compliance-engine successfully computed snapshots for the following policies: ',
     {

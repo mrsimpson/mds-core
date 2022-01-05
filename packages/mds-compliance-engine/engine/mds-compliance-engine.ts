@@ -86,6 +86,12 @@ export function processPolicy(
   if (isPolicyActive(policy)) {
     const provider_ids = getProviderIDs(policy.provider_ids)
     const results = provider_ids.map(provider_id => {
+      /**
+       * If there's no data for this provider, skip it.
+       * This allows querying for a given set of providers at a time, instead of _all_ providers.
+       */
+      if (!providerInputs.hasOwnProperty(provider_id)) return undefined
+
       const { filteredEvents, deviceMap } = providerInputs[provider_id]
       return createComplianceSnapshot(provider_id, policy, geographies, filteredEvents, deviceMap, compliance_as_of)
     })

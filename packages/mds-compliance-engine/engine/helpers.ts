@@ -1,6 +1,5 @@
-import cache from '@mds-core/mds-agency-cache'
 import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service'
-import db from '@mds-core/mds-db'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import {
   CountPolicy,
   PolicyDomainModel,
@@ -12,7 +11,7 @@ import {
 } from '@mds-core/mds-policy-service'
 import { providers } from '@mds-core/mds-providers'
 import { Device, Geography, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { areThereCommonElements, isDefined, now, RuntimeError } from '@mds-core/mds-utils'
+import { areThereCommonElements, days, isDefined, now, RuntimeError } from '@mds-core/mds-utils'
 import { DateTime } from 'luxon'
 import moment from 'moment-timezone'
 import { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
@@ -54,23 +53,32 @@ export async function getAllInputs() {
   }, {})
 }
 
-export async function getProviderInputs(provider_id: string) {
-  const deviceRecords = await db.readDeviceIds(provider_id)
-  const deviceIdSubset = deviceRecords.map((record: { device_id: UUID; provider_id: UUID }) => record.device_id)
-  const devices = await cache.readDevices(deviceIdSubset)
-  // Get last event for each of these devices.
-  const events = await cache.readEvents(deviceIdSubset)
+/**
+ *
+ * @param provider_id Provider ID to query for
+ * @param timestamp Timestamp to query state up till
+ * @returns All events and devices for a given provider
+ */
+export async function getProviderInputs(provider_id: string, timestamp: number = now()) {
+  const { events } = await IngestServiceClient.getEventsUsingOptions({
+    provider_ids: [provider_id],
+    time_range: { start: timestamp - days(2), end: timestamp },
+    grouping_type: 'latest_per_vehicle',
+    order: { column: 'timestamp', direction: 'ASC' }
+  })
 
-  const deviceMap = devices.reduce((map: { [d: string]: Device }, device) => {
-    return device ? Object.assign(map, { [device.device_id]: device }) : map
+  const deviceMap = (await IngestServiceClient.getDevices(events.map(({ device_id }) => device_id))).reduce<{
+    [k: string]: Device
+  }>((acc, device) => {
+    acc[device.device_id] = device
+    return acc
   }, {})
 
-  /* We do not evaluate violations for vehicles that have not sent events within the last 48 hours.
-   * So we throw old events out and do not consider them.
-   * We also don't consider events that have no associated telemetry.
-   */
-  const filteredEvents = filterEvents(events)
-  return { filteredEvents, deviceMap, provider_id }
+  return {
+    filteredEvents: events, // These events are pre-filtered from the service query where we provide a time range and pre-sorted by timestamp
+    deviceMap,
+    provider_id
+  }
 }
 
 export function isPolicyActive(policy: PolicyDomainModel, end_time: number = now()): boolean {

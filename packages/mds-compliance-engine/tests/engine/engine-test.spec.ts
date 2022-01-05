@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import cache from '@mds-core/mds-agency-cache'
 import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
 import db from '@mds-core/mds-db'
 import { PolicyDomainModel } from '@mds-core/mds-policy-service'
@@ -56,7 +55,6 @@ describe('Tests General Compliance Engine Functionality', () => {
 
   beforeEach(async () => {
     await db.reinitialize()
-    await cache.startup()
   })
 
   it('Verifies not considering events older than 48 hours', async () => {
@@ -68,8 +66,7 @@ describe('Tests General Compliance Engine Functionality', () => {
       vehicle_state: 'available',
       speed: 0
     })
-    await cache.seed({ devices, events, telemetry: [] })
-    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
 
     // make sure this helper works
     const recentEvents = filterEvents(events) as VehicleEventWithTelemetry[]
@@ -89,14 +86,18 @@ describe('Tests General Compliance Engine Functionality', () => {
   })
 
   it('does not run inactive policies', async () => {
-    const devices = makeDevices(400, now())
-    const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
-      event_types: ['trip_start'],
-      vehicle_state: 'on_trip',
-      speed: 4
-    })
-    await cache.seed({ devices, events, telemetry: [] })
-    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    const devices = makeDevices(6, now())
+    const start_time = now() - 10000000
+    const events = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+      const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
+        event_types: ['trip_start'],
+        vehicle_state: 'on_trip',
+        speed: 0
+      })
+      events_acc.push(...device_events)
+      return events_acc
+    }, []) as VehicleEventWithTelemetry[]
+    await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
     const inputs = await getAllInputs()
     const result = await processPolicy(EXPIRED_POLICY, geographies, inputs)
     test.assert.deepEqual(result, [])
@@ -106,8 +107,6 @@ describe('Tests General Compliance Engine Functionality', () => {
 describe('Verifies compliance engine processes by vehicle most recent event', () => {
   beforeEach(async () => {
     await db.reinitialize()
-    await cache.startup()
-    await cache.reset()
   })
   it('should process count violation vehicles with the most recent event last', async () => {
     const devices = makeDevices(6, now())
@@ -122,8 +121,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
       events_acc.push(...device_events)
       return events_acc
     }, []) as VehicleEventWithTelemetry[]
-    await cache.seed({ devices, events, telemetry: [] })
-    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
     const inputs = await getAllInputs()
     const complianceResults = await processPolicy(LOW_COUNT_POLICY, geographies, inputs)
     const { 0: result } = complianceResults.filter(
@@ -148,8 +146,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
       events_acc.push(...device_events)
       return events_acc
     }, []) as VehicleEventWithTelemetry[]
-    await cache.seed({ devices, events, telemetry: [] })
-    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
     const inputs = await getAllInputs()
     const complianceResults = processPolicy(ARBITRARY_EVENT_TYPES_POLICY, geographies, inputs)
     const { 0: result } = complianceResults.filter(
@@ -170,8 +167,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
       events_acc.push(...device_events)
       return events_acc
     }, []) as VehicleEventWithTelemetry[]
-    await cache.seed({ devices, events, telemetry: [] })
-    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
     const inputs = await getAllInputs()
     const complianceResults = processPolicy(ARBITRARY_EVENT_TYPES_POLICY, geographies, inputs)
     const { 0: result } = complianceResults.filter(
@@ -192,8 +188,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
       events_acc.push(...device_events)
       return events_acc
     }, []) as VehicleEventWithTelemetry[]
-    await cache.seed({ devices, events, telemetry: [] })
-    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
     const inputs = await getAllInputs()
     const complianceResults = processPolicy(COUNT_POLICY_JSON, geographies, inputs)
     const { 0: result } = complianceResults.filter(
@@ -214,8 +209,7 @@ describe('Verifies errors are being properly thrown', async () => {
       speed: 0
     })
 
-    await cache.seed({ devices, events, telemetry: [] })
-    await Promise.all(devices.map(async device => db.writeDevice(device)))
+    await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
 
     await assert.rejects(
       async () => {
