@@ -777,14 +777,13 @@ importers:
 
   packages/mds-compliance-batch-processor:
     specifiers:
-      '@mds-core/mds-agency-cache': workspace:0.4.9
       '@mds-core/mds-api-server': workspace:0.3.20
-      '@mds-core/mds-compliance-engine': workspace:0.7.6
+      '@mds-core/mds-compliance-engine': workspace:0.7.7
       '@mds-core/mds-compliance-service': workspace:0.10.1
       '@mds-core/mds-db': workspace:0.4.27
       '@mds-core/mds-logger': workspace:0.5.2
       '@mds-core/mds-policy-service': workspace:0.11.0
-      '@mds-core/mds-providers': workspace:0.2.3
+      '@mds-core/mds-providers': 0.2.3
       '@mds-core/mds-service-helpers': workspace:0.5.0
       '@mds-core/mds-test-data': workspace:0.4.10
       '@mds-core/mds-types': workspace:0.8.0
@@ -793,13 +792,13 @@ importers:
       express: 4.17.1
       yargs: 17.0.1
     dependencies:
-      '@mds-core/mds-agency-cache': link:../mds-agency-cache
       '@mds-core/mds-api-server': link:../mds-api-server
       '@mds-core/mds-compliance-engine': link:../mds-compliance-engine
       '@mds-core/mds-compliance-service': link:../mds-compliance-service
       '@mds-core/mds-db': link:../mds-db
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-policy-service': link:../mds-policy-service
+      '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-service-helpers': link:../mds-service-helpers
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
@@ -807,17 +806,16 @@ importers:
       express: 4.17.1
       yargs: 17.0.1
     devDependencies:
-      '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-test-data': link:../mds-test-data
 
   packages/mds-compliance-engine:
     specifiers:
       '@mds-core/mds-agency': workspace:0.4.4
-      '@mds-core/mds-agency-cache': workspace:0.4.9
       '@mds-core/mds-api-helpers': workspace:0.1.67
       '@mds-core/mds-api-server': workspace:0.3.20
       '@mds-core/mds-compliance-service': workspace:0.10.1
       '@mds-core/mds-db': workspace:0.4.27
+      '@mds-core/mds-ingest-service': 0.9.0
       '@mds-core/mds-logger': workspace:0.5.2
       '@mds-core/mds-policy-service': workspace:0.11.0
       '@mds-core/mds-providers': workspace:0.2.3
@@ -836,11 +834,11 @@ importers:
       moment-timezone: 0.5.33
       yargs: 17.2.1
     dependencies:
-      '@mds-core/mds-agency-cache': link:../mds-agency-cache
       '@mds-core/mds-api-helpers': link:../mds-api-helpers
       '@mds-core/mds-api-server': link:../mds-api-server
       '@mds-core/mds-compliance-service': link:../mds-compliance-service
       '@mds-core/mds-db': link:../mds-db
+      '@mds-core/mds-ingest-service': link:../mds-ingest-service
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-policy-service': link:../mds-policy-service
       '@mds-core/mds-providers': link:../mds-providers
