@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
 import { getProviderInputs, getSupersedingPolicies, processPolicy } from '@mds-core/mds-compliance-engine'
 import { ComplianceServiceClient, ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
 import db from '@mds-core/mds-db'
 import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { providers } from '@mds-core/mds-providers'
-import { ProcessManager, SerializedBuffers } from '@mds-core/mds-service-helpers'
-import { minutes, now } from '@mds-core/mds-utils'
-import express from 'express'
+import { SerializedBuffers } from '@mds-core/mds-service-helpers'
+import { now } from '@mds-core/mds-utils'
 import { ComplianceBatchProcessorLogger } from './logger'
 
 const BATCH_SIZE = Number(process.env.BATCH_SIZE) || 5
@@ -67,35 +65,3 @@ export async function computeSnapshot() {
     }
   )
 }
-
-ProcessManager(
-  {
-    start: async () => {
-      HttpServer(
-        ApiServer((app: express.Express): express.Express => app),
-        { port: process.env.MDS_COMPLIANCE_BATCH_PROCESSOR_HTTP_PORT }
-      )
-      try {
-        const start = now()
-        await computeSnapshot()
-        const end = now()
-        ComplianceBatchProcessorLogger.debug(`mds-compliance-engine time metrics`, {
-          start,
-          end,
-          durationMs: end - start
-        })
-
-        process.exit(0)
-      } catch (error) {
-        ComplianceBatchProcessorLogger.error('mds-compliance-engine ran into an error, retrying', { error })
-        throw error
-      }
-    },
-    /**
-     * Usually this is called to stop the process, but the snapshot computation stops itself,
-     * so we leave this empty.
-     */
-   stop: async () => { } // eslint-disable-line
-  },
-  { retries: 3, maxTimeout: minutes(15) }
-).monitor()
