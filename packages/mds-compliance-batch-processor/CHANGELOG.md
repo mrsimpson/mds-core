@@ -1,5 +1,23 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.1.27
+
+### Patch Changes
+
+- d9e5324c: Do not auto-invoke the compute-compliance ProcessManager whenever this package is imported
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+- Updated dependencies [0993473d]
+  - @mds-core/mds-api-server@0.3.21
+  - @mds-core/mds-compliance-engine@0.7.8
+  - @mds-core/mds-db@0.4.28
+  - @mds-core/mds-logger@0.5.3
+  - @mds-core/mds-policy-service@0.11.1
+  - @mds-core/mds-providers@0.2.4
+  - @mds-core/mds-service-helpers@0.5.1
+  - @mds-core/mds-types@0.8.1
+  - @mds-core/mds-utils@0.2.15
+  - @mds-core/mds-compliance-service@0.10.2
+
 ## 0.1.26
 
 ### Patch Changes

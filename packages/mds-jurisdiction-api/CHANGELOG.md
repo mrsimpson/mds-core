@@ -1,5 +1,18 @@
 # @mds-core/mds-jurisdiction-api
 
+## 0.1.42
+
+### Patch Changes
+
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+- Updated dependencies [0993473d]
+  - @mds-core/mds-api-helpers@0.1.68
+  - @mds-core/mds-api-server@0.3.21
+  - @mds-core/mds-jurisdiction-service@0.5.1
+  - @mds-core/mds-logger@0.5.3
+  - @mds-core/mds-service-helpers@0.5.1
+  - @mds-core/mds-utils@0.2.15
+
 ## 0.1.41
 
 ### Patch Changes

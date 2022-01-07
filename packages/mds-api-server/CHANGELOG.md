@@ -1,5 +1,16 @@
 # @mds-core/mds-api-server
 
+## 0.3.21
+
+### Patch Changes
+
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+- Updated dependencies [0993473d]
+  - @mds-core/mds-api-authorizer@0.1.54
+  - @mds-core/mds-logger@0.5.3
+  - @mds-core/mds-service-helpers@0.5.1
+  - @mds-core/mds-utils@0.2.15
+
 ## 0.3.20
 
 ### Patch Changes
