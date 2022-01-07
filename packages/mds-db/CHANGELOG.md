@@ -1,5 +1,11 @@
 # @mds-core/mds-db
 
+## 0.4.29
+
+### Patch Changes
+
+- a1811a50: Adds the main field back to mds-db so it can be used externally
+
 ## 0.4.28
 
 ### Patch Changes

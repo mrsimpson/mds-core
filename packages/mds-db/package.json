@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-db",
-  "version": "0.4.28",
+  "version": "0.4.29",
   "description": "Mobility Data Specification database interface",
   "keywords": [
     "mds",
