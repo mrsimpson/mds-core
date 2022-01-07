@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-api-helpers",
-  "version": "0.1.68",
+  "version": "0.1.69",
   "description": "Mobility Data Specification helper functions",
   "keywords": [
     "mds",
@@ -19,7 +19,7 @@
   "dependencies": {
     "@mds-core/mds-agency-cache": "workspace:0.4.10",
     "@mds-core/mds-api-server": "workspace:0.3.21",
-    "@mds-core/mds-db": "workspace:0.4.28",
+    "@mds-core/mds-db": "workspace:0.4.29",
     "@mds-core/mds-types": "workspace:0.8.1",
     "@mds-core/mds-utils": "workspace:0.2.15"
   }

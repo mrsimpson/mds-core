@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-db",
-  "version": "0.4.28",
+  "version": "0.4.29",
   "description": "Mobility Data Specification database interface",
   "keywords": [
     "mds",
@@ -8,6 +8,7 @@
   ],
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
+  "main": "dist/index.js",
   "files": [
     "dist/"
   ],
