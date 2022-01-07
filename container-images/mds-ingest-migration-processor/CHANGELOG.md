@@ -1,5 +1,13 @@
 # @container-images/mds-ingest-migration-processor
 
+## 0.0.40
+
+### Patch Changes
+
+- Updated dependencies [9e43b468]
+  - @mds-core/mds-ingest-migration-processor@0.0.38
+  - @mds-core/mds-webpack-config@0.1.9
+
 ## 0.0.39
 
 ### Patch Changes

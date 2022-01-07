@@ -1,5 +1,14 @@
 # @mds-core/mds-utils
 
+## 0.2.16
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+- Updated dependencies [9e43b468]
+  - @mds-core/mds-logger@0.5.4
+  - @mds-core/mds-types@0.8.2
+
 ## 0.2.15
 
 ### Patch Changes

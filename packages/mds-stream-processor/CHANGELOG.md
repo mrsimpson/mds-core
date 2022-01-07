@@ -1,5 +1,17 @@
 # @mds-core/mds-stream-processor
 
+## 0.4.6
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+- Updated dependencies [9e43b468]
+  - @mds-core/mds-logger@0.5.4
+  - @mds-core/mds-service-helpers@0.5.2
+  - @mds-core/mds-stream@0.2.5
+  - @mds-core/mds-types@0.8.2
+  - @mds-core/mds-utils@0.2.16
+
 ## 0.4.5
 
 ### Patch Changes

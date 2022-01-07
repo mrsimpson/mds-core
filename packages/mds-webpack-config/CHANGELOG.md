@@ -1,5 +1,11 @@
 # @mds-core/mds-webpack-config
 
+## 0.1.9
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+
 ## 0.1.8
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @mds-core/mds-test-data
 
+## 0.4.12
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+- Updated dependencies [9e43b468]
+  - @mds-core/mds-providers@0.2.5
+  - @mds-core/mds-types@0.8.2
+  - @mds-core/mds-utils@0.2.16
+
 ## 0.4.11
 
 ### Patch Changes
