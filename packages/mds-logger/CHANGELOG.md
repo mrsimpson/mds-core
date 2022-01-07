@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.5.4
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+
 ## 0.5.3
 
 ### Patch Changes

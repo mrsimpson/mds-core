@@ -1,5 +1,21 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.38
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+- Updated dependencies [9e43b468]
+  - @mds-core/mds-agency-cache@0.4.11
+  - @mds-core/mds-api-server@0.3.22
+  - @mds-core/mds-ingest-service@0.9.2
+  - @mds-core/mds-logger@0.5.4
+  - @mds-core/mds-repository@0.1.30
+  - @mds-core/mds-service-helpers@0.5.2
+  - @mds-core/mds-stream-processor@0.4.6
+  - @mds-core/mds-types@0.8.2
+  - @mds-core/mds-utils@0.2.16
+
 ## 0.0.37
 
 ### Patch Changes

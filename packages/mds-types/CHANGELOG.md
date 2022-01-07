@@ -1,5 +1,11 @@
 # @mds-core/mds-types
 
+## 0.8.2
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+
 ## 0.8.1
 
 ### Patch Changes
