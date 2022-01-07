@@ -32,5 +32,8 @@
   },
   "devDependencies": {
     "@mds-core/mds-schema-validators": "workspace:0.4.1"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

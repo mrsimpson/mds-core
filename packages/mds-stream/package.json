@@ -24,5 +24,8 @@
     "kafkajs": "1.15.0",
     "nats": "2.2.0",
     "sinon": "11.1.2"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

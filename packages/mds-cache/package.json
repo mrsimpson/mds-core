@@ -20,5 +20,8 @@
     "@types/ioredis": "4.27.6",
     "envalid": "7.2.1",
     "ioredis": "4.27.10"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

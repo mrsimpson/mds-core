@@ -25,5 +25,8 @@
   },
   "peerDependencies": {
     "webpack": "5.56.1"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

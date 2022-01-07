@@ -26,5 +26,8 @@
     "@types/ioredis": "4.27.6",
     "flat": "5.0.2",
     "ioredis": "4.27.10"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

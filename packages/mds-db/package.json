@@ -8,7 +8,6 @@
   ],
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
-  "main": "dist/index.js",
   "files": [
     "dist/"
   ],
@@ -31,5 +30,8 @@
   },
   "devDependencies": {
     "@mds-core/mds-test-data": "workspace:0.4.11"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

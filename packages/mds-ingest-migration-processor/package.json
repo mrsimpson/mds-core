@@ -31,5 +31,8 @@
     "@types/express": "4.17.12",
     "envalid": "7.2.1",
     "express": "4.17.1"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

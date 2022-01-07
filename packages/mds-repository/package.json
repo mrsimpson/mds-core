@@ -31,5 +31,8 @@
   "peerDependencies": {
     "pg": "8.7.1",
     "typeorm": "0.2.40"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

@@ -28,5 +28,8 @@
     "ajv-formats": "2.1.1",
     "ajv-keywords": "5.0.0",
     "joi": "17.4.0"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

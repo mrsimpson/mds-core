@@ -22,5 +22,8 @@
     "@mds-core/mds-db": "workspace:0.4.29",
     "@mds-core/mds-types": "workspace:0.8.1",
     "@mds-core/mds-utils": "workspace:0.2.15"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

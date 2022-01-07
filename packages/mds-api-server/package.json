@@ -39,5 +39,8 @@
   },
   "devDependencies": {
     "graphql": "15.5.1"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

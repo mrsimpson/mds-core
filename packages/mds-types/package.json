@@ -17,5 +17,8 @@
   },
   "dependencies": {
     "@types/geojson": "7946.0.8"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

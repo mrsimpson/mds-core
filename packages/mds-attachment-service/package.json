@@ -36,5 +36,8 @@
     "pg": "8.7.1",
     "sharp": "0.29.1",
     "typeorm": "0.2.40"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

@@ -27,5 +27,8 @@
     "@mds-core/mds-utils": "workspace:0.2.15",
     "@types/event-stream": "3.3.34",
     "event-stream": "4.0.1"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

@@ -18,5 +18,8 @@
   },
   "dependencies": {
     "@mds-core/mds-types": "workspace:0.8.1"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

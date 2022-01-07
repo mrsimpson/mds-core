@@ -26,5 +26,8 @@
   },
   "devDependencies": {
     "@mds-core/mds-providers": "workspace:0.2.4"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

@@ -30,5 +30,8 @@
     "@mds-core/mds-geography-service": "workspace:0.8.1",
     "@mds-core/mds-stream": "workspace:0.2.4",
     "@mds-core/mds-test-data": "workspace:0.4.11"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

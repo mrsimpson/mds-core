@@ -35,5 +35,8 @@
   },
   "devDependencies": {
     "@mds-core/mds-test-data": "workspace:0.4.11"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }
