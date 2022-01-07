@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-agency-cache",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "description": "Mobility Data Specification cache interface",
   "keywords": [
     "mds",
@@ -17,14 +17,17 @@
     "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand --passWithNoTests"
   },
   "dependencies": {
-    "@mds-core/mds-cache": "workspace:0.0.27",
-    "@mds-core/mds-logger": "workspace:0.5.3",
-    "@mds-core/mds-schema-validators": "workspace:0.4.1",
-    "@mds-core/mds-types": "workspace:0.8.1",
-    "@mds-core/mds-utils": "workspace:0.2.15",
+    "@mds-core/mds-cache": "workspace:0.0.28",
+    "@mds-core/mds-logger": "workspace:0.5.4",
+    "@mds-core/mds-schema-validators": "workspace:0.4.2",
+    "@mds-core/mds-types": "workspace:0.8.2",
+    "@mds-core/mds-utils": "workspace:0.2.16",
     "@types/flat": "5.0.2",
     "@types/ioredis": "4.27.6",
     "flat": "5.0.2",
     "ioredis": "4.27.10"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

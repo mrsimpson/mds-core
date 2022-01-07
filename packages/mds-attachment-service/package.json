@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-attachment-service",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Mobility Data Specification Attachment Service",
   "keywords": [
     "mds"
@@ -21,13 +21,13 @@
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-logger": "workspace:0.5.3",
-    "@mds-core/mds-repository": "workspace:0.1.29",
-    "@mds-core/mds-rpc-common": "workspace:0.3.1",
-    "@mds-core/mds-schema-validators": "workspace:0.4.1",
-    "@mds-core/mds-service-helpers": "workspace:0.5.1",
-    "@mds-core/mds-types": "workspace:0.8.1",
-    "@mds-core/mds-utils": "workspace:0.2.15",
+    "@mds-core/mds-logger": "workspace:0.5.4",
+    "@mds-core/mds-repository": "workspace:0.1.30",
+    "@mds-core/mds-rpc-common": "workspace:0.3.2",
+    "@mds-core/mds-schema-validators": "workspace:0.4.2",
+    "@mds-core/mds-service-helpers": "workspace:0.5.2",
+    "@mds-core/mds-types": "workspace:0.8.2",
+    "@mds-core/mds-utils": "workspace:0.2.16",
     "@types/sharp": "0.29.2",
     "aws-sdk": "2.999.0",
     "express": "4.17.1",
@@ -36,5 +36,8 @@
     "pg": "8.7.1",
     "sharp": "0.29.1",
     "typeorm": "0.2.40"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

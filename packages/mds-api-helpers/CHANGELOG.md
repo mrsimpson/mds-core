@@ -1,5 +1,17 @@
 # @mds-core/mds-api-helpers
 
+## 0.1.70
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+- Updated dependencies [9e43b468]
+  - @mds-core/mds-agency-cache@0.4.11
+  - @mds-core/mds-api-server@0.3.22
+  - @mds-core/mds-db@0.4.30
+  - @mds-core/mds-types@0.8.2
+  - @mds-core/mds-utils@0.2.16
+
 ## 0.1.69
 
 ### Patch Changes

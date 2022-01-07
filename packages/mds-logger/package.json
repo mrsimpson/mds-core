@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-logger",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Mobility Data Specification logging interface",
   "keywords": [
     "mds",
@@ -23,5 +23,8 @@
     "express-http-context": "1.2.4",
     "pino": "6.13.3",
     "pino-pretty": "7.0.1"
+  },
+  "publishConfig": {
+    "main": "dist/index.js"
   }
 }

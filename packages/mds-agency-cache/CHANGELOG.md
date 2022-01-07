@@ -1,5 +1,17 @@
 # @mds-core/mds-agency-cache
 
+## 0.4.11
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+- Updated dependencies [9e43b468]
+  - @mds-core/mds-cache@0.0.28
+  - @mds-core/mds-logger@0.5.4
+  - @mds-core/mds-schema-validators@0.4.2
+  - @mds-core/mds-types@0.8.2
+  - @mds-core/mds-utils@0.2.16
+
 ## 0.4.10
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # @mds-core/mds-jurisdiction-api
 
+## 0.1.44
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+- Updated dependencies [9e43b468]
+  - @mds-core/mds-api-helpers@0.1.70
+  - @mds-core/mds-api-server@0.3.22
+  - @mds-core/mds-jurisdiction-service@0.5.2
+  - @mds-core/mds-logger@0.5.4
+  - @mds-core/mds-service-helpers@0.5.2
+  - @mds-core/mds-utils@0.2.16
+
 ## 0.1.43
 
 ### Patch Changes

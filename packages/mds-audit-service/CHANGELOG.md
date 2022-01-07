@@ -1,5 +1,18 @@
 # @mds-core/mds-audit-service
 
+## 0.5.2
+
+### Patch Changes
+
+- 9e43b468: Add publishConfig for all packages to include a main entry
+- Updated dependencies [9e43b468]
+  - @mds-core/mds-repository@0.1.30
+  - @mds-core/mds-rpc-common@0.3.2
+  - @mds-core/mds-schema-validators@0.4.2
+  - @mds-core/mds-service-helpers@0.5.2
+  - @mds-core/mds-types@0.8.2
+  - @mds-core/mds-utils@0.2.16
+
 ## 0.5.1
 
 ### Patch Changes
