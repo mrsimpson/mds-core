@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.5.3
+
+### Patch Changes
+
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+
 ## 0.5.2
 
 ### Patch Changes

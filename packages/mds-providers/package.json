@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-providers",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Mobility Data Specification provider details",
   "keywords": [
     "mds",
@@ -17,6 +17,6 @@
     "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand --passWithNoTests"
   },
   "dependencies": {
-    "@mds-core/mds-types": "workspace:0.8.0"
+    "@mds-core/mds-types": "workspace:0.8.1"
   }
 }

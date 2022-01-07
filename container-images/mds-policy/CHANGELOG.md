@@ -1,5 +1,14 @@
 # @container-images/mds-policy
 
+## 0.1.41
+
+### Patch Changes
+
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+- Updated dependencies [0993473d]
+  - @mds-core/mds-policy@0.7.5
+  - @mds-core/mds-webpack-config@0.1.8
+
 ## 0.1.40
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @mds-core/mds-providers
 
+## 0.2.4
+
+### Patch Changes
+
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+- Updated dependencies [0993473d]
+  - @mds-core/mds-types@0.8.1
+
 ## 0.2.3
 
 ### Patch Changes

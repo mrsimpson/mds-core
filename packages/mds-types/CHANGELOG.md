@@ -1,5 +1,11 @@
 # @mds-core/mds-types
 
+## 0.8.1
+
+### Patch Changes
+
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+
 ## 0.8.0
 
 ### Minor Changes
