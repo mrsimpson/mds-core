@@ -1,13 +1,12 @@
 {
   "name": "@mds-core/mds-webpack-config",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Webpack Configuration",
   "keywords": [
     "mds"
   ],
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
-  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/"

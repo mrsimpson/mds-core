@@ -1,5 +1,11 @@
 # @mds-core/mds-webpack-config
 
+## 0.1.8
+
+### Patch Changes
+
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+
 ## 0.1.7
 
 ### Patch Changes

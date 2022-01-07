@@ -1,11 +1,10 @@
 {
   "name": "@mds-core/mds-rpc-common",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "MDS RPC Common Utilities",
   "keywords": [],
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
-  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/"
@@ -17,11 +16,11 @@
   "dependencies": {
     "@improbable-eng/grpc-web-node-http-transport": "0.14.1",
     "@lacuna-tech/rpc_ts": "2.1.2-alpha.14",
-    "@mds-core/mds-api-server": "workspace:0.3.20",
-    "@mds-core/mds-logger": "workspace:0.5.2",
-    "@mds-core/mds-service-helpers": "workspace:0.5.0",
-    "@mds-core/mds-types": "workspace:0.8.0",
-    "@mds-core/mds-utils": "workspace:0.2.14",
+    "@mds-core/mds-api-server": "workspace:0.3.21",
+    "@mds-core/mds-logger": "workspace:0.5.3",
+    "@mds-core/mds-service-helpers": "workspace:0.5.1",
+    "@mds-core/mds-types": "workspace:0.8.1",
+    "@mds-core/mds-utils": "workspace:0.2.15",
     "@types/express": "4.17.13",
     "express": "4.17.1"
   }

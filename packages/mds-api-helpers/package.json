@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-api-helpers",
-  "version": "0.1.67",
+  "version": "0.1.68",
   "description": "Mobility Data Specification helper functions",
   "keywords": [
     "mds",
@@ -8,7 +8,6 @@
   ],
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
-  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/"
@@ -18,10 +17,10 @@
     "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap --lines 40  ts-mocha --project ../../tsconfig.json"
   },
   "dependencies": {
-    "@mds-core/mds-agency-cache": "workspace:0.4.9",
-    "@mds-core/mds-api-server": "workspace:0.3.20",
-    "@mds-core/mds-db": "workspace:0.4.27",
-    "@mds-core/mds-types": "workspace:0.8.0",
-    "@mds-core/mds-utils": "workspace:0.2.14"
+    "@mds-core/mds-agency-cache": "workspace:0.4.10",
+    "@mds-core/mds-api-server": "workspace:0.3.21",
+    "@mds-core/mds-db": "workspace:0.4.28",
+    "@mds-core/mds-types": "workspace:0.8.1",
+    "@mds-core/mds-utils": "workspace:0.2.15"
   }
 }

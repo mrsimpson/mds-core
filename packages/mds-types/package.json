@@ -1,13 +1,12 @@
 {
   "name": "@mds-core/mds-types",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Mobility Data Specification common types",
   "keywords": [
     "mds"
   ],
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
-  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/"

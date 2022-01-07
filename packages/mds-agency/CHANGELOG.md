@@ -1,5 +1,24 @@
 # @mds-core/mds-agency
 
+## 0.4.5
+
+### Patch Changes
+
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+- Updated dependencies [0993473d]
+  - @mds-core/mds-agency-cache@0.4.10
+  - @mds-core/mds-api-helpers@0.1.68
+  - @mds-core/mds-api-server@0.3.21
+  - @mds-core/mds-db@0.4.28
+  - @mds-core/mds-ingest-service@0.9.1
+  - @mds-core/mds-logger@0.5.3
+  - @mds-core/mds-providers@0.2.4
+  - @mds-core/mds-schema-validators@0.4.1
+  - @mds-core/mds-service-helpers@0.5.1
+  - @mds-core/mds-stream@0.2.4
+  - @mds-core/mds-types@0.8.1
+  - @mds-core/mds-utils@0.2.15
+
 ## 0.4.4
 
 ### Patch Changes

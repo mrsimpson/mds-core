@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-test-data",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "description": "Mobility Data Specification test data generator",
   "keywords": [
     "mds",
@@ -8,7 +8,6 @@
   ],
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
-  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/"
@@ -18,8 +17,8 @@
     "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand --passWithNoTests"
   },
   "dependencies": {
-    "@mds-core/mds-providers": "workspace:0.2.3",
-    "@mds-core/mds-types": "workspace:0.8.0",
-    "@mds-core/mds-utils": "workspace:0.2.14"
+    "@mds-core/mds-providers": "workspace:0.2.4",
+    "@mds-core/mds-types": "workspace:0.8.1",
+    "@mds-core/mds-utils": "workspace:0.2.15"
   }
 }

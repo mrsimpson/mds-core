@@ -1,5 +1,14 @@
 # @container-images/mds-ingest-migration-processor
 
+## 0.0.39
+
+### Patch Changes
+
+- 0993473d: Resolve DEP0128 from Node v16 by removing "main" entry from package.json
+- Updated dependencies [0993473d]
+  - @mds-core/mds-ingest-migration-processor@0.0.37
+  - @mds-core/mds-webpack-config@0.1.8
+
 ## 0.0.38
 
 ### Patch Changes
