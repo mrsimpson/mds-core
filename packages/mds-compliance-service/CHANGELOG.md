@@ -1,5 +1,12 @@
 # @mds-core/mds-compliance-service
 
+## 0.10.3
+
+### Patch Changes
+
+- Updated dependencies [a1811a50]
+  - @mds-core/mds-db@0.4.29
+
 ## 0.10.2
 
 ### Patch Changes

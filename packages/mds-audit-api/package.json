@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-audit-api",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Endpoint for auditing compliance with MDS",
   "keywords": [
     "mds",
@@ -21,10 +21,10 @@
   },
   "dependencies": {
     "@mds-core/mds-agency-cache": "workspace:0.4.10",
-    "@mds-core/mds-api-helpers": "workspace:0.1.68",
+    "@mds-core/mds-api-helpers": "workspace:0.1.69",
     "@mds-core/mds-api-server": "workspace:0.3.21",
     "@mds-core/mds-attachment-service": "workspace:0.5.1",
-    "@mds-core/mds-db": "workspace:0.4.28",
+    "@mds-core/mds-db": "workspace:0.4.29",
     "@mds-core/mds-ingest-service": "0.9.1",
     "@mds-core/mds-logger": "workspace:0.5.3",
     "@mds-core/mds-providers": "workspace:0.2.4",
