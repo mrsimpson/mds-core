@@ -18,7 +18,7 @@
     "images": "pnpm run:concurrent image",
     "preinstall": "npx check-node-version --package && npx only-allow pnpm && pnpm i -g pnpm",
     "lint": "pnpm lint:audit && pnpm lint:prettier '**/package.json' && pnpm lint:eslint '**/*.ts'",
-    "lint:audit": "pnpm-ci audit --strict -i GHSA-93q8-gq69-wqmw GHSA-92xj-mqp7-vmcj GHSA-w7rc-rwvf-8q5r GHSA-896r-f27r-55mw",
+    "lint:audit": "pnpm-ci audit --strict -i GHSA-93q8-gq69-wqmw GHSA-92xj-mqp7-vmcj GHSA-w7rc-rwvf-8q5r GHSA-896r-f27r-55mw GHSA-5rrq-pxf6-6jx5 GHSA-wxgw-qj99-44c2 GHSA-gf8q-jrpm-jvxq",
     "lint:eslint": "eslint --ignore-path .gitignore --ignore-path .eslintignore",
     "lint:prettier": "prettier --check",
     "prepare": "husky install",
