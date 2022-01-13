@@ -1439,6 +1439,7 @@ importers:
       circle-to-polygon: 2.2.0
       moment-timezone: 0.5.33
       point-in-polygon: 1.1.0
+      ts-deep-pick: 0.2.2
       uuid: 8.3.2
     dependencies:
       '@mds-core/mds-logger': link:../mds-logger
@@ -1450,6 +1451,7 @@ importers:
       circle-to-polygon: 2.2.0
       moment-timezone: 0.5.33
       point-in-polygon: 1.1.0
+      ts-deep-pick: 0.2.2
       uuid: 8.3.2
 
   packages/mds-webpack-config:
@@ -10443,6 +10445,12 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /ts-deep-pick/0.2.2:
+    resolution: {integrity: sha512-DFR0THXKY8Hil84r4vx5Ofb7zVryHCBfv/vYcgbDyymmivdB1vUcBwbYsDzP3j9pwnQqVFNZZplYu628STrXAA==}
+    dependencies:
+      ts-typetools: 0.6.1
+    dev: false
+
   /ts-jest/27.0.5_f00d4390c46e935f345edb7ef7ff7ebb:
     resolution: {integrity: sha512-lIJApzfTaSSbtlksfFNHkWOzLJuuSm4faFAfo5kvzOiRAuoN4/eKxVJ2zEAho8aecE04qX6K1pAzfH5QHL1/8w==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
@@ -10547,6 +10555,10 @@ packages:
       source-map-support: 0.5.20
       yn: 2.0.0
     dev: true
+
+  /ts-typetools/0.6.1:
+    resolution: {integrity: sha512-A4TcVw40hKKgdK22M6vDvqEmzxuE21uyeGuFBHzgl9USRmmQRnvwY9fURIQfdP8pXV6wIq6O4g3kr3/O3Yl0hA==}
+    dev: false
 
   /tsconfig-paths/3.11.0:
     resolution: {integrity: sha512-7ecdYDnIdmv639mmDwslG6KQg1Z9STTz1j7Gcz0xa+nshh/gKDAHcPxRbWOsA3SPp0tXP2leTcY9Kw+NAkfZzA==}
