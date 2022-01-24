@@ -31,12 +31,15 @@ describe('MDS Logger', () => {
     jest.clearAllMocks()
   })
 
-  it('censors logs of lat and lng info for mds-logger.info', () => {
+  describe('redaction', () => {
     const toCensor = {
       device_id: 'ec551174-f324-4251-bfed-28d9f3f473fc',
       gps: {
         lat: 1231.21,
         lng: 1231.21,
+        lon: 42.36,
+        longitude: 42.36,
+        latitude: 1231.21,
         speed: 0,
         hdop: 1,
         heading: 180
@@ -46,75 +49,90 @@ describe('MDS Logger', () => {
       recorded: 1555384091836
     }
 
-    const info = jest.spyOn(pinoLogger, 'info').mockImplementation(() => {
-      return
+    const expected = expect.objectContaining({
+      namespace: 'mds-logger',
+      data: expect.objectContaining({
+        gps: expect.objectContaining({
+          lat: '[REDACTED]',
+          lng: '[REDACTED]',
+          lon: '[REDACTED]',
+          latitude: '[REDACTED]',
+          longitude: '[REDACTED]'
+        }),
+        charge: 0.5
+      }),
+      message: 'some message'
     })
 
-    logger.info('some message', toCensor)
-    expect(info).toHaveBeenCalledWith(
-      expect.objectContaining({
-        namespace: 'mds-logger',
-        data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
-        message: 'some message'
+    it('censors logs of lat and lng info for mds-logger.info', () => {
+      const info = jest.spyOn(pinoLogger, 'info').mockImplementation(() => {
+        return
       })
-    )
-  })
 
-  it('censors logs of lat and lng info for mds-logger.warn', () => {
-    const toCensor = {
-      device_id: 'ec551174-f324-4251-bfed-28d9f3f473fc',
-      gps: {
-        lat: 1231.21,
-        lng: 1231.21,
-        speed: 0,
-        hdop: 1,
-        heading: 180
-      },
-      charge: 0.5,
-      timestamp: 1555384091559,
-      recorded: 1555384091836
-    }
-    const warn = jest.spyOn(pinoLogger, 'warn').mockImplementation(() => {
-      return
+      logger.info('some message', toCensor)
+      expect(info).toHaveBeenCalledWith(expected)
     })
 
-    logger.warn('some message', toCensor)
-    expect(warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        namespace: 'mds-logger',
-        data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
-        message: 'some message'
+    it('censors logs of geoinfo for mds-logger.warn', () => {
+      const warn = jest.spyOn(pinoLogger, 'warn').mockImplementation(() => {
+        return
       })
-    )
-  })
 
-  it('censors logs of lat and lng info for mds-logger.error', () => {
-    const toCensor = {
-      device_id: 'ec551174-f324-4251-bfed-28d9f3f473fc',
-      gps: {
-        lat: 1231.21,
-        lng: 1231.21,
-        speed: 0,
-        hdop: 1,
-        heading: 180
-      },
-      charge: 0.5,
-      timestamp: 1555384091559,
-      recorded: 1555384091836
-    }
-
-    const error = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
-      return
+      logger.warn('some message', toCensor)
+      expect(warn).toHaveBeenCalledWith(expected)
     })
 
-    logger.error('some message', toCensor)
-    expect(error).toHaveBeenCalledWith(
-      expect.objectContaining({
-        namespace: 'mds-logger',
-        data: expect.objectContaining({ gps: expect.objectContaining({ lat: '[REDACTED]', lng: '[REDACTED]' }) }),
-        message: 'some message'
+    it('censors logs of lat and lng info for mds-logger.error', () => {
+      const error = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
+        return
       })
-    )
+
+      logger.error('some message', toCensor)
+      expect(error).toHaveBeenCalledWith(expected)
+    })
+
+    it('applies fuzzy logic', () => {
+      const error = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
+        return
+      })
+
+      logger.error('some message', { LAT: 41.36, Longitude: -71.06 })
+      expect(error).toHaveBeenCalledWith(
+        expect.objectContaining({ data: { LAT: '[REDACTED]', Longitude: '[REDACTED]' } })
+      )
+    })
+
+    it('censors an arbitrary key', () => {
+      const error = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
+        return
+      })
+
+      createLogger('mds-logger', { redactKeys: ['device_id'] }).error('some message', toCensor)
+      expect(error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            device_id: '[REDACTED]',
+            gps: expect.objectContaining({ lat: '[REDACTED]' })
+          })
+        })
+      )
+    })
+
+    it('censors an arbitrary capitalized key', () => {
+      const error = jest.spyOn(pinoLogger, 'error').mockImplementation(() => {
+        return
+      })
+
+      createLogger('mds-logger', { redactKeys: ['DeviceId'] }).error('some message', toCensor)
+      expect(error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            device_id: '[REDACTED]',
+            gps: expect.objectContaining({ lat: '[REDACTED]' })
+          })
+        })
+      )
+    })
   })
 
   it('verifies conversion of an error', () => {

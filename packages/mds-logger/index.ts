@@ -17,7 +17,7 @@ import httpContext from 'express-http-context'
 import { inspect } from 'util'
 import { LogLevel } from './@types'
 import { debugLog, logger } from './loggers'
-import { redact } from './redaction'
+import { normalize, redact } from './redaction'
 
 // Verify that defaultOptions is available (not available on non-nodejs platforms)
 if (inspect?.defaultOptions) {
@@ -33,18 +33,24 @@ const getCustomProps = () => {
 }
 
 const log =
-  (level: LogLevel, namespace: string) =>
+  (level: LogLevel, namespace: string, redactKeys: Set<string>) =>
   (message: string, data?: Record<string, unknown> | Error): void => {
     if (process.env.QUIET !== 'true') {
       return data
-        ? logger[level]({ ...getCustomProps(), namespace, data: redact(data), message })
+        ? logger[level]({ ...getCustomProps(), namespace, data: redact(data, redactKeys), message })
         : logger[level]({ ...getCustomProps(), namespace, message })
     }
   }
 
-export const createLogger = (namespace: string, options: Partial<{ debugPrefix: string }> = {}) => ({
-  debug: debugLog(`${options.debugPrefix ?? 'mds'}:${namespace}`),
-  info: log('info', namespace),
-  warn: log('warn', namespace),
-  error: log('error', namespace)
-})
+export const createLogger = (
+  namespace: string,
+  { debugPrefix, redactKeys = [] }: Partial<{ debugPrefix: string; redactKeys: string[] }> = {}
+) => {
+  const keys = new Set(['lat', 'latitude', 'lng', 'lon', 'longitude', ...redactKeys].map(normalize))
+  return {
+    debug: debugLog(`${debugPrefix ?? 'mds'}:${namespace}`, keys),
+    info: log('info', namespace, keys),
+    warn: log('warn', namespace, keys),
+    error: log('error', namespace, keys)
+  }
+}
