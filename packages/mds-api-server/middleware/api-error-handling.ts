@@ -1,9 +1,11 @@
 import { ErrorCheckFunction, isServiceError } from '@mds-core/mds-service-helpers'
 import {
+  AlreadyPublishedError,
   AuthorizationError,
   BadParamsError,
   ConflictError,
   DependencyMissingError,
+  InsufficientPermissionsError,
   NotFoundError,
   ValidationError
 } from '@mds-core/mds-utils'
@@ -13,11 +15,13 @@ import { ApiRequest, ApiResponse } from '../@types'
 import { ApiServerLogger } from '../logger'
 
 const isValidationError = ErrorCheckFunction(ValidationError)
+const isAlreadyPublishedError = ErrorCheckFunction(AlreadyPublishedError)
 const isBadParamsError = ErrorCheckFunction(BadParamsError)
 const isNotFoundError = ErrorCheckFunction(NotFoundError)
 const isConflictError = ErrorCheckFunction(ConflictError)
 const isAuthorizationError = ErrorCheckFunction(AuthorizationError)
 const isDependencyMissingError = ErrorCheckFunction(DependencyMissingError)
+const isInsufficientPermissionsError = ErrorCheckFunction(InsufficientPermissionsError)
 
 /**
  *
@@ -39,6 +43,8 @@ export const ApiErrorHandlingMiddleware = (
   const { method, originalUrl } = req
 
   if (isValidationError(error) || isBadParamsError(error)) return res.status(StatusCodes.BAD_REQUEST).send({ error })
+  if (isAlreadyPublishedError(error)) return res.status(StatusCodes.METHOD_NOT_ALLOWED).send({ error })
+  if (isInsufficientPermissionsError(error)) return res.status(StatusCodes.FORBIDDEN).send({ error })
   if (isNotFoundError(error)) return res.status(StatusCodes.NOT_FOUND).send({ error })
   if (isConflictError(error)) return res.status(StatusCodes.CONFLICT).send({ error })
   if (isAuthorizationError(error)) return res.status(StatusCodes.FORBIDDEN).send({ error })

@@ -15,7 +15,8 @@
  */
 
 import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
-import { NotFoundError, testEnvSafeguard } from '@mds-core/mds-utils'
+import { UUID } from '@mds-core/mds-types'
+import { AlreadyPublishedError, NotFoundError, testEnvSafeguard } from '@mds-core/mds-utils'
 import { FindManyOptions, In, IsNull, MoreThan, Not } from 'typeorm'
 import {
   GeographyDomainCreateModel,
@@ -237,6 +238,55 @@ class GeographyReadWriteRepository extends ReadWriteRepository {
       return entities.map(GeographyEntityToDomain.mapper())
     } catch (error) /* istanbul ignore next */ {
       throw RepositoryError(error)
+    }
+  }
+
+  public isPublished = (geography: GeographyDomainModel) => {
+    return Boolean(geography.publish_date)
+  }
+
+  /**
+   * Deletes geographyMetadata by geography_id
+   * @param geography_id
+   * @returns geography_id
+   */
+  public deleteGeographyMetadata = async (geography_id: UUID): Promise<UUID> => {
+    try {
+      const connection = await this.connect('rw')
+      await connection.getRepository(GeographyMetadataEntity).delete({ geography_id })
+      return geography_id
+    } catch (err) {
+      throw RepositoryError(err)
+    }
+  }
+
+  /**
+   * Deletes geography by geography_id.
+   * Throws NotFoundError if does not exist.
+   * Throws AlreadyPublishedError if publish date is not null.
+   * @param geography_id
+   * @returns geography_id
+   */
+  public deleteGeography = async (geography_id: UUID): Promise<UUID> => {
+    const existingGeo = await GeographyRepository.getGeography(geography_id, {})
+    if (!existingGeo) {
+      throw new NotFoundError('cannot find Geography')
+    }
+    if (GeographyRepository.isPublished(existingGeo)) {
+      throw new AlreadyPublishedError('Cannot delete an already published geography')
+    }
+    try {
+      const connection = await this.connect('rw')
+      await connection
+        .getRepository(GeographyEntity)
+        .createQueryBuilder()
+        .delete()
+        .where({ geography_id })
+        .andWhere('publish_date IS NULL')
+        .execute()
+      return geography_id
+    } catch (err) {
+      throw RepositoryError(err)
     }
   }
 

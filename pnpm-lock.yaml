@@ -949,11 +949,11 @@ importers:
     specifiers:
       '@mds-core/mds-api-helpers': workspace:0.1.71
       '@mds-core/mds-api-server': workspace:0.3.23
-      '@mds-core/mds-db': workspace:0.4.31
       '@mds-core/mds-geography-service': workspace:0.8.3
       '@mds-core/mds-logger': workspace:0.5.5
       '@mds-core/mds-providers': workspace:0.2.5
       '@mds-core/mds-schema-validators': workspace:0.4.3
+      '@mds-core/mds-service-helpers': workspace:0.5.3
       '@mds-core/mds-test-data': workspace:0.4.13
       '@mds-core/mds-types': workspace:0.8.2
       '@mds-core/mds-utils': workspace:0.2.17
@@ -962,11 +962,11 @@ importers:
     dependencies:
       '@mds-core/mds-api-helpers': link:../mds-api-helpers
       '@mds-core/mds-api-server': link:../mds-api-server
-      '@mds-core/mds-db': link:../mds-db
       '@mds-core/mds-geography-service': link:../mds-geography-service
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
+      '@mds-core/mds-service-helpers': link:../mds-service-helpers
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
       '@types/express': 4.17.13
@@ -5882,7 +5882,7 @@ packages:
     dev: false
 
   /fsevents/2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    resolution: {integrity: sha1-ilJveLj99GI7cJ4Ll1xSwkwC/Ro=}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
     requiresBuild: true
@@ -10795,7 +10795,7 @@ packages:
     dev: true
 
   /uglify-js/3.14.5:
-    resolution: {integrity: sha512-qZukoSxOG0urUTvjc2ERMTcAy+BiFh3weWAkeurLwjrCba73poHmG3E36XEjd/JGukMzwTL7uCxZiAexj8ppvQ==}
+    resolution: {integrity: sha1-zau31JVCMdgMtKknZUxGVeUfSFk=}
     engines: {node: '>=0.8.0'}
     hasBin: true
     requiresBuild: true

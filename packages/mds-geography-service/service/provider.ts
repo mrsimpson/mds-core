@@ -15,6 +15,7 @@
  */
 
 import { ProcessController, ServiceException, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
+import { NotFoundError } from '@mds-core/mds-utils'
 import { GeographyDomainModel, GeographyService, GeographyServiceRequestContext } from '../@types'
 import { GeographyServiceLogger } from '../logger'
 import { GeographyRepository } from '../repository'
@@ -117,6 +118,18 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService, Geograp
     }
   },
 
+  deleteGeographyAndMetadata: async (context, geography_id) => {
+    try {
+      await GeographyRepository.deleteGeography(geography_id)
+      await GeographyRepository.deleteGeographyMetadata(geography_id)
+      return ServiceResult(geography_id)
+    } catch (error) /* istanbul ignore next */ {
+      const exception = ServiceException('Error deleting Geography Metadata', error)
+      GeographyServiceLogger.error('deleteGeographyMetadata error', { exception, error })
+      return exception
+    }
+  },
+
   editGeography: async (context, model) => {
     try {
       const geography = await GeographyRepository.editGeography(validateGeographyDomainCreateModel(model))
@@ -124,6 +137,24 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService, Geograp
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Editing Geographies', error)
       GeographyServiceLogger.error('editGeography error', { exception, error })
+      return exception
+    }
+  },
+
+  editGeographyMetadata: async (context, model) => {
+    try {
+      const existingGeo = await GeographyRepository.getGeography(model.geography_id, { includeMetadata: true })
+      if (!existingGeo?.geography_metadata) {
+        throw new NotFoundError('cannot find Geography Metadata')
+      }
+
+      const [geography_metadata] = await GeographyRepository.writeGeographiesMetadata([
+        validateGeographyMetadataDomainCreateModel(model)
+      ])
+      return ServiceResult(geography_metadata)
+    } catch (error) /* istanbul ignore next */ {
+      const exception = ServiceException('Error Editing Geography Metadata', error)
+      GeographyServiceLogger.error('editGeographyMetadata error', { exception, error })
       return exception
     }
   },

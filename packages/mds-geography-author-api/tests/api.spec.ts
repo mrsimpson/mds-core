@@ -24,14 +24,18 @@
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 
 import { ApiServer } from '@mds-core/mds-api-server'
-import db from '@mds-core/mds-db'
-import { GeographyServiceManager } from '@mds-core/mds-geography-service'
 import {
-  DISTRICT_SEVEN,
+  GeographyRepository,
+  GeographyServiceClient,
+  GeographyServiceManager,
+  GeographyWithMetadataDomainModel
+} from '@mds-core/mds-geography-service'
+import {
   GEOGRAPHY2_UUID,
   GEOGRAPHY_UUID,
   LA_CITY_BOUNDARY,
   POLICY_UUID,
+  restrictedAreas,
   SCOPED_AUTH
 } from '@mds-core/mds-test-data'
 import { pathPrefix, uuid } from '@mds-core/mds-utils'
@@ -63,13 +67,13 @@ describe('Tests app', () => {
     })
 
     before(async () => {
-      await db.reinitialize()
+      await GeographyRepository.deleteAll()
       await GeographyServer.start()
     })
 
     after(async () => {
       await GeographyServer.stop()
-      await db.shutdown()
+      await GeographyRepository.deleteAll()
     })
 
     // Geography endpoints
@@ -99,7 +103,7 @@ describe('Tests app', () => {
     })
 
     it('cannot update one geography (no auth)', done => {
-      const geography = { geography_id: GEOGRAPHY_UUID, geography_json: DISTRICT_SEVEN }
+      const geography = { geography_id: GEOGRAPHY_UUID, geography_json: restrictedAreas }
       request
         .put(pathPrefix(`/geographies/${GEOGRAPHY_UUID}`))
         .set('Authorization', EMPTY_SCOPE)
@@ -111,7 +115,7 @@ describe('Tests app', () => {
     })
 
     it('verifies updating one geography', done => {
-      const geography = { name: 'LA', geography_id: GEOGRAPHY_UUID, geography_json: DISTRICT_SEVEN }
+      const geography = { name: 'LA', geography_id: GEOGRAPHY_UUID, geography_json: restrictedAreas }
       request
         .put(pathPrefix(`/geographies/${GEOGRAPHY_UUID}`))
         .set('Authorization', GEOGRAPHIES_WRITE_SCOPE)
@@ -137,7 +141,7 @@ describe('Tests app', () => {
     })
 
     it('verifies cannot PUT non-existent geography', done => {
-      const geography = { name: 'LA', geography_id: POLICY_UUID, geography_json: DISTRICT_SEVEN }
+      const geography = { name: 'LA', geography_id: POLICY_UUID, geography_json: restrictedAreas }
       request
         .put(pathPrefix(`/geographies/${POLICY_UUID}`))
         .set('Authorization', GEOGRAPHIES_WRITE_SCOPE)
@@ -176,7 +180,9 @@ describe('Tests app', () => {
     })
 
     it('can publish a geography (correct auth)', async () => {
-      await db.writeGeography({ name: 'Geography 2', geography_id: GEOGRAPHY2_UUID, geography_json: DISTRICT_SEVEN })
+      await GeographyServiceClient.writeGeographies([
+        { name: 'Geography 2', geography_id: GEOGRAPHY2_UUID, geography_json: restrictedAreas }
+      ])
       const result = await request
         .put(pathPrefix(`/geographies/${GEOGRAPHY2_UUID}/publish`))
         .set('Authorization', GEOGRAPHIES_PUBLISH_SCOPE)
@@ -203,24 +209,20 @@ describe('Tests app', () => {
 
     it('can delete a geography (correct auth)', async () => {
       const testUUID = uuid()
-      await db.writeGeography({ geography_id: testUUID, geography_json: LA_CITY_BOUNDARY, name: 'testafoo' })
-      await db.writeGeographyMetadata({ geography_id: testUUID, geography_metadata: { foo: 'afoo' } })
+      await GeographyServiceClient.writeGeographies([
+        { geography_id: testUUID, geography_json: LA_CITY_BOUNDARY, name: 'testafoo' }
+      ])
+      await GeographyServiceClient.writeGeographiesMetadata([
+        { geography_id: testUUID, geography_metadata: { foo: 'afoo' } }
+      ])
+
       await request
         .delete(pathPrefix(`/geographies/${testUUID}`))
         .set('Authorization', GEOGRAPHIES_WRITE_SCOPE)
         .expect(200)
-      await assert.rejects(
-        async () => {
-          await db.readSingleGeography(testUUID)
-        },
-        { name: 'NotFoundError' }
-      )
-      await assert.rejects(
-        async () => {
-          await db.readSingleGeographyMetadata(testUUID)
-        },
-        { name: 'NotFoundError' }
-      )
+
+      const geography = await GeographyServiceClient.getGeography(testUUID, { includeMetadata: true })
+      await assert(!geography)
     })
 
     it('cannot delete a published geography (correct auth)', async () => {
@@ -231,7 +233,7 @@ describe('Tests app', () => {
     })
 
     it('sends the correct error code if something blows up on the backend during delete', async () => {
-      sandbox.stub(db, 'deleteGeography').callsFake(function stubAThrow() {
+      sandbox.stub(GeographyServiceClient, 'deleteGeographyAndMetadata').callsFake(function stubAThrow() {
         throw new Error('random backend err')
       })
       await request
@@ -249,16 +251,18 @@ describe('Tests app', () => {
     })
 
     before(async () => {
-      await db.reinitialize()
+      await GeographyRepository.deleteAll()
       await GeographyServer.start()
-      await db.writeGeography({ name: 'Geography 1', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY })
-      await db.writeGeography({ name: 'Geography 2', geography_id: GEOGRAPHY2_UUID, geography_json: DISTRICT_SEVEN })
-      await db.publishGeography({ geography_id: GEOGRAPHY2_UUID })
+      await GeographyServiceClient.writeGeographies([
+        { name: 'Geography 1', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY },
+        { name: 'Geography 2', geography_id: GEOGRAPHY2_UUID, geography_json: restrictedAreas }
+      ])
+      await GeographyServiceClient.publishGeography({ geography_id: GEOGRAPHY2_UUID })
     })
 
     after(async () => {
       await GeographyServer.stop()
-      await db.shutdown()
+      await GeographyRepository.deleteAll()
     })
 
     it('cannot GET geography metadata (no auth)', done => {
@@ -300,13 +304,13 @@ describe('Tests app', () => {
     })
 
     it('sends the correct error code if it cannot retrieve the metadata', async () => {
-      sandbox.stub(db, 'readBulkGeographyMetadata').callsFake(function stubAThrow() {
+      sandbox.stub(GeographyServiceClient, 'getGeography').callsFake(function stubAThrow() {
         throw new Error('err')
       })
       await request
         .get(pathPrefix(`/geographies/${GEOGRAPHY_UUID}/meta`))
         .set('Authorization', GEOGRAPHIES_READ_PUBLISHED_SCOPE)
-        .expect(404)
+        .expect(500)
     })
 
     it('verifies PUTing geography metadata to create', async () => {
@@ -317,8 +321,10 @@ describe('Tests app', () => {
         .send({ geography_id: GEOGRAPHY_UUID, geography_metadata: metadata })
         .expect(201)
       test.assert(requestResult.body.version === GEOGRAPHY_AUTHOR_API_DEFAULT_VERSION)
-      const result = await db.readSingleGeographyMetadata(GEOGRAPHY_UUID)
-      test.assert(result.geography_metadata.some_arbitrary_thing === 'boop')
+      const result = (await GeographyServiceClient.getGeography(GEOGRAPHY_UUID, {
+        includeMetadata: true
+      })) as GeographyWithMetadataDomainModel<{ some_arbitrary_thing: string }>
+      test.assert(result?.geography_metadata?.some_arbitrary_thing === 'boop')
     })
 
     it('verifies PUTing geography metadata to edit', async () => {
@@ -328,8 +334,10 @@ describe('Tests app', () => {
         .set('Authorization', GEOGRAPHIES_WRITE_SCOPE)
         .send({ geography_id: GEOGRAPHY_UUID, geography_metadata: metadata })
         .expect(200)
-      const result = await db.readSingleGeographyMetadata(GEOGRAPHY_UUID)
-      test.assert(result.geography_metadata.some_arbitrary_thing === 'beep')
+      const result = (await GeographyServiceClient.getGeography(GEOGRAPHY_UUID, {
+        includeMetadata: true
+      })) as GeographyWithMetadataDomainModel<{ some_arbitrary_thing: string }>
+      test.assert(result.geography_metadata?.some_arbitrary_thing === 'beep')
     })
 
     it('verifies that metadata cannot be created without a preexisting geography', async () => {
@@ -343,7 +351,9 @@ describe('Tests app', () => {
     })
 
     it('correctly retrieves all geography metadata when using only the unpublished scope', async () => {
-      await db.writeGeographyMetadata({ geography_id: GEOGRAPHY2_UUID, geography_metadata: { earth: 'isround' } })
+      await GeographyServiceClient.writeGeographiesMetadata([
+        { geography_id: GEOGRAPHY2_UUID, geography_metadata: { earth: 'isround' } }
+      ])
 
       const result = await request
         .get(pathPrefix(`/geographies/meta`))

@@ -195,6 +195,40 @@ describe('Geography Service Tests', () => {
       await GeographyRepository.shutdown()
     })
 
+    describe('Edit Geographies Metadata - ', () => {
+      it('updates a metadata record', async () => {
+        const [geography] = await GeographyServiceClient.writeGeographies([
+          { geography_id: uuid(), geography_json: { type: 'FeatureCollection', features: [] } }
+        ])
+
+        await GeographyServiceClient.writeGeographiesMetadata([
+          {
+            geography_id: geography.geography_id,
+            geography_metadata: { status: 'sneaky' }
+          }
+        ])
+
+        const metadataEdited = await GeographyServiceClient.editGeographyMetadata({
+          geography_id: geography.geography_id,
+          geography_metadata: { status: 'not sneaky' }
+        })
+
+        expect(metadataEdited).toMatchObject({ geography_metadata: { status: 'not sneaky' } })
+      })
+
+      it('throws error if geography does not exist', async () => {
+        await expect(
+          GeographyServiceClient.editGeographyMetadata({
+            geography_id: uuid(),
+            geography_metadata: { status: 'modified' }
+          })
+        ).rejects.toMatchObject({
+          details: 'cannot find Geography Metadata',
+          message: 'Error Editing Geography Metadata'
+        })
+      })
+    })
+
     it('Edits Geography works if unpublished', async () => {
       const [geography] = await GeographyServiceClient.writeGeographies([
         { geography_id: uuid(), geography_json: { type: 'FeatureCollection', features: [] } }

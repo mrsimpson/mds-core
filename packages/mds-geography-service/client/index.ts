@@ -37,7 +37,10 @@ export const GeographyServiceClientFactory = (
     writeGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.writeGeographies, args),
     writeGeographiesMetadata: (...args) =>
       RpcRequest(options, GeographyServiceRpcClient.writeGeographiesMetadata, args),
+    deleteGeographyAndMetadata: (...args) =>
+      RpcRequest(options, GeographyServiceRpcClient.deleteGeographyAndMetadata, args),
     editGeography: (...args) => RpcRequest(options, GeographyServiceRpcClient.editGeography, args),
+    editGeographyMetadata: (...args) => RpcRequest(options, GeographyServiceRpcClient.editGeographyMetadata, args),
     publishGeography: (...args) => RpcRequest(options, GeographyServiceRpcClient.publishGeography, args),
     getGeographiesByIds: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeographiesByIds, args)
   }
