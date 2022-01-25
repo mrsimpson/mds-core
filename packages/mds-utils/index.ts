@@ -17,8 +17,8 @@
 import type { UUID } from '@mds-core/mds-types'
 import { v4 } from 'uuid'
 
+export * from './deep-pick-properties'
 export * from './exceptions/exception-messages'
 export * from './exceptions/exceptions'
 export * from './utils'
-
 export const uuid = (): UUID => v4()

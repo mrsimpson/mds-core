@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-repository",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "Mobility Data Specification ORM",
   "keywords": [
     "mds",
@@ -17,10 +17,10 @@
     "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap ts-mocha --project ../../tsconfig.json"
   },
   "dependencies": {
-    "@mds-core/mds-logger": "workspace:0.5.4",
+    "@mds-core/mds-logger": "workspace:0.5.5",
     "@mds-core/mds-providers": "workspace:0.2.5",
     "@mds-core/mds-types": "workspace:0.8.2",
-    "@mds-core/mds-utils": "workspace:0.2.16",
+    "@mds-core/mds-utils": "workspace:0.2.17",
     "@types/pg": "8.6.1",
     "await-lock": "2.1.0"
   },

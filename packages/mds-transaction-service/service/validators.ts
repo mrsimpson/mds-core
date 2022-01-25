@@ -58,24 +58,15 @@ const tripReceiptSchema: JSONSchemaType<TripReceiptDetailsDomainModel> = {
     trip_id: uuidSchema,
     start_timestamp: timestampSchema,
     end_timestamp: timestampSchema,
-    vehicle_type: { type: 'string', enum: [...VEHICLE_TYPES] },
-    start_geography_id: uuidSchema,
-    end_geography_id: { ...uuidSchema, nullable: true },
-    duration: { type: 'integer' }, // duration of the trip in seconds
-    distance: { type: 'integer' }, // distance traveled in trip, in meters
+    start_geography_id: { ...uuidSchema, nullable: true, default: null },
+    start_geography_type: { type: 'string' },
+    end_geography_id: { ...uuidSchema, nullable: true, default: null },
+    end_geography_type: { type: 'string' },
+    duration: { type: 'integer', nullable: true, default: null },
+    distance: { type: 'integer', nullable: true, default: null },
     trip_events: { type: 'array', items: usableEventSchema }
   },
-  required: [
-    'distance',
-    'duration',
-    'end_geography_id',
-    'end_timestamp',
-    'start_geography_id',
-    'start_timestamp',
-    'trip_events',
-    'trip_id',
-    'vehicle_type'
-  ]
+  required: ['start_timestamp', 'end_timestamp', 'trip_events', 'trip_id']
 }
 
 /**
