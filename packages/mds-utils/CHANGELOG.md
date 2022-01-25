@@ -1,5 +1,13 @@
 # @mds-core/mds-utils
 
+## 0.2.17
+
+### Patch Changes
+
+- bdf3b09d: Add deepPickProperties function.
+- Updated dependencies [c3627656]
+  - @mds-core/mds-logger@0.5.5
+
 ## 0.2.16
 
 ### Patch Changes

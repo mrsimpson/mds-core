@@ -1,5 +1,20 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.39
+
+### Patch Changes
+
+- Updated dependencies [bdf3b09d]
+- Updated dependencies [c3627656]
+  - @mds-core/mds-utils@0.2.17
+  - @mds-core/mds-logger@0.5.5
+  - @mds-core/mds-agency-cache@0.4.12
+  - @mds-core/mds-api-server@0.3.23
+  - @mds-core/mds-ingest-service@0.9.3
+  - @mds-core/mds-repository@0.1.31
+  - @mds-core/mds-service-helpers@0.5.3
+  - @mds-core/mds-stream-processor@0.4.7
+
 ## 0.0.38
 
 ### Patch Changes
