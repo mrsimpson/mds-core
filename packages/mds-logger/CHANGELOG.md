@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.5.5
+
+### Patch Changes
+
+- c3627656: Enhance log redaction with support for additional redaction properties, also added additional defaults for latitude and longitude
+
 ## 0.5.4
 
 ### Patch Changes
