@@ -74,30 +74,33 @@
                   "minimum": 100000000000,
                   "maximum": 99999999999999
                 },
-                "vehicle_type": {
-                  "type": "string",
-                  "enum": [
-                    "car",
-                    "bicycle",
-                    "scooter",
-                    "moped",
-                    "other"
-                  ]
-                },
                 "start_geography_id": {
                   "type": "string",
-                  "format": "uuid"
+                  "format": "uuid",
+                  "nullable": true,
+                  "default": null
+                },
+                "start_geography_type": {
+                  "type": "string"
                 },
                 "end_geography_id": {
                   "type": "string",
                   "format": "uuid",
-                  "nullable": true
+                  "nullable": true,
+                  "default": null
+                },
+                "end_geography_type": {
+                  "type": "string"
                 },
                 "duration": {
-                  "type": "integer"
+                  "type": "integer",
+                  "nullable": true,
+                  "default": null
                 },
                 "distance": {
-                  "type": "integer"
+                  "type": "integer",
+                  "nullable": true,
+                  "default": null
                 },
                 "trip_events": {
                   "type": "array",
@@ -415,15 +418,10 @@
                 }
               },
               "required": [
-                "distance",
-                "duration",
-                "end_geography_id",
-                "end_timestamp",
-                "start_geography_id",
                 "start_timestamp",
+                "end_timestamp",
                 "trip_events",
-                "trip_id",
-                "vehicle_type"
+                "trip_id"
               ]
             },
             {

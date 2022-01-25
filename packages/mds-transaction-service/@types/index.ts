@@ -28,13 +28,52 @@ export interface PaginationLinks {
 // one example -- many others are possible
 export interface TripReceiptDetailsDomainModel {
   trip_id: UUID
+  /**
+   * Should be populated with the timestamp of the starting event
+   * (trip_enter_jurisdiction | enter_jurisdiction | trip_start) for the trip.
+   * If there is none, then this defaults to the ending event timestamp.
+   */
   start_timestamp: Timestamp
+  /**
+   * Should be populated with the timestamp of the terminus event (trip_leave_jurisdiction | trip_end) for the trip.
+   * If there is none, then this defaults to the starting event timestamp.
+   */
   end_timestamp: Timestamp
-  vehicle_type: VEHICLE_TYPE
+  /**
+   * Start geography used for billing.
+   *
+   * Because geographies may overlap, the ordering of the geographies is at the discretion of the regulating agency,
+   * and their policies.
+   */
   start_geography_id: Nullable<UUID>
+  /**
+   * Type of the starting geography. If start_geography_id is null, then this field should default to 'out_of_bound'.
+   */
+  start_geography_type: string
+  /**
+   * End geography used for billing.
+   *
+   * Because geographies may overlap, the ordering of the geographies is at the discretion of the regulating agency,
+   * and their policies.
+   */
   end_geography_id: Nullable<UUID>
-  duration: number // seconds
-  distance: number // meters
+  /**
+   * Type of the ending geography. If start_geography_id is null, then this field should default to 'out_of_bound'.
+   */
+  end_geography_type: string
+  /**
+   * Duration of the trip in milliseconds. Null if one endpoint of the trip was out of bounds
+   * and we do not know the duration. */
+  duration: Nullable<number>
+  /**
+   * Distance in meters, given the great-circle-distance between the start & end points of the trip.
+   * NOTE: This will be an under-estimate of the actual distance.
+   * Null if one endpoint of the trip was out of bounds and we don't know where it started or ended.
+   */
+  distance: Nullable<number>
+  /**
+   * All events that contain this trip_id.
+   */
   trip_events: EventDomainModel[]
 }
 
