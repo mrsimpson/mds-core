@@ -60,14 +60,29 @@ export async function getAllInputs() {
  * @returns All events and devices for a given provider
  */
 export async function getProviderInputs(provider_id: string, timestamp: number = now()) {
-  const { events } = await IngestServiceClient.getEventsUsingOptions({
+  const {
+    events: eventsAcc,
+    cursor: { next }
+  } = await IngestServiceClient.getEventsUsingOptions({
     provider_ids: [provider_id],
     time_range: { start: timestamp - days(2), end: timestamp },
     grouping_type: 'latest_per_vehicle',
     order: { column: 'timestamp', direction: 'ASC' }
   })
 
-  const deviceMap = (await IngestServiceClient.getDevices(events.map(({ device_id }) => device_id))).reduce<{
+  let cursor = next
+
+  while (cursor !== null) {
+    const {
+      events,
+      cursor: { next: nextCursor }
+    } = await IngestServiceClient.getEventsUsingCursor(cursor)
+
+    eventsAcc.push(...events)
+    cursor = nextCursor
+  }
+
+  const deviceMap = (await IngestServiceClient.getDevices(eventsAcc.map(({ device_id }) => device_id))).reduce<{
     [k: string]: Device
   }>((acc, device) => {
     acc[device.device_id] = device
@@ -75,7 +90,7 @@ export async function getProviderInputs(provider_id: string, timestamp: number =
   }, {})
 
   return {
-    filteredEvents: events, // These events are pre-filtered from the service query where we provide a time range and pre-sorted by timestamp
+    filteredEvents: eventsAcc, // These events are pre-filtered from the service query where we provide a time range and pre-sorted by timestamp
     deviceMap,
     provider_id
   }
