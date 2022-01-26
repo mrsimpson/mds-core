@@ -56,10 +56,375 @@
           "example": "https://mds.coruscant.com/compliance/snapshot/c78280ff-4e58-4e30-afa9-d72673037799"
         },
         "receipt_details": {
-          "description": "Free-form object which describes the details of this transaction. Highly use-case dependent.",
           "anyOf": [
             {
-              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "properties": {
+                "trip_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "start_timestamp": {
+                  "type": "integer",
+                  "minimum": 100000000000,
+                  "maximum": 99999999999999
+                },
+                "end_timestamp": {
+                  "type": "integer",
+                  "minimum": 100000000000,
+                  "maximum": 99999999999999
+                },
+                "start_geography_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "nullable": true,
+                  "default": null
+                },
+                "start_geography_type": {
+                  "type": "string"
+                },
+                "end_geography_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "nullable": true,
+                  "default": null
+                },
+                "end_geography_type": {
+                  "type": "string"
+                },
+                "duration": {
+                  "type": "integer",
+                  "nullable": true,
+                  "default": null
+                },
+                "distance": {
+                  "type": "integer",
+                  "nullable": true,
+                  "default": null
+                },
+                "trip_events": {
+                  "type": "array",
+                  "items": {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "object",
+                    "if": {
+                      "properties": {
+                        "event_types": {
+                          "type": "array",
+                          "contains": {
+                            "type": "string",
+                            "enum": [
+                              "trip_start",
+                              "trip_end",
+                              "trip_enter_jurisdiction",
+                              "trip_leave_jurisdiction"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "trip_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      },
+                      "required": [
+                        "trip_id"
+                      ]
+                    },
+                    "properties": {
+                      "device_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "provider_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "timestamp": {
+                        "type": "integer",
+                        "minimum": 100000000000,
+                        "maximum": 99999999999999
+                      },
+                      "annotation": {
+                        "$schema": "http://json-schema.org/draft-07/schema#",
+                        "type": "object",
+                        "properties": {
+                          "device_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "timestamp": {
+                            "type": "integer",
+                            "minimum": 100000000000,
+                            "maximum": 99999999999999
+                          },
+                          "vehicle_id": {
+                            "type": "string"
+                          },
+                          "vehicle_type": {
+                            "type": "string",
+                            "enum": [
+                              "car",
+                              "bicycle",
+                              "scooter",
+                              "moped",
+                              "other"
+                            ]
+                          },
+                          "propulsion_types": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "human",
+                                "electric",
+                                "electric_assist",
+                                "hybrid",
+                                "combustion"
+                              ]
+                            }
+                          },
+                          "geography_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid"
+                            }
+                          },
+                          "geography_types": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "latency_ms": {
+                            "type": "integer"
+                          },
+                          "recorded": {
+                            "type": "integer",
+                            "minimum": 100000000000,
+                            "maximum": 99999999999999
+                          }
+                        },
+                        "required": [
+                          "device_id",
+                          "timestamp",
+                          "vehicle_id",
+                          "vehicle_type",
+                          "propulsion_types",
+                          "geography_ids",
+                          "geography_types",
+                          "latency_ms"
+                        ],
+                        "nullable": true
+                      },
+                      "event_types": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "agency_drop_off",
+                            "agency_pick_up",
+                            "battery_charged",
+                            "battery_low",
+                            "comms_lost",
+                            "comms_restored",
+                            "compliance_pick_up",
+                            "decommissioned",
+                            "located",
+                            "maintenance",
+                            "maintenance_pick_up",
+                            "missing",
+                            "off_hours",
+                            "on_hours",
+                            "provider_drop_off",
+                            "rebalance_pick_up",
+                            "reservation_cancel",
+                            "reservation_start",
+                            "system_resume",
+                            "system_suspend",
+                            "trip_cancel",
+                            "trip_end",
+                            "trip_enter_jurisdiction",
+                            "trip_leave_jurisdiction",
+                            "trip_start",
+                            "unspecified",
+                            "maintenance_start",
+                            "maintenance_end",
+                            "driver_cancellation",
+                            "enter_jurisdiction",
+                            "leave_jurisdiction",
+                            "passenger_cancellation",
+                            "provider_cancellation",
+                            "recommissioned",
+                            "reservation_stop",
+                            "service_end",
+                            "service_start",
+                            "trip_resume",
+                            "trip_stop"
+                          ]
+                        },
+                        "minItems": 1
+                      },
+                      "vehicle_state": {
+                        "type": "string",
+                        "enum": [
+                          "available",
+                          "elsewhere",
+                          "non_operational",
+                          "on_trip",
+                          "removed",
+                          "reserved",
+                          "unknown",
+                          "stopped"
+                        ]
+                      },
+                      "telemetry": {
+                        "$schema": "http://json-schema.org/draft-07/schema#",
+                        "type": "object",
+                        "properties": {
+                          "device_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "provider_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "timestamp": {
+                            "type": "integer",
+                            "minimum": 100000000000,
+                            "maximum": 99999999999999
+                          },
+                          "gps": {
+                            "type": "object",
+                            "properties": {
+                              "lat": {
+                                "type": "number",
+                                "format": "float"
+                              },
+                              "lng": {
+                                "type": "number",
+                                "format": "float"
+                              },
+                              "altitude": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "heading": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null,
+                                "minimum": 0,
+                                "exclusiveMaximum": 360
+                              },
+                              "speed": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "accuracy": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "hdop": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "satellites": {
+                                "type": "integer",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [
+                              "lat",
+                              "lng"
+                            ]
+                          },
+                          "charge": {
+                            "type": "number",
+                            "format": "float",
+                            "nullable": true,
+                            "default": null,
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "stop_id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [
+                          "device_id",
+                          "provider_id",
+                          "timestamp",
+                          "gps"
+                        ]
+                      },
+                      "trip_state": {
+                        "type": "string",
+                        "enum": [
+                          "on_trip",
+                          "reserved",
+                          "stopped",
+                          null
+                        ],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "trip_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "recorded": {
+                        "type": "integer",
+                        "minimum": 100000000000,
+                        "maximum": 99999999999999
+                      },
+                      "telemetry_timestamp": {
+                        "type": "integer",
+                        "minimum": 100000000000,
+                        "maximum": 99999999999999
+                      }
+                    },
+                    "required": [
+                      "device_id",
+                      "provider_id",
+                      "timestamp",
+                      "event_types",
+                      "vehicle_state",
+                      "telemetry",
+                      "recorded"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "start_timestamp",
+                "end_timestamp",
+                "trip_events",
+                "trip_id"
+              ]
+            },
+            {
               "type": "object",
               "description": "Receipt details which provide a pointer to an MDS Compliance Violation.",
               "properties": {
@@ -79,12 +444,379 @@
                 }
               },
               "required": [
-                "violation_id",
-                "policy_id"
+                "violation_id"
               ]
             },
             {
-              "type": "object"
+              "type": "object",
+              "properties": {
+                "trip_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "start_timestamp": {
+                  "type": "integer",
+                  "minimum": 100000000000,
+                  "maximum": 99999999999999
+                },
+                "end_timestamp": {
+                  "type": "integer",
+                  "minimum": 100000000000,
+                  "maximum": 99999999999999
+                },
+                "vehicle_type": {
+                  "type": "string",
+                  "enum": [
+                    "car",
+                    "bicycle",
+                    "scooter",
+                    "moped",
+                    "other"
+                  ]
+                },
+                "geography_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "nullable": true
+                },
+                "duration": {
+                  "type": "integer"
+                },
+                "trip_events": {
+                  "type": "array",
+                  "items": {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "object",
+                    "if": {
+                      "properties": {
+                        "event_types": {
+                          "type": "array",
+                          "contains": {
+                            "type": "string",
+                            "enum": [
+                              "trip_start",
+                              "trip_end",
+                              "trip_enter_jurisdiction",
+                              "trip_leave_jurisdiction"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "trip_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      },
+                      "required": [
+                        "trip_id"
+                      ]
+                    },
+                    "properties": {
+                      "device_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "provider_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "timestamp": {
+                        "type": "integer",
+                        "minimum": 100000000000,
+                        "maximum": 99999999999999
+                      },
+                      "annotation": {
+                        "$schema": "http://json-schema.org/draft-07/schema#",
+                        "type": "object",
+                        "properties": {
+                          "device_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "timestamp": {
+                            "type": "integer",
+                            "minimum": 100000000000,
+                            "maximum": 99999999999999
+                          },
+                          "vehicle_id": {
+                            "type": "string"
+                          },
+                          "vehicle_type": {
+                            "type": "string",
+                            "enum": [
+                              "car",
+                              "bicycle",
+                              "scooter",
+                              "moped",
+                              "other"
+                            ]
+                          },
+                          "propulsion_types": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "human",
+                                "electric",
+                                "electric_assist",
+                                "hybrid",
+                                "combustion"
+                              ]
+                            }
+                          },
+                          "geography_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid"
+                            }
+                          },
+                          "geography_types": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "latency_ms": {
+                            "type": "integer"
+                          },
+                          "recorded": {
+                            "type": "integer",
+                            "minimum": 100000000000,
+                            "maximum": 99999999999999
+                          }
+                        },
+                        "required": [
+                          "device_id",
+                          "timestamp",
+                          "vehicle_id",
+                          "vehicle_type",
+                          "propulsion_types",
+                          "geography_ids",
+                          "geography_types",
+                          "latency_ms"
+                        ],
+                        "nullable": true
+                      },
+                      "event_types": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "agency_drop_off",
+                            "agency_pick_up",
+                            "battery_charged",
+                            "battery_low",
+                            "comms_lost",
+                            "comms_restored",
+                            "compliance_pick_up",
+                            "decommissioned",
+                            "located",
+                            "maintenance",
+                            "maintenance_pick_up",
+                            "missing",
+                            "off_hours",
+                            "on_hours",
+                            "provider_drop_off",
+                            "rebalance_pick_up",
+                            "reservation_cancel",
+                            "reservation_start",
+                            "system_resume",
+                            "system_suspend",
+                            "trip_cancel",
+                            "trip_end",
+                            "trip_enter_jurisdiction",
+                            "trip_leave_jurisdiction",
+                            "trip_start",
+                            "unspecified",
+                            "maintenance_start",
+                            "maintenance_end",
+                            "driver_cancellation",
+                            "enter_jurisdiction",
+                            "leave_jurisdiction",
+                            "passenger_cancellation",
+                            "provider_cancellation",
+                            "recommissioned",
+                            "reservation_stop",
+                            "service_end",
+                            "service_start",
+                            "trip_resume",
+                            "trip_stop"
+                          ]
+                        },
+                        "minItems": 1
+                      },
+                      "vehicle_state": {
+                        "type": "string",
+                        "enum": [
+                          "available",
+                          "elsewhere",
+                          "non_operational",
+                          "on_trip",
+                          "removed",
+                          "reserved",
+                          "unknown",
+                          "stopped"
+                        ]
+                      },
+                      "telemetry": {
+                        "$schema": "http://json-schema.org/draft-07/schema#",
+                        "type": "object",
+                        "properties": {
+                          "device_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "provider_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "timestamp": {
+                            "type": "integer",
+                            "minimum": 100000000000,
+                            "maximum": 99999999999999
+                          },
+                          "gps": {
+                            "type": "object",
+                            "properties": {
+                              "lat": {
+                                "type": "number",
+                                "format": "float"
+                              },
+                              "lng": {
+                                "type": "number",
+                                "format": "float"
+                              },
+                              "altitude": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "heading": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null,
+                                "minimum": 0,
+                                "exclusiveMaximum": 360
+                              },
+                              "speed": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "accuracy": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "hdop": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "satellites": {
+                                "type": "integer",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [
+                              "lat",
+                              "lng"
+                            ]
+                          },
+                          "charge": {
+                            "type": "number",
+                            "format": "float",
+                            "nullable": true,
+                            "default": null,
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "stop_id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [
+                          "device_id",
+                          "provider_id",
+                          "timestamp",
+                          "gps"
+                        ]
+                      },
+                      "trip_state": {
+                        "type": "string",
+                        "enum": [
+                          "on_trip",
+                          "reserved",
+                          "stopped",
+                          null
+                        ],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "trip_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "recorded": {
+                        "type": "integer",
+                        "minimum": 100000000000,
+                        "maximum": 99999999999999
+                      },
+                      "telemetry_timestamp": {
+                        "type": "integer",
+                        "minimum": 100000000000,
+                        "maximum": 99999999999999
+                      }
+                    },
+                    "required": [
+                      "device_id",
+                      "provider_id",
+                      "timestamp",
+                      "event_types",
+                      "vehicle_state",
+                      "telemetry",
+                      "recorded"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "duration",
+                "end_timestamp",
+                "geography_id",
+                "start_timestamp",
+                "trip_events",
+                "trip_id",
+                "vehicle_type"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "custom_description": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "custom_description"
+              ]
             }
           ]
         }
