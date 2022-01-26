@@ -1,5 +1,11 @@
 # @mds-core/mds-compliance-engine
 
+## 0.7.2-hotfix.1
+
+### Patch Changes
+
+- 35d2fbdb: No-op bump for new hotfix package
+
 ## 0.7.2-hotfix.0
 
 ### Patch Changes

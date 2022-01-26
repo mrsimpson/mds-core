@@ -778,7 +778,7 @@ importers:
   packages/mds-compliance-batch-processor:
     specifiers:
       '@mds-core/mds-agency-cache': workspace:0.4.8
-      '@mds-core/mds-compliance-engine': workspace:0.7.1
+      '@mds-core/mds-compliance-engine': workspace:0.7.2-hotfix.0
       '@mds-core/mds-compliance-service': workspace:0.8.1
       '@mds-core/mds-db': workspace:0.4.22
       '@mds-core/mds-logger': workspace:0.5.2

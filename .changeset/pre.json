@@ -64,6 +64,7 @@
     "@mds-core/mds-webpack-config": "0.1.7"
   },
   "changesets": [
-    "nasty-penguins-grab"
+    "nasty-penguins-grab",
+    "strange-badgers-jump"
   ]
 }
