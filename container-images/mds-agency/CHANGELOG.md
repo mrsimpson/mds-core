@@ -1,5 +1,11 @@
 # @container-images/mds-agency
 
+## 0.1.72
+
+### Patch Changes
+
+- @mds-core/mds-agency@0.4.9
+
 ## 0.1.71
 
 ### Patch Changes
