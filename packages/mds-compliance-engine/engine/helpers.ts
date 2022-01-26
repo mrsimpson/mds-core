@@ -24,7 +24,7 @@ const TWO_DAYS_IN_MS = 172800000
 const isOfTimeFormat = (timeString: string): timeString is TIME_FORMAT => /^\d{2}:\d{2}:\d{2}$/.test(timeString)
 
 export function getPolicyType(policy: PolicyDomainModel) {
-  return policy.rules[0].rule_type
+  return policy.rules[0]?.rule_type
 }
 
 export const isCountPolicy = (policy: PolicyDomainModel): policy is CountPolicy =>
