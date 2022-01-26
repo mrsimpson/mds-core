@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ConflictError, ServerError } from '@mds-core/mds-utils'
+import { ConflictError, DependencyMissingError, ServerError } from '@mds-core/mds-utils'
 
 const isError = (error: unknown): error is Error => error instanceof Error
 
@@ -34,6 +34,10 @@ export const RepositoryError = (error: unknown) => {
     // UNIQUE VIOLATION
     if (code === '23505') {
       return new ConflictError(getProperty('detail', error), error)
+    }
+    // constraint violation
+    if (code === '23503') {
+      return new DependencyMissingError(getProperty('detail', error), error)
     }
     return error
   }

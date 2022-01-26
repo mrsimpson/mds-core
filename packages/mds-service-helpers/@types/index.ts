@@ -24,7 +24,8 @@ export const ServiceErrorDescriptorTypes = [
   'ServiceException',
   'UnsupportedTypeError',
   'ValidationError',
-  'ServiceUnavailable'
+  'ServiceUnavailable',
+  'AlreadyPublishedError'
 ] as const
 
 export type ServiceErrorDescriptorType = typeof ServiceErrorDescriptorTypes[number]

@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-stream-processor",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "MDS Stream Processor",
   "keywords": [
     "mds"
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@mds-core/mds-logger": "workspace:0.5.5",
-    "@mds-core/mds-service-helpers": "workspace:0.5.3",
+    "@mds-core/mds-service-helpers": "workspace:0.6.0",
     "@mds-core/mds-stream": "workspace:0.2.6",
     "@mds-core/mds-types": "workspace:0.8.2",
     "@mds-core/mds-utils": "workspace:0.2.17",

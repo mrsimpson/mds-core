@@ -1,5 +1,16 @@
 # @mds-core/mds-policy
 
+## 0.7.9
+
+### Patch Changes
+
+- cae7ad2b: removed outdated references to mds-db
+- Updated dependencies [cae7ad2b]
+  - @mds-core/mds-api-helpers@0.2.0
+  - @mds-core/mds-api-server@0.4.0
+  - @mds-core/mds-db@0.4.32
+  - @mds-core/mds-policy-service@0.11.4
+
 ## 0.7.8
 
 ### Patch Changes

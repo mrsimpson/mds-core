@@ -1,5 +1,19 @@
 # @mds-core/mds-compliance-engine
 
+## 0.7.12
+
+### Patch Changes
+
+- c870460e: Fixed a bug where only the first page of events was considered by compliance.
+- Updated dependencies [cae7ad2b]
+  - @mds-core/mds-api-helpers@0.2.0
+  - @mds-core/mds-api-server@0.4.0
+  - @mds-core/mds-service-helpers@0.6.0
+  - @mds-core/mds-db@0.4.32
+  - @mds-core/mds-policy-service@0.11.4
+  - @mds-core/mds-compliance-service@0.10.6
+  - @mds-core/mds-ingest-service@0.9.4
+
 ## 0.7.11
 
 ### Patch Changes

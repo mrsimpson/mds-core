@@ -1,5 +1,15 @@
 # @mds-core/mds-policy-service
 
+## 0.11.4
+
+### Patch Changes
+
+- Updated dependencies [cae7ad2b]
+- Updated dependencies [cae7ad2b]
+  - @mds-core/mds-geography-service@0.9.0
+  - @mds-core/mds-service-helpers@0.6.0
+  - @mds-core/mds-rpc-common@0.3.4
+
 ## 0.11.3
 
 ### Patch Changes

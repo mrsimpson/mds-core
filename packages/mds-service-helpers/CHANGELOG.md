@@ -1,5 +1,11 @@
 # @mds-core/mds-service-helpers
 
+## 0.6.0
+
+### Minor Changes
+
+- cae7ad2b: added more error rpc error types for middleware error handling
+
 ## 0.5.3
 
 ### Patch Changes

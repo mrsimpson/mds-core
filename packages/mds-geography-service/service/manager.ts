@@ -32,7 +32,10 @@ export const GeographyServiceManager = RpcServer<GeographyService, GeographyServ
     getPublishedGeographies: (args, context) => GeographyServiceProvider.getPublishedGeographies(context, ...args),
     writeGeographies: (args, context) => GeographyServiceProvider.writeGeographies(context, ...args),
     writeGeographiesMetadata: (args, context) => GeographyServiceProvider.writeGeographiesMetadata(context, ...args),
+    deleteGeographyAndMetadata: (args, context) =>
+      GeographyServiceProvider.deleteGeographyAndMetadata(context, ...args),
     editGeography: (args, context) => GeographyServiceProvider.editGeography(context, ...args),
+    editGeographyMetadata: (args, context) => GeographyServiceProvider.editGeographyMetadata(context, ...args),
     publishGeography: (args, context) => GeographyServiceProvider.publishGeography(context, ...args),
     getGeographiesByIds: (args, context) => GeographyServiceProvider.getGeographiesByIds(context, ...args)
   },

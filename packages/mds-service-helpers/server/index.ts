@@ -16,6 +16,7 @@
 
 import { Nullable } from '@mds-core/mds-types'
 import {
+  AlreadyPublishedError,
   BadParamsError,
   ConflictError,
   DependencyMissingError,
@@ -159,6 +160,11 @@ export const ServiceException = (message: string, error?: unknown) => {
   /* istanbul ignore if */
   if (error instanceof NotFoundError) {
     return ServiceError({ type: 'NotFoundError', message, details })
+  }
+
+  /* istanbul ignore if */
+  if (error instanceof AlreadyPublishedError) {
+    return ServiceError({ type: 'AlreadyPublishedError', message, details })
   }
 
   /* istanbul ignore if */

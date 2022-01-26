@@ -1,5 +1,17 @@
 # @mds-core/mds-geography-service
 
+## 0.9.0
+
+### Minor Changes
+
+- cae7ad2b: mds-geography-api and mds-geography-author-api now use mds-geography-service exclusively
+
+### Patch Changes
+
+- Updated dependencies [cae7ad2b]
+  - @mds-core/mds-service-helpers@0.6.0
+  - @mds-core/mds-rpc-common@0.3.4
+
 ## 0.8.3
 
 ### Patch Changes

@@ -21,7 +21,11 @@ import {
   ApiResponseLocalsClaims,
   ApiVersionedResponse
 } from '@mds-core/mds-api-server'
-import { GeographyDomainCreateModel, GeographyDomainModel } from '@mds-core/mds-geography-service'
+import {
+  GeographyDomainCreateModel,
+  GeographyDomainModel,
+  GeographyMetadataDomainModel
+} from '@mds-core/mds-geography-service'
 import { Geography, GeographyMetadata, UUID } from '@mds-core/mds-types'
 
 export const GEOGRAPHY_AUTHOR_API_SUPPORTED_VERSIONS = ['1.0.0'] as const
@@ -57,11 +61,11 @@ export type GeographyAuthorApiResponse<B = {}> = ApiVersionedResponse<GEOGRAPHY_
   ApiResponseLocalsClaims<GeographyAuthorApiAccessTokenScopes>
 
 export type GeographyAuthorApiGetGeographyMetadatumResponse = GeographyAuthorApiResponse<{
-  data: { geography_metadata: GeographyMetadata }
+  data: { geography_metadata: GeographyMetadataDomainModel }
 }>
 
 export type GeographyAuthorApiGetGeographyMetadataResponse = GeographyAuthorApiResponse<{
-  data: { geography_metadata: GeographyMetadata[] }
+  data: { geography_metadata: GeographyMetadataDomainModel[] }
 }>
 
 export type GeographyAuthorApiPostGeographyResponse = GeographyAuthorApiResponse<{
@@ -69,7 +73,9 @@ export type GeographyAuthorApiPostGeographyResponse = GeographyAuthorApiResponse
 }>
 
 export type GeographyAuthorApiPutGeographyResponse = GeographyAuthorApiResponse<{ data: { geography: Geography } }>
-export type GeographyAuthorApiPublishGeographyResponse = GeographyAuthorApiResponse<{ data: { geography: Geography } }>
+export type GeographyAuthorApiPublishGeographyResponse = GeographyAuthorApiResponse<{
+  data: { geography: GeographyDomainModel }
+}>
 export type GeographyAuthorApiPutGeographyMetadataResponse = GeographyAuthorApiResponse<{
   data: { geography_metadata: GeographyMetadata }
 }>
