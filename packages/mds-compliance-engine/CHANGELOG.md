@@ -1,5 +1,11 @@
 # @mds-core/mds-compliance-engine
 
+## 0.7.2-hotfix.0
+
+### Patch Changes
+
+- 9f384a55: Add optional chaining operator when attempting to access policy rules in getPolicyType
+
 ## 0.7.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.1.21-hotfix.0
+
+### Patch Changes
+
+- Updated dependencies [9f384a55]
+  - @mds-core/mds-compliance-engine@0.7.2-hotfix.0
+
 ## 0.1.20
 
 ### Patch Changes

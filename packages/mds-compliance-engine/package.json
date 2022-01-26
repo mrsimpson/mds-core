@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-engine",
-  "version": "0.7.1",
+  "version": "0.7.2-hotfix.0",
   "description": "MDS Compliance Tool",
   "keywords": [
     "mds",
