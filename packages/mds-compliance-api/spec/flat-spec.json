@@ -20,7 +20,7 @@
             ]
           }
         ],
-        "summary": "Get violation periods",
+        "summary": "Get Violation Periods. Violation Periods are defined as periods where there are consecutive Compliance Snapshots for a given provider_id/policy_id which are in violation.",
         "parameters": [
           {
             "in": "query",
@@ -193,7 +193,7 @@
             ]
           }
         ],
-        "summary": "Get compliance snapshot_ids",
+        "summary": "Get compliance snapshot_ids given a token. Sometimes, an opaque token will be provided as part of a URI to point to a collection of snapshots, this endpoint can be utilized to access those snapshots.",
         "parameters": [
           {
             "in": "query",
@@ -249,7 +249,7 @@
             ]
           }
         ],
-        "summary": "Get a compliance violation",
+        "summary": "Get a compliance violation. A single compliance violation is defined as a discrete violation of a policy. Typically, this will map back to a single vehicle.",
         "parameters": [
           {
             "in": "path",
@@ -536,6 +536,7 @@
       },
       "ComplianceSnapshot": {
         "type": "object",
+        "description": "A Compliance Snapshot can be thought of as a birds-eye-view picture of a Provider's compliance with a given policy at a point in time. Compliance Snapshots will typically consider a Provider's entire fleet in aggregate.",
         "properties": {
           "compliance_as_of": {
             "$ref": "#/components/schemas/Timestamp"

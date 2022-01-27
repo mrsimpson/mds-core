@@ -1,5 +1,11 @@
 # @mds-core/mds-compliance-engine
 
+## 0.7.13
+
+### Patch Changes
+
+- 849785dd: Patches a bug which resulted in compliance-engine crashes when considering a policy with no rules.
+
 ## 0.7.12
 
 ### Patch Changes
