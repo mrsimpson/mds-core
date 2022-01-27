@@ -14,9 +14,10 @@
     limitations under the License.
  */
 
+import { GeographyDomainModel, getPolygon } from '@mds-core/mds-geography-service'
 import { CountPolicy, CountRule } from '@mds-core/mds-policy-service'
-import { Device, Geography, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { clone, getPolygon, isDefined, pointInShape } from '@mds-core/mds-utils'
+import { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { clone, isDefined, pointInShape } from '@mds-core/mds-utils'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../@types'
 import { annotateVehicleMap, isInStatesOrEvents, isInVehicleTypes, isRuleActive } from './helpers'
 
@@ -26,7 +27,7 @@ import { annotateVehicleMap, isInStatesOrEvents, isInVehicleTypes, isRuleActive 
  */
 export function isCountRuleMatch(
   rule: CountRule,
-  geographies: Geography[],
+  geographies: GeographyDomainModel[],
   device: Device,
   event: VehicleEventWithTelemetry
 ) {
@@ -56,7 +57,7 @@ export function isCountRuleMatch(
 export function processCountPolicy(
   policy: CountPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
-  geographies: Geography[],
+  geographies: GeographyDomainModel[],
   devices: { [d: string]: Device }
 ): ComplianceEngineResult | undefined {
   // Necessary because we destructively modify the devices list to keep track of which devices we've seen.

@@ -15,8 +15,7 @@
  */
 
 // utility functions
-
-import { BBox, BoundingBox, Geography, SingleOrArray, Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
+import { BBox, BoundingBox, SingleOrArray, Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
 import circleToPolygon from 'circle-to-polygon'
 import { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson'
 import pointInPoly from 'point-in-polygon'
@@ -487,16 +486,6 @@ function isInsideBoundingBox(telemetry: Telemetry | undefined | null, bbox: Boun
   return false
 }
 
-function getPolygon(geographies: Geography[], geography: string): Geometry | FeatureCollection {
-  const res = geographies.find((location: Geography) => {
-    return location.geography_id === geography
-  })
-  if (res === undefined) {
-    throw new Error(`Geography ${geography} not found in ${geographies}!`)
-  }
-  return res.geography_json
-}
-
 function areThereCommonElements<T, U>(arr1: T[], arr2: U[]) {
   const set = new Set([...arr1, ...arr2])
   return set.size !== arr1.length + arr2.length
@@ -626,7 +615,6 @@ export {
   getCurrentDate,
   getEnvVar,
   getNextStates,
-  getPolygon,
   getRandomSubarray,
   head,
   hours,

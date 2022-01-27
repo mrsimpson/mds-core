@@ -16,7 +16,7 @@
 
 import { getProviderInputs, getSupersedingPolicies, processPolicy } from '@mds-core/mds-compliance-engine'
 import { ComplianceServiceClient, ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
-import db from '@mds-core/mds-db'
+import { GeographyDomainModel, GeographyServiceClient } from '@mds-core/mds-geography-service'
 import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { providers } from '@mds-core/mds-providers'
 import { SerializedBuffers } from '@mds-core/mds-service-helpers'
@@ -38,7 +38,9 @@ async function batchComplianceSnapshots(snapshots: ComplianceSnapshotDomainModel
 
 export async function computeSnapshot() {
   const policies: PolicyDomainModel[] = getSupersedingPolicies(await PolicyServiceClient.readActivePolicies(now()))
-  const geographies = await db.readGeographies({ get_published: true })
+  const geographies: GeographyDomainModel[] = await GeographyServiceClient.getPublishedGeographies({
+    includeMetadata: false
+  })
   const compliance_as_of = now() // The timestamp right after we fetch the inputs (latest state as of that time)
 
   const provider_ids = Object.keys(providers)

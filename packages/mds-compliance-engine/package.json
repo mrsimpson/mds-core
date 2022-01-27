@@ -23,6 +23,7 @@
     "@mds-core/mds-api-server": "workspace:0.4.0",
     "@mds-core/mds-compliance-service": "workspace:0.10.6",
     "@mds-core/mds-db": "workspace:0.4.32",
+    "@mds-core/mds-geography-service": "workspace:0.9.0",
     "@mds-core/mds-ingest-service": "0.9.4",
     "@mds-core/mds-logger": "workspace:0.5.5",
     "@mds-core/mds-policy-service": "workspace:0.11.4",

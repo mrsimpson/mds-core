@@ -1,12 +1,13 @@
+import { GeographyDomainModel, getPolygon } from '@mds-core/mds-geography-service'
 import { SpeedPolicy, SpeedRule } from '@mds-core/mds-policy-service'
-import { Device, Geography, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { clone, getPolygon, pointInShape } from '@mds-core/mds-utils'
+import { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { clone, pointInShape } from '@mds-core/mds-utils'
 import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../@types'
 import { annotateVehicleMap, isInStatesOrEvents, isInVehicleTypes, isRuleActive } from './helpers'
 
 export function isSpeedRuleMatch(
   rule: SpeedRule,
-  geographies: Geography[],
+  geographies: GeographyDomainModel[],
   device: Device,
   event: VehicleEventWithTelemetry
 ) {
@@ -29,7 +30,7 @@ export function isSpeedRuleMatch(
 export function processSpeedPolicy(
   policy: SpeedPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
-  geographies: Geography[],
+  geographies: GeographyDomainModel[],
   devices: { [d: string]: Device }
 ): ComplianceEngineResult | undefined {
   const matchedVehicles: {

@@ -14,15 +14,16 @@
     limitations under the License.
  */
 
+import { GeographyDomainModel, getPolygon } from '@mds-core/mds-geography-service'
 import { TimePolicy, TimeRule } from '@mds-core/mds-policy-service'
-import { Device, Geography, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { clone, getPolygon, now, pointInShape, RULE_UNIT_MAP } from '@mds-core/mds-utils'
+import { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { clone, now, pointInShape, RULE_UNIT_MAP } from '@mds-core/mds-utils'
 import { ComplianceEngineResult } from '../@types'
 import { annotateVehicleMap, isInStatesOrEvents, isInVehicleTypes, isRuleActive } from './helpers'
 
 export function isTimeRuleMatch(
   rule: TimeRule,
-  geographies: Geography[],
+  geographies: GeographyDomainModel[],
   device: Device,
   // We throw out events that have no telemetry.
   event: VehicleEvent & { telemetry: Telemetry }
@@ -47,7 +48,7 @@ export function isTimeRuleMatch(
 export function processTimePolicy(
   policy: TimePolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
-  geographies: Geography[],
+  geographies: GeographyDomainModel[],
   devices: { [d: string]: Device }
 ): ComplianceEngineResult | undefined {
   const matchedVehicles: {

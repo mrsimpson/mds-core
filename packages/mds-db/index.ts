@@ -25,7 +25,6 @@ import * as audit from './audits'
 import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
 import * as devices from './devices'
 import * as events from './events'
-import * as geographies from './geographies'
 import { DbLogger } from './logger'
 import { createTables, dropTables } from './migration'
 import * as telemetry from './telemetry'
@@ -141,7 +140,6 @@ export default {
   shutdown,
   ...devices,
   ...events,
-  ...geographies,
   ...audit,
   ...trips,
   ...telemetry,

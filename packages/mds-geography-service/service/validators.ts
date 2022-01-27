@@ -20,6 +20,7 @@ import Ajv from 'ajv'
 import gjv from 'geojson-validation'
 import {
   GeographyDomainCreateModel,
+  GeographyDomainModel,
   GeographyMetadataDomainCreateModel,
   GetGeographiesOptions,
   GetPublishedGeographiesOptions
@@ -51,6 +52,30 @@ const uuidSchema = <const>{ type: 'string', format: 'uuid' }
 export const { validate: validateGeographyDomainCreateModel, isValid: isValidGeographyDomainCreateModel } =
   SchemaValidator<GeographyDomainCreateModel>(
     {
+      $id: 'GeographyCreate',
+      type: 'object',
+      properties: {
+        geography_id: uuidSchema,
+        name: { type: 'string', maxLength: 255, nullable: true, default: null },
+        description: { type: 'string', maxLength: 255, nullable: true, default: null },
+        effective_date: { type: 'integer', nullable: true, default: null },
+        prev_geographies: { type: 'array', items: uuidSchema, nullable: true, default: null },
+        geography_json: {
+          type: 'object',
+          required: ['features', 'type'],
+          valid_geojson: true
+        }
+      },
+      additionalProperties: false,
+      required: ['geography_id', 'geography_json']
+    },
+    { allErrors: true },
+    ajvWithGeoJSON
+  )
+
+export const { validate: validateGeographyDomainModel, isValid: isValidGeographyDomainModel } =
+  SchemaValidator<GeographyDomainModel>(
+    {
       $id: 'Geography',
       type: 'object',
       properties: {
@@ -59,6 +84,7 @@ export const { validate: validateGeographyDomainCreateModel, isValid: isValidGeo
         description: { type: 'string', maxLength: 255, nullable: true, default: null },
         effective_date: { type: 'integer', nullable: true, default: null },
         prev_geographies: { type: 'array', items: uuidSchema, nullable: true, default: null },
+        publish_date: { type: 'integer', nullable: true, default: null },
         geography_json: {
           type: 'object',
           required: ['features', 'type'],

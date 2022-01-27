@@ -1,4 +1,5 @@
 import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service'
+import { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import {
   CountPolicy,
@@ -10,7 +11,7 @@ import {
   TIME_FORMAT
 } from '@mds-core/mds-policy-service'
 import { providers } from '@mds-core/mds-providers'
-import { Device, Geography, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { Device, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { areThereCommonElements, days, isDefined, now, RuntimeError } from '@mds-core/mds-utils'
 import { DateTime } from 'luxon'
 import moment from 'moment-timezone'
@@ -236,9 +237,14 @@ export function createMatchedVehicleInformation(
 export function annotateVehicleMap<T extends Rule<Exclude<RULE_TYPE, 'rate'>>>(
   policy: PolicyDomainModel,
   events: VehicleEventWithTelemetry[],
-  geographies: Geography[],
+  geographies: GeographyDomainModel[],
   vehicleMap: { [d: string]: { device: Device; speed?: number; rule_applied?: UUID; rules_matched?: UUID[] } },
-  matcherFunction: (rule: T, geographyArr: Geography[], device: Device, event: VehicleEventWithTelemetry) => boolean
+  matcherFunction: (
+    rule: T,
+    geographyArr: GeographyDomainModel[],
+    device: Device,
+    event: VehicleEventWithTelemetry
+  ) => boolean
 ): MatchedVehicleInformation[] {
   // For holding the final form of the relevant vehicle, event, and matching rule data.
   const vehiclesFoundMap: { [d: string]: MatchedVehicleInformation } = {}

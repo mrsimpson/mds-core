@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
+import { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import { validateGeographyDomainModel } from '@mds-core/mds-geography-service/service/validators'
 import { PolicyDomainModel, validatePolicyDomainModel } from '@mds-core/mds-policy-service'
-import { validateEvents, validateGeographies } from '@mds-core/mds-schema-validators'
-import { Device, Geography, VehicleEvent } from '@mds-core/mds-types'
+import { validateEvents } from '@mds-core/mds-schema-validators'
+import { Device, VehicleEvent } from '@mds-core/mds-types'
 import * as fs from 'fs'
 import * as yargs from 'yargs'
 import { ComplianceEngineResult } from './@types'
@@ -60,8 +62,8 @@ async function main(): Promise<(ComplianceEngineResult | undefined)[]> {
       description: 'Path to policies JSON',
       type: 'string'
     }).argv
-  const geographies = (await readJson(args.geographies)) as Geography[]
-  if (!geographies || !validateGeographies(geographies)) {
+  const geographies = (await readJson(args.geographies)) as GeographyDomainModel[]
+  if (!geographies || !validateGeographyDomainModel(geographies)) {
     ComplianceEngineLogger.error('unable to read geographies')
     process.exit(1)
   }

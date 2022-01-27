@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap --lines 61  ts-mocha --project ../../tsconfig.json"
+    "test": "DOTENV_CONFIG_PATH=../../.env nyc --use-spawn-wrap --lines 56 ts-mocha --project ../../tsconfig.json"
   },
   "dependencies": {
     "@mds-core/mds-attachment-service": "workspace:0.5.4",

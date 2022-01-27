@@ -13,3 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { FeatureCollection, Geometry } from 'geojson'
+import { GeographyDomainModel } from './@types'
+
+function getPolygon(geographies: GeographyDomainModel[], geography: string): Geometry | FeatureCollection {
+  const res = geographies.find((location: GeographyDomainModel) => {
+    return location.geography_id === geography
+  })
+  if (res === undefined) {
+    throw new Error(`Geography ${geography} not found in ${geographies}!`)
+  }
+  return res.geography_json
+}
+
+export { getPolygon }
