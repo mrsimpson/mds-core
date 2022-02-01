@@ -42,10 +42,10 @@ async function setupClient(useWriteable: boolean): Promise<MDSPostgresClient> {
     await client.connect()
     client.setConnected(true)
     return client
-  } catch (err) {
-    DbLogger.error('postgres connection error', err.stack)
+  } catch (error) {
+    DbLogger.error('postgres connection error', { error })
     client.setConnected(false)
-    throw err
+    throw error
   }
 }
 
@@ -57,10 +57,10 @@ export async function getReadOnlyClient(): Promise<MDSPostgresClient> {
       readOnlyCachedClient = await setupClient(false)
     }
     return readOnlyCachedClient
-  } catch (err) {
+  } catch (error) {
     readOnlyCachedClient = null
-    DbLogger.error('postgres connection error', err)
-    throw err
+    DbLogger.error('postgres connection error', { error })
+    throw error
   } finally {
     readOnlyClientLock.release()
   }
@@ -74,10 +74,10 @@ export async function getWriteableClient(): Promise<MDSPostgresClient> {
       writeableCachedClient = await setupClient(true)
     }
     return writeableCachedClient
-  } catch (err) {
+  } catch (error) {
     writeableCachedClient = null
-    DbLogger.error('postgres connection error', err)
-    throw err
+    DbLogger.error('postgres connection error', { error })
+    throw error
   } finally {
     writeableClientLock.release()
   }
@@ -95,9 +95,9 @@ export async function makeReadOnlyQuery(sql: string, vals?: SqlVals): Promise<an
     await logSql(sql)
     const result = await client.query(sql, values)
     return result.rows
-  } catch (err) {
-    DbLogger.error(`error with SQL query ${sql}`, err.stack || err)
-    throw err
+  } catch (error) {
+    DbLogger.error(`error with SQL query ${sql}`, { error })
+    throw error
   }
 }
 

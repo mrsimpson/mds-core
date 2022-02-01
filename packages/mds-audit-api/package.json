@@ -38,7 +38,7 @@
     "aws-sdk": "2.999.0",
     "express": "4.17.1",
     "multer": "1.4.3",
-    "sharp": "0.29.1"
+    "sharp": "0.29.3"
   },
   "devDependencies": {
     "@mds-core/mds-test-data": "workspace:0.4.13"

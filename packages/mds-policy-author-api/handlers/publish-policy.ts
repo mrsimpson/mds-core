@@ -31,7 +31,7 @@ export const PublishPolicyHandler = async (
     return res.status(200).send({ version: res.locals.version, data: { policy } })
   } catch (error) {
     /* istanbul ignore next */
-    PolicyAuthorApiLogger.error('failed to publish policy', error.stack)
+    PolicyAuthorApiLogger.error('failed to publish policy', { error })
     /* istanbul ignore next */
     return next(error)
   }

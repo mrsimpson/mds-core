@@ -32,8 +32,8 @@ export const DeleteGeographyHandler = async (
       version: res.locals.version,
       data: { geography_id }
     })
-  } catch (err) {
-    GeographyAuthorLogger.warn('failed to delete geography', err.stack)
-    return next(err)
+  } catch (error) {
+    GeographyAuthorLogger.warn('failed to delete geography', { error })
+    return next(error)
   }
 }

@@ -103,7 +103,7 @@ describe('Jurisdiction Service Tests', () => {
         geography_id: uuid()
       })
       test.value(result).is(null)
-    } catch (error) {
+    } catch (error: any) {
       test.value(error.type).is('ConflictError')
     }
   })
@@ -116,7 +116,7 @@ describe('Jurisdiction Service Tests', () => {
         geography_id: uuid()
       })
       test.value(result).is(null)
-    } catch (error) {
+    } catch (error: any) {
       test.value(error.type).is('ConflictError')
     }
   })
@@ -129,7 +129,7 @@ describe('Jurisdiction Service Tests', () => {
         geography_id: uuid()
       })
       test.value(result).is(null)
-    } catch (error) {
+    } catch (error: any) {
       test.value(error.type).is('ValidationError')
     }
   })
@@ -142,7 +142,7 @@ describe('Jurisdiction Service Tests', () => {
         timestamp: TODAY
       })
       test.value(result).is(null)
-    } catch (error) {
+    } catch (error: any) {
       test.value(error.type).is('ConflictError')
     }
   })
@@ -154,7 +154,7 @@ describe('Jurisdiction Service Tests', () => {
         timestamp: LAST_WEEK
       })
       test.value(result).is(null)
-    } catch (error) {
+    } catch (error: any) {
       test.value(error.type).is('ValidationError')
     }
   })
@@ -166,7 +166,7 @@ describe('Jurisdiction Service Tests', () => {
         timestamp: TODAY
       })
       test.value(result).is(null)
-    } catch (error) {
+    } catch (error: any) {
       test.value(error.type).is('NotFoundError')
     }
   })
@@ -215,7 +215,7 @@ describe('Jurisdiction Service Tests', () => {
         effective: LAST_WEEK
       })
       test.value(result).is(null)
-    } catch (error) {
+    } catch (error: any) {
       test.value(error.type).is('NotFoundError')
     }
   })
@@ -224,7 +224,7 @@ describe('Jurisdiction Service Tests', () => {
     try {
       const result = await JurisdictionServiceClient.getJurisdiction(uuid())
       test.value(result).is(null)
-    } catch (error) {
+    } catch (error: any) {
       test.value(error.type).is('NotFoundError')
     }
   })
@@ -243,7 +243,7 @@ describe('Jurisdiction Service Tests', () => {
     try {
       const result = await JurisdictionServiceClient.deleteJurisdiction(JURISDICTION_ID)
       test.value(result).is(null)
-    } catch (error) {
+    } catch (error: any) {
       test.value(error.type).is('NotFoundError')
     }
   })

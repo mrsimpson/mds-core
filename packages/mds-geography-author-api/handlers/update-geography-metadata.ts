@@ -35,7 +35,7 @@ export const UpdateGeographyMetadataHandler = async (
         await GeographyServiceClient.writeGeographiesMetadata([geography_metadata])
         return res.status(201).send({ version: res.locals.version, data: { geography_metadata } })
       } catch (writeErr) {
-        GeographyAuthorLogger.warn('failed to write geography metadata', writeErr.stack)
+        GeographyAuthorLogger.warn('failed to write geography metadata', { error: writeErr })
         if (ErrorCheckFunction(DependencyMissingError)(writeErr)) {
           return res.status(404).send({ error: writeErr })
         }

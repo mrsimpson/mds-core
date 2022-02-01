@@ -60,8 +60,8 @@ export async function deleteAuditAttachment(auditTripId: UUID, attachmentId: UUI
     if (auditAttachments.length === 0) {
       await AttachmentServiceClient.deleteAttachment(attachmentId)
     }
-  } catch (err) {
-    AuditApiLogger.error('deleteAttachment error', err.stack || err)
-    throw err
+  } catch (error) {
+    AuditApiLogger.error('deleteAttachment error', { error })
+    throw error
   }
 }

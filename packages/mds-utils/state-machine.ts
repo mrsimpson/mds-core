@@ -27,11 +27,9 @@ import {
  * may transition out, then possible states for each event_type
  */
 const microMobilityStateTransitionDict: {
-  [S in MICRO_MOBILITY_VEHICLE_STATE]: Partial<
-    {
-      [E in MICRO_MOBILITY_VEHICLE_EVENT]: MICRO_MOBILITY_VEHICLE_STATE[]
-    }
-  >
+  [S in MICRO_MOBILITY_VEHICLE_STATE]: Partial<{
+    [E in MICRO_MOBILITY_VEHICLE_EVENT]: MICRO_MOBILITY_VEHICLE_STATE[]
+  }>
 } = {
   available: {
     agency_pick_up: ['removed'],

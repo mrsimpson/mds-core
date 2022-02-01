@@ -87,9 +87,9 @@ export async function writeTelemetry(telemetries: Telemetry[]): Promise<Recorded
           ...recorded_telemetry
         }) as Recorded<Telemetry>
     )
-  } catch (err) {
-    DbLogger.error('pg write telemetry error', err)
-    throw err
+  } catch (error) {
+    DbLogger.error('pg write telemetry error', { error })
+    throw error
   }
 }
 
@@ -119,8 +119,8 @@ export async function readTelemetry(
     return res.rows.map((row: TelemetryRecord) => {
       return convertTelemetryRecordToTelemetry(row) as Recorded<Telemetry>
     })
-  } catch (err) {
-    DbLogger.error('read telemetry error', err)
-    throw err
+  } catch (error) {
+    DbLogger.error('read telemetry error', { error })
+    throw error
   }
 }

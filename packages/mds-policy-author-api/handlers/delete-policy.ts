@@ -30,7 +30,7 @@ export const DeletePolicyHandler = async (
     return res.status(200).send({ version: res.locals.version, data: { policy_id } })
   } catch (error) {
     /* istanbul ignore next */
-    PolicyAuthorApiLogger.error('failed to delete policy', error)
+    PolicyAuthorApiLogger.error('failed to delete policy', { error })
     /* istanbul ignore next */
     return next(error)
   }

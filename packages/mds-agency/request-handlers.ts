@@ -95,7 +95,7 @@ export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res:
     try {
       await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
     } catch (error) {
-      AgencyLogger.error('failed to write device stream/cache', error)
+      AgencyLogger.error('failed to write device stream/cache', { error })
     }
 
     return res.status(201).send({})
@@ -156,8 +156,8 @@ export const getVehiclesByProvider = async (
   try {
     const response = await getVehicles(skip, take, url, req.query, provider_id)
     return res.status(200).send({ ...response })
-  } catch (err) {
-    AgencyLogger.error('getVehicles fail', err)
+  } catch (error) {
+    AgencyLogger.error('getVehicles fail', { error })
     return res.status(500).send(AgencyServerError)
   }
 }

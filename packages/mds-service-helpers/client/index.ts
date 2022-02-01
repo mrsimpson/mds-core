@@ -27,7 +27,7 @@ export const isServiceError = <E extends string = ServiceErrorDescriptorType>(
   (types.length === 0 || types.includes((error as ServiceErrorDescriptor<E>).type))
 
 /** Will match an error of the specified type if it's thrown locally, or from a service */
-export const isError = <E extends Error>(error: unknown, type: new () => E) =>
+export const isError = <E extends Error>(error: unknown, type: new () => E): error is E =>
   error instanceof type || isServiceError(error, new type().name)
 
 /** Create a function that will match an error of the specified if it's thrown locally, or from a service */

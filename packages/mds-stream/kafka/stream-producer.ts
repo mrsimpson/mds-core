@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ExtendedKeys, Nullable, RequiredKeys, SetIntersection } from '@mds-core/mds-types'
+import { ExtendedKeys, Nullable, RequiredKeys } from '@mds-core/mds-types'
 import { ClientDisconnectedError, ExceptionMessages, isDefined } from '@mds-core/mds-utils'
 import { Kafka, Producer } from 'kafkajs'
 import { isArray } from 'util'
@@ -25,7 +25,7 @@ import { getKafkaBrokers } from './helpers'
 /**
  * Gets all the keys of all required properties of T that extend string
  */
-type RequiredStringKeys<T extends object> = SetIntersection<RequiredKeys<T>, ExtendedKeys<T, string>>
+type RequiredStringKeys<T extends object> = RequiredKeys<T> & ExtendedKeys<T, string>
 
 export interface KafkaStreamProducerOptions<TMessage> {
   clientId: string
@@ -47,7 +47,7 @@ const createStreamProducer = async <TMessage>({
     await producer.connect()
     return producer
   } catch (err) {
-    StreamLogger.error(err)
+    StreamLogger.error('createStreamProducer error', { err })
   }
   return null
 }
@@ -59,14 +59,17 @@ const disconnectProducer = async (producer: Nullable<Producer>) => {
 }
 
 /**
- * Gets the key to partition on (e.g. a device_id) if partitionKey is set in the options.
+ * Gets the value of a key to partition on (e.g. a device_id) if partitionKey is set in the options.
  * By default, this uses a hash of the key to determine what partition it should land on.
  * If no partitionKey is specified in the options, none will be used.
  */
 const getKey = <TMessage>(msg: TMessage, options?: Partial<KafkaStreamProducerOptions<TMessage>>) => {
   const { partitionKey } = options ?? {}
 
-  return partitionKey ? { key: msg[partitionKey] } : {}
+  const partitionVal = partitionKey ? msg[partitionKey] : undefined
+
+  // this type check shouldn't need to happen, but TS 4.1+ fails to guarantee that msg[partitionKey] is a string
+  return typeof partitionVal === 'string' ? { key: partitionVal } : {}
 }
 
 export const KafkaStreamProducer = <TMessage>(

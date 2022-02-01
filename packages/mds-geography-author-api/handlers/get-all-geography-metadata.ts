@@ -91,7 +91,7 @@ export const GetAllGeographyMetadataHandler = async (
     )
     return res.status(200).send({ version: res.locals.version, data: { geography_metadata } })
   } catch (error) {
-    GeographyAuthorLogger.warn('failed to read geography metadata', error)
+    GeographyAuthorLogger.warn('failed to read geography metadata', { error })
     return next(error)
   }
 }

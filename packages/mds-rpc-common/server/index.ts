@@ -96,12 +96,14 @@ const startRepl = (options: RpcServerOptions['repl']): Promise<net.Server> =>
     })
   })
 
-export const RpcServer = <Service, RequestContext extends {}>(
+export type RpcServer = <Service, RequestContext extends {}>(
   definition: RpcServiceDefinition<Service>,
   { onStart, onStop }: RpcServiceHandlers,
   routes: ServiceHandlerFor<RpcServiceDefinition<Service>, RequestContext>,
-  options: Partial<RpcServerOptions> = {}
-): ProcessManager => {
+  options?: Partial<RpcServerOptions>
+) => ProcessManager
+
+export const RpcServer: RpcServer = (definition, { onStart, onStop }, routes, options = {}) => {
   let server: Nullable<http.Server> = null
   let repl: Nullable<net.Server> = null
 

@@ -170,9 +170,9 @@ function writeDevice(device: Device, pipeline: Redis.Pipeline) {
     }
 
     return hwrite('device', device, pipeline)
-  } catch (err) {
-    AgencyCacheLogger.error('Failed to write device to cache', err)
-    throw err
+  } catch (error) {
+    AgencyCacheLogger.error('Failed to write device to cache', { error })
+    throw error
   }
 }
 
@@ -223,9 +223,9 @@ function writeEvent(event: VehicleEvent, pipeline: Redis.Pipeline, prevEvent?: V
           addGeospatialHash(event.device_id, [lat, lng], pipeline)
         }
         hwrite('event', event, pipeline)
-      } catch (err) {
-        AgencyCacheLogger.error('hwrites', err.stack)
-        throw err
+      } catch (error) {
+        AgencyCacheLogger.error('hwrites', { error })
+        throw error
       }
     } else {
       return null
@@ -237,9 +237,9 @@ function writeEvent(event: VehicleEvent, pipeline: Redis.Pipeline, prevEvent?: V
         addGeospatialHash(event.device_id, [lat, lng], pipeline)
       }
       hwrite('event', event, pipeline)
-    } catch (err) {
-      AgencyCacheLogger.error('hwrites', err.stack)
-      throw err
+    } catch (error) {
+      AgencyCacheLogger.error('hwrites', { error })
+      throw error
     }
   }
 }
@@ -296,9 +296,9 @@ async function readDeviceStatus(device_id: UUID) {
     const statuses = Object.values(deviceStatusMap)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return statuses.find((status: any) => status.telemetry) || statuses[0] || null
-  } catch (err) {
-    AgencyCacheLogger.error('Error reading device status', err)
-    throw err
+  } catch (error) {
+    AgencyCacheLogger.error('Error reading device status', { error })
+    throw error
   }
 }
 
@@ -394,9 +394,9 @@ function writeOneTelemetry(
     try {
       if (!priorTelemetry) throw Error('missing prior telemetry')
       return telemetry.timestamp > priorTelemetry.timestamp
-    } catch (err) {
+    } catch (error) {
       if (!options.quiet) {
-        AgencyCacheLogger.info('writeOneTelemetry: no prior telemetry found:', err.message)
+        AgencyCacheLogger.info('writeOneTelemetry: no prior telemetry found:', { error })
       }
       // Cache miss; return true
       return true
@@ -411,9 +411,9 @@ function writeOneTelemetry(
     } else {
       return
     }
-  } catch (err) {
-    AgencyCacheLogger.error('writeOneTelemetry error', err.stack)
-    throw err
+  } catch (error) {
+    AgencyCacheLogger.error('writeOneTelemetry error', { error })
+    throw error
   }
 }
 
@@ -428,9 +428,9 @@ async function writeTelemetry(telemetries: Telemetry[], options: { quiet: boolea
     )
 
     await pipeline.exec()
-  } catch (err) {
-    AgencyCacheLogger.error('Failed to write telemetry to cache', err)
-    throw err
+  } catch (error) {
+    AgencyCacheLogger.error('Failed to write telemetry to cache', { error })
+    throw error
   }
 }
 
@@ -444,8 +444,8 @@ async function readAllTelemetry() {
   return ((await hreads(['telemetry'], device_ids)) as StringifiedTelemetry[]).reduce((acc: Telemetry[], telemetry) => {
     try {
       return [...acc, parseTelemetry(telemetry)]
-    } catch (err) {
-      AgencyCacheLogger.error(JSON.parse(err))
+    } catch (error) {
+      AgencyCacheLogger.error('readAllTelemetry error', { error })
       return acc
     }
   }, [])
@@ -518,13 +518,13 @@ async function cleanup() {
       // return a wee report
       report.deleted = result
       return report
-    } catch (ex) {
-      AgencyCacheLogger.error('cleanup: exception', ex)
-      throw ex
+    } catch (error) {
+      AgencyCacheLogger.error('cleanup: exception', { error })
+      throw error
     }
-  } catch (ex) {
-    AgencyCacheLogger.error('cleanup: exception', ex)
-    return Promise.reject(ex)
+  } catch (error) {
+    AgencyCacheLogger.error('cleanup: exception', { error })
+    return Promise.reject(error)
   }
 }
 

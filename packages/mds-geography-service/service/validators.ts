@@ -41,7 +41,7 @@ const ajvWithGeoJSON = new Ajv({ allErrors: true }).addKeyword({
         throw new ValidationError(messageOrResponse.join(','))
       }
     } catch (error) {
-      GeographyServiceLogger.error(`geojson-validation error is ${JSON.stringify(error.reason)}`)
+      GeographyServiceLogger.error(`geojson-validation error`, { error })
       return false
     }
   }

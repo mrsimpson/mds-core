@@ -87,12 +87,12 @@ const sendSuccess = (
 const refreshDeviceCache = async (device: Device, event: VehicleEvent) => {
   try {
     await cache.readDevice(event.device_id)
-  } catch (err) {
+  } catch (refreshError) {
     try {
       await Promise.all([cache.writeDevices([device]), stream.writeDevice(device)])
-      AgencyLogger.debug('Re-adding previously deregistered device to cache', err)
+      AgencyLogger.debug('Re-adding previously deregistered device to cache', { error: refreshError })
     } catch (error) {
-      AgencyLogger.warn(`Error writing to cache/stream ${error}`)
+      AgencyLogger.warn(`Error writing to cache/stream`, { error })
     }
   }
 }
@@ -151,14 +151,14 @@ export const createEventHandler = async (
         cache.writeTelemetry([telemetry]),
         stream.writeTelemetry([telemetry])
       ])
-    } catch (err) {
-      AgencyLogger.warn('/event exception cache/stream', err)
+    } catch (eventPersistenceError) {
+      AgencyLogger.warn('/event exception cache/stream', { error: eventPersistenceError })
     } finally {
       return sendSuccess(req, res, event)
     }
-  } catch (err) {
-    if (err instanceof ValidationError) return res.status(400).send(agencyValidationErrorParser(err))
+  } catch (error) {
+    if (error instanceof ValidationError) return res.status(400).send(agencyValidationErrorParser(error))
 
-    await handleDbError(req, res, err, provider_id, unparsedEvent)
+    await handleDbError(req, res, error as any, provider_id, unparsedEvent)
   }
 }

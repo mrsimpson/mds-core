@@ -102,8 +102,8 @@ async function shutdown(): Promise<void> {
         repository.shutdown()
       )
     )
-  } catch (err) {
-    DbLogger.error('error during disconnection', err.stack)
+  } catch (error) {
+    DbLogger.error('error during disconnection', { error })
   }
 }
 

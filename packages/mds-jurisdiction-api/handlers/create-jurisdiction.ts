@@ -52,12 +52,13 @@ export const CreateJurisdictionHandler = async (
     }
     return res.status(201).send({ version, jurisdictions })
   } catch (error) {
-    if (isServiceError(error))
+    if (isServiceError(error)) {
       if (error.type === 'ValidationError') {
         return res.status(400).send({ error })
       }
-    if (error.type === 'ConflictError') {
-      return res.status(409).send({ error })
+      if (error.type === 'ConflictError') {
+        return res.status(409).send({ error })
+      }
     }
     return res.status(500).send({ error })
   }

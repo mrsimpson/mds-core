@@ -75,8 +75,8 @@ export async function readTripIds(params: Partial<ReadTripIdsQueryParams> = {}):
       tripIds: res2.rows.map(row => row.trip_id),
       count
     }
-  } catch (err) {
-    DbLogger.error('readTripIds error', err)
-    throw err
+  } catch (error) {
+    DbLogger.error('readTripIds error', { error })
+    throw error
   }
 }

@@ -28,7 +28,7 @@ export const PublishGeographyHandler = async (
     const published_geo = await GeographyServiceClient.publishGeography({ geography_id })
 
     return res.status(200).send({ version: res.locals.version, data: { geography: published_geo } })
-  } catch (updateErr) {
-    return next(updateErr)
+  } catch (error) {
+    return next(error)
   }
 }
