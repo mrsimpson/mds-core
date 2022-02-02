@@ -1,5 +1,14 @@
 # @mds-core/mds-geography-api
 
+## 0.4.2
+
+### Patch Changes
+
+- ba4523c5: Fix return type for GET Geographies to be more accurate
+- Updated dependencies [ba4523c5]
+  - @mds-core/mds-geography-service@0.10.1
+  - @mds-core/mds-api-helpers@0.2.2
+
 ## 0.4.1
 
 ### Patch Changes
