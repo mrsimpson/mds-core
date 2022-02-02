@@ -15,8 +15,9 @@
  */
 
 import { RpcClient, RpcRequest, RpcRequestOptions } from '@mds-core/mds-rpc-common'
-import { ServiceClient } from '@mds-core/mds-service-helpers'
+import { ServiceClient, UnwrapServiceResult } from '@mds-core/mds-service-helpers'
 import { GeographyService, GeographyServiceDefinition, GeographyServiceRequestContext } from '../@types'
+import { GeographyServiceProvider } from '../service/provider'
 // What the API layer, and any other clients, will invoke.
 export const GeographyServiceClientFactory = (
   context: GeographyServiceRequestContext,
@@ -33,7 +34,10 @@ export const GeographyServiceClientFactory = (
     getGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.getGeographies, args),
     getUnpublishedGeographies: (...args) =>
       RpcRequest(options, GeographyServiceRpcClient.getUnpublishedGeographies, args),
-    getPublishedGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.getPublishedGeographies, args),
+    getPublishedGeographies: (...args) =>
+      process.env.BYPASS_GET_PUBLISHED_GEOGRAPHIES_RPC === 'true'
+        ? UnwrapServiceResult(GeographyServiceProvider.getPublishedGeographies)(context, ...args)
+        : RpcRequest(options, GeographyServiceRpcClient.getPublishedGeographies, args),
     writeGeographies: (...args) => RpcRequest(options, GeographyServiceRpcClient.writeGeographies, args),
     writeGeographiesMetadata: (...args) =>
       RpcRequest(options, GeographyServiceRpcClient.writeGeographiesMetadata, args),
