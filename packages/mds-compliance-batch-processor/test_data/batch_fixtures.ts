@@ -15,11 +15,12 @@
  */
 
 import db from '@mds-core/mds-db'
+import { GeographyDomainModel, GeographyServiceClient } from '@mds-core/mds-geography-service'
 import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { providers } from '@mds-core/mds-providers'
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
-import { Device_v1_1_0, Geography } from '@mds-core/mds-types'
+import { Device_v1_1_0 } from '@mds-core/mds-types'
 import { minutes, now } from '@mds-core/mds-utils'
 import { FeatureCollection } from 'geojson'
 import { readJson } from './helpers'
@@ -28,9 +29,9 @@ let policies: PolicyDomainModel[] = []
 
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
-const geographies: Geography[] = [
+const geographies = [
   { name: 'la', geography_id: CITY_OF_LA, geography_json: LA_CITY_BOUNDARY as FeatureCollection }
-]
+] as GeographyDomainModel[]
 
 process.env.TIMEZONE = 'America/Los_Angeles'
 
@@ -43,8 +44,8 @@ async function main() {
   policies = await readJson('./test_data/policies.json')
 
   await db.reinitialize()
-  await db.writeGeography(geographies[0])
-  await db.publishGeography(geographies[0])
+  await GeographyServiceClient.writeGeographies([geographies[0]])
+  await GeographyServiceClient.publishGeography({ geography_id: geographies[0].geography_id })
 
   const providerIDs = Object.keys(providers).slice(0, 4)
   const devices = providerIDs.reduce((acc: Device_v1_1_0[], providerID) => {

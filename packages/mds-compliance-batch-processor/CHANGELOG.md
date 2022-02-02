@@ -1,5 +1,31 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.2.0
+
+### Minor Changes
+
+- 04aca084: converted usage of mds-db to mds-geography-service
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [04aca084]
+- Updated dependencies [04aca084]
+- Updated dependencies [11b7a478]
+- Updated dependencies [04aca084]
+- Updated dependencies [04aca084]
+  - @mds-core/mds-db@0.5.0
+  - @mds-core/mds-geography-service@0.10.0
+  - @mds-core/mds-utils@0.3.0
+  - @mds-core/mds-policy-service@0.11.5
+  - @mds-core/mds-service-helpers@0.6.1
+  - @mds-core/mds-types@0.9.0
+  - @mds-core/mds-api-server@0.4.1
+  - @mds-core/mds-compliance-engine@0.8.0
+  - @mds-core/mds-compliance-service@0.10.7
+  - @mds-core/mds-logger@0.5.6
+  - @mds-core/mds-providers@0.2.6
+
 ## 0.1.32
 
 ### Patch Changes

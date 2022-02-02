@@ -39,7 +39,7 @@ export const StreamProcessor = <TMessageIn, TMessageOut>(
           try {
             await Promise.all(sinkProducers.map(producer => producer.write(transformed)))
           } catch (error) {
-            StreamProcessorLogger.error(`Error when writing to producer`, error)
+            StreamProcessorLogger.error(`Error when writing to producer`, { error })
             await Promise.all(sinkProducers.map(producer => producer.shutdown()))
             await Promise.all(sinkProducers.map(producer => producer.initialize()))
             throw error
@@ -117,7 +117,7 @@ const launch = async (processor: StreamProcessorController) => {
       `${npm_package_name} v${npm_package_version} (${
         npm_package_git_commit ?? 'local'
       }) connected to Kafka on ${KAFKA_HOST} failed to start`,
-      error
+      { error }
     )
     return 1
   }

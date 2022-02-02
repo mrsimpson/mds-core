@@ -21,6 +21,7 @@
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
+import { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { CountPolicy, CountRule, RULE_TYPES } from '@mds-core/mds-policy-service'
 import {
   LA_CITY_BOUNDARY,
@@ -29,7 +30,7 @@ import {
   makeTelemetryInArea,
   veniceSpecOps
 } from '@mds-core/mds-test-data'
-import { Device, Geography, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
 import { Feature, FeatureCollection } from 'geojson'
 import MockDate from 'mockdate'
@@ -87,7 +88,17 @@ const COUNT_POLICY = {
   ]
 }
 
-const GEOGRAPHIES = [{ name: 'la', geography_id: CITY_OF_LA, geography_json: LA_CITY_BOUNDARY as FeatureCollection }]
+const GEOGRAPHIES: GeographyDomainModel[] = [
+  {
+    name: 'la',
+    geography_id: CITY_OF_LA,
+    geography_json: LA_CITY_BOUNDARY as FeatureCollection,
+    description: '',
+    effective_date: null,
+    prev_geographies: null,
+    publish_date: null
+  }
+]
 
 describe('Tests Compliance Engine Count Functionality:', () => {
   describe('basic count compliance cases', () => {
@@ -328,7 +339,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
           geography_id: 'e0e4a085-7a50-43e0-afa4-6792ca897c5a',
           geography_json: feature.geometry
         }
-      }) as unknown as Geography[]
+      }) as unknown as GeographyDomainModel[]
 
       const VENICE_SPEC_OPS_POLICY: CountPolicy = {
         name: 'Venice Special Operations Zone',

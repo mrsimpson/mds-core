@@ -109,7 +109,7 @@ const ProcessMonitor = async (
       }
     )
   } catch (error) /* istanbul ignore next */ {
-    ServiceHelpersLogger.error(`Initializing process ${version} failed: ${error.message}, Exiting...`)
+    ServiceHelpersLogger.error(`Initializing process ${version} failed, Exiting...`, { error })
     await controller.stop()
     process.exit(1)
   }

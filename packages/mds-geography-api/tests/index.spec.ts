@@ -16,6 +16,7 @@
 
 import { ApiServer } from '@mds-core/mds-api-server'
 import {
+  GeographyDomainModel,
   GeographyFactory,
   GeographyRepository,
   GeographyServiceManager,
@@ -29,7 +30,6 @@ import {
   POLICY_UUID,
   SCOPED_AUTH
 } from '@mds-core/mds-test-data'
-import { Geography } from '@mds-core/mds-types'
 import { now, pathPrefix } from '@mds-core/mds-utils'
 import supertest from 'supertest'
 import { api } from '../api'
@@ -103,7 +103,7 @@ describe('Tests app', () => {
         .set('Authorization', GEOGRAPHIES_READ_PUBLISHED_SCOPE)
         .expect(200)
       expect(result.body.data.geographies).toHaveLength(1)
-      result.body.data.geographies.forEach((item: Geography) => {
+      result.body.data.geographies.forEach((item: GeographyDomainModel) => {
         expect(item.geography_json).toBeTruthy()
       })
       expect(result.body.version).toStrictEqual(GEOGRAPHY_API_DEFAULT_VERSION)
@@ -116,7 +116,7 @@ describe('Tests app', () => {
         .set('Authorization', GEOGRAPHIES_READ_PUBLISHED_SCOPE)
         .expect(200)
       expect(result.body.data.geographies).toHaveLength(1)
-      result.body.data.geographies.forEach((item: Geography) => {
+      result.body.data.geographies.forEach((item: GeographyDomainModel) => {
         expect(item.geography_json).toBeFalsy()
       })
       expect(result.body.version).toStrictEqual(GEOGRAPHY_API_DEFAULT_VERSION)

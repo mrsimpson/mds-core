@@ -60,7 +60,7 @@ function api(app: express.Express): express.Express {
         }
         return res.status(200).send({ version: res.locals.version, data: { geographies: [geography] } })
       } catch (error) {
-        GeographyLogger.error('failed to read geography', error.stack)
+        GeographyLogger.error('failed to read geography', { error })
         if (error instanceof NotFoundError) {
           return res.status(404).send({ error })
         }
@@ -126,7 +126,7 @@ function api(app: express.Express): express.Express {
         if (error instanceof InsufficientPermissionsError) {
           return res.status(403).send({ error })
         }
-        GeographyLogger.error('failed to read geographies', error.stack)
+        GeographyLogger.error('failed to read geographies', { error })
         return next(new ServerError(error))
       }
     }

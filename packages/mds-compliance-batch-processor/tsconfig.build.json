@@ -6,8 +6,9 @@
   "references": [
     { "path": "../../packages/mds-agency-cache/tsconfig.build.json" },
     { "path": "../../packages/mds-compliance-engine/tsconfig.build.json" },
-    { "path": "../../packages/mds-db/tsconfig.build.json" },
     { "path": "../../packages/mds-compliance-service/tsconfig.build.json" },
+    { "path": "../../packages/mds-db/tsconfig.build.json" },
+    { "path": "../../packages/mds-geography-service/tsconfig.build.json" },
     { "path": "../../packages/mds-logger/tsconfig.build.json" },
     { "path": "../../packages/mds-policy/tsconfig.build.json" },
     { "path": "../../packages/mds-providers/tsconfig.build.json" },

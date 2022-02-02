@@ -201,8 +201,8 @@ export const createTelemetryHandler = async (
     AgencyLogger.debug(`no valid telemetry in ${data.length} items for ${provider_id}`, { body, fails })
 
     return res.status(400).send(allInvalidDataBody(failures))
-  } catch (err) {
-    if (isError(err, NotFoundError)) {
+  } catch (error) {
+    if (isError(error, NotFoundError)) {
       /**
        * TODO: as of MDS v1.1 this is what we should be sending, but we're on 1.0 for now
        */
@@ -219,9 +219,9 @@ export const createTelemetryHandler = async (
       })
     }
 
-    if (isError(err, ValidationError)) return res.status(400).send(agencyValidationErrorParser(err))
+    if (isError(error, ValidationError)) return res.status(400).send(agencyValidationErrorParser(error))
 
-    AgencyLogger.error('createTelemetryHandler fatal error', { error: err })
+    AgencyLogger.error('createTelemetryHandler fatal error', { error })
     return res.status(500).send({ error: new ServerError() })
   }
 }

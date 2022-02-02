@@ -244,7 +244,7 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
       const entity = await connection.getRepository(PolicyMetadataEntity).findOneOrFail({ policy_id })
       return PolicyMetadataEntityToDomain.map(entity)
     } catch (error) {
-      if (error.name === 'EntityNotFoundError') {
+      if (error instanceof Error && error.name === 'EntityNotFoundError') {
         throw new NotFoundError(error)
       }
       throw RepositoryError(error)
@@ -257,7 +257,7 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
       const entity = await connection.getRepository(PolicyEntity).findOneOrFail({ policy_id })
       return PolicyEntityToDomain.map(entity, presentationOptions)
     } catch (error) {
-      if (error.name === 'EntityNotFoundError') {
+      if (error instanceof Error && error.name === 'EntityNotFoundError') {
         throw new NotFoundError(error)
       }
       throw RepositoryError(error)
@@ -306,7 +306,7 @@ class PolicyReadWriteRepository extends ReadWriteRepository {
       }
       return Boolean(PolicyEntityToDomain.map(entity).publish_date)
     } catch (error) {
-      if (error.name === 'EntityNotFoundError') {
+      if (error instanceof Error && error.name === 'EntityNotFoundError') {
         throw new NotFoundError(error)
       }
       throw RepositoryError(error)

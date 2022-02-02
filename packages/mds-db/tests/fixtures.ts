@@ -1,13 +1,15 @@
-import { DISTRICT_SEVEN, GEOGRAPHY2_UUID, GEOGRAPHY_UUID, LA_CITY_BOUNDARY } from '@mds-core/mds-test-data'
-import { Geography } from '@mds-core/mds-types'
-
-export const LAGeography: Geography = {
-  name: 'Los Angeles',
-  geography_id: GEOGRAPHY_UUID,
-  geography_json: LA_CITY_BOUNDARY
-}
-export const DistrictSeven: Geography = {
-  name: 'District Seven',
-  geography_id: GEOGRAPHY2_UUID,
-  geography_json: DISTRICT_SEVEN
-}
+/**
+ * Copyright 2022 City of Los Angeles
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */

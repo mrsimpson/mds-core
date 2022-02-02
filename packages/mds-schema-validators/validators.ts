@@ -20,7 +20,6 @@ import {
   AUDIT_EVENT_TYPE,
   AUDIT_EVENT_TYPES,
   Device,
-  Geography,
   MODALITIES,
   PROPULSION_TYPES,
   Telemetry,
@@ -102,8 +101,6 @@ export const geographySchema = Joi.object().keys({
   effective_date: timestampSchema,
   description: Joi.string()
 })
-
-const geographiesSchema = Joi.array().items(geographySchema)
 
 export const vehicleEventTypeSchema = stringSchema.valid(...VEHICLE_EVENTS)
 
@@ -256,17 +253,6 @@ export const isValidAuditNote = (value: unknown, options: Partial<ValidatorOptio
 export const HasPropertyAssertion = <T>(obj: unknown, ...props: (keyof T)[]): obj is T =>
   typeof obj === 'object' && obj !== null && props.every(prop => prop in obj)
 
-export function validateGeographies(geographies: unknown): geographies is Geography[] {
-  const { error } = geographiesSchema.validate(geographies)
-  if (error) {
-    throw new ValidationError('invalid_geographies', {
-      geographies,
-      details: Format('geographies', error)
-    })
-  }
-  return true
-}
-
 export function validateEvents(events: unknown): events is VehicleEvent[] {
   const { error } = eventsSchema.validate(events)
   if (error) {
@@ -276,14 +262,6 @@ export function validateEvents(events: unknown): events is VehicleEvent[] {
     })
   }
   return true
-}
-
-export function geographyValidationDetails(geography: Geography): Joi.ValidationErrorItem[] | null {
-  const { error } = geographySchema.validate(geography, { allowUnknown: false })
-  if (error) {
-    return error.details
-  }
-  return null
 }
 
 const validateTripEvent = (event: VehicleEvent) => ValidateSchema(event, tripEventSchema, {})

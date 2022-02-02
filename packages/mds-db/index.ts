@@ -25,7 +25,6 @@ import * as audit from './audits'
 import { getReadOnlyClient, getWriteableClient, makeReadOnlyQuery } from './client'
 import * as devices from './devices'
 import * as events from './events'
-import * as geographies from './geographies'
 import { DbLogger } from './logger'
 import { createTables, dropTables } from './migration'
 import * as telemetry from './telemetry'
@@ -103,8 +102,8 @@ async function shutdown(): Promise<void> {
         repository.shutdown()
       )
     )
-  } catch (err) {
-    DbLogger.error('error during disconnection', err.stack)
+  } catch (error) {
+    DbLogger.error('error during disconnection', { error })
   }
 }
 
@@ -141,7 +140,6 @@ export default {
   shutdown,
   ...devices,
   ...events,
-  ...geographies,
   ...audit,
   ...trips,
   ...telemetry,

@@ -1,5 +1,25 @@
 # @mds-core/mds-ingest-migration-processor
 
+## 0.0.41
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [04aca084]
+- Updated dependencies [11b7a478]
+- Updated dependencies [11b7a478]
+- Updated dependencies [04aca084]
+- Updated dependencies [04aca084]
+  - @mds-core/mds-utils@0.3.0
+  - @mds-core/mds-repository@0.1.32
+  - @mds-core/mds-agency-cache@0.4.13
+  - @mds-core/mds-service-helpers@0.6.1
+  - @mds-core/mds-stream-processor@0.4.9
+  - @mds-core/mds-types@0.9.0
+  - @mds-core/mds-api-server@0.4.1
+  - @mds-core/mds-ingest-service@0.9.5
+  - @mds-core/mds-logger@0.5.6
+
 ## 0.0.40
 
 ### Patch Changes

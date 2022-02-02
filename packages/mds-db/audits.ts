@@ -75,9 +75,9 @@ export async function readAudits(query: ReadAuditsQueryParams) {
       count,
       audits: selectResult.rows
     }
-  } catch (err) {
-    DbLogger.error('readAudits error', err.stack || err)
-    throw err
+  } catch (error) {
+    DbLogger.error('readAudits error', { error })
+    throw error
   }
 }
 
@@ -118,9 +118,9 @@ export async function readAuditEvents(audit_trip_id: UUID): Promise<Recorded<Aud
     await logSql(sql, sqlVals)
     const result = await client.query(sql, sqlVals)
     return result.rows
-  } catch (err) {
-    DbLogger.error('readAuditEvents error', err.stack || err)
-    throw err
+  } catch (error) {
+    DbLogger.error('readAuditEvents error', { error })
+    throw error
   }
 }
 

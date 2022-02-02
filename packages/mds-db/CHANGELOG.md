@@ -1,5 +1,28 @@
 # @mds-core/mds-db
 
+## 0.5.0
+
+### Minor Changes
+
+- 04aca084: dropped all methods for interacting with geographies and geography metadata
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- 04aca084: converted usage of mds-db to mds-geography-service
+- Updated dependencies [04aca084]
+- Updated dependencies [11b7a478]
+- Updated dependencies [04aca084]
+- Updated dependencies [04aca084]
+  - @mds-core/mds-geography-service@0.10.0
+  - @mds-core/mds-utils@0.3.0
+  - @mds-core/mds-policy-service@0.11.5
+  - @mds-core/mds-types@0.9.0
+  - @mds-core/mds-attachment-service@0.5.5
+  - @mds-core/mds-audit-service@0.5.5
+  - @mds-core/mds-ingest-service@0.9.5
+  - @mds-core/mds-logger@0.5.6
+
 ## 0.4.32
 
 ### Patch Changes

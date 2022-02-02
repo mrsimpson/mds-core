@@ -81,7 +81,7 @@ const RpcResponse = async <Method extends RpcMethod>(
   try {
     const response = await request(...args)
     return response
-  } catch (error) {
+  } catch (error: any) {
     throw RpcClientError(error)
   }
 }

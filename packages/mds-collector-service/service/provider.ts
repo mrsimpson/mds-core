@@ -121,7 +121,7 @@ export const CollectorServiceProvider: ServiceProvider<CollectorService, Collect
           try {
             validator.validate(message)
             return failures
-          } catch (errors) {
+          } catch (errors: any) {
             return failures.concat({ position, errors })
           }
         },

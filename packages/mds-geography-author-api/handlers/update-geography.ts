@@ -29,7 +29,7 @@ export const UpdateGeographyHandler = async (
     await GeographyServiceClient.editGeography(geography)
     return res.status(201).send({ version: res.locals.version, data: { geography } })
   } catch (error) {
-    GeographyAuthorLogger.warn('failed to edit geography', error.stack)
+    GeographyAuthorLogger.warn('failed to edit geography', { error })
     return next(error)
   }
 }

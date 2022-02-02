@@ -44,10 +44,9 @@ export const initClient = async () => {
     */
     await client.connect()
   } catch (err) {
-    CacheLogger.error(
-      `Initial redis connection to ${REDIS_HOST}:${REDIS_PORT} failed (connection will be retried)`,
+    CacheLogger.error(`Initial redis connection to ${REDIS_HOST}:${REDIS_PORT} failed (connection will be retried)`, {
       err
-    )
+    })
   }
 
   return client

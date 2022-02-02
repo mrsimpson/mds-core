@@ -51,7 +51,7 @@ async function writeDevice(device: Device) {
     try {
       await AgencyStreamNats.writeDevice(device)
     } catch (err) {
-      StreamLogger.error('Failed to write device to NATS', err)
+      StreamLogger.error('Failed to write device to NATS', { err })
       throw err
     }
   }
@@ -59,7 +59,7 @@ async function writeDevice(device: Device) {
     try {
       await AgencyStreamKafka.writeDevice(device)
     } catch (err) {
-      StreamLogger.error('Failed to write device to Kafka', err)
+      StreamLogger.error('Failed to write device to Kafka', { err })
       throw err
     }
   }
@@ -92,7 +92,7 @@ async function writeTelemetry(telemetry: Telemetry[]) {
     try {
       await AgencyStreamNats.writeTelemetry(telemetry)
     } catch (err) {
-      StreamLogger.error('Failed to write telemetry to NATS', err)
+      StreamLogger.error('Failed to write telemetry to NATS', { err })
       throw err
     }
   }
@@ -100,7 +100,7 @@ async function writeTelemetry(telemetry: Telemetry[]) {
     try {
       await AgencyStreamKafka.writeTelemetry(telemetry)
     } catch (err) {
-      StreamLogger.error('Failed to write telemetry to Kafka', err)
+      StreamLogger.error('Failed to write telemetry to Kafka', { err })
       throw err
     }
   }

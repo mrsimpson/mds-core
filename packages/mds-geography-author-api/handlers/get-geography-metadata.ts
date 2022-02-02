@@ -46,8 +46,8 @@ export const GetGeographyMetadataHandler = async (
       throw new InsufficientPermissionsError('permission to read metadata of unpublished geographies missing')
     }
     return res.status(200).send({ version: res.locals.version, data: { geography_metadata } })
-  } catch (err) {
-    GeographyAuthorLogger.warn('failed to read geography metadata', err.stack)
-    return next(err)
+  } catch (error) {
+    GeographyAuthorLogger.warn('failed to read geography metadata', { error })
+    return next(error)
   }
 }

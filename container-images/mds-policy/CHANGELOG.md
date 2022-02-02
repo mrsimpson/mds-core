@@ -1,5 +1,14 @@
 # @container-images/mds-policy
 
+## 0.1.46
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [11b7a478]
+  - @mds-core/mds-policy@0.7.10
+  - @mds-core/mds-webpack-config@0.1.10
+
 ## 0.1.45
 
 ### Patch Changes

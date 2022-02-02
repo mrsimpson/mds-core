@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 City of Los Angeles
+ * Copyright 2022 City of Los Angeles
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export type ModelMapper = <From, To, Options = Partial<{}>>(
-  map: (model: From, options?: Options | undefined) => To
-) => {
-  map: (model: From, options?: Options | undefined) => To
-  mapper: (options?: Options | undefined) => (model: From) => To
+
+import { FeatureCollection, Geometry } from 'geojson'
+import { GeographyDomainModel } from './@types'
+
+function getPolygon(geographies: GeographyDomainModel[], geography: string): Geometry | FeatureCollection {
+  const res = geographies.find((location: GeographyDomainModel) => {
+    return location.geography_id === geography
+  })
+  if (res === undefined) {
+    throw new Error(`Geography ${geography} not found in ${geographies}!`)
+  }
+  return res.geography_json
 }
 
-export const ModelMapper: ModelMapper = map => ({
-  map,
-  mapper: options => model => map(model, options)
-})
+export { getPolygon }

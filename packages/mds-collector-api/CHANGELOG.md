@@ -1,5 +1,22 @@
 # @mds-core/mds-collector-api
 
+## 0.1.48
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [04aca084]
+- Updated dependencies [11b7a478]
+- Updated dependencies [04aca084]
+- Updated dependencies [04aca084]
+  - @mds-core/mds-utils@0.3.0
+  - @mds-core/mds-collector-service@0.4.5
+  - @mds-core/mds-service-helpers@0.6.1
+  - @mds-core/mds-types@0.9.0
+  - @mds-core/mds-api-helpers@0.2.1
+  - @mds-core/mds-api-server@0.4.1
+  - @mds-core/mds-logger@0.5.6
+
 ## 0.1.47
 
 ### Patch Changes

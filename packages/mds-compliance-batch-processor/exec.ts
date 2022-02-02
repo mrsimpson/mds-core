@@ -2,7 +2,7 @@ import { ApiServer, HttpServer } from '@mds-core/mds-api-server'
 import { ProcessManager } from '@mds-core/mds-service-helpers'
 import { minutes, now } from '@mds-core/mds-utils'
 import type express from 'express'
-import { computeSnapshot } from '.'
+import { computeSnapshot } from './batch_process'
 import { ComplianceBatchProcessorLogger } from './logger'
 
 ProcessManager(

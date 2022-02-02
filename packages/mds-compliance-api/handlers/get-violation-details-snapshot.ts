@@ -72,9 +72,9 @@ export const GetViolationDetailsSnapshotHandler = async (
     const { version } = res.locals
     return res.status(200).send({ version, compliance })
   } catch (error) {
-    if (isError(error, NotFoundError)) return res.status(404).send(error)
+    if (isError(error, NotFoundError)) return res.status(404).send({ error })
 
-    ComplianceApiLogger.error(error)
+    ComplianceApiLogger.error('GET Violation Details Snapshot error', { error })
     return res.status(500).send({ error: new ServerError() })
   }
 }

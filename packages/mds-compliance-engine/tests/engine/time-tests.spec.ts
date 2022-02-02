@@ -15,9 +15,10 @@
  */
 
 import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service/@types'
+import { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { TimePolicy, TimeRule } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { Device, Geography, Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import { Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
 import { minutes } from '@mds-core/mds-utils'
 import { FeatureCollection } from 'geojson'
 import test from 'unit.js'
@@ -34,9 +35,9 @@ import {
 
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
-const geographies: Geography[] = [
+const geographies = [
   { name: 'la', geography_id: CITY_OF_LA, geography_json: LA_CITY_BOUNDARY as FeatureCollection }
-]
+] as GeographyDomainModel[]
 
 process.env.TIMEZONE = 'America/Los_Angeles'
 

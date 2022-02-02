@@ -1,22 +1,26 @@
+import { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { CountPolicy, RULE_TYPES, SpeedPolicy, TimePolicy } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, restrictedAreas, veniceSpecOps } from '@mds-core/mds-test-data'
-import { Geography } from '@mds-core/mds-types'
 import { days, now } from '@mds-core/mds-utils'
 import { Polygon } from 'geojson'
 
 export const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
-export const LA_GEOGRAPHY: Geography = { name: 'la', geography_id: CITY_OF_LA, geography_json: LA_CITY_BOUNDARY }
+export const LA_GEOGRAPHY = {
+  name: 'la',
+  geography_id: CITY_OF_LA,
+  geography_json: LA_CITY_BOUNDARY
+} as GeographyDomainModel
 export const LA_BEACH = 'ff822e26-a70c-4721-ac32-2f6734beff9b'
-export const LA_BEACH_GEOGRAPHY: Geography = {
+export const LA_BEACH_GEOGRAPHY = {
   name: 'la beach',
   geography_id: LA_BEACH,
   geography_json: restrictedAreas
-}
-export const RESTRICTED_GEOGRAPHY: Geography = {
+} as GeographyDomainModel
+export const RESTRICTED_GEOGRAPHY = {
   name: 'la',
   geography_id: 'c0591267-bb6a-4f28-a612-ff7f4a8f8b2a',
   geography_json: restrictedAreas
-}
+} as GeographyDomainModel
 
 export const COUNT_POLICY_UUID = '72971a3d-876c-41ea-8e48-c9bb965bbbcc'
 export const COUNT_POLICY_UUID_2 = '37637f96-2580-475a-89e7-cfc5d2e70f84'
@@ -123,7 +127,7 @@ export const COUNT_POLICY_JSON_5: CountPolicy = {
 export const VENICE_POLICY_UUID = 'dd9ace3e-14c8-461b-b5e7-1326505ff176'
 
 // A geo contained within Venice Beach
-export const INNER_GEO: Geography = {
+export const INNER_GEO = {
   name: 'inner venice geo',
   geography_id: 'b4c75556-3842-47a9-b8f6-d721b98c8ca5',
   geography_json: {
@@ -147,17 +151,17 @@ export const INNER_GEO: Geography = {
       }
     ]
   }
-}
+} as GeographyDomainModel
 
 // This geo is all of Venice Beach.
-export const OUTER_GEO: Geography = {
+export const OUTER_GEO = {
   geography_id: 'e0e4a085-7a50-43e0-afa4-6792ca897c5a',
   name: 'outer venice geo',
   geography_json: {
     type: 'FeatureCollection',
     features: [{ properties: {}, type: 'Feature', geometry: veniceSpecOps.features[0].geometry }]
   }
-}
+} as GeographyDomainModel
 
 // This is another geo contained within Venice Beach, near the canals.
 // It is contained within INNER_GEO.
@@ -202,7 +206,7 @@ export const TANZANIA_POLYGON: Polygon = {
   ]
 }
 
-export const TANZANIA_GEO: Geography = {
+export const TANZANIA_GEO = {
   geography_id: '122de6e9-a008-4602-a8b9-9ded3efa3580',
   name: 'Tanzania geo',
   geography_json: {
@@ -215,7 +219,7 @@ export const TANZANIA_GEO: Geography = {
       }
     ]
   }
-}
+} as GeographyDomainModel
 
 export const HIGH_COUNT_POLICY: CountPolicy = {
   policy_id: '221975ef-569c-40a1-a9b0-646e6155c764',

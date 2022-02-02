@@ -35,7 +35,6 @@ import {
   isValidVehicleEventType,
   validateEvent,
   validateEvents,
-  validateGeographies,
   ValidationError
 } from '../validators'
 
@@ -370,65 +369,5 @@ describe('Tests validators', () => {
 
     events[0].event_types = ['notreal']
     await expect(async () => validateEvents(events)).rejects.toThrow(ValidationError)
-  })
-
-  it('verifies geographies validatory (array)', async () => {
-    const geographies: any = [
-      {
-        name: 'inner venice geo',
-        geography_id: 'b4c75556-3842-47a9-b8f6-d721b98c8ca5',
-        geography_json: {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Polygon',
-                coordinates: [
-                  [
-                    [-118.46941709518433, 33.9807517760146],
-                    [-118.46564054489136, 33.9807517760146],
-                    [-118.46564054489136, 33.98356306245639],
-                    [-118.46941709518433, 33.98356306245639],
-                    [-118.46941709518433, 33.9807517760146]
-                  ]
-                ]
-              }
-            }
-          ]
-        }
-      },
-      {
-        name: 'a random utah geo',
-        geography_id: 'a345a55d-6b31-4c18-b082-3a37bba49982',
-        geography_json: {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Polygon',
-                coordinates: [
-                  [
-                    [-112.587890625, 37.71859032558816],
-                    [-109.3798828125, 37.71859032558816],
-                    [-109.3798828125, 38.58252615935333],
-                    [-112.587890625, 38.58252615935333],
-                    [-112.587890625, 37.71859032558816]
-                  ]
-                ]
-              }
-            }
-          ]
-        }
-      }
-    ]
-
-    expect(validateGeographies(geographies)).toBe(true)
-
-    geographies[0].geography_json = {}
-    await expect(async () => validateGeographies(geographies)).rejects.toThrow(ValidationError)
   })
 })

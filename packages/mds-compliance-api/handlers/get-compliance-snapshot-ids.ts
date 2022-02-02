@@ -50,7 +50,7 @@ export const GetComplianceSnapshotIDsHandler = async (
     const { version } = res.locals
     return res.status(200).send({ version, data: base64DecodeComplianceIDsToken(compliance_ids_token) })
   } catch (error) {
-    ComplianceApiLogger.error(error)
+    ComplianceApiLogger.error('GET Compliance Snapshot IDs error', { error })
     return res.status(500).send({ error: new ServerError() })
   }
 }

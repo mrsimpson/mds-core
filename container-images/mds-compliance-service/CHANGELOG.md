@@ -1,5 +1,14 @@
 # @container-images/mds-compliance-service
 
+## 0.0.47
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [11b7a478]
+  - @mds-core/mds-compliance-service@0.10.7
+  - @mds-core/mds-webpack-config@0.1.10
+
 ## 0.0.46
 
 ### Patch Changes

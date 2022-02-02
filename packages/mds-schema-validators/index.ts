@@ -46,10 +46,16 @@ export const SchemaValidator = <T>(
   let ajvInstance = ajv || new Ajv(options)
   /* the ajv-errors plugin throws an error when allErrors is not true */
   if (options.allErrors === true) {
-    ajvInstance = withErrors(ajvInstance)
+    if (!ajvInstance.getKeyword('errorMessage')) {
+      ajvInstance = withErrors(ajvInstance)
+    }
   }
-  ajvInstance.addKeyword(dynamicDefaults())
-  ajvInstance.addKeyword(transform())
+  if (!ajvInstance.getKeyword('dynamicDefaults')) {
+    ajvInstance.addKeyword(dynamicDefaults())
+  }
+  if (!ajvInstance.getKeyword('transform')) {
+    ajvInstance.addKeyword(transform())
+  }
 
   const validator: ValidateFunction<T> = withFormats(ajvInstance, ['uuid', 'uri', 'email', 'float']).compile($schema)
   return {

@@ -94,7 +94,7 @@ export const GetViolationPeriodsHandler = async (
 
     if (isError(error, AuthorizationError)) return res.status(403).send({ error })
 
-    ComplianceApiLogger.error(error)
+    ComplianceApiLogger.error('GET Violation Periods error', { error })
     res.status(500).send({ error: new ServerError() })
   }
 }

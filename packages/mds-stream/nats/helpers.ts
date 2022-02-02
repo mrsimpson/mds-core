@@ -46,7 +46,7 @@ export const createStreamConsumer = async (
       )
     )
   } catch (err) {
-    StreamLogger.error(err)
+    StreamLogger.error('createStreamConsumer error', { err })
   }
   return natsClient
 }

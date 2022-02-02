@@ -21,11 +21,12 @@ class BaseError extends Error {
   }
 }
 
-const reason = (error?: Error | string) => (error instanceof Error ? error.message : error)
+const reason = (error?: unknown) =>
+  error instanceof Error ? error.message : typeof error === 'string' ? error : 'Unknown error'
 
 /* istanbul ignore next */
 export class ServerError extends BaseError {
-  public constructor(error?: Error | string, public info?: unknown) {
+  public constructor(error?: unknown, public info?: unknown) {
     super('ServerError', reason(error), info)
   }
 }

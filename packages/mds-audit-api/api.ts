@@ -686,8 +686,8 @@ function api(app: express.Express): express.Express {
       try {
         const response = await getVehicles(skip, take, url, req.query, bbox, strict, provider_id)
         return res.status(200).send({ version: res.locals.version, ...response })
-      } catch (err) {
-        AuditApiLogger.error('getVehicles fail', err)
+      } catch (error) {
+        AuditApiLogger.error('getVehicles fail', { error })
         return res.status(500).send({
           error: 'internal_server_error'
         })
@@ -709,8 +709,8 @@ function api(app: express.Express): express.Express {
         } else {
           res.status(404).send({ error: new NotFoundError('vehicle not found', { provider_id, vin }) })
         }
-      } catch (err) {
-        AuditApiLogger.error('getVehicle fail', err)
+      } catch (error) {
+        AuditApiLogger.error('getVehicle fail', { error })
         res.status(500).send({
           error: 'internal_server_error'
         })
@@ -739,13 +739,13 @@ function api(app: express.Express): express.Express {
           ...attachmentSummary(attachment),
           audit_trip_id
         })
-      } catch (err) {
-        if (isError(err, ValidationError)) return res.status(400).send({ error: err })
+      } catch (error) {
+        if (isError(error, ValidationError)) return res.status(400).send({ error })
 
-        if (isError(err, UnsupportedTypeError)) return res.status(415).send({ error: err })
+        if (isError(error, UnsupportedTypeError)) return res.status(415).send({ error })
 
-        AuditApiLogger.error('post attachment fail', err)
-        return res.status(500).send({ error: new ServerError(err) })
+        AuditApiLogger.error('post attachment fail', { error })
+        return res.status(500).send({ error: new ServerError(error) })
       }
     }
   )
@@ -758,12 +758,12 @@ function api(app: express.Express): express.Express {
     try {
       await deleteAuditAttachment(audit_trip_id, attachment_id)
       res.status(200).send({ version: res.locals.version })
-    } catch (err) {
-      AuditApiLogger.error('delete attachment error', err)
-      if (err instanceof NotFoundError) {
-        return res.status(404).send({ error: err })
+    } catch (error) {
+      AuditApiLogger.error('delete attachment error', { error })
+      if (error instanceof NotFoundError) {
+        return res.status(404).send({ error })
       }
-      return res.status(500).send({ error: new ServerError(err) })
+      return res.status(500).send({ error: new ServerError(error) })
     }
   })
 

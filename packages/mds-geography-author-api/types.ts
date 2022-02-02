@@ -26,7 +26,7 @@ import {
   GeographyDomainModel,
   GeographyMetadataDomainModel
 } from '@mds-core/mds-geography-service'
-import { Geography, GeographyMetadata, UUID } from '@mds-core/mds-types'
+import { UUID } from '@mds-core/mds-types'
 
 export const GEOGRAPHY_AUTHOR_API_SUPPORTED_VERSIONS = ['1.0.0'] as const
 export type GEOGRAPHY_AUTHOR_API_SUPPORTED_VERSION = typeof GEOGRAPHY_AUTHOR_API_SUPPORTED_VERSIONS[number]
@@ -46,14 +46,14 @@ export type GeographyAuthorApiGetGeographyMetadataRequest = GeographyAuthorApiRe
 
 export type GeographyAuthorApiPostGeographyRequest = GeographyAuthorApiRequest<GeographyDomainCreateModel>
 
-export type GeographyAuthorApiPutGeographyRequest = GeographyAuthorApiRequest<Geography>
+export type GeographyAuthorApiPutGeographyRequest = GeographyAuthorApiRequest<GeographyDomainModel>
 
 export type GeographyAuthorApiDeleteGeographyRequest = GeographyAuthorApiRequest & ApiRequestParams<'geography_id'>
 
 export type GeographyAuthorApiGetGeographyMetadatumRequest = GeographyAuthorApiRequest &
   ApiRequestParams<'geography_id'>
 
-export type GeographyAuthorApiPutGeographyMetadataRequest = GeographyAuthorApiRequest<GeographyMetadata>
+export type GeographyAuthorApiPutGeographyMetadataRequest = GeographyAuthorApiRequest<GeographyMetadataDomainModel>
 
 export type GeographyAuthorApiPublishGeographyRequest = GeographyAuthorApiRequest & ApiRequestParams<'geography_id'>
 
@@ -72,12 +72,14 @@ export type GeographyAuthorApiPostGeographyResponse = GeographyAuthorApiResponse
   data: { geography: GeographyDomainModel }
 }>
 
-export type GeographyAuthorApiPutGeographyResponse = GeographyAuthorApiResponse<{ data: { geography: Geography } }>
+export type GeographyAuthorApiPutGeographyResponse = GeographyAuthorApiResponse<{
+  data: { geography: GeographyDomainModel }
+}>
 export type GeographyAuthorApiPublishGeographyResponse = GeographyAuthorApiResponse<{
   data: { geography: GeographyDomainModel }
 }>
 export type GeographyAuthorApiPutGeographyMetadataResponse = GeographyAuthorApiResponse<{
-  data: { geography_metadata: GeographyMetadata }
+  data: { geography_metadata: GeographyMetadataDomainModel }
 }>
 
 export type GeographyAuthorApiDeleteGeographyResponse = GeographyAuthorApiResponse<{ data: { geography_id: UUID } }>

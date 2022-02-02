@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FeatureCollection } from 'geojson'
 import { Device } from './device'
 import { AUDIT_EVENT_TYPE, VehicleEvent, VEHICLE_EVENT } from './event'
 import { Telemetry, TelemetryData, WithGpsProperty } from './telemetry'
@@ -83,21 +82,6 @@ export interface AuditDetails extends Audit {
   }
 }
 
-// We don't put the publish_date into the geography_json column
-// as we do with the Policy type, because we don't want to mess with
-// the geojson FeatureCollection type.
-export interface Geography {
-  geography_id: UUID
-  geography_json: FeatureCollection
-  prev_geographies?: UUID[]
-  name: string
-  publish_date?: Timestamp
-  effective_date?: Timestamp
-  description?: string
-}
-
-export type GeographySummary = Omit<Geography, 'geography_json'>
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface GeographyMetadata<M extends {} = Record<string, any>> {
   geography_id: UUID
@@ -140,3 +124,4 @@ export * from './trip'
 export * from './utils'
 export * from './vehicle/vehicle_states'
 export * from './vehicle/vehicle_types'
+

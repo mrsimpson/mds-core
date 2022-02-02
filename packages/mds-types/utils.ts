@@ -188,13 +188,6 @@ export type AnyFunction<A = any> = (...args: any[]) => A
 export type AnyConstructor<A = object> = new (...args: any[]) => A
 
 /**
- * Intersection of T and U
- * @example
- * type A = SetIntersection<'a' | 'b', 'a' | 'c'> // 'a'
- */
-export type SetIntersection<T extends keyof any, U extends keyof any> = T extends U ? T : never
-
-/**
  * Extracts keys of T which have values that extend U
  * @examples ```typescript
  * type PickString<T> = ExtendedKeys<T, string>

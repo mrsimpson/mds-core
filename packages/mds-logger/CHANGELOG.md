@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.5.6
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+
 ## 0.5.5
 
 ### Patch Changes

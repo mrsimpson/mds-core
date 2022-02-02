@@ -1,5 +1,30 @@
 # @mds-core/mds-geography-service
 
+## 0.10.0
+
+### Minor Changes
+
+- 04aca084: moved getPolygon util method to mds-geography-service
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- 04aca084: converted usage of mds-db to mds-geography-service
+- Updated dependencies [04aca084]
+- Updated dependencies [11b7a478]
+- Updated dependencies [11b7a478]
+- Updated dependencies [11b7a478]
+- Updated dependencies [04aca084]
+- Updated dependencies [04aca084]
+  - @mds-core/mds-utils@0.3.0
+  - @mds-core/mds-rpc-common@0.3.5
+  - @mds-core/mds-repository@0.1.32
+  - @mds-core/mds-service-helpers@0.6.1
+  - @mds-core/mds-types@0.9.0
+  - @mds-core/mds-logger@0.5.6
+  - @mds-core/mds-schema-validators@0.5.0
+  - @mds-core/mds-test-data@0.4.14
+
 ## 0.9.0
 
 ### Minor Changes
