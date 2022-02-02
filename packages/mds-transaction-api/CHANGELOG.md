@@ -1,5 +1,23 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.10
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [04aca084]
+- Updated dependencies [11b7a478]
+- Updated dependencies [04aca084]
+- Updated dependencies [04aca084]
+  - @mds-core/mds-utils@0.3.0
+  - @mds-core/mds-service-helpers@0.6.1
+  - @mds-core/mds-types@0.9.0
+  - @mds-core/mds-api-helpers@0.2.1
+  - @mds-core/mds-api-server@0.4.1
+  - @mds-core/mds-logger@0.5.6
+  - @mds-core/mds-schema-validators@0.5.0
+  - @mds-core/mds-transaction-service@0.6.2
+
 ## 0.2.9
 
 ### Patch Changes

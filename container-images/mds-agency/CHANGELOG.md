@@ -1,5 +1,14 @@
 # @container-images/mds-agency
 
+## 0.1.73
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [11b7a478]
+  - @mds-core/mds-agency@0.4.10
+  - @mds-core/mds-webpack-config@0.1.10
+
 ## 0.1.72
 
 ### Patch Changes

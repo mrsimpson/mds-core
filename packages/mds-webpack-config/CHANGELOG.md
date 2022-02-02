@@ -1,5 +1,11 @@
 # @mds-core/mds-webpack-config
 
+## 0.1.10
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+
 ## 0.1.9
 
 ### Patch Changes

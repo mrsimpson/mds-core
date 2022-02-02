@@ -1,5 +1,15 @@
 # @mds-core/mds-types
 
+## 0.9.0
+
+### Minor Changes
+
+- 04aca084: removed Geography from mds-types, and related validator
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+
 ## 0.8.2
 
 ### Patch Changes
