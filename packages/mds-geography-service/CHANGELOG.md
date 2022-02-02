@@ -1,5 +1,11 @@
 # @mds-core/mds-geography-service
 
+## 0.10.1
+
+### Patch Changes
+
+- ba4523c5: Make getPublishedGeographies bypass RPC by default, adjust GeographyWithMetadataDomainModel to be more accurate
+
 ## 0.10.0
 
 ### Minor Changes
