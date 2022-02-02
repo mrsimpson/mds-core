@@ -1,5 +1,20 @@
 # @mds-core/mds-agency-cache
 
+## 0.4.13
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [04aca084]
+- Updated dependencies [11b7a478]
+- Updated dependencies [04aca084]
+- Updated dependencies [04aca084]
+  - @mds-core/mds-utils@0.3.0
+  - @mds-core/mds-cache@0.0.30
+  - @mds-core/mds-types@0.9.0
+  - @mds-core/mds-logger@0.5.6
+  - @mds-core/mds-schema-validators@0.5.0
+
 ## 0.4.12
 
 ### Patch Changes

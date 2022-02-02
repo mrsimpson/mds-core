@@ -1,5 +1,23 @@
 # @mds-core/mds-schema-validators
 
+## 0.5.0
+
+### Minor Changes
+
+- 04aca084: removed Geography from mds-types, and related validator
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [04aca084]
+- Updated dependencies [11b7a478]
+- Updated dependencies [04aca084]
+- Updated dependencies [04aca084]
+  - @mds-core/mds-utils@0.3.0
+  - @mds-core/mds-types@0.9.0
+  - @mds-core/mds-providers@0.2.6
+  - @mds-core/mds-test-data@0.4.14
+
 ## 0.4.3
 
 ### Patch Changes

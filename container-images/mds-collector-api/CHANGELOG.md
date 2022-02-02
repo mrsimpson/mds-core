@@ -1,5 +1,14 @@
 # @container-images/mds-collector-api
 
+## 0.0.49
+
+### Patch Changes
+
+- 11b7a478: Changes to support TS 4.5.5
+- Updated dependencies [11b7a478]
+  - @mds-core/mds-collector-api@0.1.48
+  - @mds-core/mds-webpack-config@0.1.10
+
 ## 0.0.48
 
 ### Patch Changes
