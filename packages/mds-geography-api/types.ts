@@ -49,7 +49,7 @@ export type GeographyApiGetGeographyResponseBody = {
 export type GeographyApiGetGeographyResponse = GeographyApiResponse<GeographyApiGetGeographyResponseBody>
 
 export type GeographyApiGetGeographiesResponseBody = {
-  data: { geographies: GeographyDomainModel[] }
+  data: { geographies: (GeographyDomainModel | Omit<GeographyDomainModel, 'geography_json'>)[] }
 }
 
 export type GeographyApiGetGeographiesResponse = GeographyApiResponse<GeographyApiGetGeographiesResponseBody>

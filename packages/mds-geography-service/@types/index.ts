@@ -54,8 +54,8 @@ export type GetPublishedGeographiesOptions = GetGeographiesOptions &
     publishedAfter: Timestamp
   }>
 
-export type GeographyWithMetadataDomainModel<M extends {} = {}> = GeographyDomainModel &
-  Partial<Pick<GeographyMetadataDomainModel<M>, 'geography_metadata'>>
+export type GeographyWithMetadataDomainModel<M extends Record<string, any> = Record<string, any>> =
+  GeographyDomainModel & Partial<Pick<GeographyMetadataDomainModel<M>, 'geography_metadata'>>
 
 export interface GeographyService {
   getGeography: (
