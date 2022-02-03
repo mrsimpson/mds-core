@@ -1,5 +1,11 @@
 # @container-images/mds-compliance-service
 
+## 0.0.49
+
+### Patch Changes
+
+- @mds-core/mds-compliance-service@0.10.9
+
 ## 0.0.48
 
 ### Patch Changes
