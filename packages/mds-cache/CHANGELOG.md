@@ -1,5 +1,12 @@
 # @mds-core/mds-cache
 
+## 0.0.31
+
+### Patch Changes
+
+- Updated dependencies [ccb94996]
+  - @mds-core/mds-utils@0.3.1
+
 ## 0.0.30
 
 ### Patch Changes

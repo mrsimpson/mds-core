@@ -1,5 +1,14 @@
 # @mds-core/mds-agency-cache
 
+## 0.4.14
+
+### Patch Changes
+
+- Updated dependencies [ccb94996]
+  - @mds-core/mds-utils@0.3.1
+  - @mds-core/mds-cache@0.0.31
+  - @mds-core/mds-schema-validators@0.5.1
+
 ## 0.4.13
 
 ### Patch Changes
