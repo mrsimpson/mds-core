@@ -1,5 +1,16 @@
 # @mds-core/mds-collector-api
 
+## 0.1.50
+
+### Patch Changes
+
+- Updated dependencies [ccb94996]
+  - @mds-core/mds-utils@0.3.1
+  - @mds-core/mds-api-helpers@0.2.3
+  - @mds-core/mds-api-server@0.4.2
+  - @mds-core/mds-collector-service@0.4.6
+  - @mds-core/mds-service-helpers@0.6.2
+
 ## 0.1.49
 
 ### Patch Changes

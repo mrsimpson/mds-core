@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { hasOwnProperty } from '../utils'
+
 class BaseError extends Error {
   public constructor(public name: string, public reason?: string, public info?: unknown) {
     super(reason)
@@ -21,8 +23,21 @@ class BaseError extends Error {
   }
 }
 
-const reason = (error?: unknown) =>
-  error instanceof Error ? error.message : typeof error === 'string' ? error : 'Unknown error'
+const reason = (error?: unknown) => {
+  if (error) {
+    if (typeof error === 'object') {
+      if (hasOwnProperty(error, 'message') && typeof error.message === 'string') {
+        return error.message
+      }
+    }
+
+    if (typeof error === 'string') {
+      return error
+    }
+
+    return JSON.stringify(error)
+  }
+}
 
 /* istanbul ignore next */
 export class ServerError extends BaseError {

@@ -1,5 +1,11 @@
 # @mds-core/mds-utils
 
+## 0.3.1
+
+### Patch Changes
+
+- ccb94996: When deriving error reasons, JSON.stringify() errors that are simple objects
+
 ## 0.3.0
 
 ### Minor Changes

@@ -595,6 +595,10 @@ const zip = <T, U, R>(arr1: T[], arr2: U[], mapper: (x: T, y: U) => R) => {
   return arr1.map((elem, index) => mapper(elem, arr2[index]))
 }
 
+const hasOwnProperty = <X extends {}, Y extends PropertyKey>(obj: X, prop: Y): obj is X & Record<Y, unknown> => {
+  return obj.hasOwnProperty(prop)
+}
+
 export {
   RULE_UNIT_MAP,
   START_NOW,
@@ -654,5 +658,6 @@ export {
   testEnvSafeguard,
   timeframe,
   yesterday,
-  zip
+  zip,
+  hasOwnProperty
 }
