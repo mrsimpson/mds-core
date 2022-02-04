@@ -15,7 +15,7 @@
  */
 
 import { parseRequest } from '@mds-core/mds-api-helpers'
-import { ApiRequestParams } from '@mds-core/mds-api-server'
+import { ApiRequestParams, ApiResponse } from '@mds-core/mds-api-server'
 import {
   PaginationLinks,
   SORTABLE_COLUMN,
@@ -26,15 +26,22 @@ import {
 } from '@mds-core/mds-transaction-service'
 import { ValidationError } from '@mds-core/mds-utils'
 import express from 'express'
+import { StatusCodes } from 'http-status-codes'
+import { Parser } from 'json2csv'
+import { DateTime } from 'luxon'
 import { TransactionApiRequest, TransactionApiResponse } from '../@types'
 
 export type TransactionApiGetTransactionsRequest = TransactionApiRequest &
   ApiRequestParams<'provider_id' | 'start_timestamp' | 'end_timestamp'>
+export type TransactionApiGetTransactionsRequestWithCursor = TransactionApiGetTransactionsRequest &
+  ApiRequestParams<'before' | 'after'>
 
 export type TransactionApiGetTransactionsResponse = TransactionApiResponse<{
   transactions: TransactionDomainModel[]
   links: PaginationLinks
 }>
+
+export type TransactionApiGetTransactionsAsCsvResponse = ApiResponse<string>
 
 const getOrderOption = (req: TransactionApiGetTransactionsRequest) => {
   const { order_column: column } = parseRequest(req)
@@ -113,7 +120,7 @@ const constructUrls = (
 }
 
 export const GetTransactionsHandler = async (
-  req: TransactionApiGetTransactionsRequest,
+  req: TransactionApiGetTransactionsRequestWithCursor,
   res: TransactionApiGetTransactionsResponse,
   next: express.NextFunction
 ) => {
@@ -173,6 +180,71 @@ export const GetTransactionsHandler = async (
     }
 
     return res.status(200).send({ version, transactions, links })
+  } catch (error) {
+    next(error)
+  }
+}
+export const GetTransactionsAsCsvHandler = async (
+  req: TransactionApiGetTransactionsRequest,
+  res: TransactionApiGetTransactionsAsCsvResponse,
+  next: express.NextFunction
+) => {
+  try {
+    const { provider_id } = parseRequest(req).single({ parser: String }).query('provider_id')
+    const order = getOrderOption(req)
+    const {
+      start_timestamp,
+      end_timestamp,
+      limit = 10
+    } = parseRequest(req).single({ parser: Number }).query('start_timestamp', 'end_timestamp', 'limit')
+    const parser = new Parser({
+      fields: [
+        { label: 'Transaction', value: 'transaction_id' },
+        { label: 'Provider', value: 'provider_id' },
+        { label: 'Device', value: 'device_id' },
+        { label: 'Timestamp', value: 'timestamp' },
+        { label: 'Fee Type', value: 'fee_type' },
+        { label: 'Amount', value: 'amount' },
+        { label: 'Receipt', value: 'receipt_id' },
+        { label: 'Receipt Timestamp', value: 'receipt.timestamp' },
+        { label: 'Receipt Origin URL', value: 'receipt.origin_url' },
+        { label: 'Receipt Details (JSON)', value: 'receipt.details' } // TODO test this
+      ]
+    })
+
+    const { transactions, cursor } = await TransactionServiceClient.getTransactions({
+      provider_id,
+      start_timestamp,
+      end_timestamp,
+      order,
+      limit
+    })
+
+    res
+      .status(StatusCodes.OK)
+      .contentType('text/csv')
+      .header('Access-Control-Expose-Headers', 'Content-Disposition')
+      .header(
+        'Content-Disposition',
+        `attachment; filename="transactions-${DateTime.now().toFormat('yyyy-LL-dd hh.mm.ss a')}.csv"`
+      )
+      .write(parser.parse(transactions))
+
+    let next = cursor.afterCursor
+    while (next !== null) {
+      const { transactions, cursor: current } = await TransactionServiceClient.getTransactions({
+        provider_id,
+        start_timestamp,
+        end_timestamp,
+        order,
+        limit,
+        after: next
+      })
+      res.write(parser.parse(transactions))
+      next = current.afterCursor
+    }
+
+    return res.end()
   } catch (error) {
     next(error)
   }

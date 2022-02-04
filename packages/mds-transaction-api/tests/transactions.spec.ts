@@ -60,7 +60,7 @@ declare global {
 }
 
 describe('Test Transactions API: Transactions', () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     jest.clearAllMocks()
   })
 
@@ -323,6 +323,85 @@ describe('Test Transactions API: Transactions', () => {
       })
       expect(result.status).toBe(200)
     })
+
+    it('Can GET bulk transactions as csv', async () => {
+      const mockTransactionsA = [...transactionsGenerator(15)]
+      const mockTransactionsB = [...transactionsGenerator(15)]
+
+      const basicOptions = {
+        provider_id: uuid(),
+        start_timestamp: Date.now(),
+        end_timestamp: Date.now()
+      }
+
+      const getTransactionsMock = jest
+        .spyOn(TransactionServiceClient, 'getTransactions')
+        .mockImplementationOnce(async _ => ({
+          transactions: mockTransactionsA,
+          cursor: { beforeCursor: null, afterCursor: 'arbitraryAfterCursor' }
+        }))
+        .mockImplementationOnce(async _ => ({
+          transactions: mockTransactionsB,
+          cursor: { beforeCursor: null, afterCursor: null }
+        }))
+
+      const result = await request
+        .get(
+          pathPrefix(`/transactions/csv${basicOptionsUrls(basicOptions)}&order_column=timestamp&order_direction=DESC`)
+        )
+        .set('Authorization', SCOPED_AUTH(['transactions:read']))
+        .buffer()
+        .parse((res, callback) => {
+          // res.setEncoding('binary') // csv is not json
+          let data = ''
+          res.on('data', chunk => {
+            data += chunk
+          })
+          res.on('end', () => {
+            callback(null, data)
+          })
+        })
+
+      expect(getTransactionsMock).toHaveBeenNthCalledWith(1, {
+        ...basicOptions,
+        limit: 10,
+        order: {
+          column: 'timestamp',
+          direction: 'DESC'
+        }
+      })
+      expect(getTransactionsMock).toHaveBeenNthCalledWith(2, {
+        ...basicOptions,
+        limit: 10,
+        after: 'arbitraryAfterCursor',
+        order: {
+          column: 'timestamp',
+          direction: 'DESC'
+        }
+      })
+
+      const transactions = result.body
+
+      expect(result.status).toStrictEqual(200)
+      expect(transactions).toMatch(
+        /^"Transaction","Provider","Device","Timestamp","Fee Type","Amount","Receipt","Receipt Timestamp","Receipt Origin URL","Receipt Details \(JSON\)"/
+      )
+      const lines = transactions.split(/\r\n|\r|\n/)
+      expect(lines.length).toEqual(31)
+      lines.forEach((line: string, i: number) => {
+        if (i === 0) {
+          expect(line).toMatch(
+            /^"Transaction","Provider","Device","Timestamp","Fee Type","Amount","Receipt","Receipt Timestamp","Receipt Origin URL","Receipt Details \(JSON\)"$/m
+          )
+        } else if (i > 0 && i <= 15) {
+          expect(line).toMatch(new RegExp(`^"${mockTransactionsA[i - 1].transaction_id}"`))
+        } else if (i > 15 && i <= 30) {
+          expect(line).toMatch(new RegExp(`^"${mockTransactionsB[i - 16].transaction_id}"`))
+        } else {
+          throw 'bad csv'
+        }
+      })
+    })
   })
 
   describe('Failure', () => {
@@ -333,6 +412,10 @@ describe('Test Transactions API: Transactions', () => {
         .set('Authorization', SCOPED_AUTH(['transactions:read']))
 
       expect(result.status).toStrictEqual(400)
+      const csvResult = await request
+        .get(pathPrefix(`/transactions/csv?order_column=${order_column}&order_direction=${order_direction}`))
+        .set('Authorization', SCOPED_AUTH(['transactions:read']))
+      expect(csvResult.status).toStrictEqual(400)
     })
 
     it('GETting a non-existent transaction fails', async () => {
