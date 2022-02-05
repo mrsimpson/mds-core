@@ -1,5 +1,22 @@
 # @mds-core/mds-compliance-service
 
+## 0.10.10
+
+### Patch Changes
+
+- 7b061ba5: Asyncifying mds-providers methods as prep for creating a true mds-providers service'
+- 7b061ba5: Making calls to mds-provider async as preparation for migrating the static providers list in mds-providers to a database
+- Updated dependencies [7b061ba5]
+- Updated dependencies [ca45bfaf]
+- Updated dependencies [7b061ba5]
+- Updated dependencies [ca45bfaf]
+  - @mds-core/mds-providers@0.2.7
+  - @mds-core/mds-repository@0.1.34
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-rpc-common@0.3.7
+  - @mds-core/mds-policy-service@0.11.8
+  - @mds-core/mds-db@0.5.3
+
 ## 0.10.9
 
 ### Patch Changes

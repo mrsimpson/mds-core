@@ -1,5 +1,13 @@
 # @mds-core/mds-repository
 
+## 0.1.34
+
+### Patch Changes
+
+- ca45bfaf: Rework ModelMapper type
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-providers@0.2.7
+
 ## 0.1.33
 
 ### Patch Changes

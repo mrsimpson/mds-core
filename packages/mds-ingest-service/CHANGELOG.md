@@ -1,5 +1,18 @@
 # @mds-core/mds-ingest-service
 
+## 0.9.7
+
+### Patch Changes
+
+- 7b061ba5: Making calls to mds-provider async as preparation for migrating the static providers list in mds-providers to a database
+- Updated dependencies [ca45bfaf]
+- Updated dependencies [7b061ba5]
+- Updated dependencies [ca45bfaf]
+  - @mds-core/mds-repository@0.1.34
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-rpc-common@0.3.7
+  - @mds-core/mds-agency-cache@0.4.15
+
 ## 0.9.6
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # @mds-core/mds-compliance-api
 
+## 0.4.15
+
+### Patch Changes
+
+- 7b061ba5: Making calls to mds-provider async as preparation for migrating the static providers list in mds-providers to a database
+- Updated dependencies [7b061ba5]
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-compliance-service@0.10.10
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-test-data@0.4.16
+  - @mds-core/mds-policy-service@0.11.8
+  - @mds-core/mds-api-server@0.4.3
+  - @mds-core/mds-db@0.5.3
+  - @mds-core/mds-api-helpers@0.2.4
+
 ## 0.4.14
 
 ### Patch Changes

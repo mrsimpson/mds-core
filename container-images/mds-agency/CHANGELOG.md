@@ -1,5 +1,12 @@
 # @container-images/mds-agency
 
+## 0.1.76
+
+### Patch Changes
+
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-agency@0.4.13
+
 ## 0.1.75
 
 ### Patch Changes

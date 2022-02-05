@@ -1,5 +1,12 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.7
+
+### Patch Changes
+
+- ca45bfaf: Remove RpcServer type
+  - @mds-core/mds-api-server@0.4.3
+
 ## 0.3.6
 
 ### Patch Changes
