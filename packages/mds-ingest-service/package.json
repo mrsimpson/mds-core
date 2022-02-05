@@ -24,7 +24,6 @@
   "dependencies": {
     "@mds-core/mds-agency-cache": "workspace:0.4.14",
     "@mds-core/mds-logger": "workspace:0.5.6",
-    "@mds-core/mds-providers": "workspace:0.2.6",
     "@mds-core/mds-repository": "workspace:0.1.33",
     "@mds-core/mds-rpc-common": "workspace:0.3.6",
     "@mds-core/mds-schema-validators": "workspace:0.5.1",

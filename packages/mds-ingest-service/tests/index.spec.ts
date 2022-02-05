@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-import { TEST1_PROVIDER_ID } from '@mds-core/mds-providers'
 import { Device, UUID } from '@mds-core/mds-types'
 import { now, uuid } from '@mds-core/mds-utils'
 import { EventAnnotationDomainCreateModel, EventDomainCreateModel, TelemetryDomainCreateModel } from '../@types'
@@ -23,6 +22,7 @@ import { IngestServiceClient } from '../client'
 import { IngestRepository } from '../repository'
 import { IngestServiceManager } from '../service/manager'
 
+const TEST1_PROVIDER_ID = uuid()
 const DEVICE_UUID_A = uuid()
 const DEVICE_UUID_B = uuid()
 const TRIP_UUID_A = uuid()

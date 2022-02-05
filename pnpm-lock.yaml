@@ -489,7 +489,6 @@ importers:
 
   packages/mds-api-authorizer:
     specifiers:
-      '@mds-core/mds-providers': workspace:0.2.6
       '@mds-core/mds-test-data': workspace:0.4.15
       '@mds-core/mds-types': workspace:0.9.0
       '@mds-core/mds-utils': workspace:0.3.1
@@ -505,8 +504,6 @@ importers:
       '@types/jsonwebtoken': 8.5.5
       express: 4.17.1
       jsonwebtoken: 8.5.1
-    devDependencies:
-      '@mds-core/mds-providers': link:../mds-providers
 
   packages/mds-api-helpers:
     specifiers:
@@ -747,7 +744,6 @@ importers:
       '@mds-core/mds-db': workspace:0.5.2
       '@mds-core/mds-logger': workspace:0.5.6
       '@mds-core/mds-policy-service': workspace:0.11.7
-      '@mds-core/mds-providers': workspace:0.2.6
       '@mds-core/mds-schema-validators': workspace:0.5.1
       '@mds-core/mds-service-helpers': workspace:0.6.2
       '@mds-core/mds-test-data': workspace:0.4.15
@@ -764,7 +760,6 @@ importers:
       '@mds-core/mds-db': link:../mds-db
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-policy-service': link:../mds-policy-service
-      '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
       '@mds-core/mds-service-helpers': link:../mds-service-helpers
       '@mds-core/mds-test-data': link:../mds-test-data
@@ -955,7 +950,6 @@ importers:
       '@mds-core/mds-api-server': workspace:0.4.2
       '@mds-core/mds-geography-service': workspace:0.10.2
       '@mds-core/mds-logger': workspace:0.5.6
-      '@mds-core/mds-providers': workspace:0.2.6
       '@mds-core/mds-schema-validators': workspace:0.5.1
       '@mds-core/mds-service-helpers': workspace:0.6.2
       '@mds-core/mds-test-data': workspace:0.4.15
@@ -968,7 +962,6 @@ importers:
       '@mds-core/mds-api-server': link:../mds-api-server
       '@mds-core/mds-geography-service': link:../mds-geography-service
       '@mds-core/mds-logger': link:../mds-logger
-      '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
       '@mds-core/mds-service-helpers': link:../mds-service-helpers
       '@mds-core/mds-types': link:../mds-types
@@ -1040,7 +1033,6 @@ importers:
     specifiers:
       '@mds-core/mds-agency-cache': workspace:0.4.14
       '@mds-core/mds-logger': workspace:0.5.6
-      '@mds-core/mds-providers': workspace:0.2.6
       '@mds-core/mds-repository': workspace:0.1.33
       '@mds-core/mds-rpc-common': workspace:0.3.6
       '@mds-core/mds-schema-validators': workspace:0.5.1
@@ -1055,7 +1047,6 @@ importers:
     dependencies:
       '@mds-core/mds-agency-cache': link:../mds-agency-cache
       '@mds-core/mds-logger': link:../mds-logger
-      '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-repository': link:../mds-repository
       '@mds-core/mds-rpc-common': link:../mds-rpc-common
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
@@ -1137,7 +1128,6 @@ importers:
       '@mds-core/mds-geography-service': workspace:0.10.2
       '@mds-core/mds-logger': workspace:0.5.6
       '@mds-core/mds-policy-service': workspace:0.11.7
-      '@mds-core/mds-providers': workspace:0.2.6
       '@mds-core/mds-schema-validators': workspace:0.5.1
       '@mds-core/mds-stream': workspace:0.2.8
       '@mds-core/mds-test-data': workspace:0.4.15
@@ -1152,7 +1142,6 @@ importers:
       '@mds-core/mds-db': link:../mds-db
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-policy-service': link:../mds-policy-service
-      '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
