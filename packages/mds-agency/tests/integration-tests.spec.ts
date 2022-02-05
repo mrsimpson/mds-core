@@ -30,9 +30,15 @@
 import cache from '@mds-core/mds-agency-cache'
 import { ApiServer } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import { TEST1_PROVIDER_ID, TEST2_PROVIDER_ID } from '@mds-core/mds-providers'
 import stream from '@mds-core/mds-stream'
-import { JUMP_TEST_DEVICE_1, makeDevices, makeEventsWithTelemetry, makeTelemetry } from '@mds-core/mds-test-data'
+import {
+  JUMP_TEST_DEVICE_1,
+  makeDevices,
+  makeEventsWithTelemetry,
+  makeTelemetry,
+  TEST1_PROVIDER_ID,
+  TEST2_PROVIDER_ID
+} from '@mds-core/mds-test-data'
 import {
   Device,
   MICRO_MOBILITY_EVENT_STATES_MAP,

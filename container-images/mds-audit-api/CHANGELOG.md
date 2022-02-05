@@ -1,5 +1,12 @@
 # @container-images/mds-audit-api
 
+## 0.1.77
+
+### Patch Changes
+
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-audit-api@0.3.13
+
 ## 0.1.76
 
 ### Patch Changes

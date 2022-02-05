@@ -1,5 +1,13 @@
 # @mds-core/mds-api-authorizer
 
+## 0.1.59
+
+### Patch Changes
+
+- 7b061ba5: Making calls to mds-provider async as preparation for migrating the static providers list in mds-providers to a database
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-test-data@0.4.16
+
 ## 0.1.58
 
 ### Patch Changes
