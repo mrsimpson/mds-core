@@ -33,8 +33,11 @@ const request = supertest(ApiServer(api))
 const basicOptionsUrls = (basicOptions: object) =>
   Object.entries(basicOptions).reduce((urlParams, [key, val]) => {
     if (val) {
-      if (urlParams === '?') return `${urlParams}${key}=${val}`
-      return `${urlParams}&${key}=${val}`
+      const expanded = Array.isArray(val)
+        ? val.map((element: string) => `${key}=${element}`).join('&')
+        : `${key}=${val}`
+      if (urlParams === '?') return `${urlParams}${expanded}`
+      return `${urlParams}&${expanded}`
     }
 
     return urlParams
@@ -395,10 +398,74 @@ describe('Test Transactions API: Transactions', () => {
           )
         } else if (i > 0 && i <= 15) {
           expect(line).toMatch(new RegExp(`^"${mockTransactionsA[i - 1].transaction_id}"`))
+          const expectedJSON = JSON.stringify(mockTransactionsA[i - 1].receipt.receipt_details).replace(/"/g, '""')
+          expect(line).toMatch(new RegExp(`"${expectedJSON}"$`))
         } else if (i > 15 && i <= 30) {
           expect(line).toMatch(new RegExp(`^"${mockTransactionsB[i - 16].transaction_id}"`))
         } else {
-          throw 'bad csv'
+          throw 'csv too long'
+        }
+      })
+    })
+
+    it('Can GET bulk transactions as csv and pick columns', async () => {
+      const mockTransactions = [...transactionsGenerator(15)]
+
+      const basicOptions = {
+        provider_id: uuid(),
+        start_timestamp: Date.now(),
+        end_timestamp: Date.now()
+      }
+      const fullOptions = {
+        pick_columns: ['provider_id', 'amount', 'fee_type'],
+        ...basicOptions
+      }
+
+      const getTransactionsMock = jest
+        .spyOn(TransactionServiceClient, 'getTransactions')
+        .mockImplementationOnce(async _ => ({
+          transactions: mockTransactions,
+          cursor: { beforeCursor: null, afterCursor: null }
+        }))
+
+      const result = await request
+        .get(
+          pathPrefix(`/transactions/csv${basicOptionsUrls(fullOptions)}&order_column=timestamp&order_direction=DESC`)
+        )
+        .set('Authorization', SCOPED_AUTH(['transactions:read']))
+        .buffer()
+        .parse((res, callback) => {
+          // res.setEncoding('binary') // csv is not json
+          let data = ''
+          res.on('data', chunk => {
+            data += chunk
+          })
+          res.on('end', () => {
+            callback(null, data)
+          })
+        })
+
+      expect(getTransactionsMock).toHaveBeenNthCalledWith(1, {
+        ...basicOptions,
+        limit: 10,
+        order: {
+          column: 'timestamp',
+          direction: 'DESC'
+        }
+      })
+      const transactions = result.body
+
+      expect(result.status).toStrictEqual(200)
+      const lines = transactions.split(/\r\n|\r|\n/)
+      expect(lines.length).toEqual(16)
+      lines.forEach((line: string, i: number) => {
+        if (i === 0) {
+          // expect(line).toMatch(/^"Provider","Amount","Fee Type"$/m)
+          expect(line).toMatch(/^"Provider",/)
+        } else if (i > 0 && i <= 15) {
+          expect(line).toMatch(new RegExp(`^"${mockTransactions[i - 1].provider_id}"`))
+        } else {
+          throw 'csv too long'
         }
       })
     })

@@ -24,7 +24,7 @@ import {
   TransactionSearchParams,
   TransactionServiceClient
 } from '@mds-core/mds-transaction-service'
-import { ValidationError } from '@mds-core/mds-utils'
+import { deepPickProperties, ValidationError } from '@mds-core/mds-utils'
 import express from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { Parser } from 'json2csv'
@@ -35,6 +35,8 @@ export type TransactionApiGetTransactionsRequest = TransactionApiRequest &
   ApiRequestParams<'provider_id' | 'start_timestamp' | 'end_timestamp'>
 export type TransactionApiGetTransactionsRequestWithCursor = TransactionApiGetTransactionsRequest &
   ApiRequestParams<'before' | 'after'>
+export type TransactionApiGetTransactionsRequestWithPickColumns = TransactionApiGetTransactionsRequest &
+  ApiRequestParams<'pick_columns'>
 
 export type TransactionApiGetTransactionsResponse = TransactionApiResponse<{
   transactions: TransactionDomainModel[]
@@ -185,7 +187,7 @@ export const GetTransactionsHandler = async (
   }
 }
 export const GetTransactionsAsCsvHandler = async (
-  req: TransactionApiGetTransactionsRequest,
+  req: TransactionApiGetTransactionsRequestWithPickColumns,
   res: TransactionApiGetTransactionsAsCsvResponse,
   next: express.NextFunction
 ) => {
@@ -197,19 +199,45 @@ export const GetTransactionsAsCsvHandler = async (
       end_timestamp,
       limit = 10
     } = parseRequest(req).single({ parser: Number }).query('start_timestamp', 'end_timestamp', 'limit')
+    const PICKABLE_COLUMNS = <const>[
+      'transaction_id',
+      'provider_id',
+      'device_id',
+      'timestamp',
+      'fee_type',
+      'amount',
+      'receipt.receipt_id',
+      'receipt.timestamp',
+      'receipt.origin_url',
+      'receipt.receipt_details'
+    ]
+    type PickableColumn = typeof PICKABLE_COLUMNS[number]
+    const isColumn = (col: string): col is PickableColumn => (PICKABLE_COLUMNS as readonly string[]).includes(col)
+    const { pick_columns } = parseRequest(req)
+      .list({
+        parser: vals => vals.filter(isColumn)
+      })
+      .query('pick_columns')
+
+    const fields: Array<{ label: string; value: PickableColumn }> = [
+      { label: 'Transaction', value: 'transaction_id' },
+      { label: 'Provider', value: 'provider_id' },
+      { label: 'Device', value: 'device_id' },
+      { label: 'Timestamp', value: 'timestamp' },
+      { label: 'Fee Type', value: 'fee_type' },
+      { label: 'Amount', value: 'amount' },
+      { label: 'Receipt', value: 'receipt.receipt_id' },
+      { label: 'Receipt Timestamp', value: 'receipt.timestamp' },
+      { label: 'Receipt Origin URL', value: 'receipt.origin_url' },
+      { label: 'Receipt Details (JSON)', value: 'receipt.receipt_details' } // TODO test this
+    ]
+
     const parser = new Parser({
-      fields: [
-        { label: 'Transaction', value: 'transaction_id' },
-        { label: 'Provider', value: 'provider_id' },
-        { label: 'Device', value: 'device_id' },
-        { label: 'Timestamp', value: 'timestamp' },
-        { label: 'Fee Type', value: 'fee_type' },
-        { label: 'Amount', value: 'amount' },
-        { label: 'Receipt', value: 'receipt_id' },
-        { label: 'Receipt Timestamp', value: 'receipt.timestamp' },
-        { label: 'Receipt Origin URL', value: 'receipt.origin_url' },
-        { label: 'Receipt Details (JSON)', value: 'receipt.details' } // TODO test this
-      ]
+      fields: pick_columns
+        ? fields
+            .filter(({ value }) => pick_columns.includes(value))
+            .sort((a, b) => pick_columns.indexOf(a.value) - pick_columns.indexOf(a.value))
+        : fields
     })
 
     const { transactions, cursor } = await TransactionServiceClient.getTransactions({
@@ -220,6 +248,7 @@ export const GetTransactionsAsCsvHandler = async (
       limit
     })
 
+    const chunk = pick_columns ? transactions.map(row => deepPickProperties(row, pick_columns)) : transactions
     res
       .status(StatusCodes.OK)
       .contentType('text/csv')
@@ -228,7 +257,7 @@ export const GetTransactionsAsCsvHandler = async (
         'Content-Disposition',
         `attachment; filename="transactions-${DateTime.now().toFormat('yyyy-LL-dd hh.mm.ss a')}.csv"`
       )
-      .write(parser.parse(transactions))
+      .write(parser.parse(chunk))
 
     let next = cursor.afterCursor
     while (next !== null) {
@@ -240,7 +269,8 @@ export const GetTransactionsAsCsvHandler = async (
         limit,
         after: next
       })
-      res.write(parser.parse(transactions))
+      const chunk = pick_columns ? transactions.map(row => deepPickProperties(row, pick_columns)) : transactions
+      res.write(parser.parse(chunk))
       next = current.afterCursor
     }
 
