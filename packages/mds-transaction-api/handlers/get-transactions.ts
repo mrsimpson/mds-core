@@ -236,7 +236,7 @@ export const GetTransactionsAsCsvHandler = async (
       fields: pick_columns
         ? fields
             .filter(({ value }) => pick_columns.includes(value))
-            .sort((a, b) => pick_columns.indexOf(a.value) - pick_columns.indexOf(a.value))
+            .sort((a, b) => pick_columns.indexOf(a.value) - pick_columns.indexOf(b.value))
         : fields
     }
     const parser = new Parser(conf)
@@ -261,7 +261,7 @@ export const GetTransactionsAsCsvHandler = async (
       .write(parser.parse(chunk))
 
     let next = cursor.afterCursor
-    const parser2 = new Parser({
+    const headlessParser = new Parser({
       header: false,
       ...conf
     })
@@ -275,7 +275,7 @@ export const GetTransactionsAsCsvHandler = async (
         after: next
       })
       const chunk = pick_columns ? transactions.map(row => deepPickProperties(row, pick_columns)) : transactions
-      res.write('\n' + parser2.parse(chunk))
+      res.write('\n' + headlessParser.parse(chunk))
       next = current.afterCursor
     }
 

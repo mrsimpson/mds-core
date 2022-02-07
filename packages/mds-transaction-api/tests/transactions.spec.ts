@@ -462,10 +462,10 @@ describe('Test Transactions API: Transactions', () => {
       expect(lines.length).toEqual(16)
       lines.forEach((line: string, i: number) => {
         if (i === 0) {
-          // expect(line).toMatch(/^"Provider","Amount","Fee Type"$/m)
-          expect(line).toMatch(/^"Provider",/)
+          expect(line).toMatch(/^"Provider","Amount","Fee Type"$/m)
         } else if (i > 0 && i <= 15) {
           expect(line).toMatch(new RegExp(`^"${mockTransactions[i - 1].provider_id}"`))
+          expect(line).toMatch(new RegExp(`"${mockTransactions[i - 1].fee_type}"$`))
         } else {
           throw 'csv too long'
         }
