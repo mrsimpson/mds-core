@@ -1,5 +1,22 @@
 # @mds-core/mds-transaction-service
 
+## 0.6.5
+
+### Patch Changes
+
+- 49110532: Add DesignType decorators to some columns
+- Updated dependencies [49110532]
+- Updated dependencies [49110532]
+- Updated dependencies [bce81d4d]
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-repository@0.1.35
+  - @mds-core/mds-ingest-service@0.9.8
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-rpc-common@0.3.8
+  - @mds-core/mds-schema-validators@0.5.3
+  - @mds-core/mds-service-helpers@0.6.3
+  - @mds-core/mds-stream@0.2.9
+
 ## 0.6.4
 
 ### Patch Changes
