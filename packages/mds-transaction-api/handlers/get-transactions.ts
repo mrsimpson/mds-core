@@ -232,13 +232,14 @@ export const GetTransactionsAsCsvHandler = async (
       { label: 'Receipt Details (JSON)', value: 'receipt.receipt_details' } // TODO test this
     ]
 
-    const parser = new Parser({
+    const conf = {
       fields: pick_columns
         ? fields
             .filter(({ value }) => pick_columns.includes(value))
             .sort((a, b) => pick_columns.indexOf(a.value) - pick_columns.indexOf(a.value))
         : fields
-    })
+    }
+    const parser = new Parser(conf)
 
     const { transactions, cursor } = await TransactionServiceClient.getTransactions({
       provider_id,
@@ -260,6 +261,10 @@ export const GetTransactionsAsCsvHandler = async (
       .write(parser.parse(chunk))
 
     let next = cursor.afterCursor
+    const parser2 = new Parser({
+      header: false,
+      ...conf
+    })
     while (next !== null) {
       const { transactions, cursor: current } = await TransactionServiceClient.getTransactions({
         provider_id,
@@ -270,7 +275,7 @@ export const GetTransactionsAsCsvHandler = async (
         after: next
       })
       const chunk = pick_columns ? transactions.map(row => deepPickProperties(row, pick_columns)) : transactions
-      res.write(parser.parse(chunk))
+      res.write('\n' + parser2.parse(chunk))
       next = current.afterCursor
     }
 

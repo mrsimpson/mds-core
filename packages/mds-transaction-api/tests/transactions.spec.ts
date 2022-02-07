@@ -402,6 +402,8 @@ describe('Test Transactions API: Transactions', () => {
           expect(line).toMatch(new RegExp(`"${expectedJSON}"$`))
         } else if (i > 15 && i <= 30) {
           expect(line).toMatch(new RegExp(`^"${mockTransactionsB[i - 16].transaction_id}"`))
+          const expectedJSON = JSON.stringify(mockTransactionsB[i - 16].receipt.receipt_details).replace(/"/g, '""')
+          expect(line).toMatch(new RegExp(`"${expectedJSON}"$`))
         } else {
           throw 'csv too long'
         }
