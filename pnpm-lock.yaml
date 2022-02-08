@@ -452,6 +452,7 @@ importers:
       '@types/express': 4.17.13
       ajv: 8.6.3
       express: 4.17.1
+      http-status-codes: 2.1.4
     dependencies:
       '@mds-core/mds-agency-cache': link:../mds-agency-cache
       '@mds-core/mds-api-helpers': link:../mds-api-helpers
@@ -470,6 +471,7 @@ importers:
       express: 4.17.1
     devDependencies:
       '@mds-core/mds-test-data': link:../mds-test-data
+      http-status-codes: 2.1.4
 
   packages/mds-agency-cache:
     specifiers:
@@ -6454,8 +6456,7 @@ packages:
     dev: true
 
   /http-status-codes/2.1.4:
-    resolution: {integrity: sha512-MZVIsLKGVOVE1KEnldppe6Ij+vmemMuApDfjhVSLzyYP+td0bREEYyAoIw9yFePoBXManCuBqmiNP5FqJS5Xkg==}
-    dev: false
+    resolution: {integrity: sha1-RT2ZtL2UJCVMT2qaOgNxWSMFJ5g=}
 
   /https-proxy-agent/5.0.0:
     resolution: {integrity: sha512-EkYm5BcKUGiduxzSt3Eppko+PiNWNEpa4ySk9vTC6wDsQJW9rHSa+UhGNJoRYp7bz6Ht1eaRIa6QaJqO5rCFbA==}
