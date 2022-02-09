@@ -24,11 +24,8 @@ import {
   TransactionSearchParams,
   TransactionServiceClient
 } from '@mds-core/mds-transaction-service'
-import { deepPickProperties, ValidationError } from '@mds-core/mds-utils'
+import { csvStreamFromRepository, ValidationError } from '@mds-core/mds-utils'
 import express from 'express'
-import { StatusCodes } from 'http-status-codes'
-import { Parser } from 'json2csv'
-import { DateTime } from 'luxon'
 import { TransactionApiRequest, TransactionApiResponse } from '../@types'
 
 export type TransactionApiGetTransactionsRequest = TransactionApiRequest &
@@ -211,6 +208,7 @@ export const GetTransactionsAsCsvHandler = async (
       'receipt.origin_url',
       'receipt.receipt_details'
     ]
+
     type PickableColumn = typeof PICKABLE_COLUMNS[number]
     const isColumn = (col: string): col is PickableColumn => (PICKABLE_COLUMNS as readonly string[]).includes(col)
     const { pick_columns } = parseRequest(req)
@@ -232,54 +230,14 @@ export const GetTransactionsAsCsvHandler = async (
       { label: 'Receipt Details (JSON)', value: 'receipt.receipt_details' } // TODO test this
     ]
 
-    const conf = {
-      fields: pick_columns
-        ? fields
-            .filter(({ value }) => pick_columns.includes(value))
-            .sort((a, b) => pick_columns.indexOf(a.value) - pick_columns.indexOf(b.value))
-        : fields
-    }
-    const parser = new Parser(conf)
-
-    const { transactions, cursor } = await TransactionServiceClient.getTransactions({
-      provider_id,
-      start_timestamp,
-      end_timestamp,
-      order,
-      limit
-    })
-
-    const chunk = pick_columns ? transactions.map(row => deepPickProperties(row, pick_columns)) : transactions
-    res
-      .status(StatusCodes.OK)
-      .contentType('text/csv')
-      .header('Access-Control-Expose-Headers', 'Content-Disposition')
-      .header(
-        'Content-Disposition',
-        `attachment; filename="transactions-${DateTime.now().toFormat('yyyy-LL-dd hh.mm.ss a')}.csv"`
-      )
-      .write(parser.parse(chunk))
-
-    let next = cursor.afterCursor
-    const headlessParser = new Parser({
-      header: false,
-      ...conf
-    })
-    while (next !== null) {
-      const { transactions, cursor: current } = await TransactionServiceClient.getTransactions({
-        provider_id,
-        start_timestamp,
-        end_timestamp,
-        order,
-        limit,
-        after: next
-      })
-      const chunk = pick_columns ? transactions.map(row => deepPickProperties(row, pick_columns)) : transactions
-      res.write('\n' + headlessParser.parse(chunk))
-      next = current.afterCursor
-    }
-
-    return res.end()
+    return csvStreamFromRepository(
+      TransactionServiceClient.getTransactions,
+      { provider_id, start_timestamp, end_timestamp, order, limit },
+      'transactions',
+      res,
+      fields,
+      pick_columns
+    )
   } catch (error) {
     next(error)
   }
