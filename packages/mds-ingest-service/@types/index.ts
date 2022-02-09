@@ -43,6 +43,12 @@ type ResponseWithCursor<T extends {}> = T & {
 
 export interface GetDevicesOptions {
   limit?: number
+  provider_id?: UUID
+}
+
+export interface GetDeviceOptions {
+  provider_id?: UUID
+  device_id: UUID
 }
 
 export type GetDevicesResponse = ResponseWithCursor<{
@@ -221,6 +227,7 @@ export type GetEventsWithDeviceAndTelemetryInfoResponse = ResponseWithCursor<{
 
 export interface IngestService {
   getDevicesUsingOptions: (options: GetDevicesOptions) => GetDevicesResponse
+  getDevice: (options: GetDeviceOptions) => DeviceDomainModel | undefined
   getDevicesUsingCursor: (cursor: string) => GetDevicesResponse
   getEventsUsingOptions: (params: GetVehicleEventsFilterParams) => GetVehicleEventsResponse
   getEventsUsingCursor: (cursor: string) => GetVehicleEventsResponse
@@ -249,6 +256,7 @@ export interface IngestMigrationService {
 
 export const IngestServiceDefinition: RpcServiceDefinition<IngestService & IngestMigrationService> = {
   getDevices: RpcRoute<IngestService['getDevices']>(),
+  getDevice: RpcRoute<IngestService['getDevice']>(),
   getDevicesUsingOptions: RpcRoute<IngestService['getDevicesUsingOptions']>(),
   getDevicesUsingCursor: RpcRoute<IngestService['getDevicesUsingCursor']>(),
   getEventsUsingOptions: RpcRoute<IngestService['getEventsUsingOptions']>(),

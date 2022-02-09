@@ -80,6 +80,16 @@ export const IngestServiceProvider: ServiceProvider<
     }
   },
 
+  getDevice: async (context, options) => {
+    try {
+      return ServiceResult(await IngestRepository.getDevice(options))
+    } catch (error) {
+      const exception = ServiceException('Error in getDevice', error)
+      IngestServiceLogger.error('getDevice exception', { exception, error })
+      return exception
+    }
+  },
+
   getDevicesUsingCursor: async (context, cursor) => {
     try {
       return ServiceResult(await IngestRepository.getDevicesUsingCursor(cursor))

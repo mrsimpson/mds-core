@@ -23,6 +23,7 @@ import { IngestRepository } from '../repository'
 import { IngestServiceManager } from '../service/manager'
 
 const TEST1_PROVIDER_ID = uuid()
+const TEST2_PROVIDER_ID = uuid()
 const DEVICE_UUID_A = uuid()
 const DEVICE_UUID_B = uuid()
 const TRIP_UUID_A = uuid()
@@ -251,7 +252,34 @@ describe('Ingest Service Tests', () => {
           expect(cursor.cursor.prev).not.toBeNull()
           expect(cursor.cursor.next).toBeNull()
         }
+
+        const withProviderId = await IngestServiceClient.getDevicesUsingOptions({
+          limit: 2,
+          provider_id: TEST1_PROVIDER_ID
+        })
+        expect(withProviderId.devices).toHaveLength(2)
+        expect(withProviderId.cursor.next).toBeNull()
       })
+
+      it('gets one device at a time', async () => {
+        const device = await IngestServiceClient.getDevice({ device_id: TEST_DEVICE_A.device_id })
+        expect(device).not.toBeNull()
+
+        const deviceAndProvider1 = await IngestServiceClient.getDevice({
+          device_id: TEST_DEVICE_A.device_id,
+          provider_id: TEST1_PROVIDER_ID
+        })
+
+        expect(deviceAndProvider1).not.toBeNull()
+
+        const deviceAndProvider2 = await IngestServiceClient.getDevice({
+          device_id: TEST_DEVICE_A.device_id,
+          provider_id: TEST2_PROVIDER_ID
+        })
+
+        expect(deviceAndProvider2).toBeUndefined()
+      })
+
       it('gets 0 devices', async () => {
         const devices = await IngestServiceClient.getDevices([uuid()])
         expect(devices.length).toEqual(0)

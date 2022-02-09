@@ -16,6 +16,7 @@
 
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import {
   Audit,
   AuditEvent,
@@ -87,8 +88,8 @@ export async function writeAuditEvent(event: AuditEvent): Promise<Recorded<Audit
   return result
 }
 
-export async function readDevice(device_id: UUID, provider_id: UUID): Promise<Recorded<Device>> {
-  const result: Recorded<Device> = await db.readDevice(device_id, provider_id)
+export async function readDevice(device_id: UUID, provider_id: UUID): Promise<Device | undefined> {
+  const result = await IngestServiceClient.getDevice({ device_id, provider_id })
   return result
 }
 
