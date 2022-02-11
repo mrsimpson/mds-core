@@ -24,7 +24,7 @@ import { CreateTransactionsHandler } from '../handlers/create-transactions'
 import { GetTransactionOperationsHandler } from '../handlers/get-operations'
 import { GetTransactionStatusesHandler } from '../handlers/get-statuses'
 import { GetTransactionHandler } from '../handlers/get-transaction'
-import { GetTransactionsHandler } from '../handlers/get-transactions'
+import { GetTransactionsAsCsvHandler, GetTransactionsHandler } from '../handlers/get-transactions'
 import { GetTransactionsStatusesHandler } from '../handlers/get-transactions-statuses'
 import { SetTransactionStatusHandler } from '../handlers/set-status'
 import { TransactionApiVersionMiddleware } from '../middleware'
@@ -45,6 +45,15 @@ export const api = (app: express.Express): express.Express =>
           (scopes.includes('transactions:read:provider') && isUUID(claims?.provider_id))
       ),
       GetTransactionsHandler
+    )
+    .get(
+      pathPrefix('/transactions/csv'),
+      checkTransactionApiAccess(
+        (scopes, claims) =>
+          scopes.includes('transactions:read') ||
+          (scopes.includes('transactions:read:provider') && isUUID(claims?.provider_id))
+      ),
+      GetTransactionsAsCsvHandler
     )
     .get(
       pathPrefix('/transactions/statuses'),
