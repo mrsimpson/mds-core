@@ -16,5 +16,10 @@
 
 import { CreateCollectorMessagesTable1612209108259 } from './1612209108259-CreateCollectorMessagesTable'
 import { CreateCollectorSchemasTable1614811400362 } from './1614811400362-CreateCollectorSchemasTable'
+import { DropRedundantIdentityColumnIndex1644684612646 } from './1644684612646-DropRedundantIdentityColumnIndex'
 
-export default [CreateCollectorMessagesTable1612209108259, CreateCollectorSchemasTable1614811400362]
+export default [
+  CreateCollectorMessagesTable1612209108259,
+  CreateCollectorSchemasTable1614811400362,
+  DropRedundantIdentityColumnIndex1644684612646
+]
