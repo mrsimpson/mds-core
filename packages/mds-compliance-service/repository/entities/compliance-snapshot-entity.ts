@@ -63,6 +63,6 @@ export class ComplianceSnapshotEntity
   @Column('jsonb')
   vehicles_found: ComplianceSnapshotEntityModel['vehicles_found']
 
-  @Column('jsonb')
+  @Column('jsonb', { default: '[]' })
   violating_vehicles: MatchedVehicleInformation[]
 }

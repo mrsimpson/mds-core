@@ -16,5 +16,10 @@
 
 import { CreateTransactionsTable1607356754555 } from './1607356754555-CreateTransactionsTable'
 import { TransactionsSearchIndicies1615586339528 } from './1615586339528-TransactionsSearchIndicies'
+import { ChangeRecordedColumnDefaultExpression1644682449755 } from './1644682449755-ChangeRecordedColumnDefaultExpression'
 
-export default [CreateTransactionsTable1607356754555, TransactionsSearchIndicies1615586339528]
+export default [
+  CreateTransactionsTable1607356754555,
+  TransactionsSearchIndicies1615586339528,
+  ChangeRecordedColumnDefaultExpression1644682449755
+]

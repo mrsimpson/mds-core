@@ -32,7 +32,7 @@ export const RecordedColumn = <T extends AnyConstructor>(
   abstract class RecordedColumnMixin extends EntityClass implements RecordedColumn {
     @Column('bigint', {
       transformer: BigintTransformer,
-      default: () => '(extract(epoch from now()) * 1000)::bigint',
+      default: () => 'mds_current_timestamp_ms()',
       ...options
     })
     @Index()

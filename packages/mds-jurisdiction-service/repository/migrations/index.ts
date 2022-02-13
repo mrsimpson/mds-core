@@ -15,5 +15,6 @@
  */
 
 import { CreateJurisdictionsTable1582294819607 } from './1582294819607-CreateJurisdictionsTable'
+import { ChangeRecordedColumnDefaultExpression1644682444753 } from './1644682444753-ChangeRecordedColumnDefaultExpression'
 
-export default [CreateJurisdictionsTable1582294819607]
+export default [CreateJurisdictionsTable1582294819607, ChangeRecordedColumnDefaultExpression1644682444753]

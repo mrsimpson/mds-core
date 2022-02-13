@@ -37,6 +37,7 @@ import { CreateEventsWithDeviceAndTelemetryInfoView1633182766754 } from './16331
 import { SetTelemetryTimestampNonNullable1633354341092 } from './1633354341092-SetTelemetryTimestampNonNullable'
 import { ChangeEventsWithDeviceAndTelemetryInfoToUseInnerJoin1634672590753 } from './1634672590753-ChangeEventsWithDeviceAndTelemetryInfoToUseInnerJoin'
 import { AddIndexToDeviceVehicleId1635174402366 } from './1635174402366-AddIndexToDeviceVehicleId'
+import { ChangeRecordedColumnDefaultExpression1644682444725 } from './1644682444725-ChangeRecordedColumnDefaultExpression'
 
 export default [
   CreateDevicesTable1603212409274,
@@ -61,5 +62,6 @@ export default [
   CreateEventsWithDeviceAndTelemetryInfoView1633182766754,
   SetTelemetryTimestampNonNullable1633354341092,
   ChangeEventsWithDeviceAndTelemetryInfoToUseInnerJoin1634672590753,
-  AddIndexToDeviceVehicleId1635174402366
+  AddIndexToDeviceVehicleId1635174402366,
+  ChangeRecordedColumnDefaultExpression1644682444725
 ]
