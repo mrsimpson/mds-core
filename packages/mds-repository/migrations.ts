@@ -50,7 +50,7 @@ export const RepositoryMigrations = (migrationTableName: string): (Function | st
         await queryRunner.query(`
           BEGIN TRANSACTION;
             SELECT pg_advisory_xact_lock(${AdvisoryLockKey});
-            CREATE OR REPLACE FUNCTION mds_current_timestamp_ms() RETURNS BIGINT LANGUAGE SQL AS 'SELECT (EXTRACT(epoch FROM now()) * 1000)::BIGINT';
+            CREATE OR REPLACE FUNCTION mds_epoch_ms() RETURNS BIGINT LANGUAGE SQL AS 'SELECT (EXTRACT(epoch FROM now()) * 1000)::BIGINT';
           COMMIT TRANSACTION;`)
       }
 
