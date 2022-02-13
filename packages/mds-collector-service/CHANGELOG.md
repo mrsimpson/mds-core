@@ -1,5 +1,15 @@
 # @mds-core/mds-collector-service
 
+## 0.4.9
+
+### Patch Changes
+
+- e9b227c2: Use a function for setting recorded column default
+- Updated dependencies [ad3fb707]
+- Updated dependencies [e9b227c2]
+  - @mds-core/mds-repository@0.1.36
+  - @mds-core/mds-rpc-common@0.3.9
+
 ## 0.4.8
 
 ### Patch Changes

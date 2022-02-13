@@ -1,5 +1,11 @@
 # @container-images/mds-ingest-migration-processor
 
+## 0.0.47
+
+### Patch Changes
+
+- @mds-core/mds-ingest-migration-processor@0.0.45
+
 ## 0.0.46
 
 ### Patch Changes

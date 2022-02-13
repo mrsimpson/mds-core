@@ -1,5 +1,12 @@
 # @mds-core/mds-repository
 
+## 0.1.36
+
+### Patch Changes
+
+- ad3fb707: Don't index the id column when it's part of the PK
+- e9b227c2: Use a function for setting recorded column default
+
 ## 0.1.35
 
 ### Patch Changes

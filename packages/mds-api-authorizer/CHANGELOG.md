@@ -1,5 +1,11 @@
 # @mds-core/mds-api-authorizer
 
+## 0.1.61
+
+### Patch Changes
+
+- 896e4925: converts test suites from mocha to jest
+
 ## 0.1.60
 
 ### Patch Changes
