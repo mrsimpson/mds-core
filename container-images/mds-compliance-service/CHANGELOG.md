@@ -1,5 +1,12 @@
 # @container-images/mds-compliance-service
 
+## 0.0.53
+
+### Patch Changes
+
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-compliance-service@0.10.13
+
 ## 0.0.52
 
 ### Patch Changes

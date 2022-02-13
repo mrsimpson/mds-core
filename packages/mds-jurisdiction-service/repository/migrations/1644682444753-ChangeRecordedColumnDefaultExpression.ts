@@ -4,9 +4,7 @@ export class ChangeRecordedColumnDefaultExpression1644682444753 implements Migra
   name = 'ChangeRecordedColumnDefaultExpression1644682444753'
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE "jurisdictions" ALTER COLUMN "recorded" SET DEFAULT mds_current_timestamp_ms()`
-    )
+    await queryRunner.query(`ALTER TABLE "jurisdictions" ALTER COLUMN "recorded" SET DEFAULT mds_epoch_ms()`)
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

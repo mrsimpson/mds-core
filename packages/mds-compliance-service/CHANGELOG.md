@@ -1,5 +1,15 @@
 # @mds-core/mds-compliance-service
 
+## 0.10.13
+
+### Patch Changes
+
+- 6f834fe4: Rename database function to mds_epoch_ms()
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-repository@0.1.37
+  - @mds-core/mds-db@0.5.6
+  - @mds-core/mds-policy-service@0.11.11
+
 ## 0.10.12
 
 ### Patch Changes

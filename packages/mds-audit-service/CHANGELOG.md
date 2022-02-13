@@ -1,5 +1,13 @@
 # @mds-core/mds-audit-service
 
+## 0.5.10
+
+### Patch Changes
+
+- 6f834fe4: Rename database function to mds_epoch_ms()
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-repository@0.1.37
+
 ## 0.5.9
 
 ### Patch Changes

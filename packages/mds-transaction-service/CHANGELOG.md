@@ -1,5 +1,14 @@
 # @mds-core/mds-transaction-service
 
+## 0.6.7
+
+### Patch Changes
+
+- 6f834fe4: Rename database function to mds_epoch_ms()
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-ingest-service@0.9.10
+  - @mds-core/mds-repository@0.1.37
+
 ## 0.6.6
 
 ### Patch Changes
