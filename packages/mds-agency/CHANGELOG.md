@@ -1,5 +1,18 @@
 # @mds-core/mds-agency
 
+## 0.4.15
+
+### Patch Changes
+
+- d6a8cd72: updated tests from mocha to jest
+- Updated dependencies [b3f25823]
+- Updated dependencies [896e4925]
+- Updated dependencies [e9b227c2]
+  - @mds-core/mds-api-helpers@0.2.6
+  - @mds-core/mds-api-server@0.4.5
+  - @mds-core/mds-ingest-service@0.9.9
+  - @mds-core/mds-db@0.5.5
+
 ## 0.4.14
 
 ### Patch Changes

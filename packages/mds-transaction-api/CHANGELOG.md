@@ -1,5 +1,17 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.15
+
+### Patch Changes
+
+- b3f25823: Add csv support to get transactions in new endpoint, put code supporting it in api-helpers for reuse
+- Updated dependencies [b3f25823]
+- Updated dependencies [896e4925]
+- Updated dependencies [e9b227c2]
+  - @mds-core/mds-api-helpers@0.2.6
+  - @mds-core/mds-api-server@0.4.5
+  - @mds-core/mds-transaction-service@0.6.6
+
 ## 0.2.14
 
 ### Patch Changes

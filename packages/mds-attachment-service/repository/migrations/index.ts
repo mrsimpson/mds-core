@@ -16,5 +16,10 @@
 
 import { CreateAttachmentsTable1603203608358 } from './1603203608358-CreateAttachmentsTable'
 import { AddAttachmentListIdColumn1610046028054 } from './1610046028054-AddAttachmentListIdColumn'
+import { ChangeRecordedColumnDefaultExpression1644682437591 } from './1644682437591-ChangeRecordedColumnDefaultExpression'
 
-export default [CreateAttachmentsTable1603203608358, AddAttachmentListIdColumn1610046028054]
+export default [
+  CreateAttachmentsTable1603203608358,
+  AddAttachmentListIdColumn1610046028054,
+  ChangeRecordedColumnDefaultExpression1644682437591
+]

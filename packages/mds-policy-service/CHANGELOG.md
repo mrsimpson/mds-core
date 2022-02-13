@@ -1,5 +1,16 @@
 # @mds-core/mds-policy-service
 
+## 0.11.10
+
+### Patch Changes
+
+- 8de42ab6: Make Policy Service Kafka writes optional. They now depend on the presence of the KAFKA_HOST environment variable.
+- Updated dependencies [ad3fb707]
+- Updated dependencies [e9b227c2]
+  - @mds-core/mds-repository@0.1.36
+  - @mds-core/mds-geography-service@0.10.5
+  - @mds-core/mds-rpc-common@0.3.9
+
 ## 0.11.9
 
 ### Patch Changes
