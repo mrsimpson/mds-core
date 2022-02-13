@@ -1,5 +1,13 @@
 # @mds-core/mds-collector-service
 
+## 0.4.10
+
+### Patch Changes
+
+- 6f834fe4: Rename database function to mds_epoch_ms()
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-repository@0.1.37
+
 ## 0.4.9
 
 ### Patch Changes

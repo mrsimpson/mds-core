@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-ingest-service",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "description": "Mobility Data Specification Ingest Service",
   "keywords": [
     "mds",
@@ -24,7 +24,7 @@
   "dependencies": {
     "@mds-core/mds-agency-cache": "workspace:0.4.16",
     "@mds-core/mds-logger": "workspace:0.5.6",
-    "@mds-core/mds-repository": "workspace:0.1.36",
+    "@mds-core/mds-repository": "workspace:0.1.37",
     "@mds-core/mds-rpc-common": "workspace:0.3.9",
     "@mds-core/mds-schema-validators": "workspace:0.5.3",
     "@mds-core/mds-service-helpers": "workspace:0.6.3",

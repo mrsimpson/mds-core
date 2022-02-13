@@ -1,5 +1,12 @@
 # @container-images/mds-collector-service
 
+## 0.0.44
+
+### Patch Changes
+
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-collector-service@0.4.10
+
 ## 0.0.43
 
 ### Patch Changes

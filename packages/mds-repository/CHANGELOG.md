@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.1.37
+
+### Patch Changes
+
+- 6f834fe4: Rename database function to mds_epoch_ms()
+
 ## 0.1.36
 
 ### Patch Changes
