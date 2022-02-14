@@ -32,6 +32,7 @@ export const IngestServiceClientFactory = (
 
   return {
     getDevicesUsingOptions: (...args) => RpcRequest(options, IngestServiceRpcClient.getDevicesUsingOptions, args),
+    getDevice: (...args) => RpcRequest(options, IngestServiceRpcClient.getDevice, args),
     getDevicesUsingCursor: (...args) => RpcRequest(options, IngestServiceRpcClient.getDevicesUsingCursor, args),
     getEventsUsingOptions: (...args) =>
       process.env.ENABLE_RPC === 'true'

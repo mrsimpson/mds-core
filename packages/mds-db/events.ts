@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import { Recorded, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { isTimestamp, isUUID } from '@mds-core/mds-utils'
+import { isDefined, isTimestamp, isUUID, NotFoundError } from '@mds-core/mds-utils'
 import { getReadOnlyClient, getWriteableClient } from './client'
-import { readDevice } from './devices'
 import { DbLogger } from './logger'
 import schema from './schema'
 import { cols_sql, logSql, SqlExecuter, SqlVals, vals_list, vals_sql } from './sql-utils'
@@ -25,7 +25,11 @@ import { ReadEventsQueryParams, ReadEventsResult } from './types'
 
 export async function writeEvent(event: VehicleEvent) {
   const client = await getWriteableClient()
-  await readDevice(event.device_id, event.provider_id, client)
+  const device = IngestServiceClient.getDevice({ device_id: event.device_id, provider_id: event.provider_id })
+  if (!isDefined(device)) {
+    throw new NotFoundError(`device_id ${event.device_id} not found`)
+  }
+
   const telemetry_timestamp = event.telemetry ? event.telemetry.timestamp : null
   const sql = `INSERT INTO ${schema.TABLE.events} (${cols_sql(schema.TABLE_COLUMNS.events)}) VALUES (${vals_sql(
     schema.TABLE_COLUMNS.events

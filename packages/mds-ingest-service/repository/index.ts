@@ -22,7 +22,7 @@ import {
   RepositoryError
 } from '@mds-core/mds-repository'
 import { Device, Nullable, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { head, isUUID, tail, testEnvSafeguard, ValidationError, zip } from '@mds-core/mds-utils'
+import { head, isDefined, isUUID, tail, testEnvSafeguard, ValidationError, zip } from '@mds-core/mds-utils'
 import { Any, SelectQueryBuilder } from 'typeorm'
 import { buildPaginator, Cursor, PagingResult } from 'typeorm-cursor-pagination'
 import {
@@ -32,6 +32,7 @@ import {
   EventAnnotationDomainModel,
   EventDomainCreateModel,
   EventDomainModel,
+  GetDeviceOptions,
   GetDevicesOptions,
   GetDevicesResponse,
   GetEventsWithDeviceAndTelemetryInfoOptions,
@@ -190,14 +191,42 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     }
   }
 
+  public getDevice = async (options: GetDeviceOptions): Promise<DeviceDomainModel | undefined> => {
+    try {
+      const { device_id, provider_id } = options
+      const connection = await this.connect('ro')
+      const query = connection
+        .getRepository(DeviceEntity)
+        .createQueryBuilder('devices')
+        .where('"device_id" = :device_id', { device_id })
+
+      if (provider_id) {
+        query.andWhere('"provider_id" = :provider_id', { provider_id })
+      }
+
+      const entity = await query.getOne()
+      if (isDefined(entity)) {
+        return DeviceEntityToDomain.map(entity)
+      }
+      return entity
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
   private getDevicesQuery = async ({
     limit = 100,
+    provider_id,
     beforeCursor,
     afterCursor
   }: WithCursorOptions<GetDevicesOptions>): Promise<GetDevicesResponse> => {
     try {
       const connection = await this.connect('ro')
       const query = connection.createQueryBuilder(DeviceEntity, 'device')
+      if (isDefined(provider_id)) {
+        query.where('device.provider_id = :provider_id', { provider_id })
+      }
+
       const pager = buildPaginator({
         entity: DeviceEntity,
         alias: 'device',

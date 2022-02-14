@@ -19,6 +19,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-enable prettier/prettier */
 /* eslint-enable @typescript-eslint/no-unused-vars */
+import { IngestServiceClient, IngestServiceManager } from '@mds-core/mds-ingest-service'
 import { JUMP_PROVIDER_ID, JUMP_TEST_DEVICE_1, makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import { Device, Recorded, Telemetry, VehicleEvent } from '@mds-core/mds-types'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
@@ -92,15 +93,19 @@ async function seedTripEvents(reinit = true) {
   await MDSDBPostgres.seed({ devices, events, telemetry })
 }
 
+const IngestServer = IngestServiceManager.controller()
+
 if (pg_info.database) {
   describe('Test mds-db-postgres', () => {
     describe('test reads and writes', () => {
       beforeEach(async () => {
         await initializeDB()
+        await IngestServer.start()
       })
 
       afterEach(async () => {
         await shutdownDB()
+        await IngestServer.stop()
       })
 
       // This is incredibly stupid and makes 0 sense, but if we don't import (and use) unit.js, should.js breaks...
@@ -112,7 +117,10 @@ if (pg_info.database) {
       it('can make successful writes', async () => {
         await MDSDBPostgres.reinitialize()
         await MDSDBPostgres.writeDevice(JUMP_TEST_DEVICE_1)
-        const device: Device = await MDSDBPostgres.readDevice(JUMP_TEST_DEVICE_1.device_id, JUMP_PROVIDER_ID)
+        const device: Device = (await IngestServiceClient.getDevice({
+          device_id: JUMP_TEST_DEVICE_1.device_id,
+          provider_id: JUMP_PROVIDER_ID
+        })) as Device
         assert.deepEqual(device.device_id, JUMP_TEST_DEVICE_1.device_id)
       })
 
@@ -120,8 +128,11 @@ if (pg_info.database) {
         await shutdownDB()
         await MDSDBPostgres.writeDevice(JUMP_TEST_DEVICE_1)
         await shutdownDB()
-        const device: Device = await MDSDBPostgres.readDevice(JUMP_TEST_DEVICE_1.device_id, JUMP_PROVIDER_ID)
-        assert.deepEqual(device.device_id, JUMP_TEST_DEVICE_1.device_id)
+        const device = await IngestServiceClient.getDevice({
+          device_id: JUMP_TEST_DEVICE_1.device_id,
+          provider_id: JUMP_PROVIDER_ID
+        })
+        assert.deepEqual(device?.device_id, JUMP_TEST_DEVICE_1.device_id)
       })
 
       it('can read and write Devices, VehicleEvents, and Telemetry', async () => {

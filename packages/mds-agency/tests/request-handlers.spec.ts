@@ -394,7 +394,7 @@ describe('Agency API request handlers', () => {
       } as any)
       res.status = statusHandler
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(db, 'readDevice', Sinon.fake.rejects('it-broke'))
+      Sinon.replace(IngestServiceClient, 'getDevice', Sinon.fake.rejects('it-broke'))
       await updateVehicle(
         {
           params: { device_id },
@@ -420,7 +420,7 @@ describe('Agency API request handlers', () => {
       } as any)
       res.status = statusHandler
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(db, 'readDevice', Sinon.fake.resolves({ provider_id: 'not-your-provider' }))
+      Sinon.replace(IngestServiceClient, 'getDevice', Sinon.fake.resolves({ provider_id: 'not-your-provider' }))
       await updateVehicle(
         {
           params: { device_id },
@@ -446,7 +446,7 @@ describe('Agency API request handlers', () => {
       } as any)
       res.status = statusHandler
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(db, 'readDevice', Sinon.fake.resolves({ provider_id }))
+      Sinon.replace(IngestServiceClient, 'getDevice', Sinon.fake.resolves({ provider_id }))
       Sinon.replace(db, 'updateDevice', Sinon.fake.resolves({ provider_id }))
       Sinon.replace(cache, 'writeDevices', Sinon.fake.resolves({ provider_id }))
       Sinon.replace(stream, 'writeDevice', Sinon.fake.resolves({ provider_id }))

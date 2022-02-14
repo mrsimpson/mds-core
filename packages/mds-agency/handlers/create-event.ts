@@ -1,9 +1,9 @@
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
-import { validateEventDomainModel } from '@mds-core/mds-ingest-service'
+import { IngestServiceClient, validateEventDomainModel } from '@mds-core/mds-ingest-service'
 import stream from '@mds-core/mds-stream'
 import { DeepPartial, Device, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { normalizeToArray, now, ValidationError } from '@mds-core/mds-utils'
+import { isDefined, normalizeToArray, NotFoundError, now, ValidationError } from '@mds-core/mds-utils'
 import { AgencyLogger } from '../logger'
 import { AgencyApiSubmitVehicleEventRequest, AgencyApiSubmitVehicleEventResponse, AgencyServerError } from '../types'
 import { agencyValidationErrorParser, eventValidForMode } from '../utils'
@@ -122,7 +122,10 @@ export const createEventHandler = async (
     })()
 
     // TODO switch to cache for speed?
-    const device = await db.readDevice(device_id, provider_id)
+    const device = await IngestServiceClient.getDevice({ device_id, provider_id })
+    if (!isDefined(device)) {
+      throw new NotFoundError(`device_id ${device_id} not found`)
+    }
 
     // Note: Even though the event has passed schema validation, we need to verify it's allowed for this mode of vehicle
     const invalidStateOrEventTypes = eventValidForMode(device, event)

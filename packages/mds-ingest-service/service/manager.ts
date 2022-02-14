@@ -27,6 +27,7 @@ export const IngestServiceManager = RpcServer<IngestService & IngestMigrationSer
   },
   {
     getDevicesUsingOptions: (args, context) => IngestServiceProvider.getDevicesUsingOptions(context, ...args),
+    getDevice: (args, context) => IngestServiceProvider.getDevice(context, ...args),
     getDevicesUsingCursor: (args, context) => IngestServiceProvider.getDevicesUsingCursor(context, ...args),
     getEventsUsingOptions: (args, context) => IngestServiceProvider.getEventsUsingOptions(context, ...args),
     getEventsUsingCursor: (args, context) => IngestServiceProvider.getEventsUsingCursor(context, ...args),
