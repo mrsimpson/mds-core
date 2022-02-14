@@ -17,7 +17,7 @@
 import cache from '@mds-core/mds-agency-cache'
 import { parseRequest } from '@mds-core/mds-api-helpers'
 import db from '@mds-core/mds-db'
-import { validateDeviceDomainModel } from '@mds-core/mds-ingest-service'
+import { IngestServiceClient, validateDeviceDomainModel } from '@mds-core/mds-ingest-service'
 import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import stream from '@mds-core/mds-stream'
 import {
@@ -29,7 +29,7 @@ import {
   UUID,
   VEHICLE_STATE
 } from '@mds-core/mds-types'
-import { now, ServerError, ValidationError } from '@mds-core/mds-utils'
+import { isDefined, NotFoundError, now, ServerError, ValidationError } from '@mds-core/mds-utils'
 import urls from 'url'
 import { AgencyLogger } from './logger'
 import {
@@ -202,7 +202,11 @@ export const updateVehicle = async (req: AgencyApiUpdateVehicleRequest, res: Age
   const { provider_id } = res.locals
 
   try {
-    const tempDevice = await db.readDevice(device_id, provider_id)
+    const tempDevice = await IngestServiceClient.getDevice({ device_id, provider_id })
+    if (!isDefined(tempDevice)) {
+      throw new NotFoundError(`device_id ${device_id} not found`)
+    }
+
     if (tempDevice.provider_id !== provider_id) {
       await updateVehicleFail(req, res, provider_id, device_id, 'not found')
     } else {

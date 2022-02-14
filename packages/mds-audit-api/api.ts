@@ -17,7 +17,11 @@
 import { asJsonApiLinks, parsePagingQueryParams, parseRequest } from '@mds-core/mds-api-helpers'
 import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import { TelemetryDomainModel, validateTelemetryDomainCreateModel } from '@mds-core/mds-ingest-service'
+import {
+  IngestServiceClient,
+  TelemetryDomainModel,
+  validateTelemetryDomainCreateModel
+} from '@mds-core/mds-ingest-service'
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import { ValidationError } from '@mds-core/mds-schema-validators'
 import { isError } from '@mds-core/mds-service-helpers'
@@ -50,7 +54,6 @@ import {
   readAudit,
   readAuditEvents,
   readAudits,
-  readDevice,
   readEvents,
   readTelemetry,
   withGpsProperty,
@@ -474,7 +477,7 @@ function api(app: express.Express): express.Express {
           const attachments = await readAttachments(audit_trip_id)
 
           const device = provider_device_id
-            ? await readDevice(provider_device_id, provider_id)
+            ? await IngestServiceClient.getDevice({ device_id: provider_device_id, provider_id })
             : await getVehicle(provider_id, provider_vehicle_id)
 
           if (device) {

@@ -17,12 +17,18 @@
 
 import { Device, UUID } from '@mds-core/mds-types'
 import { now, uuid } from '@mds-core/mds-utils'
-import { EventAnnotationDomainCreateModel, EventDomainCreateModel, TelemetryDomainCreateModel } from '../@types'
+import {
+  DeviceDomainModel,
+  EventAnnotationDomainCreateModel,
+  EventDomainCreateModel,
+  TelemetryDomainCreateModel
+} from '../@types'
 import { IngestServiceClient } from '../client'
 import { IngestRepository } from '../repository'
 import { IngestServiceManager } from '../service/manager'
 
 const TEST1_PROVIDER_ID = uuid()
+const TEST2_PROVIDER_ID = uuid()
 const DEVICE_UUID_A = uuid()
 const DEVICE_UUID_B = uuid()
 const TRIP_UUID_A = uuid()
@@ -251,7 +257,38 @@ describe('Ingest Service Tests', () => {
           expect(cursor.cursor.prev).not.toBeNull()
           expect(cursor.cursor.next).toBeNull()
         }
+
+        const withProviderId = await IngestServiceClient.getDevicesUsingOptions({
+          limit: 2,
+          provider_id: TEST1_PROVIDER_ID
+        })
+        expect(withProviderId.devices).toHaveLength(2)
+        expect(withProviderId.cursor.next).toBeNull()
       })
+
+      it('gets one device at a time with just the device_id parameter', async () => {
+        const { recorded, ...device } = (await IngestServiceClient.getDevice({
+          device_id: DEVICE_UUID_A
+        })) as DeviceDomainModel
+        expect(device).toEqual(TEST_DEVICE_A)
+      })
+
+      it('gets one device at a time with the device_id and provider_id parameters', async () => {
+        const { recorded, ...device } = (await IngestServiceClient.getDevice({
+          device_id: DEVICE_UUID_A,
+          provider_id: TEST1_PROVIDER_ID
+        })) as DeviceDomainModel
+        expect(device).toEqual(TEST_DEVICE_A)
+      })
+
+      it('get one device throws if device does not exist', async () => {
+        const result = await IngestServiceClient.getDevice({
+          device_id: TEST_DEVICE_A.device_id,
+          provider_id: TEST2_PROVIDER_ID
+        })
+        expect(result).toBeUndefined
+      })
+
       it('gets 0 devices', async () => {
         const devices = await IngestServiceClient.getDevices([uuid()])
         expect(devices.length).toEqual(0)

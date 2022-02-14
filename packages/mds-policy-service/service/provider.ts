@@ -86,7 +86,7 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyService
         throw new DependencyMissingError(`some geographies not published!`)
 
       const publishedPolicy = await PolicyRepository.publishPolicy(policy_id, publish_date, {
-        beforeCommit: process.env.KAFKA_HOST ?  async policy => PolicyStreamKafka.write(policy) : undefined
+        beforeCommit: process.env.KAFKA_HOST ? async policy => PolicyStreamKafka.write(policy) : undefined
       })
 
       if (prev_policies) {

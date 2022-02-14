@@ -30,6 +30,7 @@
 import cache from '@mds-core/mds-agency-cache'
 import { ApiServer } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
+import { IngestServiceManager } from '@mds-core/mds-ingest-service'
 import stream from '@mds-core/mds-stream'
 import {
   JUMP_TEST_DEVICE_1,
@@ -162,14 +163,17 @@ const AUTH2 = `basic ${Buffer.from(`${TEST2_PROVIDER_ID}|${PROVIDER_SCOPES}`).to
 const AUTH_NO_SCOPE = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}`).toString('base64')}`
 
 const SAN_FERNANDO_VALLEY = 'e3ed0a0e-61d3-4887-8b6a-4af4f3769c14'
+const IngestServer = IngestServiceManager.controller()
 
 describe('Agency Tests', () => {
   beforeAll(async () => {
     await Promise.all([db.reinitialize(), cache.reinitialize()])
+    await IngestServer.start()
   })
 
   afterAll(async () => {
     await Promise.all([db.shutdown(), cache.shutdown(), stream.shutdown()])
+    await IngestServer.stop()
   })
 
   describe('Tests API', () => {

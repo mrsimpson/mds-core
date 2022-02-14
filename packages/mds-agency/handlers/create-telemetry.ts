@@ -1,8 +1,8 @@
 import db from '@mds-core/mds-db'
-import { validateTelemetryDomainModel } from '@mds-core/mds-ingest-service'
+import { IngestServiceClient, validateTelemetryDomainModel } from '@mds-core/mds-ingest-service'
 import { isError } from '@mds-core/mds-service-helpers'
 import { Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
-import { NotFoundError, now, ServerError, ValidationError } from '@mds-core/mds-utils'
+import { isDefined, NotFoundError, now, ServerError, ValidationError } from '@mds-core/mds-utils'
 import { AgencyLogger } from '../logger'
 import { AgencyApiSubmitVehicleTelemetryRequest, AgencyApiSubmitVehicleTelemetryResponse } from '../types'
 import { agencyValidationErrorParser, writeTelemetry } from '../utils'
@@ -37,7 +37,11 @@ const getDeviceIdsForProvider = async ({
 
     const { device_id } = telemetry
 
-    const device = await db.readDevice(device_id, provider_id)
+    const device = await IngestServiceClient.getDevice({ device_id, provider_id })
+
+    if (!isDefined(device)) {
+      throw new NotFoundError(`device_id ${device_id} not found`)
+    }
 
     // Set with only one entry
     return new Set<UUID>([device.device_id])

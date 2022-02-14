@@ -26,6 +26,7 @@ import cache from '@mds-core/mds-agency-cache'
 import { ApiServer } from '@mds-core/mds-api-server'
 import { AttachmentServiceClient } from '@mds-core/mds-attachment-service'
 import db from '@mds-core/mds-db'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import { MOCHA_PROVIDER_ID } from '@mds-core/mds-providers'
 import { ServiceError } from '@mds-core/mds-service-helpers'
 import { makeDevices, makeEventsWithTelemetry, makeTelemetryInArea, SCOPED_AUTH } from '@mds-core/mds-test-data'
@@ -106,7 +107,7 @@ describe('Testing API', () => {
       recorded: AUDIT_START
     }
 
-    db.writeDevice({
+    const device: Device = {
       accessibility_options: [],
       device_id: provider_device_id,
       modality: 'micromobility',
@@ -115,7 +116,11 @@ describe('Testing API', () => {
       propulsion_types: ['electric'],
       vehicle_type: 'scooter',
       recorded: AUDIT_START
-    }).then(() => {
+    }
+
+    Sinon.replace(IngestServiceClient, 'getDevice', Sinon.fake.resolves(device))
+
+    db.writeDevice(device).then(() => {
       db.writeEvent({
         ...baseEvent,
         ...{ telemetry_timestamp: OLD_EVENT, timestamp: OLD_EVENT }

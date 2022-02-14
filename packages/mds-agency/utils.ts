@@ -352,7 +352,7 @@ export async function readPayload(device_id: UUID): Promise<VehiclePayload> {
     const [device] = await IngestServiceClient.getDevices([device_id])
     payload.device = device
   } catch (err) {
-    AgencyLogger.error('readPayload: db readDevice error', { err })
+    AgencyLogger.error('readPayload: IngestServiceClient getDevices error', { err })
   }
   try {
     payload.event = await cache.readEvent(device_id)
