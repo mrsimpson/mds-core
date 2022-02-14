@@ -1,5 +1,11 @@
 # @mds-core/mds-policy-service
 
+## 0.11.12
+
+### Patch Changes
+
+- ff4ccab5: Removing mds-db.readDevice and updating references to it to call the ingest service instead
+
 ## 0.11.11
 
 ### Patch Changes

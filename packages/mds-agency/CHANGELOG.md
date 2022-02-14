@@ -1,5 +1,15 @@
 # @mds-core/mds-agency
 
+## 0.4.17
+
+### Patch Changes
+
+- ff4ccab5: Removing mds-db.readDevice and updating references to it to call the ingest service instead
+- Updated dependencies [ff4ccab5]
+  - @mds-core/mds-db@0.6.0
+  - @mds-core/mds-ingest-service@0.9.11
+  - @mds-core/mds-api-helpers@0.2.8
+
 ## 0.4.16
 
 ### Patch Changes
