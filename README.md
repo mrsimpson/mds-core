@@ -1,4 +1,6 @@
-# Introduction
+# MDS Core
+
+## Introduction
 
 The `mds-core` repo contains a deployable reference implementation for working with MDS data. It is a beta release meant for testing by cities and other entities to gather feedback and improve the product.
 
@@ -19,7 +21,7 @@ The [Mobility Data Specification](https://github.com/openmobilityfoundation/mobi
 
 **See the `mds-core` [Wiki](https://github.com/openmobilityfoundation/mds-core/wiki) for more details and help, including how to use it, architecture diagrams, release goals, how to help, the technical stack used, and slideshows and a video presentation.**
 
-# Overview of `mds-core`
+## Overview of `mds-core`
 
 The included code represents what is currently up and running for Los Angeles as well as new features under development. Includes the following:
 
@@ -29,24 +31,20 @@ The included code represents what is currently up and running for Los Angeles as
 
 ![Applications Overview](https://i.imgur.com/AGRubjE.png)
 
-# Contributing, Code of Coduct, Licensing
+## Contributing, Code of Coduct, Licensing
 
 Read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) document for rules and guidelines on contribution, code of conduct, license, development dependencies, and release guidelines.
 
-# Contents
+## Contents
 
-### Stable Content
-
-#### APIs
+### Stable Content APIs
 
 | API        | Compatible Versions |
 | ---------- | ------------------- |
 | MDS-Agency | `v1.0.0`            |
 | MDS-Policy | `v1.0.0`            |
 
-### Experimental Content
-
-#### APIs
+### Experimental Content APIs
 
 1. MDS-Audit [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/326)
 2. MDS-Compliance [PR](https://github.com/openmobilityfoundation/mobility-data-specification/pull/333)
@@ -66,14 +64,14 @@ Read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) document for rules and guide
 
 If you haven't installed PostegreSQL and Redis you can install them with homebrew on macOS
 
-```
+```sh
 brew install postgresql
 brew install redis
 ```
 
 Make sure they are running before you run the tests
 
-```
+```sh
 brew services start postgresql
 brew services start redis
 ```
@@ -121,7 +119,7 @@ pnpm start
 
 You can also run all tests from the project root with
 
-```
+```sh
 pnpm test
 ```
 
@@ -174,11 +172,11 @@ mds-core supports building multi-arch images. At the moment, amd64 is considered
 
 To enable multi-platform docker builds, you first need to configure a buildx builder (you only need to do this once):
 
-```
+```sh
 docker buildx create --use
 ```
 
-##### Kubernetes
+##### Local Kubernetes for development
 
 Configure Kubernetes in Docker:
 
@@ -204,7 +202,7 @@ kubectl cluster-info
 
 #### Install Helm/Tiller
 
-This implementation of MDS uses a Helm v2 chart for installation. Helm can be installed to your local system with Homebrew (MacOS), or by downloading the correct executable for your system from https://github.com/helm/helm/releases/tag/v2.16.9
+This implementation of MDS uses a Helm v2 chart for installation. Helm can be installed to your local system with Homebrew (MacOS), or by downloading the correct executable for your system from <https://github.com/helm/helm/releases/tag/v2.16.9>
 
 ### Build : compile source into deployable images
 
@@ -234,6 +232,8 @@ helm install --name istio --namespace istio-system ./install/kubernetes/helm/ist
 
 ### Build source into deployable images
 
+_Prerequisite: The current version of the build script uses `jq`, you need to install it globally (e. g. `brew install jq`)_
+
 This will run the build, and create the docker container images.
 
 ```sh
@@ -241,7 +241,7 @@ pnpm clean
 NODE_ENV=development pnpm image
 ```
 
-note that setting `NODE_ENV=development` will enable images to be built with the `:latest` tag instead of a specific version-branch-commit tag. If you choose not to use this, the images will be built with tags matching the format `:version-branch-commit`. You can generate a manifest with these image tags by running `pnpm values`. This manifest can be included in a helm install with the switch `--values dist/values.yaml`.
+note that setting `NODE_ENV=development` will enable images to be built with the `:latest` tag instead of a specific version-branch-commit tag. If you choose not to use this, the images will be built with tags matching the format `:version-branch-commit`. You can generate a manifest with these image tags by running `pnpm values`. This manifest can be included in a helm install with the switch `--values dist/values-mds.yaml`.
 
 Verify:
 
@@ -251,13 +251,53 @@ docker images --filter reference='mds-*'
 
 ### Install MDS
 
+#### Cluster component dependencies
+
+The following will install the common mds-core infrastructure (databases, middleware) to your local cluster:
+
 ```sh
 kubectl create namespace mds
 kubectl label namespace mds istio-injection=enabled
 cd helm/mds
 helm dep up
+```
+
+Finally, you can install the actual services. Prior to doing this, you need to configure which services to deploy. For this, easiest is to edit the generated `dist/values-mds.yaml` and enable the relevant deployments, e. g.
+
+```yaml
+deployments:
+  mds-agency:
+    enabled: true
+    version: <...>
+```
+
+Finally, deploy the services:
+
+```sh
 helm install --name mds --namespace mds .
 ```
+
+#### Troubleshooting
+
+##### `tl;dr`
+
+Try this
+
+```sh
+ helm upgrade mds ./helm/mds --install --namespace mds --values=dist/values-mds.yaml \
+--set image.pullPolicy=Never \
+--set resources.requests.cpu=0m \
+--set podAnnotations."sidecar\.istio\.io/proxyCPU"=0m
+```
+
+##### If image pull fails
+
+If you buld the images locally, you can enforce those to be deployed by setting `image.pullPolicy=Never`
+
+##### If scheduling fails due to limited resources
+
+Istio is installed to the cluster. For each pod, Istio will inject a proxying sidecar. While this effectively consumes only few resources (particularly few CPU when idling), the request-limits may prevent the pods from being scheduled. If you are still confident you want to run all the selected services, you can override the request-limits:
+`resources.requests.cpu=0m` for the actual services, `podAnnotations."sidecar\.istio\.io/proxyCPU"=0m` for the istio proxies
 
 Verify:
 
@@ -272,22 +312,24 @@ Due to the nature of `mds-core` being a highly portable Typescript project that 
 After following the above steps to set up a local MDS cluster, you can override an existing service's deployment with these steps.
 
 1. Update `mds-core/okteto.yml`'s `name` field to be set to the service you wish to replace (e.g. `mds-agency`)
-2.
 
-```sh
-curl https://get.okteto.com -sSfL | sh
-```
+2. Install Okteto
+
+   ```sh
+   curl https://get.okteto.com -sSfL | sh
+   ```
 
 3. Install the `Remote - Kubernetes` VSCode extension.
+
 4. Run `> Okteto Up` from the VSCode command palette.
 
-- After the remote session opens, execute this in the new shell window:
+   After the remote session opens, execute this in the new shell window:
 
-```sh
-pnpm install
-cd packages/${SERVICE_NAME}
-pnpm start
-```
+   ```sh
+   pnpm install
+   cd packages/${SERVICE_NAME}
+   pnpm start
+   ```
 
 5. This session is now safe to close, and you can reattach with the `okteto.${SERVICE_NAME}` ssh profile automatically added for you using the VSCode `Remote - SSH` package.
 6. When you're completely done with your session, run `> Okteto Down` from the VSCode command palette, or `okteto down` from terminal to revert the changes made by Okteto, and return your service to its previous deployment.
