@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-import test from 'unit.js'
 import { MdsNamingStrategy } from '../naming-strategies'
 
 const strategy = new MdsNamingStrategy()
 
 describe('Test Naming Strategy', () => {
-  it('Primary Key Naming Strategy', done => {
-    test.value(strategy.primaryKeyName('table', ['column'])).is('table_pkey')
-    done()
+  it('Primary Key Naming Strategy', async () => {
+    expect(strategy.primaryKeyName('table', ['column'])).toEqual('table_pkey')
   })
 
-  it('Index Naming Strategy', done => {
-    test.value(strategy.indexName('table', ['column'])).is('idx_column_table')
-    done()
+  it('Index Naming Strategy', async () => {
+    expect(strategy.indexName('table', ['column'])).toEqual('idx_column_table')
   })
 
-  it('Unique Constraint Naming Strategy', done => {
-    test.value(strategy.uniqueConstraintName('table', ['column'])).is('uc_column_table')
-    done()
+  it('Unique Constraint Naming Strategy', async () => {
+    expect(strategy.uniqueConstraintName('table', ['column'])).toEqual('uc_column_table')
   })
 
-  it('Foreign Key Naming Strategy', done => {
-    test
-      .value(strategy.foreignKeyName('table', ['column'], 'referencedtable', ['referencedcolumn']))
-      .is('fk_referencedtable_referencedcolumn')
-    done()
+  it('Foreign Key Naming Strategy', async () => {
+    expect(strategy.foreignKeyName('table', ['column'], 'referencedtable', ['referencedcolumn'])).toEqual(
+      'fk_referencedtable_referencedcolumn'
+    )
   })
 })

@@ -48,8 +48,8 @@ export const TEST1_PROVIDER_ID = '5f7114d1-4091-46ee-b492-e55875f7de00'
 export const TEST2_PROVIDER_ID = '45f37d69-73ca-4ca6-a461-e7283cffa01a'
 export const LA_YELLOW_CAB_PROVIDER_ID = '286b317e-3c6c-498e-8920-94f7bd1bb3e7'
 
-// Mocha testing PROVIDER_ID value
-export const MOCHA_PROVIDER_ID = 'c8051767-4b14-4794-abc1-85aad48baff1'
+// PROVIDER_ID value for Jest Testing
+export const JEST_PROVIDER_ID = 'c8051767-4b14-4794-abc1-85aad48baff1'
 
 // Support PROVIDER_ID values (Reserved for support use)
 export const SUPPORT1_PROVIDER_ID = '09828cf3-9b85-449b-bc8f-d3aaef5c3448'
@@ -82,7 +82,7 @@ const PROVIDER_IDS = [
   BLUE_SYSTEMS_PROVIDER_ID,
   LADOT_PROVIDER_ID,
   LA_YELLOW_CAB_PROVIDER_ID,
-  MOCHA_PROVIDER_ID,
+  JEST_PROVIDER_ID,
   SUPPORT1_PROVIDER_ID,
   SUPPORT2_PROVIDER_ID,
   SUPPORT3_PROVIDER_ID
@@ -263,9 +263,9 @@ const providers: { [k: string]: ProviderInfo } = {
     provider_id: LA_YELLOW_CAB_PROVIDER_ID,
     provider_name: 'LA Yellow Cab'
   },
-  [MOCHA_PROVIDER_ID]: {
-    provider_id: MOCHA_PROVIDER_ID,
-    provider_name: 'Mocha Test Provider'
+  [JEST_PROVIDER_ID]: {
+    provider_id: JEST_PROVIDER_ID,
+    provider_name: 'Jest Test Provider'
   },
   [SUPPORT1_PROVIDER_ID]: {
     provider_id: SUPPORT1_PROVIDER_ID,

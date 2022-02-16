@@ -23,9 +23,6 @@ import { IngestServiceClient, IngestServiceManager } from '@mds-core/mds-ingest-
 import { JUMP_PROVIDER_ID, JUMP_TEST_DEVICE_1, makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import { Device, Recorded, Telemetry, VehicleEvent } from '@mds-core/mds-types'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
-import assert from 'assert'
-import test from 'unit.js'
-import { isNullOrUndefined } from 'util'
 import MDSDBPostgres from '../index'
 import { initializeDB, pg_info, shutdownDB } from './helpers'
 
@@ -108,12 +105,6 @@ if (pg_info.database) {
         await IngestServer.stop()
       })
 
-      // This is incredibly stupid and makes 0 sense, but if we don't import (and use) unit.js, should.js breaks...
-      it('Nonsensical test', () => {
-        // eslint-disable-next-line no-self-compare
-        test.assert(true === true)
-      })
-
       it('can make successful writes', async () => {
         await MDSDBPostgres.reinitialize()
         await MDSDBPostgres.writeDevice(JUMP_TEST_DEVICE_1)
@@ -121,7 +112,7 @@ if (pg_info.database) {
           device_id: JUMP_TEST_DEVICE_1.device_id,
           provider_id: JUMP_PROVIDER_ID
         })) as Device
-        assert.deepEqual(device.device_id, JUMP_TEST_DEVICE_1.device_id)
+        expect(device.device_id).toEqual(JUMP_TEST_DEVICE_1.device_id)
       })
 
       it('can make a successful read query after shutting down a DB client', async () => {
@@ -132,18 +123,18 @@ if (pg_info.database) {
           device_id: JUMP_TEST_DEVICE_1.device_id,
           provider_id: JUMP_PROVIDER_ID
         })
-        assert.deepEqual(device?.device_id, JUMP_TEST_DEVICE_1.device_id)
+        expect(device?.device_id).toEqual(JUMP_TEST_DEVICE_1.device_id)
       })
 
       it('can read and write Devices, VehicleEvents, and Telemetry', async () => {
         await seedDB()
 
         const devicesResult: Device[] = (await MDSDBPostgres.readDeviceIds(JUMP_PROVIDER_ID, 0, 20)) as Device[]
-        assert.deepEqual(devicesResult.length, 10)
+        expect(devicesResult).toHaveLength(10)
         const vehicleEventsResult = await MDSDBPostgres.readEvents({
           start_time: String(startTime)
         })
-        assert.deepEqual(vehicleEventsResult.count, 10)
+        expect(vehicleEventsResult.count).toEqual(10)
 
         const telemetryResults: Recorded<Telemetry>[] = await MDSDBPostgres.readTelemetry(
           devicesResult[0].device_id,
@@ -151,7 +142,7 @@ if (pg_info.database) {
           now()
         )
 
-        assert(telemetryResults.length > 0)
+        expect(telemetryResults.length).toBeGreaterThan(0)
       })
 
       it('can read VehicleEvents and Telemetry as collections of trips', async () => {
@@ -159,7 +150,7 @@ if (pg_info.database) {
         await seedTripEvents(false)
 
         const devicesResult: Device[] = (await MDSDBPostgres.readDeviceIds(JUMP_PROVIDER_ID, 0, 18)) as Device[]
-        assert.deepEqual(devicesResult.length, 18)
+        expect(devicesResult).toHaveLength(18)
 
         const vehicleEventsResult = await MDSDBPostgres.readEvents({
           start_time: String(startTime)
@@ -169,15 +160,15 @@ if (pg_info.database) {
         const tripEventsResult = await MDSDBPostgres.readTripEvents({
           start_time: String(startTime)
         })
-        assert.deepStrictEqual(tripEventsResult.tripCount, trip_ids.size)
+        expect(tripEventsResult.tripCount).toEqual(trip_ids.size)
 
         // there should be X trips
-        assert.deepStrictEqual(Object.keys(tripEventsResult.trips).length, trip_ids.size)
+        expect(Object.keys(tripEventsResult.trips)).toHaveLength(trip_ids.size)
 
         // telemetry on each event should not be undefined
         Object.values(tripEventsResult.trips).forEach(trip => {
           trip.forEach(event => {
-            assert.notStrictEqual(event.telemetry, undefined)
+            expect(event.telemetry).not.toBeUndefined()
           })
         })
       })
@@ -185,24 +176,20 @@ if (pg_info.database) {
       it('can wipe a device', async () => {
         await seedDB()
         const result = await MDSDBPostgres.wipeDevice(JUMP_PROVIDER_ID)
-        assert(result !== undefined)
+        expect(result).not.toBeUndefined()
       })
     })
 
     describe('unit test read only functions', () => {
-      beforeEach(async () => {
-        await initializeDB()
-        await seedDB()
-      })
+      beforeEach(initializeDB)
 
-      afterEach(async () => {
-        await shutdownDB()
-      })
+      afterEach(shutdownDB)
 
       it('.health', async () => {
         const result = await MDSDBPostgres.health()
-        assert(result.using === 'postgres')
-        assert(!isNullOrUndefined(result.stats.current_running_queries))
+        expect(result.using).toEqual('postgres')
+        expect(result.stats.current_running_queries).not.toBeNull()
+        expect(result.stats.current_running_queries).not.toBeUndefined()
       })
     })
   })

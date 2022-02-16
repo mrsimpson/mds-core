@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import assert from 'assert'
 import { convert_v0_4_1_telemetry_to_1_0_0 } from '../../transformers'
 import { Telemetry_v0_4_1 } from '../../transformers/@types'
 
@@ -29,24 +28,24 @@ const telemetry: Telemetry_v0_4_1 = {
 }
 
 describe('Test transformers', () => {
-  it('checks the transformation between v0.4.1 and v1.0.0 Telemetry types', () => {
+  it('checks the transformation between v0.4.1 and v1.0.0 Telemetry types', async () => {
     // undefined GPS heading is not transformed
-    assert.deepEqual(convert_v0_4_1_telemetry_to_1_0_0(telemetry), telemetry)
+    expect(convert_v0_4_1_telemetry_to_1_0_0(telemetry)).toEqual(telemetry)
 
     // null GPS heading is not transformed
-    assert.deepEqual(convert_v0_4_1_telemetry_to_1_0_0({ ...telemetry, gps: { ...telemetry.gps, heading: null } }), {
+    expect(convert_v0_4_1_telemetry_to_1_0_0({ ...telemetry, gps: { ...telemetry.gps, heading: null } })).toEqual({
       ...telemetry,
       gps: { ...telemetry.gps, heading: null }
     })
 
     // Clockwise (positive) GPS heading is not transformed
-    assert.deepEqual(convert_v0_4_1_telemetry_to_1_0_0({ ...telemetry, gps: { ...telemetry.gps, heading: 180 } }), {
+    expect(convert_v0_4_1_telemetry_to_1_0_0({ ...telemetry, gps: { ...telemetry.gps, heading: 180 } })).toEqual({
       ...telemetry,
       gps: { ...telemetry.gps, heading: 180 }
     })
 
     // Counter-clockwise (negative) GPS heading is transformed to clcckwuse (positive)
-    assert.deepEqual(convert_v0_4_1_telemetry_to_1_0_0({ ...telemetry, gps: { ...telemetry.gps, heading: -180 } }), {
+    expect(convert_v0_4_1_telemetry_to_1_0_0({ ...telemetry, gps: { ...telemetry.gps, heading: -180 } })).toEqual({
       ...telemetry,
       gps: { ...telemetry.gps, heading: 180 }
     })

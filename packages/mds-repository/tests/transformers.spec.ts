@@ -14,29 +14,26 @@
  * limitations under the License.
  */
 
-import test from 'unit.js'
 import { BigintTransformer, UppercaseTransformer } from '../transformers'
 
 describe('Test Transformers', () => {
-  it('BigIntTransformer', done => {
-    test.value(BigintTransformer.to(1)).is(1)
-    test.value(BigintTransformer.to(null)).is(null)
-    test.value(BigintTransformer.to([1, null])).is([1, null])
-    test.value(BigintTransformer.from('1')).is(1)
-    test.value(BigintTransformer.from(null)).is(null)
-    test.value(BigintTransformer.from(['1', null])).is([1, null])
-    done()
+  it('BigIntTransformer', async () => {
+    expect(BigintTransformer.to(1)).toEqual(1)
+    expect(BigintTransformer.to(null)).toEqual(null)
+    expect(BigintTransformer.to([1, null])).toEqual([1, null])
+    expect(BigintTransformer.from('1')).toEqual(1)
+    expect(BigintTransformer.from(null)).toEqual(null)
+    expect(BigintTransformer.from(['1', null])).toEqual([1, null])
   })
 
-  it('UppercaseTransformer', done => {
-    test.value(UppercaseTransformer.to('a')).is('A')
-    test.value(UppercaseTransformer.to('A')).is('A')
-    test.value(UppercaseTransformer.to(null)).is(null)
-    test.value(UppercaseTransformer.to(['a', 'A', null])).is(['A', 'A', null])
-    test.value(UppercaseTransformer.from('a')).is('A')
-    test.value(UppercaseTransformer.from('A')).is('A')
-    test.value(UppercaseTransformer.from(null)).is(null)
-    test.value(UppercaseTransformer.from(['a', 'A', null])).is(['A', 'A', null])
-    done()
+  it('UppercaseTransformer', async () => {
+    expect(UppercaseTransformer.to('a')).toEqual('A')
+    expect(UppercaseTransformer.to('A')).toEqual('A')
+    expect(UppercaseTransformer.to(null)).toEqual(null)
+    expect(UppercaseTransformer.to(['a', 'A', null])).toEqual(['A', 'A', null])
+    expect(UppercaseTransformer.from('a')).toEqual('A')
+    expect(UppercaseTransformer.from('A')).toEqual('A')
+    expect(UppercaseTransformer.from(null)).toEqual(null)
+    expect(UppercaseTransformer.from(['a', 'A', null])).toEqual(['A', 'A', null])
   })
 })
