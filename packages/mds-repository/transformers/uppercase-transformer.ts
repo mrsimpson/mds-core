@@ -19,7 +19,7 @@ import { TransformerOptions } from '.'
 import { OneWayTransformer, ValueTransformer } from './types'
 
 const toUppercase: ValueTransformer<Nullable<string>> = value => {
-  const transform = (item: Nullable<string>) => (item === null ? item : item.toUpperCase())
+  const transform = (item: Nullable<string>) => item && item.toUpperCase()
   return Array.isArray(value) ? value.map(transform) : transform(value)
 }
 

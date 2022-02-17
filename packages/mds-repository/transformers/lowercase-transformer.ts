@@ -18,7 +18,7 @@ import { Nullable } from '@mds-core/mds-types'
 import { OneWayTransformer, TransformerOptions, ValueTransformer } from './types'
 
 const toLowercase: ValueTransformer<Nullable<string>> = value => {
-  const transform = (item: Nullable<string>) => (item === null ? item : item.toLowerCase())
+  const transform = (item: Nullable<string>) => item && item.toLowerCase()
   return Array.isArray(value) ? value.map(transform) : transform(value)
 }
 
