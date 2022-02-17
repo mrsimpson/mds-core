@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 City of Los Angeles
+ * Copyright 2022 City of Los Angeles
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
  */
 
 import { Nullable } from '@mds-core/mds-types'
-import { OneWayTransformer, ValueTransformer } from './types'
+import { OneWayTransformer, TransformerOptions, ValueTransformer } from './types'
 
-const toNumber: ValueTransformer<Nullable<string>, Nullable<number>> = value => {
-  const transform = (item: Nullable<string>) => (item === null ? item : Number(item))
+const toLowercase: ValueTransformer<Nullable<string>> = value => {
+  const transform = (item: Nullable<string>) => (item === null ? item : item.toLowerCase())
   return Array.isArray(value) ? value.map(transform) : transform(value)
 }
 
-// Use Number for bigint columns so the values get transformed from strings to
-// numbers when read from the database
-export const BigintTransformer = { ...OneWayTransformer, from: toNumber }
+// Transform strings to Lowercase
+export const LowercaseTransformer = ({ direction = 'both' }: TransformerOptions = {}) => ({
+  to: direction === 'read' ? OneWayTransformer.to : toLowercase,
+  from: direction === 'write' ? OneWayTransformer.from : toLowercase
+})
