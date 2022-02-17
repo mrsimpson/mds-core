@@ -14,46 +14,44 @@
  * limitations under the License.
  */
 
-import test from 'unit.js'
 import { NullablePropertyValue, OptionalPropertyValue, PropertyValue } from '../filters'
 
 describe('Test Filters', () => {
   it('Test Scalar PropertyValue', async () => {
     const filter = PropertyValue('property', 'scalar')
-    test.object(filter).hasProperty('property')
-    test.object(filter.property).hasProperty('_type', 'equal')
-    test.object(filter.property).hasProperty('value', 'scalar')
+    expect(filter).toHaveProperty('property')
+    expect(filter.property).toHaveProperty('_type', 'equal')
+    expect(filter.property).toHaveProperty('value', 'scalar')
   })
 
   it('Test Array PropertyValue', async () => {
     const filter = PropertyValue('property', ['array'])
-    test.object(filter).hasProperty('property')
-    test.object(filter.property).hasProperty('_type', 'in')
-    test.object(filter.property).hasProperty('value')
-    test.value(filter.property?.value).is(['array'])
+    expect(filter).toHaveProperty('property')
+    expect(filter.property).toHaveProperty('_type', 'in')
+    expect(filter.property).toHaveProperty('value', ['array'])
   })
 
   it('Test NullablePropertyValue (null)', async () => {
     const filter = NullablePropertyValue('property', null)
-    test.object(filter).hasProperty('property')
-    test.object(filter.property).hasProperty('_type', 'isNull')
+    expect(filter).toHaveProperty('property')
+    expect(filter.property).toHaveProperty('_type', 'isNull')
   })
 
   it('Test NullablePropertyValue (value)', async () => {
     const filter = NullablePropertyValue('property', 'scalar')
-    test.object(filter).hasProperty('property')
-    test.object(filter.property).hasProperty('_type', 'equal')
-    test.object(filter.property).hasProperty('value', 'scalar')
+    expect(filter).toHaveProperty('property')
+    expect(filter.property).toHaveProperty('_type', 'equal')
+    expect(filter.property).toHaveProperty('value', 'scalar')
   })
 
   it('Test OptionalPropertyValue (undefined)', async () => {
     const filter = OptionalPropertyValue(NullablePropertyValue, 'property', undefined)
-    test.value(filter).is({})
+    expect(filter).toEqual({})
   })
 
   it('Test OptionalPropertyValue (null)', async () => {
     const filter = OptionalPropertyValue(NullablePropertyValue, 'property', null)
-    test.object(filter).hasProperty('property')
-    test.object(filter.property).hasProperty('_type', 'isNull')
+    expect(filter).toHaveProperty('property')
+    expect(filter.property).toHaveProperty('_type', 'isNull')
   })
 })

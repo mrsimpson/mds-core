@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import test from 'unit.js'
 import { ModelMapper } from '../mapper'
 
 const stringify = ModelMapper<number, string, Partial<{ multiplier: number }>>((from, options) => {
@@ -23,15 +22,13 @@ const stringify = ModelMapper<number, string, Partial<{ multiplier: number }>>((
 })
 
 describe('Test CreateModelMapper', () => {
-  it('Without Options', done => {
-    test.value(stringify.map(1)).is('1')
-    test.value([1, 2].map(stringify.mapper())).is(['1', '2'])
-    done()
+  it('Without Options', async () => {
+    expect(stringify.map(1)).toEqual('1')
+    expect([1, 2].map(stringify.mapper())).toEqual(['1', '2'])
   })
 
-  it('With Options', done => {
-    test.value(stringify.map(1, { multiplier: 2 })).is('2')
-    test.value([1, 2].map(stringify.mapper({ multiplier: 2 }))).is(['2', '4'])
-    done()
+  it('With Options', async () => {
+    expect(stringify.map(1, { multiplier: 2 })).toEqual('2')
+    expect([1, 2].map(stringify.mapper({ multiplier: 2 }))).toEqual(['2', '4'])
   })
 })

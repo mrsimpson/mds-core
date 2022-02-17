@@ -131,10 +131,9 @@ pnpm test
 - Select the file that implements the Node/Express server for a package (typically `server.ts`) in the Explorer panel
 - Press `F5`
 
-### Mocha Tests
+### Unit Tests
 
-- Select the `Node.js: Mocha Tests` debug configuration
-- Select any one of the files in a package's test folder
+- Select the `Test: <package-name>` debug configuration
 - Press `F5`
 
 ## Kubernetes

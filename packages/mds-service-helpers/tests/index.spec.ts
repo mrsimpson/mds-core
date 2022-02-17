@@ -15,82 +15,60 @@
  */
 
 import { ValidationError } from '@mds-core/mds-utils'
-import test from 'unit.js'
 import { isError, UnwrapServiceResult } from '../client'
 import { isServiceError, ProcessManager, ServiceError, ServiceException, ServiceResult } from '../index'
 
 describe('Tests Service Helpers', () => {
   it('ServiceResult', async () => {
     const { result } = ServiceResult('success')
-    test.value(result).is('success')
+    expect(result).toEqual('success')
   })
 
   it('ServiceError', async () => {
     const { error } = ServiceError({ type: 'ValidationError', message: 'Validation Error' })
-    test.value(error.type).is('ValidationError')
-    test.value(error.message).is('Validation Error')
-    test.value(error.details).is(undefined)
+    expect(error).toMatchObject({ type: 'ValidationError', message: 'Validation Error' })
   })
 
   it('ServiceException', async () => {
     const { error } = ServiceException('Validation Error')
-    test.value(error.type).is('ServiceException')
-    test.value(error.message).is('Validation Error')
-    test.value(error.details).is(undefined)
+    expect(error).toMatchObject({ type: 'ServiceException', message: 'Validation Error' })
   })
 
   it('ServiceException (with Error)', async () => {
     const { error } = ServiceException('Validation Error', Error('Error Message'))
-    test.value(error.type).is('ServiceException')
-    test.value(error.message).is('Validation Error')
-    test.value(error.details).is('Error Message')
+    expect(error).toMatchObject({ type: 'ServiceException', message: 'Validation Error', details: 'Error Message' })
   })
 
   it('UnwrapServiceResult ServiceResult', async () => {
-    try {
-      const result = await UnwrapServiceResult(async () => ServiceResult('success'))()
-      test.value(result).is('success')
-    } catch (error) {
-      test.value(error).is(null)
-    }
+    const result = await UnwrapServiceResult(async () => ServiceResult('success'))()
+    expect(result).toEqual('success')
   })
 
   it('Catch ServiceError', async () => {
-    try {
-      const result = await UnwrapServiceResult(async () =>
-        ServiceError({ type: 'ValidationError', message: 'Validation Error' })
-      )()
-      test.value(result).is(null)
-    } catch (error) {
-      test.value(isServiceError(error)).is(true)
-      if (isServiceError(error)) {
-        test.value(error.type).is('ValidationError')
-        test.value(error.message).is('Validation Error')
-        test.value(error.details).is(undefined)
-      }
-    }
+    await expect(
+      UnwrapServiceResult(async () => ServiceError({ type: 'ValidationError', message: 'Validation Error' }))
+    ).rejects.toMatchObject({ type: 'ValidationError', message: 'Validation Error' })
   })
 
   it('Custom ServiceError type', async () => {
     const { error } = ServiceError({ type: 'CustomError', message: 'Custom Error Message' })
-    test.value(isServiceError(error, 'CustomError')).is(true)
+    expect(isServiceError(error, 'CustomError')).toEqual(true)
   })
 
   it('Tests isError', () => {
     const { error } = ServiceError({ type: 'ValidationError', message: 'Validation Error' })
-    test.value(isError(error, ValidationError))
-
-    test.value(isError(new ValidationError(), ValidationError))
+    expect(isError(error, ValidationError)).toEqual(true)
+    expect(isError(new ValidationError(), ValidationError)).toEqual(true)
   })
 
   it('ServiceError type guard', async () => {
     try {
       const error = Error('Error')
-      test.value(isServiceError(ServiceException('Error', error).error)).is(true)
+      expect(isServiceError(ServiceException('Error', error).error)).toEqual(true)
       throw error
     } catch (error) {
-      test.value(isServiceError(error)).is(false)
-      test.value(error instanceof Error).is(true)
+      expect(isServiceError(error)).toEqual(false)
+      expect(error).toBeInstanceOf(Error)
     }
   })
 
@@ -105,8 +83,8 @@ describe('Tests Service Helpers', () => {
       }
     }).controller()
     await controller.start()
-    test.value(started).is(true)
+    expect(started).toEqual(true)
     await controller.stop()
-    test.value(started).is(false)
+    expect(started).toEqual(false)
   })
 })
