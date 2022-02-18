@@ -35,7 +35,7 @@ const GeneratedAlwaysAsIdentity = (
     Column({
       type: 'bigint',
       generated: 'identity',
-      // generatedIdentity: 'ALWAYS', // Coming Soon in TypeORM 0.2.42!
+      generatedIdentity: 'ALWAYS',
       insert: false,
       transformer: BigintTransformer,
       ...options
