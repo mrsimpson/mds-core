@@ -1,5 +1,13 @@
 # @container-images/mds-collector-service
 
+## 0.0.46
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+- Updated dependencies [2637f1cc]
+  - @mds-core/mds-collector-service@0.4.12
+
 ## 0.0.45
 
 ### Patch Changes

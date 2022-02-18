@@ -1,5 +1,13 @@
 # @container-images/mds-geography-service
 
+## 0.0.48
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+- Updated dependencies [2637f1cc]
+  - @mds-core/mds-geography-service@0.10.8
+
 ## 0.0.47
 
 ### Patch Changes

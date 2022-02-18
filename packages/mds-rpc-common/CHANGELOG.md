@@ -1,5 +1,11 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.11
+
+### Patch Changes
+
+- 35ff786d: Support running multiple RPC services under the same host/manager
+
 ## 0.3.10
 
 ### Patch Changes
