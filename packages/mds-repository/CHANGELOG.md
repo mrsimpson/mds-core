@@ -1,5 +1,12 @@
 # @mds-core/mds-repository
 
+## 0.1.38
+
+### Patch Changes
+
+- bc8f0a04: Switch tests from Mocha to Jest
+- a942d36c: Add some new transformers/decorators and remove some unused filters from mds-repository
+
 ## 0.1.37
 
 ### Patch Changes

@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-import test from 'unit.js'
 import { RepositoryError } from '../exceptions'
 
 describe('Test Exceptions', () => {
-  it('RepositoryError', done => {
+  it('RepositoryError', async () => {
     const error = RepositoryError(Error('Some Caught Error'))
-    test.value(error instanceof Error).is(true)
-    done()
+    expect(error).toBeInstanceOf(Error)
   })
 })

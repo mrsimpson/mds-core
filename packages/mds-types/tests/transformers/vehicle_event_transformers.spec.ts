@@ -1,4 +1,3 @@
-import assert from 'assert'
 import {
   convert_v0_4_1_vehicle_event_to_v1_0_0,
   convert_v1_0_0_vehicle_event_to_v0_4_1,
@@ -13,7 +12,7 @@ const STOP_ID = '3f411cb1-a5a4-4b29-9e72-2714fdd24bc8'
 
 describe('Test transformers', () => {
   describe('spot checks the transformation between v0.4.1 and v1.0.0 VehicleEvent types', () => {
-    it('checks the provider_pick_up and charge combo translate correctly', () => {
+    it('checks the provider_pick_up and charge combo translate correctly', async () => {
       const event: VehicleEvent_v0_4_1 = {
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
@@ -34,7 +33,7 @@ describe('Test transformers', () => {
       }
 
       const transformedEvent = convert_v0_4_1_vehicle_event_to_v1_0_0(event)
-      assert.deepEqual(transformedEvent, {
+      expect(transformedEvent).toEqual({
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
         timestamp: TIME,
@@ -55,7 +54,7 @@ describe('Test transformers', () => {
       })
     })
 
-    it('checks that the service_end and low_battery combo translate correctly', () => {
+    it('checks that the service_end and low_battery combo translate correctly', async () => {
       const event: VehicleEvent_v0_4_1 = {
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
@@ -76,7 +75,7 @@ describe('Test transformers', () => {
       }
 
       const transformedEvent = convert_v0_4_1_vehicle_event_to_v1_0_0(event)
-      assert.deepEqual(transformedEvent, {
+      expect(transformedEvent).toEqual({
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
         timestamp: TIME,
@@ -97,7 +96,7 @@ describe('Test transformers', () => {
       })
     })
 
-    it('verifies the translation of trip_enter to on_trip', () => {
+    it('verifies the translation of trip_enter to on_trip', async () => {
       const event: VehicleEvent_v0_4_1 = {
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
@@ -118,7 +117,7 @@ describe('Test transformers', () => {
 
       const transformedEvent = convert_v0_4_1_vehicle_event_to_v1_0_0(event)
 
-      assert.deepEqual(transformedEvent, {
+      expect(transformedEvent).toEqual({
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
         timestamp: TIME,
@@ -139,7 +138,7 @@ describe('Test transformers', () => {
       })
     })
 
-    it('throws an error with the event_type `register`', () => {
+    it('throws an error with the event_type `register`', async () => {
       const event: VehicleEvent_v0_4_1 = {
         device_id: DEVICE_ID,
         provider_id: PROVIDER_ID,
@@ -158,7 +157,7 @@ describe('Test transformers', () => {
         }
       }
 
-      assert.throws(() => convert_v0_4_1_vehicle_event_to_v1_0_0(event), UnsupportedEventTypeError)
+      expect(() => convert_v0_4_1_vehicle_event_to_v1_0_0(event)).toThrowError(UnsupportedEventTypeError)
     })
   })
 
@@ -183,8 +182,8 @@ describe('Test transformers', () => {
     }
 
     const { 0: converted_eventA_1, 1: converted_eventA_2 } = convert_v1_0_0_vehicle_event_to_v0_4_1(eventA)
-    assert.deepEqual(converted_eventA_1.event_type, 'provider_drop_off')
-    assert.deepEqual(converted_eventA_2.event_type, 'trip_start')
+    expect(converted_eventA_1.event_type).toEqual('provider_drop_off')
+    expect(converted_eventA_2.event_type).toEqual('trip_start')
 
     const eventB: VehicleEvent_v1_0_0 = {
       device_id: DEVICE_ID,
@@ -210,9 +209,9 @@ describe('Test transformers', () => {
     }
 
     const { 0: converted_eventB_1, 1: converted_eventB_2 } = convert_v1_0_0_vehicle_event_to_v0_4_1(eventB)
-    assert.deepEqual(converted_eventB_1.event_type, 'no_backconversion_available')
-    assert.deepEqual(converted_eventB_2.event_type, 'no_backconversion_available')
-    assert.deepEqual(converted_eventB_2.telemetry, {
+    expect(converted_eventB_1.event_type).toEqual('no_backconversion_available')
+    expect(converted_eventB_2.event_type).toEqual('no_backconversion_available')
+    expect(converted_eventB_2.telemetry).toEqual({
       provider_id: PROVIDER_ID,
       device_id: DEVICE_ID,
       timestamp: TIME,

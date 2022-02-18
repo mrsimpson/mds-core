@@ -14,29 +14,43 @@
  * limitations under the License.
  */
 
-import test from 'unit.js'
-import { BigintTransformer, UppercaseTransformer } from '../transformers'
+import { BigintTransformer, LowercaseTransformer, UppercaseTransformer } from '../transformers'
 
 describe('Test Transformers', () => {
-  it('BigIntTransformer', done => {
-    test.value(BigintTransformer.to(1)).is(1)
-    test.value(BigintTransformer.to(null)).is(null)
-    test.value(BigintTransformer.to([1, null])).is([1, null])
-    test.value(BigintTransformer.from('1')).is(1)
-    test.value(BigintTransformer.from(null)).is(null)
-    test.value(BigintTransformer.from(['1', null])).is([1, null])
-    done()
+  it('BigIntTransformer', async () => {
+    expect(BigintTransformer.to(1)).toEqual(1)
+    expect(BigintTransformer.to(null)).toEqual(null)
+    expect(BigintTransformer.to([1, null])).toEqual([1, null])
+    expect(BigintTransformer.from('1')).toEqual(1)
+    expect(BigintTransformer.from(null)).toEqual(null)
+    expect(BigintTransformer.from(['1', null])).toEqual([1, null])
   })
 
-  it('UppercaseTransformer', done => {
-    test.value(UppercaseTransformer.to('a')).is('A')
-    test.value(UppercaseTransformer.to('A')).is('A')
-    test.value(UppercaseTransformer.to(null)).is(null)
-    test.value(UppercaseTransformer.to(['a', 'A', null])).is(['A', 'A', null])
-    test.value(UppercaseTransformer.from('a')).is('A')
-    test.value(UppercaseTransformer.from('A')).is('A')
-    test.value(UppercaseTransformer.from(null)).is(null)
-    test.value(UppercaseTransformer.from(['a', 'A', null])).is(['A', 'A', null])
-    done()
+  it('LowercaseTransformer', async () => {
+    const original = ['a', 'A', null]
+    const transformed = ['a', 'a', null]
+    expect(LowercaseTransformer().to(original)).toEqual(transformed)
+    expect(LowercaseTransformer({ direction: 'both' }).to(original)).toEqual(transformed)
+    expect(LowercaseTransformer({ direction: 'read' }).to(original)).toEqual(original)
+    expect(LowercaseTransformer({ direction: 'write' }).to(original)).toEqual(transformed)
+
+    expect(LowercaseTransformer().from(original)).toEqual(transformed)
+    expect(LowercaseTransformer({ direction: 'both' }).from(original)).toEqual(transformed)
+    expect(LowercaseTransformer({ direction: 'read' }).from(original)).toEqual(transformed)
+    expect(LowercaseTransformer({ direction: 'write' }).from(original)).toEqual(original)
+  })
+
+  it('UppercaseTransformer', async () => {
+    const original = ['a', 'A', null]
+    const transformed = ['A', 'A', null]
+    expect(UppercaseTransformer().to(original)).toEqual(transformed)
+    expect(UppercaseTransformer({ direction: 'both' }).to(original)).toEqual(transformed)
+    expect(UppercaseTransformer({ direction: 'read' }).to(original)).toEqual(original)
+    expect(UppercaseTransformer({ direction: 'write' }).to(original)).toEqual(transformed)
+
+    expect(UppercaseTransformer().from(original)).toEqual(transformed)
+    expect(UppercaseTransformer({ direction: 'both' }).from(original)).toEqual(transformed)
+    expect(UppercaseTransformer({ direction: 'read' }).from(original)).toEqual(transformed)
+    expect(UppercaseTransformer({ direction: 'write' }).from(original)).toEqual(original)
   })
 })

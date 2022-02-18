@@ -20,7 +20,6 @@ import { JurisdictionServiceManager } from '@mds-core/mds-jurisdiction-service/s
 import { SCOPED_AUTH } from '@mds-core/mds-test-data'
 import { pathPrefix, uuid } from '@mds-core/mds-utils'
 import supertest from 'supertest'
-import test from 'unit.js'
 import { JURISDICTION_API_DEFAULT_VERSION } from '../@types'
 import { api } from '../api'
 
@@ -36,7 +35,7 @@ const [JURISDICTION0, JURISDICTION1, JURISDICTION2] = [uuid(), uuid(), uuid()].m
 const JurisdictionServer = JurisdictionServiceManager.controller()
 
 describe('Test Jurisdiction API', () => {
-  before(async () => {
+  beforeAll(async () => {
     await JurisdictionServer.start()
   })
 
@@ -46,9 +45,9 @@ describe('Test Jurisdiction API', () => {
       .set('Authorization', SCOPED_AUTH(['jurisdictions:write']))
       .send(JURISDICTION0)
       .expect(201)
-    test.object(result.body).hasProperty('version', JURISDICTION_API_DEFAULT_VERSION)
-    test.object(result.body.jurisdiction).hasProperty('timestamp')
-    test.object(result.body.jurisdiction).hasProperty('jurisdiction_id', JURISDICTION0.jurisdiction_id)
+    expect(result.body).toHaveProperty('version', JURISDICTION_API_DEFAULT_VERSION)
+    expect(result.body.jurisdiction).toHaveProperty('timestamp')
+    expect(result.body.jurisdiction).toHaveProperty('jurisdiction_id', JURISDICTION0.jurisdiction_id)
   })
 
   it('Create Single Jurisdiction (forbidden)', async () => {
@@ -78,11 +77,11 @@ describe('Test Jurisdiction API', () => {
       .set('Authorization', SCOPED_AUTH(['jurisdictions:write']))
       .send([JURISDICTION1, JURISDICTION2])
       .expect(201)
-    test.object(result.body).hasProperty('version', JURISDICTION_API_DEFAULT_VERSION)
-    test.object(result.body.jurisdictions).hasProperty('length', 2)
-    test
-      .value(result.body.jurisdictions.map((jurisdiction: JurisdictionDomainModel) => jurisdiction.jurisdiction_id))
-      .is([JURISDICTION1.jurisdiction_id, JURISDICTION2.jurisdiction_id])
+    expect(result.body).toHaveProperty('version', JURISDICTION_API_DEFAULT_VERSION)
+    expect(result.body.jurisdictions as JurisdictionDomainModel[]).toHaveLength(2)
+    expect(
+      result.body.jurisdictions.map((jurisdiction: JurisdictionDomainModel) => jurisdiction.jurisdiction_id)
+    ).toEqual([JURISDICTION1.jurisdiction_id, JURISDICTION2.jurisdiction_id])
   })
 
   it('Update Single Jurisdiction (conflict error)', async () => {
@@ -115,9 +114,9 @@ describe('Test Jurisdiction API', () => {
       .set('Authorization', SCOPED_AUTH(['jurisdictions:write']))
       .send({ ...JURISDICTION1, agency_key: updated_agency_key })
       .expect(200)
-    test.object(result.body).hasProperty('version', JURISDICTION_API_DEFAULT_VERSION)
-    test.object(result.body.jurisdiction).hasProperty('jurisdiction_id', JURISDICTION1.jurisdiction_id)
-    test.object(result.body.jurisdiction).hasProperty('agency_key', updated_agency_key)
+    expect(result.body).toHaveProperty('version', JURISDICTION_API_DEFAULT_VERSION)
+    expect(result.body.jurisdiction).toHaveProperty('jurisdiction_id', JURISDICTION1.jurisdiction_id)
+    expect(result.body.jurisdiction).toHaveProperty('agency_key', updated_agency_key)
   })
 
   it('Get One Jurisdiction', async () => {
@@ -125,8 +124,8 @@ describe('Test Jurisdiction API', () => {
       .get(pathPrefix(`/jurisdictions/${JURISDICTION2.jurisdiction_id}`))
       .set('Authorization', SCOPED_AUTH(['jurisdictions:read']))
       .expect(200)
-    test.object(result.body).hasProperty('version', JURISDICTION_API_DEFAULT_VERSION)
-    test.object(result.body.jurisdiction).hasProperty('jurisdiction_id', JURISDICTION2.jurisdiction_id)
+    expect(result.body).toHaveProperty('version', JURISDICTION_API_DEFAULT_VERSION)
+    expect(result.body.jurisdiction).toHaveProperty('jurisdiction_id', JURISDICTION2.jurisdiction_id)
   })
 
   it('Get One Jurisdiction (no scope)', async () => {
@@ -145,8 +144,8 @@ describe('Test Jurisdiction API', () => {
       .get(pathPrefix(`/jurisdictions/${JURISDICTION2.jurisdiction_id}`))
       .set('Authorization', SCOPED_AUTH(['jurisdictions:read:claim'], JURISDICTION2.agency_key))
       .expect(200)
-    test.object(result.body).hasProperty('version', JURISDICTION_API_DEFAULT_VERSION)
-    test.object(result.body.jurisdiction).hasProperty('jurisdiction_id', JURISDICTION2.jurisdiction_id)
+    expect(result.body).toHaveProperty('version', JURISDICTION_API_DEFAULT_VERSION)
+    expect(result.body.jurisdiction).toHaveProperty('jurisdiction_id', JURISDICTION2.jurisdiction_id)
   })
 
   it('Get Multiple Jurisdictions', async () => {
@@ -154,18 +153,16 @@ describe('Test Jurisdiction API', () => {
       .get(pathPrefix('/jurisdictions'))
       .set('Authorization', SCOPED_AUTH(['jurisdictions:read']))
       .expect(200)
-    test.object(result.body).hasProperty('version', JURISDICTION_API_DEFAULT_VERSION)
-    test
-      .value(
-        (result.body.jurisdictions as JurisdictionDomainModel[])
-          .map(jurisdiction => jurisdiction.jurisdiction_id)
-          .filter(jurisdiction_id =>
-            [JURISDICTION0, JURISDICTION1, JURISDICTION2]
-              .map(jurisdiction => jurisdiction.jurisdiction_id)
-              .includes(jurisdiction_id)
-          ).length
-      )
-      .is(3)
+    expect(result.body).toHaveProperty('version', JURISDICTION_API_DEFAULT_VERSION)
+    expect(
+      (result.body.jurisdictions as JurisdictionDomainModel[])
+        .map(jurisdiction => jurisdiction.jurisdiction_id)
+        .filter(jurisdiction_id =>
+          [JURISDICTION0, JURISDICTION1, JURISDICTION2]
+            .map(jurisdiction => jurisdiction.jurisdiction_id)
+            .includes(jurisdiction_id)
+        )
+    ).toHaveLength(3)
   })
 
   it('Get Multiple Jurisdictions (no scope)', async () => {
@@ -177,8 +174,8 @@ describe('Test Jurisdiction API', () => {
       .get(pathPrefix('/jurisdictions'))
       .set('Authorization', SCOPED_AUTH(['jurisdictions:read:claim']))
       .expect(200)
-    test.object(result.body).hasProperty('version', JURISDICTION_API_DEFAULT_VERSION)
-    test.value((result.body.jurisdictions as JurisdictionDomainModel[]).length).is(0)
+    expect(result.body).toHaveProperty('version', JURISDICTION_API_DEFAULT_VERSION)
+    expect(result.body.jurisdictions as JurisdictionDomainModel[]).toHaveLength(0)
   })
 
   it('Get Multiple Jurisdictions (jurisdictions claim)', async () => {
@@ -186,8 +183,8 @@ describe('Test Jurisdiction API', () => {
       .get(pathPrefix('/jurisdictions'))
       .set('Authorization', SCOPED_AUTH(['jurisdictions:read:claim'], JURISDICTION2.agency_key))
       .expect(200)
-    test.object(result.body).hasProperty('version', JURISDICTION_API_DEFAULT_VERSION)
-    test.value((result.body.jurisdictions as JurisdictionDomainModel[]).length).is(1)
+    expect(result.body).toHaveProperty('version', JURISDICTION_API_DEFAULT_VERSION)
+    expect(result.body.jurisdictions).toHaveLength(1)
   })
 
   it('Delete One Jurisdiction', async () => {
@@ -195,7 +192,7 @@ describe('Test Jurisdiction API', () => {
       .delete(pathPrefix(`/jurisdictions/${JURISDICTION1.jurisdiction_id}`))
       .set('Authorization', SCOPED_AUTH(['jurisdictions:write']))
       .expect(200)
-    test.object(result.body).hasProperty('jurisdiction_id', JURISDICTION1.jurisdiction_id)
+    expect(result.body).toHaveProperty('jurisdiction_id', JURISDICTION1.jurisdiction_id)
   })
 
   it('Delete One Jurisdiction (not found)', async () => {
@@ -212,7 +209,7 @@ describe('Test Jurisdiction API', () => {
       .expect(404)
   })
 
-  after(async () => {
+  afterAll(async () => {
     await JurisdictionServer.stop()
   })
 })

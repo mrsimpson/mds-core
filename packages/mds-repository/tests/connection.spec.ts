@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import test from 'unit.js'
 import { ConnectionManager } from '../connection'
 
 const TEST_REPOSITORY_NAME = 'test-repository'
@@ -24,17 +23,17 @@ const manager = new ConnectionManager(TEST_REPOSITORY_NAME)
 describe('Test Connections', () => {
   it('Create R/W Connection', async () => {
     const rw = await manager.connect('rw')
-    test.value(rw.name).startsWith(`${TEST_REPOSITORY_NAME}-rw`)
-    test.value(rw.isConnected).is(true)
+    expect(rw.name).toMatch(new RegExp(`^${TEST_REPOSITORY_NAME}-rw.*$`))
+    expect(rw.isConnected).toEqual(true)
     await manager.disconnect('rw')
-    test.value(rw.isConnected).is(false)
+    expect(rw.isConnected).toEqual(false)
   })
 
   it('Create R/O Connection', async () => {
     const ro = await manager.connect('ro')
-    test.value(ro.name).startsWith(`${TEST_REPOSITORY_NAME}-ro`)
-    test.value(ro.isConnected).is(true)
+    expect(ro.name).toMatch(new RegExp(`^${TEST_REPOSITORY_NAME}-ro.*$`))
+    expect(ro.isConnected).toEqual(true)
     await manager.disconnect('ro')
-    test.value(ro.isConnected).is(false)
+    expect(ro.isConnected).toEqual(false)
   })
 })
