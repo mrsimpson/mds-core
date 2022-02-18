@@ -1,5 +1,17 @@
 # @mds-core/mds-db
 
+## 0.6.2
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+- Updated dependencies [2637f1cc]
+  - @mds-core/mds-attachment-service@0.5.12
+  - @mds-core/mds-audit-service@0.5.12
+  - @mds-core/mds-geography-service@0.10.8
+  - @mds-core/mds-ingest-service@0.9.13
+  - @mds-core/mds-policy-service@0.11.14
+
 ## 0.6.1
 
 ### Patch Changes

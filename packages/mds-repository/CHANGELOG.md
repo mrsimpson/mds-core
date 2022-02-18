@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.1.39
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+
 ## 0.1.38
 
 ### Patch Changes

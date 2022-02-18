@@ -1,5 +1,12 @@
 # @container-images/mds-compliance-api
 
+## 0.1.82
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+  - @mds-core/mds-compliance-api@0.4.21
+
 ## 0.1.81
 
 ### Patch Changes

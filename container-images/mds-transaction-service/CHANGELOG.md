@@ -1,5 +1,13 @@
 # @container-images/mds-transaction-service
 
+## 0.0.47
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+- Updated dependencies [2637f1cc]
+  - @mds-core/mds-transaction-service@0.6.10
+
 ## 0.0.46
 
 ### Patch Changes
