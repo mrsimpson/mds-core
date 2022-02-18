@@ -1,5 +1,16 @@
 # @mds-core/mds-db
 
+## 0.6.1
+
+### Patch Changes
+
+- bc8f0a04: Switch tests from Mocha to Jest
+  - @mds-core/mds-attachment-service@0.5.11
+  - @mds-core/mds-audit-service@0.5.11
+  - @mds-core/mds-geography-service@0.10.7
+  - @mds-core/mds-ingest-service@0.9.12
+  - @mds-core/mds-policy-service@0.11.13
+
 ## 0.6.0
 
 ### Minor Changes
