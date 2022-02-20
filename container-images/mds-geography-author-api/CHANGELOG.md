@@ -1,5 +1,55 @@
 # @container-images/mds-geography-author-api
 
+## 0.0.58
+
+### Patch Changes
+
+- @mds-core/mds-geography-author-api@0.4.11
+
+## 0.0.57
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+  - @mds-core/mds-geography-author-api@0.4.10
+
+## 0.0.56
+
+### Patch Changes
+
+- @mds-core/mds-geography-author-api@0.4.9
+
+## 0.0.55
+
+### Patch Changes
+
+- @mds-core/mds-geography-author-api@0.4.8
+
+## 0.0.54
+
+### Patch Changes
+
+- @mds-core/mds-geography-author-api@0.4.7
+
+## 0.0.53
+
+### Patch Changes
+
+- @mds-core/mds-geography-author-api@0.4.6
+
+## 0.0.52
+
+### Patch Changes
+
+- @mds-core/mds-geography-author-api@0.4.5
+
+## 0.0.51
+
+### Patch Changes
+
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-geography-author-api@0.4.4
+
 ## 0.0.50
 
 ### Patch Changes

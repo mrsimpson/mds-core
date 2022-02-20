@@ -1,5 +1,62 @@
 # @container-images/mds-ingest-service
 
+## 0.0.54
+
+### Patch Changes
+
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-ingest-service@0.9.14
+
+## 0.0.53
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+- Updated dependencies [2637f1cc]
+  - @mds-core/mds-ingest-service@0.9.13
+
+## 0.0.52
+
+### Patch Changes
+
+- @mds-core/mds-ingest-service@0.9.12
+
+## 0.0.51
+
+### Patch Changes
+
+- Updated dependencies [ff4ccab5]
+  - @mds-core/mds-ingest-service@0.9.11
+
+## 0.0.50
+
+### Patch Changes
+
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-ingest-service@0.9.10
+
+## 0.0.49
+
+### Patch Changes
+
+- Updated dependencies [e9b227c2]
+  - @mds-core/mds-ingest-service@0.9.9
+
+## 0.0.48
+
+### Patch Changes
+
+- Updated dependencies [49110532]
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-ingest-service@0.9.8
+
+## 0.0.47
+
+### Patch Changes
+
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-ingest-service@0.9.7
+
 ## 0.0.46
 
 ### Patch Changes

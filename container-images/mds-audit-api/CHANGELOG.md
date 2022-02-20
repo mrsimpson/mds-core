@@ -1,5 +1,56 @@
 # @container-images/mds-audit-api
 
+## 0.1.84
+
+### Patch Changes
+
+- @mds-core/mds-audit-api@0.3.20
+
+## 0.1.83
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+  - @mds-core/mds-audit-api@0.3.19
+
+## 0.1.82
+
+### Patch Changes
+
+- @mds-core/mds-audit-api@0.3.18
+
+## 0.1.81
+
+### Patch Changes
+
+- Updated dependencies [ff4ccab5]
+  - @mds-core/mds-audit-api@0.3.17
+
+## 0.1.80
+
+### Patch Changes
+
+- @mds-core/mds-audit-api@0.3.16
+
+## 0.1.79
+
+### Patch Changes
+
+- @mds-core/mds-audit-api@0.3.15
+
+## 0.1.78
+
+### Patch Changes
+
+- @mds-core/mds-audit-api@0.3.14
+
+## 0.1.77
+
+### Patch Changes
+
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-audit-api@0.3.13
+
 ## 0.1.76
 
 ### Patch Changes

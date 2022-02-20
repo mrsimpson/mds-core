@@ -1,5 +1,53 @@
 # @mds-core/mds-repository
 
+## 0.1.40
+
+### Patch Changes
+
+- d98d5693: Cleanup and refactor repository types
+
+## 0.1.39
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+
+## 0.1.38
+
+### Patch Changes
+
+- bc8f0a04: Switch tests from Mocha to Jest
+- a942d36c: Add some new transformers/decorators and remove some unused filters from mds-repository
+
+## 0.1.37
+
+### Patch Changes
+
+- 6f834fe4: Rename database function to mds_epoch_ms()
+
+## 0.1.36
+
+### Patch Changes
+
+- ad3fb707: Don't index the id column when it's part of the PK
+- e9b227c2: Use a function for setting recorded column default
+
+## 0.1.35
+
+### Patch Changes
+
+- 49110532: Add DesignType decorator to Recorded column class
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-utils@0.4.0
+
+## 0.1.34
+
+### Patch Changes
+
+- ca45bfaf: Rework ModelMapper type
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-providers@0.2.7
+
 ## 0.1.33
 
 ### Patch Changes

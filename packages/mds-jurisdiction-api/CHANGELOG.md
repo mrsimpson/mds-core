@@ -1,5 +1,76 @@
 # @mds-core/mds-jurisdiction-api
 
+## 0.1.57
+
+### Patch Changes
+
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-jurisdiction-service@0.5.13
+  - @mds-core/mds-api-helpers@0.2.11
+
+## 0.1.56
+
+### Patch Changes
+
+- Updated dependencies [2637f1cc]
+  - @mds-core/mds-jurisdiction-service@0.5.12
+  - @mds-core/mds-api-helpers@0.2.10
+
+## 0.1.55
+
+### Patch Changes
+
+- bc8f0a04: Switch tests from Mocha to Jest
+- Updated dependencies [bc8f0a04]
+  - @mds-core/mds-service-helpers@0.6.4
+  - @mds-core/mds-api-helpers@0.2.9
+  - @mds-core/mds-jurisdiction-service@0.5.11
+  - @mds-core/mds-api-server@0.4.6
+
+## 0.1.54
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.2.8
+
+## 0.1.53
+
+### Patch Changes
+
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-jurisdiction-service@0.5.10
+  - @mds-core/mds-api-helpers@0.2.7
+
+## 0.1.52
+
+### Patch Changes
+
+- Updated dependencies [b3f25823]
+- Updated dependencies [896e4925]
+- Updated dependencies [e9b227c2]
+  - @mds-core/mds-api-helpers@0.2.6
+  - @mds-core/mds-api-server@0.4.5
+  - @mds-core/mds-jurisdiction-service@0.5.9
+
+## 0.1.51
+
+### Patch Changes
+
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-jurisdiction-service@0.5.8
+  - @mds-core/mds-api-helpers@0.2.5
+  - @mds-core/mds-api-server@0.4.4
+  - @mds-core/mds-service-helpers@0.6.3
+
+## 0.1.50
+
+### Patch Changes
+
+- @mds-core/mds-jurisdiction-service@0.5.7
+- @mds-core/mds-api-server@0.4.3
+- @mds-core/mds-api-helpers@0.2.4
+
 ## 0.1.49
 
 ### Patch Changes

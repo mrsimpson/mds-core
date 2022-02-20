@@ -22,7 +22,7 @@ import {
   RepositoryError
 } from '@mds-core/mds-repository'
 import { Device, Nullable, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { head, isUUID, tail, testEnvSafeguard, ValidationError, zip } from '@mds-core/mds-utils'
+import { head, isDefined, isUUID, tail, testEnvSafeguard, ValidationError, zip } from '@mds-core/mds-utils'
 import { Any, SelectQueryBuilder } from 'typeorm'
 import { buildPaginator, Cursor, PagingResult } from 'typeorm-cursor-pagination'
 import {
@@ -32,6 +32,7 @@ import {
   EventAnnotationDomainModel,
   EventDomainCreateModel,
   EventDomainModel,
+  GetDeviceOptions,
   GetDevicesOptions,
   GetDevicesResponse,
   GetEventsWithDeviceAndTelemetryInfoOptions,
@@ -40,6 +41,7 @@ import {
   GetVehicleEventsOrderOption,
   GetVehicleEventsResponse,
   MigratedEventDomainModel,
+  ReadDeviceEventsQueryParams,
   ReadTripEventsQueryParams,
   TelemetryDomainCreateModel,
   TelemetryDomainModel
@@ -189,14 +191,42 @@ class IngestReadWriteRepository extends ReadWriteRepository {
     }
   }
 
+  public getDevice = async (options: GetDeviceOptions): Promise<DeviceDomainModel | undefined> => {
+    try {
+      const { device_id, provider_id } = options
+      const connection = await this.connect('ro')
+      const query = connection
+        .getRepository(DeviceEntity)
+        .createQueryBuilder('devices')
+        .where('"device_id" = :device_id', { device_id })
+
+      if (provider_id) {
+        query.andWhere('"provider_id" = :provider_id', { provider_id })
+      }
+
+      const entity = await query.getOne()
+      if (isDefined(entity)) {
+        return DeviceEntityToDomain.map(entity)
+      }
+      return entity
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
   private getDevicesQuery = async ({
     limit = 100,
+    provider_id,
     beforeCursor,
     afterCursor
   }: WithCursorOptions<GetDevicesOptions>): Promise<GetDevicesResponse> => {
     try {
       const connection = await this.connect('ro')
       const query = connection.createQueryBuilder(DeviceEntity, 'device')
+      if (isDefined(provider_id)) {
+        query.where('device.provider_id = :provider_id', { provider_id })
+      }
+
       const pager = buildPaginator({
         entity: DeviceEntity,
         alias: 'device',
@@ -491,6 +521,47 @@ class IngestReadWriteRepository extends ReadWriteRepository {
       return entities.reduce<Record<UUID, EventDomainModel[]>>((acc, { trip_id, events }) => {
         const mappedEvents = events.map(EventEntityToDomain.map)
         return Object.assign(acc, { [trip_id]: mappedEvents })
+      }, {})
+    } catch (error) {
+      throw RepositoryError(error)
+    }
+  }
+
+  public getDeviceEvents = async (params: ReadDeviceEventsQueryParams) => {
+    const { skip, take = 100, start_time, end_time, provider_id } = params
+    try {
+      const connection = await this.connect('rw')
+
+      const bigQuery = connection
+        .createQueryBuilder()
+        .select('et.device_id, array_agg(row_to_json(et.*) ORDER BY et.timestamp) AS events')
+        .from(qb => {
+          /**
+           * JOIN events and telemetry
+           */
+          qb.select('e.*, to_json(t.*) AS telemetry')
+            .from('events', 'e')
+            .innerJoin('telemetry', 't', `e.device_id = t.device_id AND e.telemetry_timestamp = t.timestamp`)
+
+          /**
+           * Add query filters
+           */
+          if (start_time) qb.where('e.timestamp >= :start_time', { start_time })
+          if (end_time) qb.andWhere('e.timestamp <= :end_time', { end_time })
+          if (provider_id) qb.andWhere('e.provider_id = :provider_id', { provider_id })
+          if (skip) qb.andWhere('e.device_id > :skip', { skip })
+
+          return qb
+        }, 'et')
+        .groupBy('et.device_id')
+        .orderBy('et.device_id')
+        .limit(take)
+
+      const entities: { device_id: UUID; events: EventEntity[] }[] = await bigQuery.execute()
+
+      return entities.reduce<Record<UUID, EventDomainModel[]>>((acc, { device_id, events }) => {
+        const mappedEvents = events.map(EventEntityToDomain.map)
+        return Object.assign(acc, { [device_id]: mappedEvents })
       }, {})
     } catch (error) {
       throw RepositoryError(error)

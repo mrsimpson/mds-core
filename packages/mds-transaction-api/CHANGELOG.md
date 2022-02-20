@@ -1,5 +1,83 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.20
+
+### Patch Changes
+
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-transaction-service@0.6.11
+  - @mds-core/mds-api-helpers@0.2.11
+
+## 0.2.19
+
+### Patch Changes
+
+- Updated dependencies [2637f1cc]
+- Updated dependencies [fc42c45a]
+  - @mds-core/mds-transaction-service@0.6.10
+  - @mds-core/mds-schema-validators@0.5.4
+  - @mds-core/mds-api-helpers@0.2.10
+
+## 0.2.18
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+  - @mds-core/mds-service-helpers@0.6.4
+  - @mds-core/mds-api-helpers@0.2.9
+  - @mds-core/mds-transaction-service@0.6.9
+  - @mds-core/mds-api-server@0.4.6
+
+## 0.2.17
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.2.8
+- @mds-core/mds-transaction-service@0.6.8
+
+## 0.2.16
+
+### Patch Changes
+
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-transaction-service@0.6.7
+  - @mds-core/mds-api-helpers@0.2.7
+
+## 0.2.15
+
+### Patch Changes
+
+- b3f25823: Add csv support to get transactions in new endpoint, put code supporting it in api-helpers for reuse
+- Updated dependencies [b3f25823]
+- Updated dependencies [896e4925]
+- Updated dependencies [e9b227c2]
+  - @mds-core/mds-api-helpers@0.2.6
+  - @mds-core/mds-api-server@0.4.5
+  - @mds-core/mds-transaction-service@0.6.6
+
+## 0.2.14
+
+### Patch Changes
+
+- Updated dependencies [49110532]
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-transaction-service@0.6.5
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-api-helpers@0.2.5
+  - @mds-core/mds-api-server@0.4.4
+  - @mds-core/mds-schema-validators@0.5.3
+  - @mds-core/mds-service-helpers@0.6.3
+
+## 0.2.13
+
+### Patch Changes
+
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-transaction-service@0.6.4
+  - @mds-core/mds-api-server@0.4.3
+  - @mds-core/mds-api-helpers@0.2.4
+
 ## 0.2.12
 
 ### Patch Changes

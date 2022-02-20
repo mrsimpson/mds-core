@@ -1,5 +1,68 @@
 # @mds-core/mds-api-helpers
 
+## 0.2.11
+
+### Patch Changes
+
+- @mds-core/mds-db@0.6.3
+
+## 0.2.10
+
+### Patch Changes
+
+- Updated dependencies [2637f1cc]
+  - @mds-core/mds-db@0.6.2
+  - @mds-core/mds-agency-cache@0.4.17
+
+## 0.2.9
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+  - @mds-core/mds-db@0.6.1
+  - @mds-core/mds-api-server@0.4.6
+
+## 0.2.8
+
+### Patch Changes
+
+- Updated dependencies [ff4ccab5]
+  - @mds-core/mds-db@0.6.0
+
+## 0.2.7
+
+### Patch Changes
+
+- @mds-core/mds-db@0.5.6
+
+## 0.2.6
+
+### Patch Changes
+
+- b3f25823: Add csv support to get transactions in new endpoint, put code supporting it in api-helpers for reuse
+- 896e4925: converts test suites from mocha to jest
+- Updated dependencies [896e4925]
+  - @mds-core/mds-api-server@0.4.5
+  - @mds-core/mds-db@0.5.5
+
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-db@0.5.4
+  - @mds-core/mds-agency-cache@0.4.16
+  - @mds-core/mds-api-server@0.4.4
+
+## 0.2.4
+
+### Patch Changes
+
+- @mds-core/mds-api-server@0.4.3
+- @mds-core/mds-db@0.5.3
+- @mds-core/mds-agency-cache@0.4.15
+
 ## 0.2.3
 
 ### Patch Changes

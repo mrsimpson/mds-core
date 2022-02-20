@@ -27,6 +27,7 @@ export const IngestServiceManager = RpcServer<IngestService & IngestMigrationSer
   },
   {
     getDevicesUsingOptions: (args, context) => IngestServiceProvider.getDevicesUsingOptions(context, ...args),
+    getDevice: (args, context) => IngestServiceProvider.getDevice(context, ...args),
     getDevicesUsingCursor: (args, context) => IngestServiceProvider.getDevicesUsingCursor(context, ...args),
     getEventsUsingOptions: (args, context) => IngestServiceProvider.getEventsUsingOptions(context, ...args),
     getEventsUsingCursor: (args, context) => IngestServiceProvider.getEventsUsingCursor(context, ...args),
@@ -42,7 +43,8 @@ export const IngestServiceManager = RpcServer<IngestService & IngestMigrationSer
     getEventsWithDeviceAndTelemetryInfoUsingOptions: (args, context) =>
       IngestServiceProvider.getEventsWithDeviceAndTelemetryInfoUsingOptions(context, ...args),
     getEventsWithDeviceAndTelemetryInfoUsingCursor: (args, context) =>
-      IngestServiceProvider.getEventsWithDeviceAndTelemetryInfoUsingCursor(context, ...args)
+      IngestServiceProvider.getEventsWithDeviceAndTelemetryInfoUsingCursor(context, ...args),
+    getDeviceEvents: (args, context) => IngestServiceProvider.getDeviceEvents(context, ...args)
   },
   {
     port: process.env.INGEST_SERVICE_RPC_PORT,

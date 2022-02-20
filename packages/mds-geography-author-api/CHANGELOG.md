@@ -1,5 +1,79 @@
 # @mds-core/mds-geography-author-api
 
+## 0.4.11
+
+### Patch Changes
+
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-geography-service@0.10.9
+  - @mds-core/mds-api-helpers@0.2.11
+
+## 0.4.10
+
+### Patch Changes
+
+- Updated dependencies [2637f1cc]
+- Updated dependencies [fc42c45a]
+  - @mds-core/mds-geography-service@0.10.8
+  - @mds-core/mds-schema-validators@0.5.4
+  - @mds-core/mds-api-helpers@0.2.10
+
+## 0.4.9
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+  - @mds-core/mds-service-helpers@0.6.4
+  - @mds-core/mds-api-helpers@0.2.9
+  - @mds-core/mds-geography-service@0.10.7
+  - @mds-core/mds-api-server@0.4.6
+
+## 0.4.8
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.2.8
+
+## 0.4.7
+
+### Patch Changes
+
+- @mds-core/mds-geography-service@0.10.6
+- @mds-core/mds-api-helpers@0.2.7
+
+## 0.4.6
+
+### Patch Changes
+
+- Updated dependencies [b3f25823]
+- Updated dependencies [896e4925]
+  - @mds-core/mds-api-helpers@0.2.6
+  - @mds-core/mds-api-server@0.4.5
+  - @mds-core/mds-geography-service@0.10.5
+
+## 0.4.5
+
+### Patch Changes
+
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-geography-service@0.10.4
+  - @mds-core/mds-api-helpers@0.2.5
+  - @mds-core/mds-api-server@0.4.4
+  - @mds-core/mds-schema-validators@0.5.3
+  - @mds-core/mds-service-helpers@0.6.3
+
+## 0.4.4
+
+### Patch Changes
+
+- 7b061ba5: Making calls to mds-provider async as preparation for migrating the static providers list in mds-providers to a database
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-geography-service@0.10.3
+  - @mds-core/mds-api-server@0.4.3
+  - @mds-core/mds-api-helpers@0.2.4
+
 ## 0.4.3
 
 ### Patch Changes

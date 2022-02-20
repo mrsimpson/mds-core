@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import test from 'unit.js'
 import { Enum, isEnum } from '../index'
 
 const values = ['one', 'two', 'three']
@@ -22,34 +21,28 @@ const values = ['one', 'two', 'three']
 const numbers = Enum(...values)
 
 describe('Tests Enums', () => {
-  it('Verifies valid enum values', done => {
-    test.value(values.reduce((isValid, value) => isValid && isEnum(numbers, value), true)).is(true)
-    test.value(Object.keys(numbers).reduce((isValid, value) => isValid && isEnum(numbers, value), true)).is(true)
-    done()
+  it('Verifies valid enum values', async () => {
+    expect(values.reduce((isValid, value) => isValid && isEnum(numbers, value), true)).toBe(true)
+    expect(Object.keys(numbers).reduce((isValid, value) => isValid && isEnum(numbers, value), true)).toBe(true)
   })
 
-  it('Verifies missing enum value', done => {
-    test.value(isEnum(numbers, 'four')).is(false)
-    done()
+  it('Verifies missing enum value', async () => {
+    expect(isEnum(numbers, 'four')).toBe(false)
   })
 
-  it('Verifies invalid numeric enum value', done => {
-    test.value(isEnum(numbers, 4)).is(false)
-    done()
+  it('Verifies invalid numeric enum value', async () => {
+    expect(isEnum(numbers, 4)).toBe(false)
   })
 
-  it('Verifies invalid null enum value', done => {
-    test.value(isEnum(numbers, null)).is(false)
-    done()
+  it('Verifies invalid null enum value', async () => {
+    expect(isEnum(numbers, null)).toBe(false)
   })
 
-  it('Verifies invalid undefined enum value', done => {
-    test.value(isEnum(numbers, undefined)).is(false)
-    done()
+  it('Verifies invalid undefined enum value', async () => {
+    expect(isEnum(numbers, undefined)).toBe(false)
   })
 
-  it('Verifies invalid object enum value', done => {
-    test.value(isEnum(numbers, { one: 'one' })).is(false)
-    done()
+  it('Verifies invalid object enum value', async () => {
+    expect(isEnum(numbers, { one: 'one' })).toBe(false)
   })
 })

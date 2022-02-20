@@ -1,5 +1,89 @@
 # @mds-core/mds-policy-service
 
+## 0.11.15
+
+### Patch Changes
+
+- d98d5693: Cleanup and refactor repository types
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-geography-service@0.10.9
+  - @mds-core/mds-repository@0.1.40
+
+## 0.11.14
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+- Updated dependencies [35ff786d]
+- Updated dependencies [2637f1cc]
+- Updated dependencies [fc42c45a]
+  - @mds-core/mds-rpc-common@0.3.11
+  - @mds-core/mds-geography-service@0.10.8
+  - @mds-core/mds-repository@0.1.39
+  - @mds-core/mds-schema-validators@0.5.4
+
+## 0.11.13
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+- Updated dependencies [a942d36c]
+  - @mds-core/mds-repository@0.1.38
+  - @mds-core/mds-service-helpers@0.6.4
+  - @mds-core/mds-geography-service@0.10.7
+  - @mds-core/mds-rpc-common@0.3.10
+
+## 0.11.12
+
+### Patch Changes
+
+- ff4ccab5: Removing mds-db.readDevice and updating references to it to call the ingest service instead
+
+## 0.11.11
+
+### Patch Changes
+
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-repository@0.1.37
+  - @mds-core/mds-geography-service@0.10.6
+
+## 0.11.10
+
+### Patch Changes
+
+- 8de42ab6: Make Policy Service Kafka writes optional. They now depend on the presence of the KAFKA_HOST environment variable.
+- Updated dependencies [ad3fb707]
+- Updated dependencies [e9b227c2]
+  - @mds-core/mds-repository@0.1.36
+  - @mds-core/mds-geography-service@0.10.5
+  - @mds-core/mds-rpc-common@0.3.9
+
+## 0.11.9
+
+### Patch Changes
+
+- Updated dependencies [49110532]
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-repository@0.1.35
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-geography-service@0.10.4
+  - @mds-core/mds-rpc-common@0.3.8
+  - @mds-core/mds-schema-validators@0.5.3
+  - @mds-core/mds-service-helpers@0.6.3
+  - @mds-core/mds-stream@0.2.9
+
+## 0.11.8
+
+### Patch Changes
+
+- Updated dependencies [ca45bfaf]
+- Updated dependencies [7b061ba5]
+- Updated dependencies [ca45bfaf]
+  - @mds-core/mds-repository@0.1.34
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-rpc-common@0.3.7
+  - @mds-core/mds-geography-service@0.10.3
+
 ## 0.11.7
 
 ### Patch Changes

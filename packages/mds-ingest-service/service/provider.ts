@@ -27,6 +27,7 @@ import { MigratedEntityModel } from '../repository/mixins/migrated-entity'
 import {
   validateEventAnnotationDomainCreateModel,
   validateEventDomainCreateModel,
+  validateGetDeviceOptions,
   validateGetDevicesOptions,
   validateGetEventsWithDeviceAndTelemetryInfoOptions,
   validateGetVehicleEventsFilterParams,
@@ -76,6 +77,16 @@ export const IngestServiceProvider: ServiceProvider<
     } catch (error) {
       const exception = ServiceException('Error in getDevicesUsingOptions', error)
       IngestServiceLogger.error('getDevicesUsingOptions exception', { exception, error })
+      return exception
+    }
+  },
+
+  getDevice: async (context, options) => {
+    try {
+      return ServiceResult(await IngestRepository.getDevice(validateGetDeviceOptions(options)))
+    } catch (error) {
+      const exception = ServiceException('Error in getDevice', error)
+      IngestServiceLogger.error('getDevice exception', { exception, error })
       return exception
     }
   },
@@ -277,6 +288,16 @@ export const IngestServiceProvider: ServiceProvider<
     } catch (error) {
       const exception = ServiceException('Error in getEventsWithDeviceAndTelemetryInfoUsingCursor', error)
       IngestServiceLogger.error('getEventsWithDeviceAndTelemetryInfoUsingCursor exception', { exception, error })
+      return exception
+    }
+  },
+
+  getDeviceEvents: async (context, options) => {
+    try {
+      return ServiceResult(await IngestRepository.getDeviceEvents(options))
+    } catch (error) {
+      const exception = ServiceException('Error in getDeviceEvents', error)
+      IngestServiceLogger.error('getDeviceEvents exception', { exception, error })
       return exception
     }
   }

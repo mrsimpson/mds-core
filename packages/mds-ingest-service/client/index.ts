@@ -32,6 +32,7 @@ export const IngestServiceClientFactory = (
 
   return {
     getDevicesUsingOptions: (...args) => RpcRequest(options, IngestServiceRpcClient.getDevicesUsingOptions, args),
+    getDevice: (...args) => RpcRequest(options, IngestServiceRpcClient.getDevice, args),
     getDevicesUsingCursor: (...args) => RpcRequest(options, IngestServiceRpcClient.getDevicesUsingCursor, args),
     getEventsUsingOptions: (...args) =>
       process.env.ENABLE_RPC === 'true'
@@ -56,7 +57,11 @@ export const IngestServiceClientFactory = (
     getEventsWithDeviceAndTelemetryInfoUsingOptions: (...args) =>
       RpcRequest(options, IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingOptions, args),
     getEventsWithDeviceAndTelemetryInfoUsingCursor: (...args) =>
-      RpcRequest(options, IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingCursor, args)
+      RpcRequest(options, IngestServiceRpcClient.getEventsWithDeviceAndTelemetryInfoUsingCursor, args),
+    getDeviceEvents: (...args) =>
+      process.env.ENABLE_RPC === 'true'
+        ? RpcRequest(options, IngestServiceRpcClient.getDeviceEvents, args)
+        : UnwrapServiceResult(IngestServiceProvider.getDeviceEvents)(context, ...args)
   }
 }
 

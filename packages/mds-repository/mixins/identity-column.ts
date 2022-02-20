@@ -20,8 +20,31 @@ import { ColumnCommonOptions } from 'typeorm/decorator/options/ColumnCommonOptio
 import { ColumnWithWidthOptions } from 'typeorm/decorator/options/ColumnWithWidthOptions'
 import { BigintTransformer } from '../transformers'
 
-export interface IdentityColumn {
-  id: number
+export type IdentityColumn = { id: number }
+
+export type IdentityColumnCreateModel<T> = T extends IdentityColumn ? Omit<T, keyof IdentityColumn> : T
+
+// Property decorator to emit GENERATED ALWAYS AS IDENTITY
+const GeneratedAlwaysAsIdentity = (
+  options: Omit<
+    ColumnWithWidthOptions & ColumnCommonOptions,
+    'type' | 'generated' | 'generatedIdentity' | 'insert' | 'transformer'
+  > = {}
+): PropertyDecorator => {
+  return (target, propertyKey) => {
+    Column({
+      type: 'bigint',
+      generated: 'identity',
+      generatedIdentity: 'ALWAYS',
+      insert: false,
+      transformer: BigintTransformer,
+      ...options
+    })(target, propertyKey)
+    // Only generate a unique index on the column when it's not part of the entity's primary key
+    if (!options.primary) {
+      Index({ unique: true })(target, propertyKey)
+    }
+  }
 }
 
 export const IdentityColumn = <T extends AnyConstructor>(
@@ -29,8 +52,7 @@ export const IdentityColumn = <T extends AnyConstructor>(
   options: ColumnWithWidthOptions & ColumnCommonOptions = {}
 ) => {
   abstract class IdentityColumnMixin extends EntityClass implements IdentityColumn {
-    @Column({ type: 'bigint', generated: 'identity', insert: false, transformer: BigintTransformer, ...options })
-    @Index({ unique: true })
+    @GeneratedAlwaysAsIdentity(options)
     id: number
   }
   return IdentityColumnMixin

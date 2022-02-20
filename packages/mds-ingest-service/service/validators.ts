@@ -32,6 +32,7 @@ import {
   EventAnnotationDomainModel,
   EventDomainCreateModel,
   EventDomainModel,
+  GetDeviceOptions,
   GetDevicesOptions,
   GetEventsWithDeviceAndTelemetryInfoOptions,
   GetVehicleEventsFilterParams,
@@ -47,6 +48,13 @@ const timestampSchema = <const>{
   type: 'integer',
   minimum: 100_000_000_000,
   maximum: 99_999_999_999_999
+}
+
+const nullableUUID = <const>{
+  type: 'string',
+  format: 'uuid',
+  nullable: true,
+  default: null
 }
 
 const nullableInteger = <const>{
@@ -67,7 +75,18 @@ const nullableString = <const>{ type: 'string', nullable: true, default: null }
 export const { validate: validateGetDevicesOptions } = SchemaValidator<GetDevicesOptions>({
   type: 'object',
   properties: {
-    limit: { type: 'integer', nullable: true, default: null }
+    limit: { type: 'integer', nullable: true, default: null },
+    provider_id: nullableUUID
+  },
+  additionalProperties: false,
+  required: []
+})
+
+export const { validate: validateGetDeviceOptions } = SchemaValidator<GetDeviceOptions>({
+  type: 'object',
+  properties: {
+    device_id: uuidSchema,
+    provider_id: nullableUUID
   },
   additionalProperties: false,
   required: []

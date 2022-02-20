@@ -1,5 +1,55 @@
 # @container-images/mds-policy
 
+## 0.1.56
+
+### Patch Changes
+
+- @mds-core/mds-policy@0.7.20
+
+## 0.1.55
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+  - @mds-core/mds-policy@0.7.19
+
+## 0.1.54
+
+### Patch Changes
+
+- @mds-core/mds-policy@0.7.18
+
+## 0.1.53
+
+### Patch Changes
+
+- @mds-core/mds-policy@0.7.17
+
+## 0.1.52
+
+### Patch Changes
+
+- @mds-core/mds-policy@0.7.16
+
+## 0.1.51
+
+### Patch Changes
+
+- @mds-core/mds-policy@0.7.15
+
+## 0.1.50
+
+### Patch Changes
+
+- @mds-core/mds-policy@0.7.14
+
+## 0.1.49
+
+### Patch Changes
+
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-policy@0.7.13
+
 ## 0.1.48
 
 ### Patch Changes

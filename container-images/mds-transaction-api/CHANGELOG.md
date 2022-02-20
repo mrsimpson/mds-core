@@ -1,5 +1,55 @@
 # @container-images/mds-transaction-api
 
+## 0.0.58
+
+### Patch Changes
+
+- @mds-core/mds-transaction-api@0.2.20
+
+## 0.0.57
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+  - @mds-core/mds-transaction-api@0.2.19
+
+## 0.0.56
+
+### Patch Changes
+
+- @mds-core/mds-transaction-api@0.2.18
+
+## 0.0.55
+
+### Patch Changes
+
+- @mds-core/mds-transaction-api@0.2.17
+
+## 0.0.54
+
+### Patch Changes
+
+- @mds-core/mds-transaction-api@0.2.16
+
+## 0.0.53
+
+### Patch Changes
+
+- Updated dependencies [b3f25823]
+  - @mds-core/mds-transaction-api@0.2.15
+
+## 0.0.52
+
+### Patch Changes
+
+- @mds-core/mds-transaction-api@0.2.14
+
+## 0.0.51
+
+### Patch Changes
+
+- @mds-core/mds-transaction-api@0.2.13
+
 ## 0.0.50
 
 ### Patch Changes

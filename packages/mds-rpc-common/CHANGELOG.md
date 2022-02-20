@@ -1,5 +1,42 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.11
+
+### Patch Changes
+
+- 35ff786d: Support running multiple RPC services under the same host/manager
+
+## 0.3.10
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+  - @mds-core/mds-service-helpers@0.6.4
+  - @mds-core/mds-api-server@0.4.6
+
+## 0.3.9
+
+### Patch Changes
+
+- Updated dependencies [896e4925]
+  - @mds-core/mds-api-server@0.4.5
+
+## 0.3.8
+
+### Patch Changes
+
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-api-server@0.4.4
+  - @mds-core/mds-service-helpers@0.6.3
+
+## 0.3.7
+
+### Patch Changes
+
+- ca45bfaf: Remove RpcServer type
+  - @mds-core/mds-api-server@0.4.3
+
 ## 0.3.6
 
 ### Patch Changes

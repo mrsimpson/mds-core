@@ -17,7 +17,11 @@
 import { asJsonApiLinks, parsePagingQueryParams, parseRequest } from '@mds-core/mds-api-helpers'
 import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import { TelemetryDomainModel, validateTelemetryDomainCreateModel } from '@mds-core/mds-ingest-service'
+import {
+  IngestServiceClient,
+  TelemetryDomainModel,
+  validateTelemetryDomainCreateModel
+} from '@mds-core/mds-ingest-service'
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import { ValidationError } from '@mds-core/mds-schema-validators'
 import { isError } from '@mds-core/mds-service-helpers'
@@ -50,7 +54,6 @@ import {
   readAudit,
   readAuditEvents,
   readAudits,
-  readDevice,
   readEvents,
   readTelemetry,
   withGpsProperty,
@@ -203,7 +206,7 @@ function api(app: express.Express): express.Express {
           // Find provider device and event by vehicle id lookup
           const provider_device = await getVehicle(provider_id, provider_vehicle_id)
           const provider_device_id = provider_device ? provider_device.device_id : null
-          const provider_name = providerName(provider_id)
+          const provider_name = await providerName(provider_id)
 
           // Create the audit
           await writeAudit({
@@ -474,7 +477,7 @@ function api(app: express.Express): express.Express {
           const attachments = await readAttachments(audit_trip_id)
 
           const device = provider_device_id
-            ? await readDevice(provider_device_id, provider_id)
+            ? await IngestServiceClient.getDevice({ device_id: provider_device_id, provider_id })
             : await getVehicle(provider_id, provider_vehicle_id)
 
           if (device) {

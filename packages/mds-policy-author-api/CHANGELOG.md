@@ -1,5 +1,83 @@
 # @mds-core/mds-policy-author-api
 
+## 0.7.20
+
+### Patch Changes
+
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-policy-service@0.11.15
+  - @mds-core/mds-api-helpers@0.2.11
+
+## 0.7.19
+
+### Patch Changes
+
+- Updated dependencies [2637f1cc]
+- Updated dependencies [fc42c45a]
+  - @mds-core/mds-policy-service@0.11.14
+  - @mds-core/mds-schema-validators@0.5.4
+  - @mds-core/mds-api-helpers@0.2.10
+
+## 0.7.18
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+  - @mds-core/mds-service-helpers@0.6.4
+  - @mds-core/mds-api-helpers@0.2.9
+  - @mds-core/mds-policy-service@0.11.13
+  - @mds-core/mds-api-server@0.4.6
+
+## 0.7.17
+
+### Patch Changes
+
+- Updated dependencies [ff4ccab5]
+  - @mds-core/mds-policy-service@0.11.12
+  - @mds-core/mds-api-helpers@0.2.8
+
+## 0.7.16
+
+### Patch Changes
+
+- @mds-core/mds-policy-service@0.11.11
+- @mds-core/mds-api-helpers@0.2.7
+
+## 0.7.15
+
+### Patch Changes
+
+- Updated dependencies [b3f25823]
+- Updated dependencies [896e4925]
+- Updated dependencies [8de42ab6]
+  - @mds-core/mds-api-helpers@0.2.6
+  - @mds-core/mds-api-server@0.4.5
+  - @mds-core/mds-policy-service@0.11.10
+
+## 0.7.14
+
+### Patch Changes
+
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-policy-service@0.11.9
+  - @mds-core/mds-api-helpers@0.2.5
+  - @mds-core/mds-api-server@0.4.4
+  - @mds-core/mds-schema-validators@0.5.3
+  - @mds-core/mds-service-helpers@0.6.3
+
+## 0.7.13
+
+### Patch Changes
+
+- Updated dependencies [7b061ba5]
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-providers@0.2.7
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-policy-service@0.11.8
+  - @mds-core/mds-api-server@0.4.3
+  - @mds-core/mds-api-helpers@0.2.4
+
 ## 0.7.12
 
 ### Patch Changes

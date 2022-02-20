@@ -18,7 +18,7 @@ import { pluralize, tail } from '@mds-core/mds-utils'
 import { Connection } from 'typeorm'
 import { ConnectionManager, ConnectionManagerCliOptions, ConnectionManagerOptions, ConnectionMode } from './connection'
 import { RepositoryLogger } from './logger'
-import { CreateRepositoryMigration } from './migration'
+import { RepositoryMigrations } from './migrations'
 
 export type RepositoryOptions = Pick<ConnectionManagerOptions, 'entities' | 'migrations'>
 
@@ -40,7 +40,7 @@ abstract class BaseRepository<TConnectionMode extends ConnectionMode> {
     this.manager = new ConnectionManager(name, {
       migrationsTableName,
       entities,
-      migrations: migrations.length === 0 ? [] : [CreateRepositoryMigration(migrationsTableName), ...migrations]
+      migrations: migrations.length === 0 ? [] : RepositoryMigrations(migrationsTableName).concat(migrations)
     })
   }
 }

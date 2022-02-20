@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
+import { DeviceDomainModel, IngestServiceClient } from '@mds-core/mds-ingest-service'
 import { Device, DeviceID, Recorded, UUID } from '@mds-core/mds-types'
-import { csv, isUUID, NotFoundError, now } from '@mds-core/mds-utils'
+import { csv, isDefined, isUUID, NotFoundError, now } from '@mds-core/mds-utils'
 import { QueryResult } from 'pg'
 import { getReadOnlyClient, getWriteableClient } from './client'
 import { DbLogger } from './logger'
 import schema from './schema'
-import { cols_sql, logSql, MDSPostgresClient, SqlVals, vals_list, vals_sql } from './sql-utils'
+import { cols_sql, logSql, SqlVals, vals_list, vals_sql } from './sql-utils'
 
 export async function readDevicesByVehicleId(
   provider_id: UUID,
@@ -72,27 +73,6 @@ export async function readDeviceIds(provider_id?: UUID, skip?: number, take?: nu
   return res.rows
 }
 
-// TODO: FIX updateDevice/readDevice circular reference
-export async function readDevice(
-  device_id: UUID,
-  provider_id?: UUID,
-  optionalClient?: MDSPostgresClient
-): Promise<Recorded<Device>> {
-  const client = optionalClient || (await getReadOnlyClient())
-  const sql = provider_id
-    ? `SELECT * FROM ${schema.TABLE.devices} WHERE device_id=$1 AND provider_id=$2`
-    : `SELECT * FROM ${schema.TABLE.devices} WHERE device_id=$1`
-  const values = provider_id ? [device_id, provider_id] : [device_id]
-  await logSql(sql, values)
-  const res = await client.query(sql, values)
-  // verify one row
-  if (res.rows.length === 1) {
-    return res.rows[0]
-  }
-  DbLogger.warn(`readDevice db failed for ${device_id}: rows=${res.rows.length}`)
-  throw new NotFoundError(`device_id ${device_id} not found`)
-}
-
 export async function readDeviceList(device_ids: UUID[]): Promise<Recorded<Device>[]> {
   if (device_ids.length === 0) {
     return []
@@ -121,7 +101,11 @@ export async function writeDevice(device: Device): Promise<Recorded<Device>> {
   return { ...device, ...recorded_device }
 }
 
-export async function updateDevice(device_id: UUID, provider_id: UUID, changes: Partial<Device>): Promise<Device> {
+export async function updateDevice(
+  device_id: UUID,
+  provider_id: UUID,
+  changes: Partial<Device>
+): Promise<DeviceDomainModel> {
   const client = await getWriteableClient()
 
   const sql = `UPDATE ${schema.TABLE.devices} SET vehicle_id = $1 WHERE device_id = $2`
@@ -130,9 +114,14 @@ export async function updateDevice(device_id: UUID, provider_id: UUID, changes: 
   const res = await client.query(sql, values)
 
   if (res.rowCount === 0) {
-    throw new Error('not found')
+    throw new NotFoundError('not found')
   } else {
-    return readDevice(device_id, provider_id)
+    const device = await IngestServiceClient.getDevice({ device_id, provider_id })
+    if (!isDefined(device)) {
+      throw new NotFoundError(`device_id ${device_id} not found`)
+    }
+
+    return device
   }
 }
 

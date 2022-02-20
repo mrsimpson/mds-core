@@ -1,5 +1,18 @@
 # @mds-core/mds-service-helpers
 
+## 0.6.4
+
+### Patch Changes
+
+- bc8f0a04: Switch tests from Mocha to Jest
+
+## 0.6.3
+
+### Patch Changes
+
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-utils@0.4.0
+
 ## 0.6.2
 
 ### Patch Changes

@@ -1,5 +1,121 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.10
+
+### Patch Changes
+
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-compliance-service@0.10.17
+  - @mds-core/mds-geography-service@0.10.9
+  - @mds-core/mds-ingest-service@0.9.14
+  - @mds-core/mds-policy-service@0.11.15
+  - @mds-core/mds-db@0.6.3
+  - @mds-core/mds-api-helpers@0.2.11
+
+## 0.8.9
+
+### Patch Changes
+
+- Updated dependencies [2637f1cc]
+- Updated dependencies [fc42c45a]
+  - @mds-core/mds-compliance-service@0.10.16
+  - @mds-core/mds-db@0.6.2
+  - @mds-core/mds-geography-service@0.10.8
+  - @mds-core/mds-ingest-service@0.9.13
+  - @mds-core/mds-policy-service@0.11.14
+  - @mds-core/mds-schema-validators@0.5.4
+  - @mds-core/mds-api-helpers@0.2.10
+
+## 0.8.8
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+  - @mds-core/mds-db@0.6.1
+  - @mds-core/mds-service-helpers@0.6.4
+  - @mds-core/mds-api-helpers@0.2.9
+  - @mds-core/mds-compliance-service@0.10.15
+  - @mds-core/mds-geography-service@0.10.7
+  - @mds-core/mds-ingest-service@0.9.12
+  - @mds-core/mds-policy-service@0.11.13
+  - @mds-core/mds-api-server@0.4.6
+
+## 0.8.7
+
+### Patch Changes
+
+- Updated dependencies [ff4ccab5]
+  - @mds-core/mds-db@0.6.0
+  - @mds-core/mds-ingest-service@0.9.11
+  - @mds-core/mds-policy-service@0.11.12
+  - @mds-core/mds-api-helpers@0.2.8
+  - @mds-core/mds-compliance-service@0.10.14
+
+## 0.8.6
+
+### Patch Changes
+
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-compliance-service@0.10.13
+  - @mds-core/mds-ingest-service@0.9.10
+  - @mds-core/mds-db@0.5.6
+  - @mds-core/mds-geography-service@0.10.6
+  - @mds-core/mds-policy-service@0.11.11
+  - @mds-core/mds-api-helpers@0.2.7
+
+## 0.8.5
+
+### Patch Changes
+
+- Updated dependencies [b3f25823]
+- Updated dependencies [896e4925]
+- Updated dependencies [e9b227c2]
+- Updated dependencies [e9b227c2]
+- Updated dependencies [8de42ab6]
+  - @mds-core/mds-api-helpers@0.2.6
+  - @mds-core/mds-api-server@0.4.5
+  - @mds-core/mds-compliance-service@0.10.12
+  - @mds-core/mds-ingest-service@0.9.9
+  - @mds-core/mds-policy-service@0.11.10
+  - @mds-core/mds-geography-service@0.10.5
+  - @mds-core/mds-db@0.5.5
+
+## 0.8.4
+
+### Patch Changes
+
+- Updated dependencies [49110532]
+- Updated dependencies [bce81d4d]
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-ingest-service@0.9.8
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-compliance-service@0.10.11
+  - @mds-core/mds-geography-service@0.10.4
+  - @mds-core/mds-policy-service@0.11.9
+  - @mds-core/mds-db@0.5.4
+  - @mds-core/mds-api-helpers@0.2.5
+  - @mds-core/mds-api-server@0.4.4
+  - @mds-core/mds-schema-validators@0.5.3
+  - @mds-core/mds-service-helpers@0.6.3
+  - @mds-core/mds-stream@0.2.9
+
+## 0.8.3
+
+### Patch Changes
+
+- 7b061ba5: Making calls to mds-provider async as preparation for migrating the static providers list in mds-providers to a database
+- Updated dependencies [7b061ba5]
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-compliance-service@0.10.10
+  - @mds-core/mds-providers@0.2.7
+  - @mds-core/mds-ingest-service@0.9.7
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-geography-service@0.10.3
+  - @mds-core/mds-policy-service@0.11.8
+  - @mds-core/mds-api-server@0.4.3
+  - @mds-core/mds-db@0.5.3
+  - @mds-core/mds-api-helpers@0.2.4
+
 ## 0.8.2
 
 ### Patch Changes

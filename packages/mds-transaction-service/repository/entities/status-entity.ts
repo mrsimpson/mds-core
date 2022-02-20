@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
+import {
+  BigintTransformer,
+  DesignType,
+  EntityCreateModel,
+  IdentityColumn,
+  RecordedColumn
+} from '@mds-core/mds-repository'
 import { Timestamp } from '@mds-core/mds-types'
 import { Column, Entity } from 'typeorm'
 import { TransactionStatusDomainModel, TRANSACTION_STATUS_TYPE } from '../../@types'
@@ -31,6 +37,7 @@ export class TransactionStatusEntity
   status_id: string
 
   @Column('bigint', { transformer: BigintTransformer })
+  @DesignType(Number)
   timestamp: Timestamp
 
   @Column('varchar', { length: 127 })
@@ -39,3 +46,5 @@ export class TransactionStatusEntity
   @Column('varchar', { length: 127 })
   author: string
 }
+
+export type TransactionStatusEntityCreateModel = EntityCreateModel<TransactionStatusEntity>

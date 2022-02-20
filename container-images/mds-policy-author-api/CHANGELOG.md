@@ -1,5 +1,54 @@
 # @container-images/mds-policy-author-api
 
+## 0.1.83
+
+### Patch Changes
+
+- @mds-core/mds-policy-author-api@0.7.20
+
+## 0.1.82
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+  - @mds-core/mds-policy-author-api@0.7.19
+
+## 0.1.81
+
+### Patch Changes
+
+- @mds-core/mds-policy-author-api@0.7.18
+
+## 0.1.80
+
+### Patch Changes
+
+- @mds-core/mds-policy-author-api@0.7.17
+
+## 0.1.79
+
+### Patch Changes
+
+- @mds-core/mds-policy-author-api@0.7.16
+
+## 0.1.78
+
+### Patch Changes
+
+- @mds-core/mds-policy-author-api@0.7.15
+
+## 0.1.77
+
+### Patch Changes
+
+- @mds-core/mds-policy-author-api@0.7.14
+
+## 0.1.76
+
+### Patch Changes
+
+- @mds-core/mds-policy-author-api@0.7.13
+
 ## 0.1.75
 
 ### Patch Changes

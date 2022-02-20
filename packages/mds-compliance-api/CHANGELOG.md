@@ -1,5 +1,104 @@
 # @mds-core/mds-compliance-api
 
+## 0.4.22
+
+### Patch Changes
+
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-compliance-service@0.10.17
+  - @mds-core/mds-policy-service@0.11.15
+  - @mds-core/mds-db@0.6.3
+  - @mds-core/mds-api-helpers@0.2.11
+
+## 0.4.21
+
+### Patch Changes
+
+- Updated dependencies [2637f1cc]
+- Updated dependencies [fc42c45a]
+  - @mds-core/mds-compliance-service@0.10.16
+  - @mds-core/mds-db@0.6.2
+  - @mds-core/mds-policy-service@0.11.14
+  - @mds-core/mds-schema-validators@0.5.4
+  - @mds-core/mds-api-helpers@0.2.10
+
+## 0.4.20
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+  - @mds-core/mds-db@0.6.1
+  - @mds-core/mds-service-helpers@0.6.4
+  - @mds-core/mds-api-helpers@0.2.9
+  - @mds-core/mds-compliance-service@0.10.15
+  - @mds-core/mds-policy-service@0.11.13
+  - @mds-core/mds-api-server@0.4.6
+
+## 0.4.19
+
+### Patch Changes
+
+- Updated dependencies [ff4ccab5]
+  - @mds-core/mds-db@0.6.0
+  - @mds-core/mds-policy-service@0.11.12
+  - @mds-core/mds-api-helpers@0.2.8
+  - @mds-core/mds-compliance-service@0.10.14
+
+## 0.4.18
+
+### Patch Changes
+
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-compliance-service@0.10.13
+  - @mds-core/mds-db@0.5.6
+  - @mds-core/mds-policy-service@0.11.11
+  - @mds-core/mds-api-helpers@0.2.7
+
+## 0.4.17
+
+### Patch Changes
+
+- Updated dependencies [b3f25823]
+- Updated dependencies [896e4925]
+- Updated dependencies [e9b227c2]
+- Updated dependencies [e9b227c2]
+- Updated dependencies [8de42ab6]
+  - @mds-core/mds-api-helpers@0.2.6
+  - @mds-core/mds-api-server@0.4.5
+  - @mds-core/mds-compliance-service@0.10.12
+  - @mds-core/mds-policy-service@0.11.10
+  - @mds-core/mds-db@0.5.5
+
+## 0.4.16
+
+### Patch Changes
+
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-compliance-service@0.10.11
+  - @mds-core/mds-policy-service@0.11.9
+  - @mds-core/mds-db@0.5.4
+  - @mds-core/mds-api-helpers@0.2.5
+  - @mds-core/mds-api-server@0.4.4
+  - @mds-core/mds-schema-validators@0.5.3
+  - @mds-core/mds-service-helpers@0.6.3
+  - @mds-core/mds-test-data@0.4.17
+
+## 0.4.15
+
+### Patch Changes
+
+- 7b061ba5: Making calls to mds-provider async as preparation for migrating the static providers list in mds-providers to a database
+- Updated dependencies [7b061ba5]
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-compliance-service@0.10.10
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-test-data@0.4.16
+  - @mds-core/mds-policy-service@0.11.8
+  - @mds-core/mds-api-server@0.4.3
+  - @mds-core/mds-db@0.5.3
+  - @mds-core/mds-api-helpers@0.2.4
+
 ## 0.4.14
 
 ### Patch Changes

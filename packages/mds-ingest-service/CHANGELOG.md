@@ -1,5 +1,89 @@
 # @mds-core/mds-ingest-service
 
+## 0.9.14
+
+### Patch Changes
+
+- d98d5693: Cleanup and refactor repository types
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-repository@0.1.40
+
+## 0.9.13
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+- Updated dependencies [35ff786d]
+- Updated dependencies [2637f1cc]
+- Updated dependencies [fc42c45a]
+  - @mds-core/mds-rpc-common@0.3.11
+  - @mds-core/mds-repository@0.1.39
+  - @mds-core/mds-schema-validators@0.5.4
+  - @mds-core/mds-agency-cache@0.4.17
+
+## 0.9.12
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+- Updated dependencies [a942d36c]
+  - @mds-core/mds-repository@0.1.38
+  - @mds-core/mds-service-helpers@0.6.4
+  - @mds-core/mds-rpc-common@0.3.10
+
+## 0.9.11
+
+### Patch Changes
+
+- ff4ccab5: Removing mds-db.readDevice and updating references to it to call the ingest service instead
+
+## 0.9.10
+
+### Patch Changes
+
+- 6f834fe4: Rename database function to mds_epoch_ms()
+- Updated dependencies [6f834fe4]
+  - @mds-core/mds-repository@0.1.37
+
+## 0.9.9
+
+### Patch Changes
+
+- e9b227c2: Use a function for setting recorded column default
+- Updated dependencies [ad3fb707]
+- Updated dependencies [e9b227c2]
+  - @mds-core/mds-repository@0.1.36
+  - @mds-core/mds-rpc-common@0.3.9
+
+## 0.9.8
+
+### Patch Changes
+
+- 49110532: Add DesignType decorators to some columns
+- bce81d4d: Add getDeviceEvents method to fetch events by device
+- Updated dependencies [49110532]
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-repository@0.1.35
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-agency-cache@0.4.16
+  - @mds-core/mds-rpc-common@0.3.8
+  - @mds-core/mds-schema-validators@0.5.3
+  - @mds-core/mds-service-helpers@0.6.3
+  - @mds-core/mds-stream@0.2.9
+
+## 0.9.7
+
+### Patch Changes
+
+- 7b061ba5: Making calls to mds-provider async as preparation for migrating the static providers list in mds-providers to a database
+- Updated dependencies [ca45bfaf]
+- Updated dependencies [7b061ba5]
+- Updated dependencies [ca45bfaf]
+  - @mds-core/mds-repository@0.1.34
+  - @mds-core/mds-schema-validators@0.5.2
+  - @mds-core/mds-rpc-common@0.3.7
+  - @mds-core/mds-agency-cache@0.4.15
+
 ## 0.9.6
 
 ### Patch Changes

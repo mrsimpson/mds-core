@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
+import {
+  BigintTransformer,
+  DesignType,
+  EntityCreateModel,
+  IdentityColumn,
+  RecordedColumn
+} from '@mds-core/mds-repository'
 import { Nullable, Timestamp, UUID } from '@mds-core/mds-types'
 import { Column, Entity, Index } from 'typeorm'
 import { FEE_TYPE } from '../../@types'
@@ -31,6 +37,7 @@ export class TransactionEntity extends IdentityColumn(RecordedColumn(class {})) 
   device_id: Nullable<UUID>
 
   @Column('bigint', { transformer: BigintTransformer })
+  @DesignType(Number)
   timestamp: Timestamp
 
   @Index()
@@ -44,3 +51,5 @@ export class TransactionEntity extends IdentityColumn(RecordedColumn(class {})) 
   @Column('jsonb')
   receipt: object
 }
+
+export type TransactionEntityCreateModel = EntityCreateModel<TransactionEntity>

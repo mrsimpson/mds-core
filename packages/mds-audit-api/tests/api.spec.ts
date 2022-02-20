@@ -26,7 +26,8 @@ import cache from '@mds-core/mds-agency-cache'
 import { ApiServer } from '@mds-core/mds-api-server'
 import { AttachmentServiceClient } from '@mds-core/mds-attachment-service'
 import db from '@mds-core/mds-db'
-import { MOCHA_PROVIDER_ID } from '@mds-core/mds-providers'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
+import { JEST_PROVIDER_ID } from '@mds-core/mds-providers'
 import { ServiceError } from '@mds-core/mds-service-helpers'
 import { makeDevices, makeEventsWithTelemetry, makeTelemetryInArea, SCOPED_AUTH } from '@mds-core/mds-test-data'
 import {
@@ -54,7 +55,7 @@ const APP_JSON = 'application/vnd.mds.audit+json; charset=utf-8; version=0.1'
 const audit_trip_id = uuid()
 const audit_trip_id_2 = uuid()
 const audit_device_id: string = uuid()
-const provider_id = MOCHA_PROVIDER_ID
+const provider_id = JEST_PROVIDER_ID
 const provider_device_id = uuid()
 const provider_vehicle_id = 'test-vehicle'
 
@@ -106,7 +107,7 @@ describe('Testing API', () => {
       recorded: AUDIT_START
     }
 
-    db.writeDevice({
+    const device: Device = {
       accessibility_options: [],
       device_id: provider_device_id,
       modality: 'micromobility',
@@ -115,7 +116,11 @@ describe('Testing API', () => {
       propulsion_types: ['electric'],
       vehicle_type: 'scooter',
       recorded: AUDIT_START
-    }).then(() => {
+    }
+
+    Sinon.replace(IngestServiceClient, 'getDevice', Sinon.fake.resolves(device))
+
+    db.writeDevice(device).then(() => {
       db.writeEvent({
         ...baseEvent,
         ...{ telemetry_timestamp: OLD_EVENT, timestamp: OLD_EVENT }
@@ -558,7 +563,7 @@ describe('Testing API', () => {
     let devices_b: Device[] // Have events and telemetry inside our BBOX
     let devices_c: Device[] // No events or telemetry
     before(done => {
-      devices_a = makeDevices(10, now(), MOCHA_PROVIDER_ID)
+      devices_a = makeDevices(10, now(), JEST_PROVIDER_ID)
       const events_a = makeEventsWithTelemetry(devices_a, now(), SAN_FERNANDO_VALLEY, {
         event_types: ['trip_start'],
         vehicle_state: 'on_trip',
@@ -567,14 +572,14 @@ describe('Testing API', () => {
       const telemetry_a = devices_a.map(device =>
         makeTelemetryInArea(device, now(), SAN_FERNANDO_VALLEY, rangeRandomInt(10))
       )
-      devices_b = makeDevices(10, now(), MOCHA_PROVIDER_ID)
+      devices_b = makeDevices(10, now(), JEST_PROVIDER_ID)
       const events_b = makeEventsWithTelemetry(devices_b, now(), CANALS, {
         event_types: ['trip_start'],
         vehicle_state: 'on_trip',
         speed: rangeRandomInt(10)
       })
       const telemetry_b = devices_b.map(device => makeTelemetryInArea(device, now(), CANALS, rangeRandomInt(10)))
-      devices_c = makeDevices(10, now(), MOCHA_PROVIDER_ID)
+      devices_c = makeDevices(10, now(), JEST_PROVIDER_ID)
 
       const seedData = {
         // Include a duplicate device (same vin + provider but different device_id)

@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { convert_v0_4_1_device_to_1_0_0, convert_v1_0_0_device_to_0_4_1 } from '../../transformers'
 import { Device_v0_4_1, Device_v1_0_0 } from '../../transformers/@types'
 
@@ -8,7 +7,7 @@ const PROVIDER_ID = 'baf215d4-8b4b-4be4-8189-980171a964ba'
 const VEHICLE_ID = '3f411cb1-a5a4-4b29-9e72-2714fdd24bc8'
 
 describe('Test transformers', () => {
-  it('checks the transformation between v0.4.1 and v1.0.0 Device types', done => {
+  it('checks the transformation between v0.4.1 and v1.0.0 Device types', async () => {
     const device: Device_v0_4_1 = {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
@@ -22,7 +21,7 @@ describe('Test transformers', () => {
       recorded: TIME
     }
 
-    assert.deepEqual(convert_v0_4_1_device_to_1_0_0(device), {
+    expect(convert_v0_4_1_device_to_1_0_0(device)).toEqual({
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
       vehicle_id: VEHICLE_ID,
@@ -34,11 +33,9 @@ describe('Test transformers', () => {
       mfgr: 'Cadillac',
       model: 'luxury'
     })
-
-    done()
   })
 
-  it('checks the transformations from v1.0.0 Device to v0.4.0', done => {
+  it('checks the transformations from v1.0.0 Device to v0.4.0', async () => {
     const device: Device_v1_0_0 = {
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
@@ -52,7 +49,7 @@ describe('Test transformers', () => {
       model: 'fancy'
     }
 
-    assert.deepEqual(convert_v1_0_0_device_to_0_4_1(device), {
+    expect(convert_v1_0_0_device_to_0_4_1(device)).toEqual({
       device_id: DEVICE_ID,
       provider_id: PROVIDER_ID,
       vehicle_id: VEHICLE_ID,
@@ -64,6 +61,5 @@ describe('Test transformers', () => {
       mfgr: 'Schwinn',
       model: 'fancy'
     })
-    done()
   })
 })

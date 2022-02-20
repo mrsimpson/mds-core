@@ -1,5 +1,36 @@
 # @mds-core/mds-api-server
 
+## 0.4.6
+
+### Patch Changes
+
+- Updated dependencies [bc8f0a04]
+  - @mds-core/mds-service-helpers@0.6.4
+
+## 0.4.5
+
+### Patch Changes
+
+- 896e4925: converts test suites from mocha to jest
+- Updated dependencies [896e4925]
+  - @mds-core/mds-api-authorizer@0.1.61
+
+## 0.4.4
+
+### Patch Changes
+
+- Updated dependencies [bce81d4d]
+  - @mds-core/mds-utils@0.4.0
+  - @mds-core/mds-api-authorizer@0.1.60
+  - @mds-core/mds-service-helpers@0.6.3
+
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [7b061ba5]
+  - @mds-core/mds-api-authorizer@0.1.59
+
 ## 0.4.2
 
 ### Patch Changes
