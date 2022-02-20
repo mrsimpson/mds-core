@@ -1,5 +1,12 @@
 # @container-images/mds-transaction-service
 
+## 0.0.48
+
+### Patch Changes
+
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-transaction-service@0.6.11
+
 ## 0.0.47
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @container-images/mds-geography-service
 
+## 0.0.49
+
+### Patch Changes
+
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-geography-service@0.10.9
+
 ## 0.0.48
 
 ### Patch Changes

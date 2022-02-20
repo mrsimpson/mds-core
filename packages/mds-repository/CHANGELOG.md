@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.1.40
+
+### Patch Changes
+
+- d98d5693: Cleanup and refactor repository types
+
 ## 0.1.39
 
 ### Patch Changes
