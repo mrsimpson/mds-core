@@ -1,5 +1,13 @@
 # @mds-core/mds-ingest-service
 
+## 0.9.14
+
+### Patch Changes
+
+- d98d5693: Cleanup and refactor repository types
+- Updated dependencies [d98d5693]
+  - @mds-core/mds-repository@0.1.40
+
 ## 0.9.13
 
 ### Patch Changes
