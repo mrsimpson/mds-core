@@ -1252,6 +1252,7 @@ importers:
       '@mds-core/mds-utils': workspace:0.4.0
       '@types/pg': 8.6.4
       await-lock: 2.1.0
+      envalid: 7.2.1
       pg: 8.7.3
       typeorm: 0.2.43
     dependencies:
@@ -1260,6 +1261,7 @@ importers:
       '@mds-core/mds-utils': link:../mds-utils
       '@types/pg': 8.6.4
       await-lock: 2.1.0
+      envalid: 7.2.1
     devDependencies:
       pg: 8.7.3
       typeorm: 0.2.43_pg@8.7.3

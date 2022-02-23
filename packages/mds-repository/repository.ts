@@ -15,25 +15,28 @@
  */
 
 import { pluralize, tail } from '@mds-core/mds-utils'
-import { Connection } from 'typeorm'
+import { bool, cleanEnv } from 'envalid'
+import { Connection, ConnectionOptions } from 'typeorm'
 import { ConnectionManager, ConnectionManagerCliOptions, ConnectionManagerOptions, ConnectionMode } from './connection'
 import { RepositoryLogger } from './logger'
 import { RepositoryMigrations } from './migrations'
 
 export type RepositoryOptions = Pick<ConnectionManagerOptions, 'entities' | 'migrations'>
 
-abstract class BaseRepository<TConnectionMode extends ConnectionMode> {
-  protected readonly manager: ConnectionManager<TConnectionMode>
+export abstract class BaseRepository<TConnectionMode extends ConnectionMode> {
+  private readonly manager: ConnectionManager<TConnectionMode>
 
-  protected abstract initialize(): Promise<void>
+  protected ormconfig = (mode: TConnectionMode, options?: ConnectionManagerCliOptions): ConnectionOptions =>
+    this.manager.ormconfig(mode, options)
 
-  protected connect = async (mode: TConnectionMode): Promise<Omit<Connection, 'connect' | 'close'>> => {
-    const { connect } = this.manager
-    const connection = await connect(mode)
-    return connection
-  }
+  protected connect = async (mode: TConnectionMode): Promise<Omit<Connection, 'connect' | 'close'>> =>
+    this.manager.connect(mode)
 
-  protected abstract shutdown(): Promise<void>
+  protected disconnect = async (mode: TConnectionMode): Promise<void> => this.manager.disconnect(mode)
+
+  public abstract initialize: () => Promise<void>
+
+  public abstract shutdown: () => Promise<void>
 
   constructor(public readonly name: string, { entities, migrations }: Required<RepositoryOptions>) {
     const migrationsTableName = `${name}-migrations`
@@ -47,26 +50,13 @@ abstract class BaseRepository<TConnectionMode extends ConnectionMode> {
 
 export abstract class ReadOnlyRepository extends BaseRepository<'ro'> {
   public initialize = async (): Promise<void> => {
-    const {
-      name,
-      manager: { connect }
-    } = this
-    RepositoryLogger.info(`Initializing R/O repository: ${name}`)
-    await connect('ro')
+    RepositoryLogger.info(`Initializing R/O repository: ${this.name}`)
+    await this.connect('ro')
   }
 
   public shutdown = async (): Promise<void> => {
-    const {
-      name,
-      manager: { disconnect }
-    } = this
-    RepositoryLogger.info(`Terminating R/O repository: ${name}`)
-    await disconnect('ro')
-  }
-
-  public cli = () => {
-    const { cli } = this.manager
-    return cli('ro')
+    RepositoryLogger.info(`Terminating R/O repository: ${this.name}`)
+    await this.disconnect('ro')
   }
 
   constructor(name: string, { entities = [] }: Omit<RepositoryOptions, 'migrations'> = {}) {
@@ -76,10 +66,7 @@ export abstract class ReadOnlyRepository extends BaseRepository<'ro'> {
 
 export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
   public runAllMigrations = async (): Promise<void> => {
-    const {
-      manager: { connect }
-    } = this
-    const connection = await connect('rw')
+    const connection = await this.connect('rw')
     const {
       options: { migrationsTableName }
     } = connection
@@ -103,10 +90,7 @@ export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
   }
 
   public revertAllMigrations = async (): Promise<void> => {
-    const {
-      manager: { connect }
-    } = this
-    const connection = await connect('rw')
+    const connection = await this.connect('rw')
     const {
       options: { migrationsTableName }
     } = connection
@@ -126,36 +110,22 @@ export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
   }
 
   public initialize = async (): Promise<void> => {
-    const {
-      name,
-      manager: { connect }
-    } = this
-    RepositoryLogger.info(`Initializing R/W repository: ${name}`)
-
-    await Promise.all([connect('rw'), connect('ro')])
+    RepositoryLogger.info(`Initializing R/W repository: ${this.name}`)
+    await Promise.all([this.connect('ro'), this.connect('rw')])
 
     // Enable migrations by default
-    const { PG_MIGRATIONS = 'true' } = process.env
-
-    /* istanbul ignore if */
-    if (PG_MIGRATIONS === 'true') {
+    const { PG_MIGRATIONS } = cleanEnv(process.env, { PG_MIGRATIONS: bool({ default: true }) })
+    if (PG_MIGRATIONS) {
       await this.runAllMigrations()
     }
   }
 
   public shutdown = async (): Promise<void> => {
-    const {
-      name,
-      manager: { disconnect }
-    } = this
-    RepositoryLogger.info(`Terminating R/W repository: ${name}`)
-    await Promise.all([disconnect('rw'), disconnect('ro')])
+    RepositoryLogger.info(`Terminating R/W repository: ${this.name}`)
+    await Promise.all([this.disconnect('ro'), this.disconnect('rw')])
   }
 
-  public cli = (options?: ConnectionManagerCliOptions) => {
-    const { cli } = this.manager
-    return cli('rw', options)
-  }
+  public cli = (options?: ConnectionManagerCliOptions) => this.ormconfig('rw', options)
 
   protected asChunksForInsert = <TEntity>(entities: TEntity[], size = 4_000) => {
     const chunks =
@@ -177,9 +147,6 @@ export abstract class ReadWriteRepository extends BaseRepository<'ro' | 'rw'> {
   }
 
   constructor(name: string, { entities = [], migrations = [] }: RepositoryOptions = {}) {
-    super(name, {
-      entities,
-      migrations
-    })
+    super(name, { entities, migrations })
   }
 }
