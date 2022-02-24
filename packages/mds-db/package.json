@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand"
+    "test": "DOTENV_CONFIG_PATH=../../.env jest --passWithNoTests"
   },
   "dependencies": {
     "@mds-core/mds-attachment-service": "workspace:0.5.13",
