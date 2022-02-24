@@ -40,8 +40,10 @@ export abstract class BaseRepository<TConnectionMode extends ConnectionMode> {
 
   constructor(public readonly name: string, { entities, migrations }: Required<RepositoryOptions>) {
     const migrationsTableName = `${name}-migrations`
+    const metadataTableName = `${name}-migration-metadata`
     this.manager = new ConnectionManager(name, {
       migrationsTableName,
+      metadataTableName,
       entities,
       migrations: migrations.length === 0 ? [] : RepositoryMigrations(migrationsTableName).concat(migrations)
     })
