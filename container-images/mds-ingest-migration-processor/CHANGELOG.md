@@ -1,5 +1,30 @@
 # @container-images/mds-ingest-migration-processor
 
+## 0.0.53
+
+### Patch Changes
+
+- @mds-core/mds-ingest-migration-processor@0.0.51
+
+## 0.0.52
+
+### Patch Changes
+
+- @mds-core/mds-ingest-migration-processor@0.0.50
+
+## 0.0.51
+
+### Patch Changes
+
+- 2637f1cc: Upgrade to latest typeorm/pg to support GENERATED ALWAYS AS IDENTITY in migrations
+  - @mds-core/mds-ingest-migration-processor@0.0.49
+
+## 0.0.50
+
+### Patch Changes
+
+- @mds-core/mds-ingest-migration-processor@0.0.48
+
 ## 0.0.49
 
 ### Patch Changes
