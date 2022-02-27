@@ -176,6 +176,11 @@ export const ComplianceRepository = ReadWriteRepository.Create(
               .values([ComplianceSnapshotDomainToEntityCreate.map(complianceSnapshot)])
               .returning('*')
               .execute()
+
+            if (!entity) {
+              throw new Error('Failed to create compliance snapshot')
+            }
+
             const domain = ComplianceSnapshotEntityToDomain.map(entity)
 
             // if there's an exception, it blows up and aborts the commit
@@ -394,6 +399,11 @@ export const ComplianceRepository = ReadWriteRepository.Create(
             .values([ComplianceViolationDomainToEntityCreate.map(complianceViolation)])
             .returning('*')
             .execute()
+
+          if (!entity) {
+            throw new Error('Failed to create compliance violation')
+          }
+
           return ComplianceViolationEntityToDomain.map(entity)
         } catch (error) {
           throw RepositoryError(error)

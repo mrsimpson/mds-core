@@ -192,6 +192,11 @@ export const TransactionRepository = ReadWriteRepository.Create(
               .values([TransactionDomainToEntityCreate.map(transaction)])
               .returning('*')
               .execute()
+
+            if (!entity) {
+              throw new Error('Failed to create transaction')
+            }
+
             const pendingTransaction = TransactionEntityToDomain.map(entity)
             await beforeCommit(pendingTransaction)
             return pendingTransaction
@@ -241,6 +246,10 @@ export const TransactionRepository = ReadWriteRepository.Create(
             .values([TransactionOperationDomainToEntityCreate.map(transactionOperation)])
             .returning('*')
             .execute()
+
+          if (!entity) {
+            throw new Error('Failed to create transaction operation')
+          }
           return TransactionOperationEntityToDomain.map(entity)
         } catch (error) {
           throw RepositoryError(error)
@@ -274,6 +283,11 @@ export const TransactionRepository = ReadWriteRepository.Create(
             .values([TransactionStatusDomainToEntityCreate.map(transactionStatus)])
             .returning('*')
             .execute()
+
+          if (!entity) {
+            throw new Error('Failed to create transaction status')
+          }
+
           return TransactionStatusEntityToDomain.map(entity)
         } catch (error) {
           throw RepositoryError(error)

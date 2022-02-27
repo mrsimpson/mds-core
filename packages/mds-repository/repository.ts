@@ -75,7 +75,7 @@ const asChunksForInsert = <TEntity>(entities: TEntity[], size = 4_000) => {
           if (!reduced[chunk]) {
             reduced.push([])
           }
-          reduced[chunk].push(t)
+          ;(reduced[chunk] as Array<TEntity>).push(t) // this cast is safe because we initialize the index if it doesn't exist yet
           return reduced
         }, [])
       : [entities]

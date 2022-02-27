@@ -177,6 +177,10 @@ export const JurisdictionRepository = ReadWriteRepository.Create(
             .returning('*')
             .execute()
 
+          if (!updated) {
+            throw new Error('Failed to update jurisdiction')
+          }
+
           return { ...jurisdiction, ...JurisdictionEntityToDomain.map(updated) }
         } catch (error) {
           throw RepositoryError(error)

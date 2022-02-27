@@ -16,7 +16,7 @@
 
 import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import { Timestamp, UUID } from '@mds-core/mds-types'
-import { ConflictError, NotFoundError, now, testEnvSafeguard } from '@mds-core/mds-utils'
+import { ConflictError, hasAtLeastOneEntry, NotFoundError, now, testEnvSafeguard } from '@mds-core/mds-utils'
 import { buildPaginator } from 'typeorm-cursor-pagination'
 import {
   FILTER_POLICY_STATUS,
@@ -170,7 +170,8 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
 
         const expressionsWithParams = statusFilters.map(status => statusToExpressionWithParams[status])
 
-        if (expressionsWithParams.length === 1) {
+        if (expressionsWithParams.length === 1 && hasAtLeastOneEntry(expressionsWithParams)) {
+          // the hasAtLeastOneEntry check is a bit redundant, but serves as a type guard so we can safely access the first element
           const [{ expression, params }] = expressionsWithParams
           query.andWhere(expression, params)
         } else {
@@ -308,6 +309,11 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
           .values(PolicyDomainToEntityCreate.map(policy))
           .returning('*')
           .execute()
+
+        if (!entity) {
+          throw new Error('Failed to write policy')
+        }
+
         return PolicyEntityToDomain.map(entity)
       } catch (error) {
         throw RepositoryError(error)
@@ -441,6 +447,11 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
           .values(PolicyMetadataDomainToEntityCreate.map(policy_metadata))
           .returning('*')
           .execute()
+
+        if (!entity) {
+          throw new Error('Failed to write policy metadata')
+        }
+
         return PolicyMetadataEntityToDomain.map(entity)
       } catch (error) {
         throw RepositoryError(error)

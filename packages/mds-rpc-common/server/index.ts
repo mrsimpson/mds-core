@@ -128,8 +128,13 @@ export const RpcServiceManager = (options: Partial<RpcServiceManagerOptions> = {
                       serverContextConnector: {
                         // Not using response contexts
                         provideResponseContext: async () => ({}),
-                        decodeRequestContext: async (encoded: ModuleRpcCommon.EncodedContext) =>
-                          JSON.parse(Buffer.from(encoded[RPC_CONTEXT_KEY], 'base64').toString('utf-8'))
+                        decodeRequestContext: async (encoded: ModuleRpcCommon.EncodedContext) => {
+                          const encodedRpcContext = encoded[RPC_CONTEXT_KEY]
+                          if (encodedRpcContext === undefined) {
+                            throw new Error(`Missing RPC context in request`)
+                          }
+                          return JSON.parse(Buffer.from(encodedRpcContext, 'base64').toString('utf-8'))
+                        }
                       }
                     })
                   ),

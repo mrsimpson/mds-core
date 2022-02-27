@@ -54,6 +54,11 @@ export const CollectorRepository = ReadWriteRepository.Create(
             .returning('*')
             .onConflict('("schema_id") DO UPDATE SET "schema" = EXCLUDED."schema", "recorded" = EXCLUDED."recorded"')
             .execute()
+
+          if (!entity) {
+            throw new Error('Failed to insert schema')
+          }
+
           return CollectorSchemaEntityToDomain.map(entity)
         } catch (error) {
           throw RepositoryError(error)

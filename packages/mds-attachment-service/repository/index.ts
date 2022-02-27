@@ -38,6 +38,11 @@ export const AttachmentRepository = ReadWriteRepository.Create('attachments', { 
           .values([AttachmentDomainToEntityCreate.map(attachment)])
           .returning('*')
           .execute()
+
+        if (!entity) {
+          throw new Error('Failed to write attachment')
+        }
+
         return AttachmentEntityToDomain.map(entity)
       } catch (error) {
         throw RepositoryError(error)
@@ -57,6 +62,10 @@ export const AttachmentRepository = ReadWriteRepository.Create('attachments', { 
           .where('attachment_id = :attachment_id', { attachment_id })
           .returning('*')
           .execute()
+
+        if (!entity) {
+          throw new Error('Failed to delete attachment')
+        }
 
         return AttachmentEntityToDomain.map(entity)
       } catch (error) {
