@@ -27,7 +27,6 @@
     "@mds-core/mds-service-helpers": "workspace:0.6.5",
     "@mds-core/mds-types": "workspace:0.9.1",
     "@mds-core/mds-utils": "workspace:0.4.1",
-    "joi": "17.4.0",
     "pg": "8.7.3",
     "typeorm": "0.2.43"
   },

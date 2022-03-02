@@ -32,8 +32,7 @@
     "@mds-core/mds-utils": "workspace:0.4.1",
     "@types/express": "4.17.13",
     "express": "4.17.1",
-    "http-status-codes": "2.1.4",
-    "joi": "17.4.0"
+    "http-status-codes": "2.1.4"
   },
   "publishConfig": {
     "main": "dist/index.js"

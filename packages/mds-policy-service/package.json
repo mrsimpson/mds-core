@@ -31,7 +31,6 @@
     "@mds-core/mds-stream": "workspace:0.2.10",
     "@mds-core/mds-types": "workspace:0.9.1",
     "@mds-core/mds-utils": "workspace:0.4.1",
-    "joi": "17.4.0",
     "pg": "8.7.3",
     "typeorm": "0.2.43",
     "typeorm-cursor-pagination": "0.6.1"
