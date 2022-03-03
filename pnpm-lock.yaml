@@ -294,22 +294,6 @@ importers:
       pg: 8.7.3
       pino: 6.13.3
 
-  container-images/mds-ingest-migration-processor:
-    specifiers:
-      '@mds-core/mds-ingest-migration-processor': workspace:0.0.53
-      '@mds-core/mds-webpack-config': workspace:0.1.11
-      dd-trace: 1.5.1
-      express: 4.17.1
-      pg: 8.7.3
-      pino: 6.13.3
-    dependencies:
-      '@mds-core/mds-ingest-migration-processor': link:../../packages/mds-ingest-migration-processor
-      '@mds-core/mds-webpack-config': link:../../packages/mds-webpack-config
-      dd-trace: 1.5.1
-      express: 4.17.1
-      pg: 8.7.3
-      pino: 6.13.3
-
   container-images/mds-ingest-service:
     specifiers:
       '@mds-core/mds-ingest-service': workspace:0.9.17
@@ -1013,37 +997,8 @@ importers:
       pg: 8.7.3
       typeorm: 0.2.43_pg@8.7.3
 
-  packages/mds-ingest-migration-processor:
-    specifiers:
-      '@mds-core/mds-agency-cache': workspace:0.4.19
-      '@mds-core/mds-api-server': workspace:0.4.7
-      '@mds-core/mds-ingest-service': workspace:0.9.17
-      '@mds-core/mds-logger': workspace:0.5.6
-      '@mds-core/mds-repository': workspace:0.1.42
-      '@mds-core/mds-service-helpers': workspace:0.6.5
-      '@mds-core/mds-stream-processor': workspace:0.4.13
-      '@mds-core/mds-types': workspace:0.9.1
-      '@mds-core/mds-utils': workspace:0.4.1
-      '@types/express': 4.17.12
-      envalid: 7.2.1
-      express: 4.17.1
-    dependencies:
-      '@mds-core/mds-agency-cache': link:../mds-agency-cache
-      '@mds-core/mds-api-server': link:../mds-api-server
-      '@mds-core/mds-ingest-service': link:../mds-ingest-service
-      '@mds-core/mds-logger': link:../mds-logger
-      '@mds-core/mds-repository': link:../mds-repository
-      '@mds-core/mds-service-helpers': link:../mds-service-helpers
-      '@mds-core/mds-stream-processor': link:../mds-stream-processor
-      '@mds-core/mds-types': link:../mds-types
-      '@mds-core/mds-utils': link:../mds-utils
-      '@types/express': 4.17.12
-      envalid: 7.2.1
-      express: 4.17.1
-
   packages/mds-ingest-service:
     specifiers:
-      '@mds-core/mds-agency-cache': workspace:0.4.19
       '@mds-core/mds-logger': workspace:0.5.6
       '@mds-core/mds-repository': workspace:0.1.42
       '@mds-core/mds-rpc-common': workspace:0.3.12
@@ -1056,7 +1011,6 @@ importers:
       typeorm: 0.2.43
       typeorm-cursor-pagination: 0.6.1
     dependencies:
-      '@mds-core/mds-agency-cache': link:../mds-agency-cache
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-repository': link:../mds-repository
       '@mds-core/mds-rpc-common': link:../mds-rpc-common
