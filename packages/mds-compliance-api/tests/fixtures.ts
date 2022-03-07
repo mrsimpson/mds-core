@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ComplianceAggregateDomainModel, ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
-import { PolicyDomainModel } from '@mds-core/mds-policy-service'
+import type { ComplianceAggregateDomainModel, ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
+import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
 import { days } from '@mds-core/mds-utils'
 
 export const POLICY_ID_1 = '6d7a9c7e-853c-4ff7-a86f-e17c06d3bd80'

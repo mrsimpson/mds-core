@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
+import type { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
 import db from '@mds-core/mds-db'
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
-import { PolicyDomainModel } from '@mds-core/mds-policy-service'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry, TEST1_PROVIDER_ID } from '@mds-core/mds-test-data'
-import { Device, VehicleEvent } from '@mds-core/mds-types'
+import type { Device, VehicleEvent } from '@mds-core/mds-types'
 import assert from 'assert'
-import { FeatureCollection } from 'geojson'
+import type { FeatureCollection } from 'geojson'
 import test from 'unit.js'
-import { VehicleEventWithTelemetry } from '../../@types'
+import type { VehicleEventWithTelemetry } from '../../@types'
 import { filterEvents, getAllInputs, getSupersedingPolicies } from '../../engine/helpers'
 import { processPolicy } from '../../engine/mds-compliance-engine'
 import {

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
-import { Timestamp, UUID } from '@mds-core/mds-types'
+import type { InsertReturning } from '@mds-core/mds-repository'
+import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
+import type { Timestamp, UUID } from '@mds-core/mds-types'
 import { ConflictError, hasAtLeastOneEntry, NotFoundError, now, testEnvSafeguard } from '@mds-core/mds-utils'
 import { buildPaginator } from 'typeorm-cursor-pagination'
-import {
+import type {
   FILTER_POLICY_STATUS,
   PolicyDomainCreateModel,
   PolicyDomainModel,

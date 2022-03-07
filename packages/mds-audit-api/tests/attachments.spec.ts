@@ -24,7 +24,7 @@
 
 import { AttachmentServiceClient } from '@mds-core/mds-attachment-service'
 import db from '@mds-core/mds-db'
-import { Attachment, AuditAttachment, Recorded } from '@mds-core/mds-types'
+import type { Attachment, AuditAttachment, Recorded } from '@mds-core/mds-types'
 import { isUUID, NotFoundError, uuid } from '@mds-core/mds-utils'
 import assert from 'assert'
 import fs from 'fs'

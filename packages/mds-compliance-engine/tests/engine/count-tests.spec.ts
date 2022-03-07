@@ -21,8 +21,9 @@
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
-import { CountPolicy, CountRule, RULE_TYPES } from '@mds-core/mds-policy-service'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { CountPolicy, CountRule } from '@mds-core/mds-policy-service'
+import { RULE_TYPES } from '@mds-core/mds-policy-service'
 import {
   LA_CITY_BOUNDARY,
   makeDevices,
@@ -30,12 +31,12 @@ import {
   makeTelemetryInArea,
   veniceSpecOps
 } from '@mds-core/mds-test-data'
-import { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
-import { Feature, FeatureCollection } from 'geojson'
+import type { Feature, FeatureCollection } from 'geojson'
 import MockDate from 'mockdate'
 import test from 'unit.js'
-import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
+import type { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { isCountRuleMatch, processCountPolicy } from '../../engine/count_processors'
 import { generateDeviceMap } from '../../engine/helpers'
 import {

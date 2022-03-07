@@ -1,21 +1,21 @@
-import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service'
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { MatchedVehicleInformation } from '@mds-core/mds-compliance-service'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
-import {
+import type {
   CountPolicy,
   PolicyDomainModel,
   Rule,
   RULE_TYPE,
   SpeedPolicy,
-  TimePolicy,
-  TIME_FORMAT
+  TimePolicy
 } from '@mds-core/mds-policy-service'
+import { TIME_FORMAT } from '@mds-core/mds-policy-service'
 import { getProviders } from '@mds-core/mds-providers'
-import { Device, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { Device, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { areThereCommonElements, days, isDefined, now, RuntimeError } from '@mds-core/mds-utils'
 import { DateTime } from 'luxon'
 import moment from 'moment-timezone'
-import { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
+import type { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
 import { ComplianceEngineLogger as logger } from '../logger'
 const { env } = process
 

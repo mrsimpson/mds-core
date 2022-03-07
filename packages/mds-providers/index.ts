@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { UUID } from '@mds-core/mds-types'
+import type { UUID } from '@mds-core/mds-types'
 
 // Officially recognized providers, from:
 // https://github.com/CityOfLosAngeles/mobility-data-specification/blob/dev/providers.csv

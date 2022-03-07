@@ -40,20 +40,15 @@ import {
   TEST1_PROVIDER_ID,
   TEST2_PROVIDER_ID
 } from '@mds-core/mds-test-data'
+import type { Device, TAXI_VEHICLE_EVENT, Timestamp, TripMetadata, TRIP_STATE, VehicleEvent } from '@mds-core/mds-types'
 import {
-  Device,
   MICRO_MOBILITY_EVENT_STATES_MAP,
   MICRO_MOBILITY_VEHICLE_EVENTS,
   TAXI_EVENT_STATES_MAP,
-  TAXI_VEHICLE_EVENT,
   TAXI_VEHICLE_EVENTS,
-  Timestamp,
   TNC_EVENT_STATES_MAP,
   TNC_VEHICLE_EVENT,
-  TripMetadata,
-  TRIP_STATE,
-  TRIP_STATES,
-  VehicleEvent
+  TRIP_STATES
 } from '@mds-core/mds-types'
 import { pathPrefix, uuid } from '@mds-core/mds-utils'
 import supertest from 'supertest'

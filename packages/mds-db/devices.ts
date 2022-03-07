@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { DeviceDomainModel, IngestServiceClient } from '@mds-core/mds-ingest-service'
-import { Device, DeviceID, Recorded, UUID } from '@mds-core/mds-types'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
+import type { Device, DeviceID, Recorded, UUID } from '@mds-core/mds-types'
 import { csv, isDefined, isUUID, NotFoundError, now } from '@mds-core/mds-utils'
-import { QueryResult } from 'pg'
+import type { QueryResult } from 'pg'
 import { getReadOnlyClient, getWriteableClient } from './client'
 import { DbLogger } from './logger'
 import schema from './schema'

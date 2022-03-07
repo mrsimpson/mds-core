@@ -16,8 +16,9 @@
 
 import { pluralize, tail } from '@mds-core/mds-utils'
 import { bool, cleanEnv } from 'envalid'
-import { Connection, ConnectionOptions } from 'typeorm'
-import { ConnectionManager, ConnectionManagerCliOptions, ConnectionManagerOptions } from './connection'
+import type { Connection, ConnectionOptions } from 'typeorm'
+import type { ConnectionManagerCliOptions, ConnectionManagerOptions } from './connection'
+import { ConnectionManager } from './connection'
 import { RepositoryLogger } from './logger'
 import { RepositoryMigrations } from './migrations'
 

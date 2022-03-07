@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { PROVIDER_SCOPES, TEST1_PROVIDER_ID } from '@mds-core/mds-test-data'
-import { Device, TripMetadata, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { Device, TripMetadata, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { now, uuid } from '@mds-core/mds-utils'
 import { StatusCodes } from 'http-status-codes'
 import type supertest from 'supertest'

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {
+import type {
   ApiRequest,
   ApiRequestParams,
   ApiRequestQuery,
@@ -22,8 +22,8 @@ import {
   ApiResponseLocalsClaims,
   ApiVersionedResponse
 } from '@mds-core/mds-api-server'
-import { TelemetryDomainCreateModel, TelemetryDomainModel } from '@mds-core/mds-ingest-service'
-import {
+import type { TelemetryDomainCreateModel, TelemetryDomainModel } from '@mds-core/mds-ingest-service'
+import type {
   AttachmentSummary,
   Audit,
   AuditEvent,

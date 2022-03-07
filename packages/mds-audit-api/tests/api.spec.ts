@@ -30,16 +30,16 @@ import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import { JEST_PROVIDER_ID } from '@mds-core/mds-providers'
 import { ServiceError } from '@mds-core/mds-service-helpers'
 import { makeDevices, makeEventsWithTelemetry, makeTelemetryInArea, SCOPED_AUTH } from '@mds-core/mds-test-data'
-import {
+import type {
   Attachment,
   Audit,
   AuditAttachment,
-  AUDIT_EVENT_TYPES,
   Device,
   Telemetry,
   Timestamp,
   VehicleEvent
 } from '@mds-core/mds-types'
+import { AUDIT_EVENT_TYPES } from '@mds-core/mds-types'
 import { NotFoundError, now, pathPrefix, rangeRandomInt, uuid } from '@mds-core/mds-utils'
 import Sinon from 'sinon'
 import supertest from 'supertest'

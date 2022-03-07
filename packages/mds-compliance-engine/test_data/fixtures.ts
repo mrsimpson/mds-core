@@ -1,8 +1,9 @@
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
-import { CountPolicy, RULE_TYPES, SpeedPolicy, TimePolicy } from '@mds-core/mds-policy-service'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { CountPolicy, SpeedPolicy, TimePolicy } from '@mds-core/mds-policy-service'
+import { RULE_TYPES } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, restrictedAreas, veniceSpecOps } from '@mds-core/mds-test-data'
 import { days, now } from '@mds-core/mds-utils'
-import { Polygon } from 'geojson'
+import type { Polygon } from 'geojson'
 
 export const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 export const LA_GEOGRAPHY = {

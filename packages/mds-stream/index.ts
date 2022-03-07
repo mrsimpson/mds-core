@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Device, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
+import type { Device, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
 import { KafkaStreamConsumer, KafkaStreamProducer } from './kafka'
 import { AgencyStreamKafka } from './kafka/agency-stream-kafka'
 import { StreamLogger } from './logger'
@@ -22,11 +22,11 @@ import { AgencyStreamNats } from './nats/agency-stream-nats'
 import { NatsStreamConsumer } from './nats/stream-consumer'
 import { NatsStreamProducer } from './nats/stream-producer'
 import { mockStream } from './test-utils'
-import { BadDataError } from './types'
+import type { BadDataError } from './types'
 
-export { KafkaStreamConsumerOptions, KafkaStreamProducerOptions } from './kafka'
-export { NatsProcessorFn } from './nats/codecs'
-export { StreamConsumer, StreamProducer } from './stream-interface'
+export type { KafkaStreamConsumerOptions, KafkaStreamProducerOptions } from './kafka'
+export type { NatsProcessorFn } from './nats/codecs'
+export type { StreamConsumer, StreamProducer } from './stream-interface'
 
 const { env } = process
 

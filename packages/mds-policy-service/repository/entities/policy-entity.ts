@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-import { BigintTransformer, EntityCreateModel, IdentityColumn } from '@mds-core/mds-repository'
-import { Nullable, Timestamp, UUID } from '@mds-core/mds-types'
+import type { EntityCreateModel } from '@mds-core/mds-repository'
+import { BigintTransformer, IdentityColumn } from '@mds-core/mds-repository'
+import type { UUID } from '@mds-core/mds-types'
+import { Nullable, Timestamp } from '@mds-core/mds-types'
 import { Column, Entity, Index } from 'typeorm'
-import { PolicyDomainModel } from '../../@types'
+import type { PolicyDomainModel } from '../../@types'
 
 export interface PolicyEntityModel extends IdentityColumn {
   policy_id: PolicyDomainModel['policy_id']

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import type { MicroMobilityVehicleEvent } from '@mds-core/mds-types'
 import {
-  MicroMobilityVehicleEvent,
   MICRO_MOBILITY_EVENT_STATES_MAP,
   MICRO_MOBILITY_VEHICLE_EVENTS,
   MICRO_MOBILITY_VEHICLE_STATES

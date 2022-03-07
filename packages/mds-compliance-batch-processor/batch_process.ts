@@ -15,11 +15,14 @@
  */
 
 import { getProviderInputs, getSupersedingPolicies, processPolicy } from '@mds-core/mds-compliance-engine'
-import { ComplianceServiceClient, ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
-import { GeographyDomainModel, GeographyServiceClient } from '@mds-core/mds-geography-service'
-import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
+import type { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service'
+import { ComplianceServiceClient } from '@mds-core/mds-compliance-service'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import { GeographyServiceClient } from '@mds-core/mds-geography-service'
+import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
+import { PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { getProviders } from '@mds-core/mds-providers'
-import { SerializedBuffers } from '@mds-core/mds-service-helpers'
+import type { SerializedBuffers } from '@mds-core/mds-service-helpers'
 import { now } from '@mds-core/mds-utils'
 import { ComplianceBatchProcessorLogger } from './logger'
 

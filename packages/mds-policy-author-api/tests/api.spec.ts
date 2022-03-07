@@ -29,13 +29,14 @@
 import { ApiServer } from '@mds-core/mds-api-server'
 import { GeographyFactory, GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
 // eslint-disable-next-line prettier/prettier
-import { PolicyDomainCreateModel, PolicyMetadataDomainModel, PolicyServiceClient, PolicyStreamKafka } from '@mds-core/mds-policy-service'
+import type { PolicyDomainCreateModel, PolicyMetadataDomainModel} from '@mds-core/mds-policy-service';
+import { PolicyServiceClient, PolicyStreamKafka } from '@mds-core/mds-policy-service'
 import { PolicyRepository } from '@mds-core/mds-policy-service/repository'
 import { PolicyServiceManager } from '@mds-core/mds-policy-service/service/manager'
 import { PolicyFactory } from '@mds-core/mds-policy-service/tests/helpers'
 import stream from '@mds-core/mds-stream'
 import { SCOPED_AUTH, venice } from '@mds-core/mds-test-data'
-import { Timestamp, UUID } from '@mds-core/mds-types'
+import type { Timestamp, UUID } from '@mds-core/mds-types'
 import { days, isUUID, now, pathPrefix, uuid } from '@mds-core/mds-utils'
 import { StatusCodes } from 'http-status-codes'
 import supertest from 'supertest'

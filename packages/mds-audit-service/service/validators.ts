@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-import { JSONSchemaType, SchemaValidator } from '@mds-core/mds-schema-validators'
-import { AUDIT_EVENTS, Telemetry, VEHICLE_EVENTS } from '@mds-core/mds-types'
-import { AuditAttachmentDomainModel, AuditDomainModel, AuditEventDomainModel } from '../@types'
+import type { JSONSchemaType } from '@mds-core/mds-schema-validators'
+import { SchemaValidator } from '@mds-core/mds-schema-validators'
+import type { Telemetry } from '@mds-core/mds-types'
+import { AUDIT_EVENTS, VEHICLE_EVENTS } from '@mds-core/mds-types'
+import type { AuditAttachmentDomainModel, AuditDomainModel, AuditEventDomainModel } from '../@types'
 
 const uuidSchema = <const>{ type: 'string', format: 'uuid' }
 const enumSchema = <T>(enumType: T[]) => <const>{ type: 'string', enum: enumType }

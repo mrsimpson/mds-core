@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { Device, UUID } from '@mds-core/mds-types'
+import type { Device, UUID } from '@mds-core/mds-types'
 import { now, uuid } from '@mds-core/mds-utils'
-import {
+import type {
   DeviceDomainModel,
   EventAnnotationDomainCreateModel,
   EventDomainCreateModel,

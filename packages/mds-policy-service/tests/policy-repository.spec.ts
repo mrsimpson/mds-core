@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { UUID } from '@mds-core/mds-types'
+import type { UUID } from '@mds-core/mds-types'
 import {
   clone,
   ConflictError,
@@ -13,7 +13,7 @@ import {
   uuid,
   yesterday
 } from '@mds-core/mds-utils'
-import { PolicyDomainCreateModel, PolicyMetadataDomainModel } from '../@types'
+import type { PolicyDomainCreateModel, PolicyMetadataDomainModel } from '../@types'
 import { PolicyRepository } from '../repository'
 import {
   DELETEABLE_POLICY,

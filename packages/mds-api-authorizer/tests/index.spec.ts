@@ -15,7 +15,7 @@
  */
 
 import { uuid } from '@mds-core/mds-utils'
-import express from 'express'
+import type express from 'express'
 import jwt from 'jsonwebtoken'
 import { AuthorizationHeaderApiAuthorizer, CustomClaim, WebSocketAuthorizer } from '../index'
 

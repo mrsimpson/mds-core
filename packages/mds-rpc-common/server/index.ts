@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-import { ModuleRpcCommon } from '@lacuna-tech/rpc_ts/lib/common'
+import type { ModuleRpcCommon } from '@lacuna-tech/rpc_ts/lib/common'
 import { ModuleRpcProtocolGrpcWebCommon } from '@lacuna-tech/rpc_ts/lib/protocol/grpc_web/common'
 import { ModuleRpcProtocolServer } from '@lacuna-tech/rpc_ts/lib/protocol/server'
-import { ServiceHandlerFor } from '@lacuna-tech/rpc_ts/lib/server/server'
+import type { ServiceHandlerFor } from '@lacuna-tech/rpc_ts/lib/server/server'
+import type { RawBodyParserMiddlewareOptions } from '@mds-core/mds-api-server'
 import {
   HealthRequestHandler,
   HttpServer,
   PrometheusMiddleware,
   RawBodyParserMiddleware,
-  RawBodyParserMiddlewareOptions,
   RequestLoggingMiddleware
 } from '@mds-core/mds-api-server'
 import { ProcessManager } from '@mds-core/mds-service-helpers'
-import { Nullable } from '@mds-core/mds-types'
-import express, { Express } from 'express'
-import http from 'http'
+import type { Nullable } from '@mds-core/mds-types'
+import type { Express } from 'express'
+import express from 'express'
+import type http from 'http'
 import net from 'net'
 import REPL from 'repl'
-import { REPL_PORT, RpcServiceDefinition, RPC_CONTENT_TYPE, RPC_CONTEXT_KEY, RPC_PORT } from '../@types'
+import type { RpcServiceDefinition } from '../@types'
+import { REPL_PORT, RPC_CONTENT_TYPE, RPC_CONTEXT_KEY, RPC_PORT } from '../@types'
 import { RpcCommonLogger } from '../logger'
 
 export interface RpcServiceHandlers {

@@ -6,11 +6,11 @@ import { uuid } from '@mds-core/mds-utils'
 import { StatusCodes } from 'http-status-codes'
 import supertest from 'supertest'
 import { api } from '../api'
+import type { POSTableVehicleEvent } from './taxi-test-helpers'
 import {
   basicTripFlow,
   constructTripMetadata,
   fakeVehicle,
-  POSTableVehicleEvent,
   postEvent,
   postTripMetadata,
   registerVehicleRequest

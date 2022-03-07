@@ -16,8 +16,9 @@
 
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
-import { DeviceDomainModel, IngestServiceClient } from '@mds-core/mds-ingest-service'
-import {
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
+import type {
   Audit,
   AuditEvent,
   BoundingBox,
@@ -31,7 +32,7 @@ import {
   WithGpsProperty
 } from '@mds-core/mds-types'
 import { now, tail } from '@mds-core/mds-utils'
-import { Query } from 'express-serve-static-core'
+import type { Query } from 'express-serve-static-core'
 import { AuditApiLogger } from './logger'
 
 export async function deleteAudit(audit_trip_id: UUID): Promise<number> {

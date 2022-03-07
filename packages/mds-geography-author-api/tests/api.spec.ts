@@ -24,12 +24,8 @@
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 
 import { ApiServer } from '@mds-core/mds-api-server'
-import {
-  GeographyRepository,
-  GeographyServiceClient,
-  GeographyServiceManager,
-  GeographyWithMetadataDomainModel
-} from '@mds-core/mds-geography-service'
+import type { GeographyWithMetadataDomainModel } from '@mds-core/mds-geography-service'
+import { GeographyRepository, GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
 import {
   GEOGRAPHY2_UUID,
   GEOGRAPHY_UUID,

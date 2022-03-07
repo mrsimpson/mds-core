@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { validateGeographyDomainModel } from '@mds-core/mds-geography-service/service/validators'
 import { validateEventDomainCreateModel } from '@mds-core/mds-ingest-service'
-import { PolicyDomainModel, validatePolicyDomainModel } from '@mds-core/mds-policy-service'
-import { Device, VehicleEvent } from '@mds-core/mds-types'
+import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
+import { validatePolicyDomainModel } from '@mds-core/mds-policy-service'
+import type { Device, VehicleEvent } from '@mds-core/mds-types'
 import * as fs from 'fs'
 import * as yargs from 'yargs'
-import { ComplianceEngineResult } from './@types'
+import type { ComplianceEngineResult } from './@types'
 import { createComplianceSnapshot } from './engine'
 import { filterEvents, generateDeviceMap, getSupersedingPolicies } from './engine/helpers'
 import { ComplianceEngineLogger } from './logger'

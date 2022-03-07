@@ -16,15 +16,15 @@
 
 import { ModelMapper } from '@mds-core/mds-repository'
 import { now } from '@mds-core/mds-utils'
-import {
+import type {
   PolicyDomainCreateModel,
   PolicyDomainModel,
   PolicyMetadataDomainCreateModel,
   PolicyMetadataDomainModel,
   POLICY_STATUS
 } from '../@types'
-import { PolicyEntityCreateModel, PolicyEntityModel } from './entities/policy-entity'
-import { PolicyMetadataEntityCreateModel, PolicyMetadataEntityModel } from './entities/policy-metadata-entity'
+import type { PolicyEntityCreateModel, PolicyEntityModel } from './entities/policy-entity'
+import type { PolicyMetadataEntityCreateModel, PolicyMetadataEntityModel } from './entities/policy-metadata-entity'
 
 type PolicyEntityToDomainOptions = Partial<{ withStatus: boolean }>
 

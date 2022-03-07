@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {
+import type {
   Device,
   MODALITY,
   PROPULSION_TYPE,
@@ -36,7 +36,7 @@ import {
   rangeRandomInt,
   uuid
 } from '@mds-core/mds-utils'
-import { Geometry } from 'geojson'
+import type { Geometry } from 'geojson'
 import { DISTRICT_SEVEN } from './test-areas/district-seven'
 import { LA_CITY_BOUNDARY } from './test-areas/la-city-boundary'
 import { restrictedAreas, serviceAreaMap, venice, veniceSpecOps } from './test-areas/test-areas'

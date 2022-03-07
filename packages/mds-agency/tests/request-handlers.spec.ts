@@ -2,7 +2,7 @@ import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import stream from '@mds-core/mds-stream'
-import { Device } from '@mds-core/mds-types'
+import type { Device } from '@mds-core/mds-types'
 import { uuid } from '@mds-core/mds-utils'
 import Sinon from 'sinon'
 import {
@@ -12,7 +12,7 @@ import {
   updateVehicle,
   updateVehicleFail
 } from '../request-handlers'
-import {
+import type {
   AgencyApiGetVehicleByIdRequest,
   AgencyApiGetVehiclesByProviderRequest,
   AgencyApiGetVehiclesByProviderResponse,

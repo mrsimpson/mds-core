@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
-import { Nullable, TimeRange, Timestamp, UUID } from '@mds-core/mds-types'
-import { PolicyDomainCreateModel, PolicyDomainModel, PolicyMetadataDomainModel, POLICY_STATUS } from './models'
+import type { RpcEmptyRequestContext, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcRoute } from '@mds-core/mds-rpc-common'
+import type { Nullable, TimeRange, Timestamp, UUID } from '@mds-core/mds-types'
+import type { PolicyDomainCreateModel, PolicyDomainModel, PolicyMetadataDomainModel, POLICY_STATUS } from './models'
 
 export type FILTER_POLICY_STATUS = Exclude<POLICY_STATUS, 'unknown'>
 

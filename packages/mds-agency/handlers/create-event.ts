@@ -2,10 +2,11 @@ import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
 import { IngestServiceClient, validateEventDomainModel } from '@mds-core/mds-ingest-service'
 import stream from '@mds-core/mds-stream'
-import { DeepPartial, Device, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { DeepPartial, Device, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { isDefined, normalizeToArray, NotFoundError, now, ValidationError } from '@mds-core/mds-utils'
 import { AgencyLogger } from '../logger'
-import { AgencyApiSubmitVehicleEventRequest, AgencyApiSubmitVehicleEventResponse, AgencyServerError } from '../types'
+import type { AgencyApiSubmitVehicleEventRequest, AgencyApiSubmitVehicleEventResponse } from '../types'
+import { AgencyServerError } from '../types'
 import { agencyValidationErrorParser, eventValidForMode } from '../utils'
 
 const handleDbError = async (

@@ -14,12 +14,12 @@
     limitations under the License.
  */
 
-import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
-import { PolicyDomainModel } from '@mds-core/mds-policy-service'
-import { Device, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
+import type { Device, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { filterDefined, hasOwnProperty, now, uuid } from '@mds-core/mds-utils'
-import { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
+import type { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
 import { ComplianceEngineLogger } from '../logger'
 import { processCountPolicy } from './count_processors'
 import { getPolicyType, getProviderIDs, isCountPolicy, isPolicyActive, isSpeedPolicy, isTimePolicy } from './helpers'

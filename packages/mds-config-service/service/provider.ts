@@ -15,8 +15,9 @@
  */
 
 import { ConfigFileReader } from '@mds-core/mds-config-files'
-import { ServiceError, ServiceProvider, ServiceResult } from '@mds-core/mds-service-helpers'
-import { ConfigService, ConfigServiceRequestContext } from '../@types'
+import type { ServiceProvider } from '@mds-core/mds-service-helpers'
+import { ServiceError, ServiceResult } from '@mds-core/mds-service-helpers'
+import type { ConfigService, ConfigServiceRequestContext } from '../@types'
 
 export const ConfigServiceProvider: ServiceProvider<ConfigService, ConfigServiceRequestContext> = {
   getSettings: async (context, properties, options) => {

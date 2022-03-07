@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service/@types'
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
-import { SpeedPolicy, SpeedRule } from '@mds-core/mds-policy-service'
+import type { MatchedVehicleInformation } from '@mds-core/mds-compliance-service/@types'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { SpeedPolicy, SpeedRule } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
-import { FeatureCollection } from 'geojson'
+import type { Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import type { FeatureCollection } from 'geojson'
 import test from 'unit.js'
-import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
+import type { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { filterEvents, generateDeviceMap } from '../../engine/helpers'
 import { isSpeedRuleMatch, processSpeedPolicy } from '../../engine/speed_processors'
 import {

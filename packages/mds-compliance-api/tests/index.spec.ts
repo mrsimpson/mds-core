@@ -16,7 +16,8 @@
 
 import { ApiServer } from '@mds-core/mds-api-server'
 import { ComplianceServiceClient, ComplianceViolationFactory } from '@mds-core/mds-compliance-service'
-import { PolicyDomainModel, PolicyServiceClient } from '@mds-core/mds-policy-service'
+import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
+import { PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { SCOPED_AUTH } from '@mds-core/mds-test-data'
 import { pathPrefix, uuid } from '@mds-core/mds-utils'
 import HttpStatus from 'http-status-codes'

@@ -20,19 +20,12 @@ import db from '@mds-core/mds-db'
 import { IngestServiceClient, validateDeviceDomainModel } from '@mds-core/mds-ingest-service'
 import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import stream from '@mds-core/mds-stream'
-import {
-  ACCESSIBILITY_OPTIONS,
-  PAYMENT_METHODS,
-  RESERVATION_METHODS,
-  RESERVATION_TYPES,
-  TripMetadata,
-  UUID,
-  VEHICLE_STATE
-} from '@mds-core/mds-types'
+import type { TripMetadata, UUID, VEHICLE_STATE } from '@mds-core/mds-types'
+import { ACCESSIBILITY_OPTIONS, PAYMENT_METHODS, RESERVATION_METHODS, RESERVATION_TYPES } from '@mds-core/mds-types'
 import { isDefined, NotFoundError, now, ServerError, ValidationError } from '@mds-core/mds-utils'
 import urls from 'url'
 import { AgencyLogger } from './logger'
-import {
+import type {
   AgencyAipGetVehicleByIdResponse,
   AgencyApiGetVehicleByIdRequest,
   AgencyApiGetVehiclesByProviderRequest,
@@ -43,9 +36,9 @@ import {
   AgencyApiRegisterVehicleResponse,
   AgencyApiRequest,
   AgencyApiUpdateVehicleRequest,
-  AgencyApiUpdateVehicleResponse,
-  AgencyServerError
+  AgencyApiUpdateVehicleResponse
 } from './types'
+import { AgencyServerError } from './types'
 import { agencyValidationErrorParser, computeCompositeVehicleData, getVehicles, readPayload } from './utils'
 
 export const registerVehicle = async (req: AgencyApiRegisterVehicleRequest, res: AgencyApiRegisterVehicleResponse) => {

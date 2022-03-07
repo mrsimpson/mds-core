@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { IdentityColumn, ModelMapper, RecordedColumn } from '@mds-core/mds-repository'
-import { Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
-import { DeviceEntityModel } from '../entities/device-entity'
-import { EventEntityModel } from '../entities/event-entity'
-import { TelemetryEntityModel } from '../entities/telemetry-entity'
-import { MigratedEntityModel } from '../mixins/migrated-entity'
+import type { IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
+import { ModelMapper } from '@mds-core/mds-repository'
+import type { Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import type { DeviceEntityModel } from '../entities/device-entity'
+import type { EventEntityModel } from '../entities/event-entity'
+import type { TelemetryEntityModel } from '../entities/telemetry-entity'
+import type { MigratedEntityModel } from '../mixins/migrated-entity'
 
 type MigratedEntityCreateOptions = {
   migrated_from: MigratedEntityModel

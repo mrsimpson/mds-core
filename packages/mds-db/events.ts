@@ -15,13 +15,13 @@
  */
 
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
-import { Recorded, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { Recorded, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { isDefined, isTimestamp, isUUID, NotFoundError } from '@mds-core/mds-utils'
 import { getReadOnlyClient, getWriteableClient } from './client'
 import { DbLogger } from './logger'
 import schema from './schema'
 import { cols_sql, logSql, SqlExecuter, SqlVals, vals_list, vals_sql } from './sql-utils'
-import { ReadEventsQueryParams, ReadEventsResult } from './types'
+import type { ReadEventsQueryParams, ReadEventsResult } from './types'
 
 export async function writeEvent(event: VehicleEvent) {
   const client = await getWriteableClient()

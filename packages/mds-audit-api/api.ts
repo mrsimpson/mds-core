@@ -15,17 +15,16 @@
  */
 
 import { asJsonApiLinks, parsePagingQueryParams, parseRequest } from '@mds-core/mds-api-helpers'
-import { AccessTokenScopeValidator, checkAccess } from '@mds-core/mds-api-server'
+import type { AccessTokenScopeValidator } from '@mds-core/mds-api-server'
+import { checkAccess } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import {
-  IngestServiceClient,
-  TelemetryDomainModel,
-  validateTelemetryDomainCreateModel
-} from '@mds-core/mds-ingest-service'
+import type { TelemetryDomainModel } from '@mds-core/mds-ingest-service'
+import { IngestServiceClient, validateTelemetryDomainCreateModel } from '@mds-core/mds-ingest-service'
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import { ValidationError } from '@mds-core/mds-schema-validators'
 import { isError } from '@mds-core/mds-service-helpers'
-import { AuditEvent, AUDIT_EVENT_TYPES, Telemetry, TelemetryData, Timestamp } from '@mds-core/mds-types'
+import type { AuditEvent, Telemetry, TelemetryData, Timestamp } from '@mds-core/mds-types'
+import { AUDIT_EVENT_TYPES } from '@mds-core/mds-types'
 import {
   AuthorizationError,
   ConflictError,
@@ -36,7 +35,7 @@ import {
   UnsupportedTypeError,
   uuid
 } from '@mds-core/mds-utils'
-import express from 'express'
+import type express from 'express'
 import urls from 'url'
 import {
   attachmentSummary,
@@ -60,7 +59,7 @@ import {
   writeAudit,
   writeAuditEvent
 } from './service'
-import {
+import type {
   AuditApiAccessTokenScopes,
   AuditApiAuditEndRequest,
   AuditApiAuditNoteRequest,

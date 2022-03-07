@@ -14,11 +14,12 @@
     limitations under the License.
  */
 
-import { GeographyDomainModel, getPolygon } from '@mds-core/mds-geography-service'
-import { TimePolicy, TimeRule } from '@mds-core/mds-policy-service'
-import { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import { getPolygon } from '@mds-core/mds-geography-service'
+import type { TimePolicy, TimeRule } from '@mds-core/mds-policy-service'
+import type { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { clone, now, pointInShape, RULE_UNIT_MAP } from '@mds-core/mds-utils'
-import { ComplianceEngineResult } from '../@types'
+import type { ComplianceEngineResult } from '../@types'
 import { ComplianceEngineLogger as logger } from '../logger'
 import { annotateVehicleMap, isInStatesOrEvents, isInVehicleTypes, isRuleActive } from './helpers'
 

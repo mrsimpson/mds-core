@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DeepPartial, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { DeepPartial, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
 
 export type ReadStreamOptions = Partial<{
   count: number
