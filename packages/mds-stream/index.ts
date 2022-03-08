@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import type { Device, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import type { Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
 import { KafkaStreamConsumer, KafkaStreamProducer } from './kafka'
 import { AgencyStreamKafka } from './kafka/agency-stream-kafka'
 import { StreamLogger } from './logger'
@@ -46,7 +47,7 @@ async function shutdown() {
 }
 
 // put basics of vehicle in the cache
-async function writeDevice(device: Device) {
+async function writeDevice(device: DeviceDomainModel) {
   if (env.NATS) {
     try {
       await AgencyStreamNats.writeDevice(device)

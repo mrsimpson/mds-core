@@ -17,6 +17,7 @@
     "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand"
   },
   "dependencies": {
+    "@mds-core/mds-ingest-service": "workspace:0.10.0",
     "@mds-core/mds-logger": "workspace:0.5.6",
     "@mds-core/mds-types": "workspace:0.9.1",
     "@mds-core/mds-utils": "workspace:0.4.1",

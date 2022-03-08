@@ -16,7 +16,8 @@
 
 import type { IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import { ModelMapper } from '@mds-core/mds-repository'
-import type { Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import type { Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import type { DeviceDomainModel } from '../../@types'
 import type { DeviceEntityModel } from '../entities/device-entity'
 import type { EventEntityModel } from '../entities/event-entity'
 import type { TelemetryEntityModel } from '../entities/telemetry-entity'
@@ -29,7 +30,7 @@ type MigratedEntityCreateOptions = {
 export type MigratedDeviceEntityCreateModel = Omit<DeviceEntityModel, keyof IdentityColumn>
 
 export const MigratedDeviceToEntityCreate = ModelMapper<
-  Device,
+  DeviceDomainModel,
   MigratedDeviceEntityCreateModel,
   MigratedEntityCreateOptions
 >(({ year = null, mfgr = null, model = null, accessibility_options = null, ...migrated }, options) => {

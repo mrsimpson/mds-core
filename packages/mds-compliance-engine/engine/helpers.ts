@@ -1,5 +1,6 @@
 import type { MatchedVehicleInformation } from '@mds-core/mds-compliance-service'
 import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import type {
   CountPolicy,
@@ -11,7 +12,7 @@ import type {
 } from '@mds-core/mds-policy-service'
 import { TIME_FORMAT } from '@mds-core/mds-policy-service'
 import { getProviders } from '@mds-core/mds-providers'
-import type { Device, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { UUID, VehicleEvent } from '@mds-core/mds-types'
 import { areThereCommonElements, days, isDefined, now, RuntimeError } from '@mds-core/mds-utils'
 import { DateTime } from 'luxon'
 import moment from 'moment-timezone'
@@ -36,8 +37,8 @@ export const isTimePolicy = (policy: PolicyDomainModel): policy is TimePolicy =>
 export const isSpeedPolicy = (policy: PolicyDomainModel): policy is SpeedPolicy =>
   policy.rules.every(({ rule_type }) => rule_type === 'speed')
 
-export function generateDeviceMap(devices: Device[]): { [d: string]: Device } {
-  return [...devices].reduce((deviceMapAcc: { [d: string]: Device }, device: Device) => {
+export function generateDeviceMap(devices: DeviceDomainModel[]): { [d: string]: DeviceDomainModel } {
+  return [...devices].reduce((deviceMapAcc: { [d: string]: DeviceDomainModel }, device: DeviceDomainModel) => {
     return Object.assign(deviceMapAcc, { [device.device_id]: device })
   }, {})
 }
@@ -85,7 +86,7 @@ export async function getProviderInputs(provider_id: string, timestamp: number =
   }
 
   const deviceMap = (await IngestServiceClient.getDevices(eventsAcc.map(({ device_id }) => device_id))).reduce<{
-    [k: string]: Device
+    [k: string]: DeviceDomainModel
   }>((acc, device) => {
     acc[device.device_id] = device
     return acc
@@ -176,7 +177,7 @@ export function isRuleActive({ start_time, end_time, days }: Pick<Rule, 'start_t
   return isCurrentDayInDays({ days }) && isCurrentTimeInInterval({ start_time, end_time })
 }
 
-export function isInVehicleTypes(rule: Rule, device: Pick<Device, 'vehicle_type'>): boolean {
+export function isInVehicleTypes(rule: Rule, device: Pick<DeviceDomainModel, 'vehicle_type'>): boolean {
   return (
     !rule.vehicle_types ||
     rule.vehicle_types.length === 0 ||
@@ -214,7 +215,7 @@ export function filterEvents(events: VehicleEvent[], end_time = now()): VehicleE
 }
 
 export function createMatchedVehicleInformation(
-  device: Device,
+  device: DeviceDomainModel,
   event: VehicleEventWithTelemetry,
   speed?: number,
   rule_applied_id?: UUID,
@@ -239,11 +240,13 @@ export function annotateVehicleMap<T extends Rule<Exclude<RULE_TYPE, 'rate'>>>(
   policy: PolicyDomainModel,
   events: VehicleEventWithTelemetry[],
   geographies: GeographyDomainModel[],
-  vehicleMap: { [d: string]: { device: Device; speed?: number; rule_applied?: UUID; rules_matched?: UUID[] } },
+  vehicleMap: {
+    [d: string]: { device: DeviceDomainModel; speed?: number; rule_applied?: UUID; rules_matched?: UUID[] }
+  },
   matcherFunction: (
     rule: T,
     geographyArr: GeographyDomainModel[],
-    device: Device,
+    device: DeviceDomainModel,
     event: VehicleEventWithTelemetry
   ) => boolean
 ): MatchedVehicleInformation[] {
@@ -307,7 +310,7 @@ export async function getProviderIDs(provider_ids: UUID[] | undefined | null) {
  */
 export function isInStatesOrEvents(
   rule: Pick<Rule, 'states'>,
-  device: Pick<Device, 'modality'>,
+  device: Pick<DeviceDomainModel, 'modality'>,
   event: VehicleEvent
 ): boolean {
   const { states } = rule

@@ -16,8 +16,9 @@
 
 import type { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
 import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
-import type { Device, Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { Timestamp, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { filterDefined, hasOwnProperty, now, uuid } from '@mds-core/mds-utils'
 import type { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
 import { ComplianceEngineLogger } from '../logger'
@@ -30,7 +31,7 @@ function computeComplianceSnapshot(
   policy: PolicyDomainModel,
   filteredEvents: VehicleEventWithTelemetry[],
   geographies: GeographyDomainModel[],
-  deviceMap: { [d: string]: Device }
+  deviceMap: { [d: string]: DeviceDomainModel }
 ) {
   const policy_type = getPolicyType(policy)
 
@@ -47,7 +48,7 @@ export function createComplianceSnapshot(
   policy: PolicyDomainModel,
   geographies: GeographyDomainModel[],
   filteredEvents: VehicleEvent[],
-  deviceMap: { [d: string]: Device },
+  deviceMap: { [d: string]: DeviceDomainModel },
   compliance_as_of: Timestamp = now()
 ): ComplianceSnapshotDomainModel | undefined {
   const complianceResult = computeComplianceSnapshot(

@@ -517,7 +517,6 @@ importers:
 
   packages/mds-api-authorizer:
     specifiers:
-      '@mds-core/mds-test-data': workspace:0.4.18
       '@mds-core/mds-types': workspace:0.9.1
       '@mds-core/mds-utils': workspace:0.4.1
       '@types/express': 4.17.13
@@ -525,7 +524,6 @@ importers:
       express: 4.17.1
       jsonwebtoken: 8.5.1
     dependencies:
-      '@mds-core/mds-test-data': link:../mds-test-data
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
       '@types/express': 4.17.13
@@ -807,6 +805,7 @@ importers:
       '@mds-core/mds-compliance-service': workspace:0.10.21
       '@mds-core/mds-db': workspace:0.6.7
       '@mds-core/mds-geography-service': 0.10.12
+      '@mds-core/mds-ingest-service': 0.10.0
       '@mds-core/mds-logger': workspace:0.5.6
       '@mds-core/mds-policy-service': workspace:0.11.18
       '@mds-core/mds-providers': 0.2.8
@@ -823,6 +822,7 @@ importers:
       '@mds-core/mds-compliance-service': link:../mds-compliance-service
       '@mds-core/mds-db': link:../mds-db
       '@mds-core/mds-geography-service': link:../mds-geography-service
+      '@mds-core/mds-ingest-service': link:../mds-ingest-service
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-policy-service': link:../mds-policy-service
       '@mds-core/mds-providers': link:../mds-providers
@@ -1351,6 +1351,7 @@ importers:
 
   packages/mds-stream:
     specifiers:
+      '@mds-core/mds-ingest-service': workspace:0.10.0
       '@mds-core/mds-logger': workspace:0.5.6
       '@mds-core/mds-types': workspace:0.9.1
       '@mds-core/mds-utils': workspace:0.4.1
@@ -1359,6 +1360,7 @@ importers:
       nats: 2.2.0
       sinon: 11.1.2
     dependencies:
+      '@mds-core/mds-ingest-service': link:../mds-ingest-service
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
@@ -1387,10 +1389,12 @@ importers:
 
   packages/mds-test-data:
     specifiers:
+      '@mds-core/mds-ingest-service': workspace:0.10.0
       '@mds-core/mds-providers': workspace:0.2.8
       '@mds-core/mds-types': workspace:0.9.1
       '@mds-core/mds-utils': workspace:0.4.1
     dependencies:
+      '@mds-core/mds-ingest-service': link:../mds-ingest-service
       '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils

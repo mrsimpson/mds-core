@@ -16,8 +16,9 @@
 
 import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { getPolygon } from '@mds-core/mds-geography-service'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import type { CountPolicy, CountRule } from '@mds-core/mds-policy-service'
-import type { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { clone, isDefined, pointInShape } from '@mds-core/mds-utils'
 import type { ComplianceEngineResult, VehicleEventWithTelemetry } from '../@types'
 import { ComplianceEngineLogger as logger } from '../logger'
@@ -29,7 +30,7 @@ import { annotateVehicleMap, isInStatesOrEvents, isInVehicleTypes, isRuleActive 
 export function isCountRuleMatch(
   rule: CountRule,
   geographies: GeographyDomainModel[],
-  device: Device,
+  device: DeviceDomainModel,
   event: VehicleEventWithTelemetry
 ) {
   if (isRuleActive(rule)) {
@@ -59,12 +60,12 @@ export function processCountPolicy(
   policy: CountPolicy,
   events: (VehicleEvent & { telemetry: Telemetry })[],
   geographies: GeographyDomainModel[],
-  devices: { [d: string]: Device }
+  devices: { [d: string]: DeviceDomainModel }
 ): ComplianceEngineResult | undefined {
   // Necessary because we destructively modify the devices list to keep track of which devices we've seen.
   const devicesToCheck = clone(devices)
-  const matchedVehicles: { [d: string]: { device: Device; rule_applied: UUID; rules_matched?: UUID[] } } = {}
-  const overflowedVehicles: { [d: string]: { device: Device; rules_matched: UUID[] } } = {}
+  const matchedVehicles: { [d: string]: { device: DeviceDomainModel; rule_applied: UUID; rules_matched?: UUID[] } } = {}
+  const overflowedVehicles: { [d: string]: { device: DeviceDomainModel; rules_matched: UUID[] } } = {}
   let countMinimumViolations = 0
   policy.rules.forEach(rule => {
     const maximum = isDefined(rule.maximum) ? rule.maximum : Number.POSITIVE_INFINITY

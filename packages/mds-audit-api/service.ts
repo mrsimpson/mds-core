@@ -93,10 +93,10 @@ export async function readDevice(device_id: UUID, provider_id: UUID): Promise<De
   return await IngestServiceClient.getDevice({ device_id, provider_id })
 }
 
-export async function readDevicesByVehicleId(provider_id: UUID, vehicle_id: string): Promise<Recorded<Device>[]> {
+export async function readDevicesByVehicleId(provider_id: UUID, vehicle_id: string): Promise<DeviceDomainModel[]> {
   try {
     const start = now()
-    const results: Recorded<Device>[] = await db.readDevicesByVehicleId(
+    const results: DeviceDomainModel[] = await db.readDevicesByVehicleId(
       provider_id,
       vehicle_id,
       vehicle_id.replace(/[\W_-]/g, '')
