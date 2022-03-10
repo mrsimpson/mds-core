@@ -1274,6 +1274,7 @@ importers:
 
   packages/mds-repository:
     specifiers:
+      '@mds-core/mds-config-files': 0.1.0
       '@mds-core/mds-logger': workspace:0.5.6
       '@mds-core/mds-types': workspace:0.9.1
       '@mds-core/mds-utils': workspace:0.4.1
@@ -1283,6 +1284,7 @@ importers:
       pg: 8.7.3
       typeorm: 0.2.43
     dependencies:
+      '@mds-core/mds-config-files': link:../mds-config-files
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils

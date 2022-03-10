@@ -14,15 +14,29 @@
  * limitations under the License.
  */
 
+import { ConfigFileReader } from '@mds-core/mds-config-files'
 import { pluralize, tail } from '@mds-core/mds-utils'
 import { bool, cleanEnv } from 'envalid'
 import type { Connection, ConnectionOptions } from 'typeorm'
 import type { ConnectionManagerCliOptions, ConnectionManagerOptions } from './connection'
 import { ConnectionManager } from './connection'
-import { RepositoryLogger } from './logger'
+import { RepositoryLogger as logger } from './logger'
+import type { ModelMapper } from './mapper'
 import { RepositoryMigrations } from './migrations'
 
-export type RepositoryOptions = Pick<ConnectionManagerOptions, 'entities' | 'migrations'>
+type Entity = Required<ConnectionManagerOptions>['entities'][number]
+type Migration = Required<ConnectionManagerOptions>['migrations'][number]
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface EntitySeeder<From = any, To = any> {
+  entity: Entity
+  mapper: ModelMapper<From, To>
+}
+
+export type ReadOnlyRepositoryOptions = { entities: Array<Entity> }
+export type ReadWriteRepositoryOptions = ReadOnlyRepositoryOptions & { migrations: Array<Migration> } & {
+  seeders?: Array<EntitySeeder>
+}
 
 export type ManagedConnection = Omit<Connection, 'connect' | 'close'>
 
@@ -33,7 +47,7 @@ const runAllMigrationsUsingConnection = async (connection: ManagedConnection): P
   if (migrationsTableName) {
     if (connection.migrations.length > 0) {
       const migrations = await connection.runMigrations({ transaction: 'all' })
-      RepositoryLogger.info(
+      logger.info(
         `Ran ${migrations.length || 'no'} ${pluralize(
           migrations.length,
           'migration',
@@ -42,9 +56,9 @@ const runAllMigrationsUsingConnection = async (connection: ManagedConnection): P
           migrations.length ? `: ${migrations.map(migration => migration.name).join(', ')}` : ''
         }`
       )
-      RepositoryLogger.info(`Schema version (${migrationsTableName}): ${tail(connection.migrations).name}`)
+      logger.info(`Schema version (${migrationsTableName}): ${tail(connection.migrations).name}`)
     } else {
-      RepositoryLogger.info(`No migrations defined (${migrationsTableName})`)
+      logger.info(`No migrations defined (${migrationsTableName})`)
     }
   }
 }
@@ -56,7 +70,7 @@ const revertAllMigrationsUsingConnection = async (connection: ManagedConnection)
   if (migrationsTableName) {
     const { migrations } = connection
     await migrations.reduce(p => p.then(() => connection.undoLastMigration()), Promise.resolve())
-    RepositoryLogger.info(
+    logger.info(
       `Reverted ${migrations.length || 'no'} ${pluralize(
         migrations.length,
         'migration',
@@ -65,6 +79,58 @@ const revertAllMigrationsUsingConnection = async (connection: ManagedConnection)
         migrations.length ? `: ${migrations.map(migration => migration.name).join(', ')}` : ''
       }`
     )
+  }
+}
+
+const DataSeeder = (connection: ManagedConnection, path?: string) => {
+  try {
+    const mount = ConfigFileReader.mount(path)
+    logger.info(`R/W repository using seed data files mounted at ${mount.path}`)
+
+    return {
+      using: async <From, To>({ entity, mapper }: EntitySeeder<From, To>): Promise<void> => {
+        const repository = connection.getRepository(entity)
+        const {
+          metadata: { tableName: table }
+        } = repository
+
+        // Make sure the source data file exists
+        if (!mount.jsonFileExists(table)) {
+          return logger.info(`No seed data file found for "${table}`)
+        }
+        logger.info(`Found seed data file for "${table}"`)
+
+        // Make sure the target table is empty
+        const count = await repository.createQueryBuilder().getCount()
+        if (count > 0) {
+          return logger.info(
+            `Seeding will be skipped ("${table}" table contains ${count} ${pluralize(count, 'row', 'rows')})`
+          )
+        }
+        logger.info(`Seeding will be attempted ("${table}" table is empty)`)
+
+        try {
+          const insert = await mount.readJsonFile<Array<From>>(table)
+          if (insert.length === 0) {
+            return logger.info(`Seed data file was empty or not an array`)
+          }
+
+          const {
+            identifiers: { length: inserted }
+          } = await repository
+            .createQueryBuilder()
+            .insert()
+            .values(insert.map(row => mapper.map(row)))
+            .execute()
+
+          logger.info(`Inserted ${inserted} ${pluralize(inserted, 'row', 'rows')} into "${table}"`)
+        } catch (error) {
+          logger.error(`Seeding failed for "${table}}`, { error })
+        }
+      }
+    }
+  } catch {
+    logger.info(`R/W repository seed data files not mounted`)
   }
 }
 
@@ -82,7 +148,7 @@ const asChunksForInsert = <TEntity>(entities: TEntity[], size = 4_000) => {
       : [entities]
 
   if (chunks.length > 1) {
-    RepositoryLogger.info(`Splitting ${entities.length} records into ${chunks.length} chunks for insert`)
+    logger.info(`Splitting ${entities.length} records into ${chunks.length} chunks for insert`)
   }
   return chunks
 }
@@ -99,18 +165,18 @@ export type ReadOnlyRepositoryPublicMethods<T> = T & RepositoryPublicMethods
 export const ReadOnlyRepository = {
   Create: <T extends {}>(
     name: string,
-    { entities }: Omit<Required<RepositoryOptions>, 'migrations'>,
+    { entities }: ReadOnlyRepositoryOptions,
     methods: (repository: ReadOnlyRepositoryProtectedMethods) => T
   ): ReadOnlyRepositoryPublicMethods<T> => {
     const { connect, disconnect } = new ConnectionManager<'ro'>(name, { entities })
 
     return {
       initialize: async () => {
-        RepositoryLogger.info(`Initializing R/O repository: ${name}`)
+        logger.info(`Initializing R/O repository: ${name}`)
         await connect('ro')
       },
       shutdown: async () => {
-        RepositoryLogger.info(`Terminating R/O repository: ${name}`)
+        logger.info(`Terminating R/O repository: ${name}`)
         await disconnect('ro')
       },
       ...methods({ connect, disconnect })
@@ -132,7 +198,7 @@ export type ReadWriteRepositoryPublicMethods<T extends {}> = T &
 export const ReadWriteRepository = {
   Create: <T extends {}>(
     name: string,
-    { entities, migrations }: Required<RepositoryOptions>,
+    { entities, migrations, seeders = [] }: ReadWriteRepositoryOptions,
     methods: (repository: ReadWriteRepositoryProtectedMethods) => T
   ): ReadWriteRepositoryPublicMethods<T> => {
     const migrationsTableName = `${name}-migrations`
@@ -152,18 +218,31 @@ export const ReadWriteRepository = {
     const revertAllMigrations = async (): Promise<void> => revertAllMigrationsUsingConnection(await connect('rw'))
 
     const initialize = async () => {
-      RepositoryLogger.info(`Initializing R/W repository: ${name}`)
-      await Promise.all([connect('ro'), connect('rw')])
+      logger.info(`Initializing R/W repository: ${name}`)
+      const [connection] = await Promise.all([connect('rw'), connect('ro')])
 
       // Enable migrations by default
-      const { PG_MIGRATIONS } = cleanEnv(process.env, { PG_MIGRATIONS: bool({ default: true }) })
+      const { PG_MIGRATIONS } = cleanEnv(process.env, { PG_MIGRATIONS: bool({ default: migrations.length > 0 }) })
+
       if (PG_MIGRATIONS) {
         await runAllMigrations()
+      }
+
+      // Enabled seeding by default
+      const { PG_SEED } = cleanEnv(process.env, { PG_SEED: bool({ default: seeders.length > 0 }) })
+
+      if (PG_SEED) {
+        const seed = DataSeeder(connection)
+        if (seed) {
+          for (const seeder of seeders) {
+            await seed.using(seeder)
+          }
+        }
       }
     }
 
     const shutdown = async () => {
-      RepositoryLogger.info(`Terminating R/W repository: ${name}`)
+      logger.info(`Terminating R/W repository: ${name}`)
       await Promise.all([disconnect('ro'), disconnect('rw')])
     }
 
