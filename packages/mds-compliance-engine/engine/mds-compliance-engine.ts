@@ -80,7 +80,7 @@ export function createComplianceSnapshot(
  * `await readGeographies({ get_published: true })`
  */
 export async function processPolicy(
-  policy: PolicyDomainModel,
+  policy: Required<PolicyDomainModel>,
   geographies: GeographyDomainModel[],
   providerInputs: ProviderInputs,
   compliance_as_of?: Timestamp

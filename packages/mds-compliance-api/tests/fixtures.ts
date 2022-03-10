@@ -356,13 +356,14 @@ export const ALL_COMPLIANCE_AGGREGATES: [
 ]
 
 const GEOGRAPHY_UUID = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
-export const POLICY1: PolicyDomainModel = {
+export const POLICY1: Required<PolicyDomainModel> = {
   name: 'Policy 1',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: POLICY_ID_1,
   start_date: TIME - days(30),
   end_date: null,
   publish_date: TIME - days(30),
+  status: 'active',
   prev_policies: null,
   currency: null,
   provider_ids: [],
@@ -380,13 +381,14 @@ export const POLICY1: PolicyDomainModel = {
   ]
 }
 
-export const POLICY2: PolicyDomainModel = {
+export const POLICY2: Required<PolicyDomainModel> = {
   name: 'Policy 2',
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: POLICY_ID_2,
   start_date: TIME - days(30),
   end_date: null,
   publish_date: TIME - days(30),
+  status: 'active',
   prev_policies: null,
   currency: null,
   provider_ids: [],

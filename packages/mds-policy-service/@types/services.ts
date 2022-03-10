@@ -61,7 +61,7 @@ export interface PolicyService {
   name: () => string
   writePolicy: (policy: PolicyDomainCreateModel) => PolicyDomainModel
   readPolicies: (params: ReadPolicyQueryParams, presentationOptions?: PresentationOptions) => ReadPoliciesResponse
-  readActivePolicies: (timestamp: Timestamp) => PolicyDomainModel[]
+  readActivePolicies: (timestamp: Timestamp) => Required<PolicyDomainModel>[]
   deletePolicy: (policy_id: UUID) => UUID
   editPolicy: (policy: PolicyDomainCreateModel) => PolicyDomainModel
   publishPolicy: (policy_id: UUID, publish_date: Timestamp) => PolicyDomainModel

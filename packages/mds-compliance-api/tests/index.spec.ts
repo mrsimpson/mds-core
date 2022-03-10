@@ -53,9 +53,11 @@ const utils = require('@mds-core/mds-utils')
 describe('Test Compliances API', () => {
   beforeEach(() => {
     jest.spyOn(utils, 'now').mockImplementation(() => TIME + 500)
-    jest.spyOn(PolicyServiceClient, 'readActivePolicies').mockImplementation(async (): Promise<PolicyDomainModel[]> => {
-      return [POLICY1, POLICY2]
-    })
+    jest
+      .spyOn(PolicyServiceClient, 'readActivePolicies')
+      .mockImplementation(async (): Promise<Required<PolicyDomainModel>[]> => {
+        return [POLICY1, POLICY2]
+      })
   })
 
   afterEach(() => {

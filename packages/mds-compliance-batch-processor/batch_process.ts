@@ -19,7 +19,6 @@ import type { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-ser
 import { ComplianceServiceClient } from '@mds-core/mds-compliance-service'
 import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { GeographyServiceClient } from '@mds-core/mds-geography-service'
-import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
 import { PolicyServiceClient } from '@mds-core/mds-policy-service'
 import { getProviders } from '@mds-core/mds-providers'
 import type { SerializedBuffers } from '@mds-core/mds-service-helpers'
@@ -40,7 +39,7 @@ async function batchComplianceSnapshots(snapshots: ComplianceSnapshotDomainModel
 }
 
 export async function computeSnapshot() {
-  const policies: PolicyDomainModel[] = getSupersedingPolicies(await PolicyServiceClient.readActivePolicies(now()))
+  const policies = getSupersedingPolicies(await PolicyServiceClient.readActivePolicies(now()))
   const geographies: GeographyDomainModel[] = await GeographyServiceClient.getPublishedGeographies({
     includeMetadata: false
   })

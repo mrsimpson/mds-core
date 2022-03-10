@@ -35,7 +35,7 @@ import {
 } from '../../test_data/fixtures'
 import { readJson } from './helpers'
 
-let policies: PolicyDomainModel[] = []
+let policies: Required<PolicyDomainModel>[] = []
 
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
@@ -51,7 +51,7 @@ function now(): number {
 
 describe('Tests General Compliance Engine Functionality', () => {
   before(async () => {
-    policies = await readJson('test_data/policies.json')
+    policies = (await readJson('test_data/policies.json')) as Required<PolicyDomainModel>[]
   })
 
   beforeEach(async () => {
@@ -216,6 +216,7 @@ describe('Verifies errors are being properly thrown', async () => {
     await assert.rejects(
       async () => {
         const inputs = await getAllInputs()
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await processPolicy(policies[0]!, geographies, inputs)
       },
       { name: 'RuntimeError' }

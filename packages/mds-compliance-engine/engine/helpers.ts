@@ -99,11 +99,11 @@ export async function getProviderInputs(provider_id: string, timestamp: number =
   }
 }
 
-export function isPolicyActive(policy: PolicyDomainModel, end_time: number = now()): boolean {
-  if (policy.end_date === null) {
-    return end_time >= policy.start_date
+export function isPolicyActive(policy: Required<PolicyDomainModel>, end_time: number = now()): boolean {
+  if (policy.status === undefined) {
+    throw new Error('Policy has no defined status')
   }
-  return end_time >= policy.start_date && end_time <= policy.end_date
+  return policy.status === 'active'
 }
 
 /**
@@ -116,6 +116,7 @@ const numericalWeekdayToLocale = (weekdayNum: number) => {
 
   const weekdayList = <const>['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return weekdayList[weekdayNum - 1]! // subtract 1 cause arrays are 0 indexed, but luxon provides weekdays in 1 | 2 | 3 | 4 | 5 | 6 | 7 form. (1 = monday) (7 = sunday)
 }
 
@@ -188,7 +189,7 @@ export function isInVehicleTypes(rule: Rule, device: Pick<DeviceDomainModel, 've
 // Take a list of policies, and eliminate all those that have been superseded. Returns
 // policies that have not been superseded.
 // TODO: move to mds-policly-service
-export function getSupersedingPolicies(policies: PolicyDomainModel[]): PolicyDomainModel[] {
+export function getSupersedingPolicies<P extends PolicyDomainModel>(policies: P[]): P[] {
   const prev_policies: string[] = policies.reduce((prev_policies_acc: string[], policy: PolicyDomainModel) => {
     if (policy.prev_policies) {
       prev_policies_acc.push(...policy.prev_policies)

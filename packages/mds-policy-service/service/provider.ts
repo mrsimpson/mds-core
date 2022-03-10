@@ -93,7 +93,7 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyService
       if (prev_policies) {
         await Promise.all(
           prev_policies.map(superseded_policy_id =>
-            PolicyRepository.updatePolicySupersededByColumn(superseded_policy_id, policy_id)
+            PolicyRepository.updatePolicySupersededBy(superseded_policy_id, policy_id, publishedPolicy.start_date)
           )
         )
       }

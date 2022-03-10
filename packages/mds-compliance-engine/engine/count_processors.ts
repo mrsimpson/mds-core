@@ -86,6 +86,7 @@ export function processCountPolicy(
             delete devicesToCheck[device.device_id]
             delete overflowedVehicles[device.device_id]
           } else if (overflowedVehicles[device.device_id]) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             overflowedVehicles[device.device_id]!.rules_matched.push(rule_id)
           } else {
             overflowedVehicles[device.device_id] = {
