@@ -1,5 +1,32 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.15
+
+### Patch Changes
+
+- aaf3c1cf: Updates Policy to add a new SupersededAt attribute, and compute pending/expired/active statuses based on when a policy actually supersedes another
+- ade56b85: Replacing Device with DeviceDomainModel
+- a5ab0aa5: Upgrade to Typescript 4.2 and require import/export type usage
+- Updated dependencies [aaf3c1cf]
+- Updated dependencies [ade56b85]
+- Updated dependencies [a93da2b6]
+- Updated dependencies [a5ab0aa5]
+- Updated dependencies [c4e78cc9]
+  - @mds-core/mds-policy-service@0.11.19
+  - @mds-core/mds-db@0.6.8
+  - @mds-core/mds-ingest-service@0.10.1
+  - @mds-core/mds-schema-validators@0.5.7
+  - @mds-core/mds-stream@0.2.11
+  - @mds-core/mds-api-helpers@0.2.16
+  - @mds-core/mds-api-server@0.4.8
+  - @mds-core/mds-compliance-service@0.10.22
+  - @mds-core/mds-geography-service@0.10.13
+  - @mds-core/mds-logger@0.5.7
+  - @mds-core/mds-providers@0.2.9
+  - @mds-core/mds-service-helpers@0.6.6
+  - @mds-core/mds-types@0.9.2
+  - @mds-core/mds-utils@0.4.2
+
 ## 0.8.14
 
 ### Patch Changes

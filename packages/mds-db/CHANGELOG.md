@@ -1,5 +1,23 @@
 # @mds-core/mds-db
 
+## 0.6.8
+
+### Patch Changes
+
+- ade56b85: Replacing Device with DeviceDomainModel
+- a5ab0aa5: Upgrade to Typescript 4.2 and require import/export type usage
+- Updated dependencies [aaf3c1cf]
+- Updated dependencies [ade56b85]
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-policy-service@0.11.19
+  - @mds-core/mds-ingest-service@0.10.1
+  - @mds-core/mds-attachment-service@0.5.17
+  - @mds-core/mds-audit-service@0.5.17
+  - @mds-core/mds-geography-service@0.10.13
+  - @mds-core/mds-logger@0.5.7
+  - @mds-core/mds-types@0.9.2
+  - @mds-core/mds-utils@0.4.2
+
 ## 0.6.7
 
 ### Patch Changes

@@ -1,5 +1,27 @@
 # @mds-core/mds-compliance-api
 
+## 0.4.27
+
+### Patch Changes
+
+- aaf3c1cf: updated tests to match readPolicies type change
+- a5ab0aa5: Upgrade to Typescript 4.2 and require import/export type usage
+- Updated dependencies [aaf3c1cf]
+- Updated dependencies [ade56b85]
+- Updated dependencies [a93da2b6]
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-policy-service@0.11.19
+  - @mds-core/mds-db@0.6.8
+  - @mds-core/mds-schema-validators@0.5.7
+  - @mds-core/mds-test-data@0.4.19
+  - @mds-core/mds-api-helpers@0.2.16
+  - @mds-core/mds-api-server@0.4.8
+  - @mds-core/mds-compliance-service@0.10.22
+  - @mds-core/mds-logger@0.5.7
+  - @mds-core/mds-service-helpers@0.6.6
+  - @mds-core/mds-types@0.9.2
+  - @mds-core/mds-utils@0.4.2
+
 ## 0.4.26
 
 ### Patch Changes

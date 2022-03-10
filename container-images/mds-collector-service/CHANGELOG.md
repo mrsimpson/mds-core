@@ -1,5 +1,13 @@
 # @container-images/mds-collector-service
 
+## 0.0.51
+
+### Patch Changes
+
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-collector-service@0.4.17
+  - @mds-core/mds-webpack-config@0.1.12
+
 ## 0.0.50
 
 ### Patch Changes

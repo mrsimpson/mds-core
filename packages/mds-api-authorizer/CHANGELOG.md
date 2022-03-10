@@ -1,5 +1,15 @@
 # @mds-core/mds-api-authorizer
 
+## 0.1.63
+
+### Patch Changes
+
+- ade56b85: Replacing Device with DeviceDomainModel
+- a5ab0aa5: Upgrade to Typescript 4.2 and require import/export type usage
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-types@0.9.2
+  - @mds-core/mds-utils@0.4.2
+
 ## 0.1.62
 
 ### Patch Changes

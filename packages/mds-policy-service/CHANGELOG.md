@@ -1,5 +1,25 @@
 # @mds-core/mds-policy-service
 
+## 0.11.19
+
+### Patch Changes
+
+- aaf3c1cf: Updates Policy to add a new SupersededAt attribute, and compute pending/expired/active statuses based on when a policy actually supersedes another
+- a5ab0aa5: Upgrade to Typescript 4.2 and require import/export type usage
+- Updated dependencies [ade56b85]
+- Updated dependencies [1f6ccdab]
+- Updated dependencies [a93da2b6]
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-schema-validators@0.5.7
+  - @mds-core/mds-stream@0.2.11
+  - @mds-core/mds-repository@0.1.43
+  - @mds-core/mds-geography-service@0.10.13
+  - @mds-core/mds-logger@0.5.7
+  - @mds-core/mds-rpc-common@0.3.13
+  - @mds-core/mds-service-helpers@0.6.6
+  - @mds-core/mds-types@0.9.2
+  - @mds-core/mds-utils@0.4.2
+
 ## 0.11.18
 
 ### Patch Changes

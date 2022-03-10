@@ -1,5 +1,18 @@
 # @mds-core/mds-repository
 
+## 0.1.43
+
+### Patch Changes
+
+- 1f6ccdab: Add support for initial repository data seeding from JSON files
+- a5ab0aa5: Upgrade to Typescript 4.2 and require import/export type usage
+- Updated dependencies [cde3743c]
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-config-files@0.1.1
+  - @mds-core/mds-logger@0.5.7
+  - @mds-core/mds-types@0.9.2
+  - @mds-core/mds-utils@0.4.2
+
 ## 0.1.42
 
 ### Patch Changes
