@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { ApiAuthorizer, AuthorizationHeaderApiAuthorizer } from '@mds-core/mds-api-authorizer'
-import express from 'express'
-import { ApiRequest, ApiResponse, ApiResponseLocalsClaims } from '../@types'
+import type { ApiAuthorizer } from '@mds-core/mds-api-authorizer'
+import { AuthorizationHeaderApiAuthorizer } from '@mds-core/mds-api-authorizer'
+import type express from 'express'
+import type { ApiRequest, ApiResponse, ApiResponseLocalsClaims } from '../@types'
 
 export type AuthorizationMiddlewareOptions = Partial<{ authorizer: ApiAuthorizer }>
 

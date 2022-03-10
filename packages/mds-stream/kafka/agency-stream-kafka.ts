@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import { Device, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import type { Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
 import { getEnvVar } from '@mds-core/mds-utils'
-import { AgencyStreamInterface } from '../agency-stream-interface'
+import type { AgencyStreamInterface } from '../agency-stream-interface'
 import { safeWrite } from '../helpers'
 import { KafkaStreamProducer } from './stream-producer'
 
 const { TENANT_ID } = getEnvVar({
   TENANT_ID: 'mds'
 })
-const deviceProducer = KafkaStreamProducer<Device>(`${TENANT_ID}.device`, { partitionKey: 'device_id' })
+const deviceProducer = KafkaStreamProducer<DeviceDomainModel>(`${TENANT_ID}.device`, { partitionKey: 'device_id' })
 const eventProducer = KafkaStreamProducer<VehicleEvent>(`${TENANT_ID}.event`, { partitionKey: 'device_id' })
 const eventErrorProducer = KafkaStreamProducer<Partial<VehicleEvent>>(`${TENANT_ID}.event.error`)
 const telemetryProducer = KafkaStreamProducer<Telemetry>(`${TENANT_ID}.telemetry`, { partitionKey: 'device_id' })

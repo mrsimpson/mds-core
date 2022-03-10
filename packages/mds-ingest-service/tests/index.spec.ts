@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { Device, UUID } from '@mds-core/mds-types'
+import type { UUID } from '@mds-core/mds-types'
 import { now, uuid } from '@mds-core/mds-utils'
-import {
+import type {
   DeviceDomainModel,
   EventAnnotationDomainCreateModel,
   EventDomainCreateModel,
@@ -101,7 +101,7 @@ const TEST_TELEMETRY_B2: TelemetryDomainCreateModel = {
   timestamp: testTimestamp + 1000
 }
 
-const TEST_DEVICE_A: Omit<Device, 'recorded'> = {
+const TEST_DEVICE_A: Omit<DeviceDomainModel, 'recorded'> = {
   accessibility_options: ['wheelchair_accessible'],
   device_id: DEVICE_UUID_A,
   provider_id: TEST1_PROVIDER_ID,
@@ -114,7 +114,7 @@ const TEST_DEVICE_A: Omit<Device, 'recorded'> = {
   model: 'Mantaray'
 }
 
-const TEST_DEVICE_B: Omit<Device, 'recorded'> = {
+const TEST_DEVICE_B: Omit<DeviceDomainModel, 'recorded'> = {
   accessibility_options: ['wheelchair_accessible'],
   device_id: DEVICE_UUID_B,
   provider_id: TEST1_PROVIDER_ID,

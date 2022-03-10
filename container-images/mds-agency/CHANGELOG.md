@@ -1,5 +1,14 @@
 # @container-images/mds-agency
 
+## 0.1.88
+
+### Patch Changes
+
+- Updated dependencies [ade56b85]
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-agency@0.5.3
+  - @mds-core/mds-webpack-config@0.1.12
+
 ## 0.1.87
 
 ### Patch Changes

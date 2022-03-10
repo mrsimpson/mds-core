@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service/@types'
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
-import { TimePolicy, TimeRule } from '@mds-core/mds-policy-service'
+import type { MatchedVehicleInformation } from '@mds-core/mds-compliance-service/@types'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import type { TimePolicy, TimeRule } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import type { Telemetry, VehicleEvent } from '@mds-core/mds-types'
 import { minutes } from '@mds-core/mds-utils'
-import { FeatureCollection } from 'geojson'
+import type { FeatureCollection } from 'geojson'
 import test from 'unit.js'
-import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
+import type { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { generateDeviceMap } from '../../engine/helpers'
 import { isTimeRuleMatch, processTimePolicy } from '../../engine/time_processors'
 import {
@@ -80,7 +81,7 @@ describe('Tests Compliance Engine Time Functionality', () => {
       speed: 0
     }) as VehicleEventWithTelemetry[]
 
-    const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
+    const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap(devices)
 
     const result = processTimePolicy(TIME_POLICY, events, geographies, deviceMap) as ComplianceEngineResult
     test.assert.deepEqual(result.vehicles_found.length, 0)
@@ -104,7 +105,7 @@ describe('Tests Compliance Engine Time Functionality', () => {
       speed: 0
     })
 
-    const deviceMap: { [d: string]: Device } = generateDeviceMap([...badDevices, ...goodDevices])
+    const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap([...badDevices, ...goodDevices])
 
     const result = processTimePolicy(
       TIME_POLICY,
@@ -144,7 +145,7 @@ describe('Tests Compliance Engine Time Functionality', () => {
       speed: 0
     })
 
-    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devicesA, ...devicesB])
+    const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap([...devicesA, ...devicesB])
 
     const result = processTimePolicy(
       OVERLAPPING_GEOS_TIME_POLICY,

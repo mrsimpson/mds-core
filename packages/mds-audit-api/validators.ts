@@ -17,7 +17,7 @@
 import { TelemetryCreateSchema } from '@mds-core/mds-ingest-service'
 import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import { AUDIT_EVENT_TYPES, VEHICLE_EVENTS } from '@mds-core/mds-types'
-import {
+import type {
   AuditApiAuditEndRequest,
   AuditApiAuditNoteRequest,
   AuditApiAuditStartRequest,

@@ -1,5 +1,13 @@
 # @container-images/mds-transaction-api
 
+## 0.0.63
+
+### Patch Changes
+
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-transaction-api@0.2.25
+  - @mds-core/mds-webpack-config@0.1.12
+
 ## 0.0.62
 
 ### Patch Changes

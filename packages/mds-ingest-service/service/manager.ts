@@ -15,7 +15,8 @@
  */
 
 import { RpcServer } from '@mds-core/mds-rpc-common'
-import { IngestService, IngestServiceDefinition, IngestServiceRequestContext } from '../@types'
+import type { IngestService, IngestServiceRequestContext } from '../@types'
+import { IngestServiceDefinition } from '../@types'
 import { IngestServiceClient } from '../client'
 import { IngestServiceProvider } from './provider'
 

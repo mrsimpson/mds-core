@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { UUID } from '@mds-core/mds-types'
+import type { UUID } from '@mds-core/mds-types'
 import { AuthorizationError, getEnvVar } from '@mds-core/mds-utils'
-import express from 'express'
+import type express from 'express'
 import jwt from 'jsonwebtoken'
 
 export interface AuthorizerClaims {

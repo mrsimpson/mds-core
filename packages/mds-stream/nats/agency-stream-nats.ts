@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import { Device, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import type { Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
 import { getEnvVar } from '@mds-core/mds-utils'
-import { AgencyStreamInterface } from '../agency-stream-interface'
+import type { AgencyStreamInterface } from '../agency-stream-interface'
 import { safeWrite } from '../helpers'
 import { NatsStreamProducer } from './stream-producer'
 
 const { TENANT_ID } = getEnvVar({
   TENANT_ID: 'mds'
 })
-const deviceProducer = NatsStreamProducer<Device>(`${TENANT_ID}.device`)
+const deviceProducer = NatsStreamProducer<DeviceDomainModel>(`${TENANT_ID}.device`)
 const eventProducer = NatsStreamProducer<VehicleEvent>(`${TENANT_ID}.event`)
 const eventErrorProducer = NatsStreamProducer<Partial<VehicleEvent>>(`${TENANT_ID}.event.error`)
 const telemetryProducer = NatsStreamProducer<Telemetry>(`${TENANT_ID}.telemetry`)

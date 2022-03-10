@@ -1,5 +1,18 @@
 # @mds-core/mds-api-helpers
 
+## 0.2.16
+
+### Patch Changes
+
+- a5ab0aa5: Upgrade to Typescript 4.2 and require import/export type usage
+- Updated dependencies [ade56b85]
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-db@0.6.8
+  - @mds-core/mds-agency-cache@0.4.20
+  - @mds-core/mds-api-server@0.4.8
+  - @mds-core/mds-types@0.9.2
+  - @mds-core/mds-utils@0.4.2
+
 ## 0.2.15
 
 ### Patch Changes

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { DomainModelCreate } from '@mds-core/mds-repository'
-import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
-import { AUDIT_EVENT_TYPE, Nullable, Telemetry, Timestamp, UUID, VEHICLE_EVENT } from '@mds-core/mds-types'
+import type { DomainModelCreate } from '@mds-core/mds-repository'
+import type { RpcEmptyRequestContext, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcRoute } from '@mds-core/mds-rpc-common'
+import type { AUDIT_EVENT_TYPE, Nullable, Telemetry, Timestamp, UUID, VEHICLE_EVENT } from '@mds-core/mds-types'
 
 export interface AuditDomainModel {
   audit_trip_id: UUID

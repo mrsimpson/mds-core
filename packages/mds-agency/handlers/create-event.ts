@@ -1,11 +1,13 @@
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import { IngestServiceClient, validateEventDomainModel } from '@mds-core/mds-ingest-service'
 import stream from '@mds-core/mds-stream'
-import { DeepPartial, Device, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { DeepPartial, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { isDefined, normalizeToArray, NotFoundError, now, ValidationError } from '@mds-core/mds-utils'
 import { AgencyLogger } from '../logger'
-import { AgencyApiSubmitVehicleEventRequest, AgencyApiSubmitVehicleEventResponse, AgencyServerError } from '../types'
+import type { AgencyApiSubmitVehicleEventRequest, AgencyApiSubmitVehicleEventResponse } from '../types'
+import { AgencyServerError } from '../types'
 import { agencyValidationErrorParser, eventValidForMode } from '../utils'
 
 const handleDbError = async (
@@ -80,7 +82,7 @@ const sendSuccess = (
  * @param device MDS Device
  * @param event MDS VehicleEvent
  */
-const refreshDeviceCache = async (device: Device, event: VehicleEvent) => {
+const refreshDeviceCache = async (device: DeviceDomainModel, event: VehicleEvent) => {
   try {
     await cache.readDevice(event.device_id)
   } catch (refreshError) {

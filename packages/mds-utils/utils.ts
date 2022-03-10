@@ -15,9 +15,9 @@
  */
 
 // utility functions
-import { BBox, BoundingBox, SingleOrArray, Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
+import type { BBox, BoundingBox, SingleOrArray, Telemetry, Timestamp, UUID } from '@mds-core/mds-types'
 import circleToPolygon from 'circle-to-polygon'
-import { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson'
+import type { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson'
 import pointInPoly from 'point-in-polygon'
 import { getCurrentDate, parseRelative } from './date-time-utils'
 import { IndexError, RuntimeError } from './exceptions/exceptions'

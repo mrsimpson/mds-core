@@ -1,5 +1,14 @@
 # @container-images/mds-compliance-api
 
+## 0.1.88
+
+### Patch Changes
+
+- Updated dependencies [aaf3c1cf]
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-compliance-api@0.4.27
+  - @mds-core/mds-webpack-config@0.1.12
+
 ## 0.1.87
 
 ### Patch Changes

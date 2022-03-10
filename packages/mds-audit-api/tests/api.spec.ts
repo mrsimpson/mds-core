@@ -26,20 +26,13 @@ import cache from '@mds-core/mds-agency-cache'
 import { ApiServer } from '@mds-core/mds-api-server'
 import { AttachmentServiceClient } from '@mds-core/mds-attachment-service'
 import db from '@mds-core/mds-db'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import { JEST_PROVIDER_ID } from '@mds-core/mds-providers'
 import { ServiceError } from '@mds-core/mds-service-helpers'
 import { makeDevices, makeEventsWithTelemetry, makeTelemetryInArea, SCOPED_AUTH } from '@mds-core/mds-test-data'
-import {
-  Attachment,
-  Audit,
-  AuditAttachment,
-  AUDIT_EVENT_TYPES,
-  Device,
-  Telemetry,
-  Timestamp,
-  VehicleEvent
-} from '@mds-core/mds-types'
+import type { Attachment, Audit, AuditAttachment, Telemetry, Timestamp, VehicleEvent } from '@mds-core/mds-types'
+import { AUDIT_EVENT_TYPES } from '@mds-core/mds-types'
 import { NotFoundError, now, pathPrefix, rangeRandomInt, uuid } from '@mds-core/mds-utils'
 import Sinon from 'sinon'
 import supertest from 'supertest'
@@ -107,11 +100,14 @@ describe('Testing API', () => {
       recorded: AUDIT_START
     }
 
-    const device: Device = {
+    const device: DeviceDomainModel = {
       accessibility_options: [],
       device_id: provider_device_id,
       modality: 'micromobility',
       provider_id,
+      year: null,
+      mfgr: null,
+      model: null,
       vehicle_id: provider_vehicle_id,
       propulsion_types: ['electric'],
       vehicle_type: 'scooter',
@@ -559,9 +555,9 @@ describe('Testing API', () => {
     })
   )
   describe('Tests retreiving vehicles', () => {
-    let devices_a: Device[] // Have events and telemetry outside our BBOX
-    let devices_b: Device[] // Have events and telemetry inside our BBOX
-    let devices_c: Device[] // No events or telemetry
+    let devices_a: DeviceDomainModel[] // Have events and telemetry outside our BBOX
+    let devices_b: DeviceDomainModel[] // Have events and telemetry inside our BBOX
+    let devices_c: DeviceDomainModel[] // No events or telemetry
     before(done => {
       devices_a = makeDevices(10, now(), JEST_PROVIDER_ID)
       const events_a = makeEventsWithTelemetry(devices_a, now(), SAN_FERNANDO_VALLEY, {
@@ -583,7 +579,12 @@ describe('Testing API', () => {
 
       const seedData = {
         // Include a duplicate device (same vin + provider but different device_id)
-        devices: [...devices_a, ...devices_b, ...devices_c, { ...(devices_c[0] as Device), ...{ device_id: uuid() } }],
+        devices: [
+          ...devices_a,
+          ...devices_b,
+          ...devices_c,
+          { ...(devices_c[0] as DeviceDomainModel), ...{ device_id: uuid() } }
+        ] as DeviceDomainModel[],
         events: [...events_a, ...events_b],
         telemetry: [...telemetry_a, ...telemetry_b]
       }
@@ -607,11 +608,13 @@ describe('Testing API', () => {
           test.value(result).hasHeader('content-type', APP_JSON)
           test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
           test.assert(result.body.vehicles.length === 10)
-          result.body.vehicles.forEach((device: Device & { updated?: Timestamp | null; telemetry: Telemetry }) => {
-            test.assert(typeof device.telemetry.gps.lat === 'number')
-            test.assert(typeof device.telemetry.gps.lng === 'number')
-            test.assert(typeof device.updated === 'number')
-          })
+          result.body.vehicles.forEach(
+            (device: DeviceDomainModel & { updated?: Timestamp | null; telemetry: Telemetry }) => {
+              test.assert(typeof device.telemetry.gps.lat === 'number')
+              test.assert(typeof device.telemetry.gps.lng === 'number')
+              test.assert(typeof device.updated === 'number')
+            }
+          )
           done(err)
         })
     })
@@ -715,6 +718,9 @@ describe('Testing API', () => {
           vehicle_id: provider_vehicle_id,
           propulsion_types: ['electric'],
           vehicle_type: 'scooter',
+          year: null,
+          mfgr: null,
+          model: null,
           recorded: AUDIT_START
         })
         await db.writeAudit(audit)

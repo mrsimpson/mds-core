@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import { MatchedVehicleInformation } from '@mds-core/mds-compliance-service/@types'
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
-import { SpeedPolicy, SpeedRule } from '@mds-core/mds-policy-service'
+import type { MatchedVehicleInformation } from '@mds-core/mds-compliance-service/@types'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import type { SpeedPolicy, SpeedRule } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
-import { Device, Telemetry, VehicleEvent } from '@mds-core/mds-types'
-import { FeatureCollection } from 'geojson'
+import type { Telemetry, VehicleEvent } from '@mds-core/mds-types'
+import type { FeatureCollection } from 'geojson'
 import test from 'unit.js'
-import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
+import type { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { filterEvents, generateDeviceMap } from '../../engine/helpers'
 import { isSpeedRuleMatch, processSpeedPolicy } from '../../engine/speed_processors'
 import {
@@ -79,7 +80,7 @@ describe('Tests Compliance Engine Speed Violations', () => {
       speed: 5
     }) as VehicleEventWithTelemetry[]
 
-    const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
+    const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap(devices)
 
     const result = processSpeedPolicy(SPEED_POLICY, events, geographies, deviceMap) as ComplianceEngineResult
     test.assert.deepEqual(result.total_violations, 0)
@@ -102,7 +103,7 @@ describe('Tests Compliance Engine Speed Violations', () => {
     })
 
     const recentEvents = filterEvents([...eventsA, ...eventsB])
-    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devicesA, ...devicesB])
+    const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap([...devicesA, ...devicesB])
 
     const result = processSpeedPolicy(
       SPEED_POLICY,
@@ -140,7 +141,7 @@ describe('Tests Compliance Engine Speed Violations', () => {
     })
 
     const recentEvents = filterEvents([...eventsA, ...eventsB])
-    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devicesA, ...devicesB])
+    const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap([...devicesA, ...devicesB])
 
     const result = processSpeedPolicy(
       OVERLAPPING_GEOS_SPEED_POLICY,

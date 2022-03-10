@@ -1,5 +1,18 @@
 # @mds-core/mds-schema-validators
 
+## 0.5.7
+
+### Patch Changes
+
+- ade56b85: Replacing Device with DeviceDomainModel
+- a93da2b6: Removing unnnecessary dependency on mds-test-data
+- a5ab0aa5: Upgrade to Typescript 4.2 and require import/export type usage
+- Updated dependencies [a5ab0aa5]
+- Updated dependencies [c4e78cc9]
+  - @mds-core/mds-providers@0.2.9
+  - @mds-core/mds-types@0.9.2
+  - @mds-core/mds-utils@0.4.2
+
 ## 0.5.6
 
 ### Patch Changes

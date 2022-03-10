@@ -21,8 +21,10 @@
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
-import { CountPolicy, CountRule, RULE_TYPES } from '@mds-core/mds-policy-service'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import type { CountPolicy, CountRule } from '@mds-core/mds-policy-service'
+import { RULE_TYPES } from '@mds-core/mds-policy-service'
 import {
   LA_CITY_BOUNDARY,
   makeDevices,
@@ -30,12 +32,12 @@ import {
   makeTelemetryInArea,
   veniceSpecOps
 } from '@mds-core/mds-test-data'
-import { Device, Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
-import { Feature, FeatureCollection } from 'geojson'
+import type { Feature, FeatureCollection } from 'geojson'
 import MockDate from 'mockdate'
 import test from 'unit.js'
-import { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
+import type { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { isCountRuleMatch, processCountPolicy } from '../../engine/count_processors'
 import { generateDeviceMap } from '../../engine/helpers'
 import {
@@ -137,7 +139,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
     })
 
     it('reports 0 violations if the number of vehicles is below the count limit', done => {
-      const devices: Device[] = makeDevices(7, now())
+      const devices: DeviceDomainModel[] = makeDevices(7, now())
       const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
         event_types: ['trip_end'],
         vehicle_state: 'available',
@@ -166,7 +168,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         speed: 0
       }) as VehicleEventWithTelemetry[]
 
-      const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
+      const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap(devices)
 
       const result = processCountPolicy(HIGH_COUNT_POLICY, events, [LA_GEOGRAPHY], deviceMap) as ComplianceEngineResult
       test.assert.deepEqual(result.total_violations, 0)
@@ -182,7 +184,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         speed: 0
       }) as VehicleEventWithTelemetry[]
 
-      const deviceMap: { [d: string]: Device } = generateDeviceMap(devices)
+      const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap(devices)
 
       const result = processCountPolicy(HIGH_COUNT_POLICY, events, [LA_GEOGRAPHY], deviceMap) as ComplianceEngineResult
       test.assert.deepEqual(result.total_violations, 1)
@@ -206,7 +208,10 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         speed: 0
       }) as VehicleEventWithTelemetry[]
 
-      const deviceMap: { [d: string]: Device } = generateDeviceMap([...matchingDevices, ...notMatchingDevices])
+      const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap([
+        ...matchingDevices,
+        ...notMatchingDevices
+      ])
       const result = processCountPolicy(
         HIGH_COUNT_POLICY,
         [...matchingEvents, ...notMatchingEvents],
@@ -222,7 +227,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
 
   describe('Verifies day-based bans work properly', () => {
     it('Reports violations accurately', done => {
-      const devices: Device[] = makeDevices(15, now())
+      const devices: DeviceDomainModel[] = makeDevices(15, now())
       const events = makeEventsWithTelemetry(devices, now() - 10, LA_BEACH, {
         event_types: ['trip_end'],
         vehicle_state: 'available',
@@ -233,8 +238,8 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       devices.forEach(device => {
         telemetry.push(makeTelemetryInArea(device, now(), LA_BEACH, 10))
       })
-      const TuesdayDeviceMap = generateDeviceMap(devices)
-      const SaturdayDeviceMap = generateDeviceMap(devices)
+      const TuesdayDeviceDomainModelMap = generateDeviceMap(devices)
+      const SaturdayDeviceDomainModelMap = generateDeviceMap(devices)
 
       // Verifies on a Tuesday that vehicles are allowed
       MockDate.set('2019-05-21T20:00:00.000Z')
@@ -242,7 +247,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         COUNT_POLICY_JSON_2,
         events,
         [LA_BEACH_GEOGRAPHY],
-        TuesdayDeviceMap
+        TuesdayDeviceDomainModelMap
       ) as ComplianceEngineResult
       test.assert(tuesdayResult.total_violations === 0)
       // Verifies on a Saturday that vehicles are banned
@@ -251,7 +256,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         COUNT_POLICY_JSON_2,
         events,
         [LA_BEACH_GEOGRAPHY],
-        SaturdayDeviceMap
+        SaturdayDeviceDomainModelMap
       ) as ComplianceEngineResult
       test.assert(saturdayResult.total_violations === 15)
       MockDate.reset()
@@ -261,7 +266,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
 
   describe('Verify that rules written for a particular event_type only apply to events of that event_type', () => {
     it('Verifies violations for on_hours events', () => {
-      const devices: Device[] = makeDevices(15, now())
+      const devices: DeviceDomainModel[] = makeDevices(15, now())
       const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
         event_types: ['on_hours'],
         vehicle_state: 'available',
@@ -280,7 +285,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
     })
 
     it('Verifies no violations for a different event_type', done => {
-      const devices: Device[] = makeDevices(15, now())
+      const devices: DeviceDomainModel[] = makeDevices(15, now())
       const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
         event_types: ['trip_end'],
         vehicle_state: 'available',
@@ -301,7 +306,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
 
   describe('Verifies max 0 count policy', () => {
     it('exercises the max 0 compliance', done => {
-      const devices: Device[] = makeDevices(15, now())
+      const devices: DeviceDomainModel[] = makeDevices(15, now())
       const events = makeEventsWithTelemetry(devices, now() - 10, LA_BEACH, {
         event_types: ['trip_start'],
         vehicle_state: 'on_trip',
@@ -373,12 +378,12 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         ]
       }
 
-      const devices_a: Device[] = makeDevices(22, now())
+      const devices_a: DeviceDomainModel[] = makeDevices(22, now())
       let iter = 0
       const events_a: VehicleEvent[] = veniceSpecOps.features.reduce((acc: VehicleEvent[], feature: Feature) => {
         if (feature.geometry.type === 'Point') {
           acc.push(
-            ...makeEventsWithTelemetry([devices_a[iter++] as Device], now() - 10, feature.geometry, {
+            ...makeEventsWithTelemetry([devices_a[iter++] as DeviceDomainModel], now() - 10, feature.geometry, {
               event_types: ['provider_drop_off'],
               vehicle_state: 'available',
               speed: 0
@@ -388,7 +393,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         return acc
       }, [])
 
-      const devices_b: Device[] = makeDevices(10, now())
+      const devices_b: DeviceDomainModel[] = makeDevices(10, now())
       const events_b: VehicleEvent[] = makeEventsWithTelemetry(
         devices_b,
         now() - 10,
@@ -400,7 +405,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         }
       )
 
-      const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
+      const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap([...devices_a, ...devices_b])
       const result = processCountPolicy(
         VENICE_SPEC_OPS_POLICY,
         [...events_a, ...events_b] as VehicleEventWithTelemetry[],
@@ -417,21 +422,21 @@ describe('Tests Compliance Engine Count Functionality:', () => {
        geography. The devices in INNER_POLYGON should overflow into the rule evaluation
        for the second rule.
        */
-      const devices_a: Device[] = makeDevices(3, now())
+      const devices_a: DeviceDomainModel[] = makeDevices(3, now())
       const events_a: VehicleEvent[] = makeEventsWithTelemetry(devices_a, now(), INNER_POLYGON, {
         event_types: ['provider_drop_off'],
         vehicle_state: 'available',
         speed: 0
       })
 
-      const devices_b: Device[] = makeDevices(2, now())
+      const devices_b: DeviceDomainModel[] = makeDevices(2, now())
       const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now(), INNER_POLYGON_2, {
         event_types: ['provider_drop_off'],
         vehicle_state: 'available',
         speed: 0
       })
 
-      const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
+      const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap([...devices_a, ...devices_b])
       const result = processCountPolicy(
         VENICE_OVERFLOW_POLICY,
         [...events_a, ...events_b] as VehicleEventWithTelemetry[],
@@ -478,14 +483,14 @@ describe('Tests Compliance Engine Count Functionality:', () => {
   it('counts total_violations accurately when mixing count minumum and maximum violations', done => {
     // The polygons within which these events are being created do not overlap
     // with each other at all.
-    const devices_a: Device[] = makeDevices(3, now())
+    const devices_a: DeviceDomainModel[] = makeDevices(3, now())
     const events_a: VehicleEvent[] = makeEventsWithTelemetry(devices_a, now() - 10, INNER_POLYGON, {
       event_types: ['provider_drop_off'],
       vehicle_state: 'available',
       speed: 0
     })
 
-    const devices_b: Device[] = makeDevices(2, now())
+    const devices_b: DeviceDomainModel[] = makeDevices(2, now())
     const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now() - 10, INNER_POLYGON_2, {
       event_types: ['provider_drop_off'],
       vehicle_state: 'available',
@@ -493,7 +498,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
     })
 
     // The geo of the first rule is contained within the geo of the second rule.
-    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
+    const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap([...devices_a, ...devices_b])
     const result = processCountPolicy(
       VENICE_MIXED_VIOLATIONS_POLICY,
       [...events_a, ...events_b] as VehicleEventWithTelemetry[],
@@ -508,20 +513,20 @@ describe('Tests Compliance Engine Count Functionality:', () => {
   it('accurately tracks overflows per rule and marks each vehicle_found with the rules that apply or match', done => {
     // The polygons within which these events are being created do not overlap
     // with each other at all.
-    const devices_a: Device[] = makeDevices(2, now())
+    const devices_a: DeviceDomainModel[] = makeDevices(2, now())
     const events_a: VehicleEvent[] = makeEventsWithTelemetry(devices_a, now() - 10, INNER_POLYGON, {
       event_types: ['provider_drop_off'],
       vehicle_state: 'available',
       speed: 0
     })
 
-    const devices_b: Device[] = makeDevices(4, now())
+    const devices_b: DeviceDomainModel[] = makeDevices(4, now())
     const events_b: VehicleEvent[] = makeEventsWithTelemetry(devices_b, now() - 10, TANZANIA_POLYGON, {
       event_types: ['provider_drop_off'],
       vehicle_state: 'available',
       speed: 0
     })
-    const deviceMap: { [d: string]: Device } = generateDeviceMap([...devices_a, ...devices_b])
+    const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap([...devices_a, ...devices_b])
     const result = processCountPolicy(
       MANY_OVERFLOWS_POLICY,
       [...events_a, ...events_b] as VehicleEventWithTelemetry[],

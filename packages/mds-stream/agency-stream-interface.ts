@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import { Device, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
-import { BadDataError } from './types'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import type { Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
+import type { BadDataError } from './types'
 
 export interface AgencyStreamInterface {
   writeEvent: (event: VehicleEvent) => Promise<void>
   writeEventError: (error: BadDataError) => Promise<void>
   writeTelemetry: (telemetry: Telemetry[]) => Promise<void>
-  writeDevice: (device: Device) => Promise<void>
+  writeDevice: (device: DeviceDomainModel) => Promise<void>
   writeTripMetadata: (metadata: TripMetadata) => Promise<void>
   shutdown: () => Promise<void>
   initialize: () => Promise<void>

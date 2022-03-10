@@ -1,5 +1,13 @@
 # @container-images/mds-policy-author-api
 
+## 0.1.88
+
+### Patch Changes
+
+- Updated dependencies [a5ab0aa5]
+  - @mds-core/mds-policy-author-api@0.7.25
+  - @mds-core/mds-webpack-config@0.1.12
+
 ## 0.1.87
 
 ### Patch Changes

@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-import { InsertReturning, ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
-import { Nullable, UUID } from '@mds-core/mds-types'
+import type { InsertReturning } from '@mds-core/mds-repository'
+import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
+import type { Nullable, UUID } from '@mds-core/mds-types'
 import { head, isDefined, isUUID, tail, testEnvSafeguard, ValidationError, zip } from '@mds-core/mds-utils'
-import { Any, SelectQueryBuilder } from 'typeorm'
-import { buildPaginator, Cursor, PagingResult } from 'typeorm-cursor-pagination'
-import {
+import type { SelectQueryBuilder } from 'typeorm'
+import { Any } from 'typeorm'
+import type { Cursor, PagingResult } from 'typeorm-cursor-pagination'
+import { buildPaginator } from 'typeorm-cursor-pagination'
+import type {
   DeviceDomainCreateModel,
   DeviceDomainModel,
   EventAnnotationDomainCreateModel,
@@ -57,10 +60,8 @@ import {
 } from './mappers'
 import migrations from './migrations'
 import views from './views'
-import {
-  EventWithDeviceAndTelemetryInfoEntity,
-  EventWithDeviceAndTelemetryInfoEntityModel
-} from './views/event-with-device-and-telemetry-info'
+import type { EventWithDeviceAndTelemetryInfoEntityModel } from './views/event-with-device-and-telemetry-info'
+import { EventWithDeviceAndTelemetryInfoEntity } from './views/event-with-device-and-telemetry-info'
 
 type WithCursorOptions<P extends object> = P & Cursor
 

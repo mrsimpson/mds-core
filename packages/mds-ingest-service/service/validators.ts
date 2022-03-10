@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { Schema, SchemaValidator } from '@mds-core/mds-schema-validators'
+import type { Schema } from '@mds-core/mds-schema-validators'
+import { SchemaValidator } from '@mds-core/mds-schema-validators'
+import type { UUID, WithNonNullableKeys } from '@mds-core/mds-types'
 import {
   ACCESSIBILITY_OPTIONS,
   MODALITIES,
   PROPULSION_TYPES,
   TRIP_STATES,
-  UUID,
   VEHICLE_EVENTS,
   VEHICLE_STATES,
-  VEHICLE_TYPES,
-  WithNonNullableKeys
+  VEHICLE_TYPES
 } from '@mds-core/mds-types'
-import {
+import type {
   DeviceDomainModel,
   EventAnnotationDomainCreateModel,
   EventAnnotationDomainModel,
@@ -36,12 +36,10 @@ import {
   GetDevicesOptions,
   GetEventsWithDeviceAndTelemetryInfoOptions,
   GetVehicleEventsFilterParams,
-  GetVehicleEventsOrderColumn,
-  GetVehicleEventsOrderDirection,
-  GROUPING_TYPES,
   TelemetryDomainCreateModel,
   TelemetryDomainModel
 } from '../@types'
+import { GetVehicleEventsOrderColumn, GetVehicleEventsOrderDirection, GROUPING_TYPES } from '../@types'
 
 const uuidSchema = <const>{ type: 'string', format: 'uuid' }
 const timestampSchema = <const>{

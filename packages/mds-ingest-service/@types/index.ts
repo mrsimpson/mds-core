@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { DomainModelCreate, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
-import { RpcEmptyRequestContext, RpcRoute, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
-import {
+import type { DomainModelCreate, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
+import type { RpcEmptyRequestContext, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
+import { RpcRoute } from '@mds-core/mds-rpc-common'
+import type {
   ACCESSIBILITY_OPTION,
   MODALITY,
   Nullable,

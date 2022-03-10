@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Timestamp } from '@mds-core/mds-types'
+import type { Timestamp } from '@mds-core/mds-types'
 import moment from 'moment-timezone'
 import { BadParamsError } from './exceptions/exceptions'
 

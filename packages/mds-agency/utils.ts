@@ -18,40 +18,37 @@ import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import stream from '@mds-core/mds-stream'
-import {
+import type {
   BoundingBox,
   Device,
   MICRO_MOBILITY_VEHICLE_EVENT,
-  MICRO_MOBILITY_VEHICLE_EVENTS,
   MICRO_MOBILITY_VEHICLE_STATE,
-  MICRO_MOBILITY_VEHICLE_STATES,
-  TAXI_TRIP_EXIT_EVENTS,
   TAXI_VEHICLE_EVENT,
-  TAXI_VEHICLE_EVENTS,
   TAXI_VEHICLE_STATE,
-  TAXI_VEHICLE_STATES,
   Telemetry,
-  TNC_TRIP_EXIT_EVENTS,
-  TNC_VEHICLE_EVENT,
-  TNC_VEHICLE_STATE,
   TRIP_STATE,
-  TRIP_STATES,
   UUID,
   VehicleEvent,
   VEHICLE_STATE
 } from '@mds-core/mds-types'
 import {
-  areThereCommonElements,
-  hasAtLeastOneEntry,
-  isInsideBoundingBox,
-  isUUID,
-  ValidationError
-} from '@mds-core/mds-utils'
-import { DefinedError } from 'ajv'
-import express from 'express'
-import { Query } from 'express-serve-static-core'
+  MICRO_MOBILITY_VEHICLE_EVENTS,
+  MICRO_MOBILITY_VEHICLE_STATES,
+  TAXI_TRIP_EXIT_EVENTS,
+  TAXI_VEHICLE_EVENTS,
+  TAXI_VEHICLE_STATES,
+  TNC_TRIP_EXIT_EVENTS,
+  TNC_VEHICLE_EVENT,
+  TNC_VEHICLE_STATE,
+  TRIP_STATES
+} from '@mds-core/mds-types'
+import type { ValidationError } from '@mds-core/mds-utils'
+import { areThereCommonElements, hasAtLeastOneEntry, isInsideBoundingBox, isUUID } from '@mds-core/mds-utils'
+import type { DefinedError } from 'ajv'
+import type express from 'express'
+import type { Query } from 'express-serve-static-core'
 import { AgencyLogger } from './logger'
-import { AgencyApiError, CompositeVehicle, PaginatedVehiclesList, TelemetryResult, VehiclePayload } from './types'
+import type { AgencyApiError, CompositeVehicle, PaginatedVehiclesList, TelemetryResult, VehiclePayload } from './types'
 
 /**
  *

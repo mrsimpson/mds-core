@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
+import type { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-service/@types'
 import db from '@mds-core/mds-db'
-import { GeographyDomainModel } from '@mds-core/mds-geography-service'
-import { PolicyDomainModel } from '@mds-core/mds-policy-service'
+import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
+import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry, TEST1_PROVIDER_ID } from '@mds-core/mds-test-data'
-import { Device, VehicleEvent } from '@mds-core/mds-types'
+import type { VehicleEvent } from '@mds-core/mds-types'
 import assert from 'assert'
-import { FeatureCollection } from 'geojson'
+import type { FeatureCollection } from 'geojson'
 import test from 'unit.js'
-import { VehicleEventWithTelemetry } from '../../@types'
+import type { VehicleEventWithTelemetry } from '../../@types'
 import { filterEvents, getAllInputs, getSupersedingPolicies } from '../../engine/helpers'
 import { processPolicy } from '../../engine/mds-compliance-engine'
 import {
@@ -34,7 +35,7 @@ import {
 } from '../../test_data/fixtures'
 import { readJson } from './helpers'
 
-let policies: PolicyDomainModel[] = []
+let policies: Required<PolicyDomainModel>[] = []
 
 const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
 
@@ -50,7 +51,7 @@ function now(): number {
 
 describe('Tests General Compliance Engine Functionality', () => {
   before(async () => {
-    policies = await readJson('test_data/policies.json')
+    policies = (await readJson('test_data/policies.json')) as Required<PolicyDomainModel>[]
   })
 
   beforeEach(async () => {
@@ -88,7 +89,7 @@ describe('Tests General Compliance Engine Functionality', () => {
   it('does not run inactive policies', async () => {
     const devices = makeDevices(6, now())
     const start_time = now() - 10000000
-    const events = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+    const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
       const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
         event_types: ['trip_start'],
         vehicle_state: 'on_trip',
@@ -111,8 +112,8 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
   it('should process count violation vehicles with the most recent event last', async () => {
     const devices = makeDevices(6, now())
     const start_time = now() - 10000000
-    const latest_device: Device = devices[0]
-    const events = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+    const latest_device: DeviceDomainModel = devices[0]
+    const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
       const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
         event_types: ['trip_start'],
         vehicle_state: 'on_trip',
@@ -138,7 +139,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
   it('Verifies arbitrary event_types can be set for a state in a rule', async () => {
     const devices = makeDevices(6, now())
     const start_time = now() - 10000000
-    const events = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+    const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
       const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
         event_types: ['battery_low'],
         vehicle_state: 'available',
@@ -159,7 +160,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
   it('Verifies no match when event types do not match policy', async () => {
     const devices = makeDevices(6, now())
     const start_time = now() - 10000000
-    const events = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+    const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
       const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
         event_types: ['reservation_cancel'],
         vehicle_state: 'available',
@@ -180,7 +181,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
   it('Verifies state wildcard matching works', async () => {
     const devices = makeDevices(11, now())
     const start_time = now() - 10000000
-    const events = devices.reduce((events_acc: VehicleEvent[], device: Device, current_index) => {
+    const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
       const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
         event_types: ['battery_low'],
         vehicle_state: 'available',
@@ -215,6 +216,7 @@ describe('Verifies errors are being properly thrown', async () => {
     await assert.rejects(
       async () => {
         const inputs = await getAllInputs()
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await processPolicy(policies[0]!, geographies, inputs)
       },
       { name: 'RuntimeError' }

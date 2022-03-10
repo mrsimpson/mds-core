@@ -1,5 +1,19 @@
 # @mds-core/mds-test-data
 
+## 0.4.19
+
+### Patch Changes
+
+- ade56b85: Replacing Device with DeviceDomainModel
+- a5ab0aa5: Upgrade to Typescript 4.2 and require import/export type usage
+- Updated dependencies [ade56b85]
+- Updated dependencies [a5ab0aa5]
+- Updated dependencies [c4e78cc9]
+  - @mds-core/mds-ingest-service@0.10.1
+  - @mds-core/mds-providers@0.2.9
+  - @mds-core/mds-types@0.9.2
+  - @mds-core/mds-utils@0.4.2
+
 ## 0.4.18
 
 ### Patch Changes

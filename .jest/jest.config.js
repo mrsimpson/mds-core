@@ -19,7 +19,7 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   testTimeout: 30000,
   transform: {
-    '^.+\\.(t|j)sx?$': ['@swc/jest', { configFile: '../../.swcrc' }]
+    '^.+\\.(t|j)sx?$': ['@swc/jest', { configFile: '../../.jest/.swcrc' }]
   },
   verbose: true
 }
