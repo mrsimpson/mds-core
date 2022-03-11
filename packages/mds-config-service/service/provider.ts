@@ -23,7 +23,7 @@ export const ConfigServiceProvider: ServiceProvider<ConfigService, ConfigService
   getSettings: async (context, properties, options) => {
     const config = ConfigFileReader.mount()
     const { partial = false } = options ?? {}
-    const files = await Promise.allSettled(properties.map(property => config.readJsonFile(property)))
+    const files = await Promise.allSettled(properties.map(property => config.readConfigFile(property)))
     const result = files.reduce<{ found: string[]; missing: string[] }>(
       (info, { status }, index) => {
         const property = properties[index]

@@ -95,7 +95,7 @@ const DataSeeder = (connection: ManagedConnection, path?: string) => {
         } = repository
 
         // Make sure the source data file exists
-        if (!mount.jsonFileExists(table)) {
+        if (!mount.configFileExists(table)) {
           return logger.info(`No seed data file found for "${table}`)
         }
         logger.info(`Found seed data file for "${table}"`)
@@ -110,7 +110,7 @@ const DataSeeder = (connection: ManagedConnection, path?: string) => {
         logger.info(`Seeding will be attempted ("${table}" table is empty)`)
 
         try {
-          const insert = await mount.readJsonFile<Array<From>>(table)
+          const insert = await mount.readConfigFile<Array<From>>(table)
           if (insert.length === 0) {
             return logger.info(`Seed data file was empty or not an array`)
           }

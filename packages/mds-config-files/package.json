@@ -19,7 +19,9 @@
   },
   "dependencies": {
     "@mds-core/mds-utils": "workspace:0.4.2",
+    "@types/yamljs": "0.2.31",
     "envalid": "7.2.1",
-    "json5": "2.2.0"
+    "json5": "2.2.0",
+    "yamljs": "0.3.0"
   }
 }

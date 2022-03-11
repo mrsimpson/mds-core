@@ -19,37 +19,55 @@ import { ConfigFileReader } from '../index'
 
 const config = ConfigFileReader.mount('./tests/data')
 
+type TestConfigFile = { passed: boolean }
+
 describe('Test Config File Reader', () => {
   it('Missing Mount', async () => {
     expect(() => ConfigFileReader.mount('./not-found')).toThrow(NotFoundError)
   })
 
   it('Missing File', async () => {
-    expect(config.fileExists('missing')).toEqual(false)
-    await expect(() => config.readFile('missing')).rejects.toThrowError(NotFoundError)
-    expect(config.jsonFileExists('missing')).toEqual(false)
-    await expect(() => config.readJsonFile('missing')).rejects.toThrowError(NotFoundError)
+    expect(config.fileExists('missing', 'txt')).toEqual(false)
+    await expect(() => config.readFile('missing', '.txt')).rejects.toThrowError(NotFoundError)
+  })
+
+  it('Missing Config File', async () => {
+    expect(config.configFileExists('missing')).toEqual(false)
+    await expect(() => config.readConfigFile('missing')).rejects.toThrowError(NotFoundError)
   })
 
   it('Exising JSON File', async () => {
-    expect(config.jsonFileExists('good')).toEqual(true)
-    const file = await config.readJsonFile<{ good: string }>('good')
-    expect(file.good).toEqual('good')
+    expect(config.configFileExists('good-json')).toEqual(true)
+    expect(config.configFileExists('good-json', 'json')).toEqual(true)
+    const test = await config.readConfigFile<TestConfigFile>('good-json')
+    expect(test.passed).toEqual(true)
   })
 
   it('Exising JSON5 File', async () => {
-    expect(config.jsonFileExists('good5')).toEqual(true)
-    const file = await config.readJsonFile<{ good5: string }>('good5')
-    expect(file.good5).toEqual('good5')
+    expect(config.configFileExists('good-json5')).toEqual(true)
+    expect(config.configFileExists('good-json5', 'json5')).toEqual(true)
+    const test = await config.readConfigFile<TestConfigFile>('good-json5')
+    expect(test.passed).toEqual(true)
+  })
+
+  it('Exising YAML File', async () => {
+    expect(config.configFileExists('good-yaml')).toEqual(true)
+    expect(config.configFileExists('good-yaml', 'yaml')).toEqual(true)
+    const test = await config.readConfigFile<TestConfigFile>('good-yaml')
+    expect(test.passed).toEqual(true)
   })
 
   it('File Not JSON', async () => {
-    await expect(() => config.readJsonFile('bad')).rejects.toThrowError(UnsupportedTypeError)
-    await expect(() => config.readJsonFile('bad5')).rejects.toThrowError(UnsupportedTypeError)
+    await expect(() => config.readConfigFile('bad-json', 'json')).rejects.toThrowError(UnsupportedTypeError)
+    await expect(() => config.readConfigFile('bad-json5', 'json5')).rejects.toThrowError(UnsupportedTypeError)
+    await expect(() => config.readConfigFile('bad-yaml', 'yaml')).rejects.toThrowError(UnsupportedTypeError)
+    await expect(() => config.readConfigFile('bad-json')).rejects.toThrowError(UnsupportedTypeError)
+    await expect(() => config.readConfigFile('bad-json5')).rejects.toThrowError(UnsupportedTypeError)
+    await expect(() => config.readConfigFile('bad-yaml')).rejects.toThrowError(UnsupportedTypeError)
   })
 
   it('Existing non-JSON File', async () => {
-    const file = await config.readFile('text', 'txt')
-    expect(file).toEqual('text')
+    const file = await config.readFile('good', 'txt')
+    expect(file).toEqual('good')
   })
 })
