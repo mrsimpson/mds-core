@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-jurisdiction-service",
-  "version": "0.5.17",
+  "version": "0.5.18",
   "description": "Mobility Data Specification Jurisdiction Service",
   "keywords": [
     "mds",
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-repository": "workspace:0.1.43",
+    "@mds-core/mds-repository": "workspace:0.1.44",
     "@mds-core/mds-rpc-common": "workspace:0.3.13",
     "@mds-core/mds-schema-validators": "workspace:0.5.7",
     "@mds-core/mds-service-helpers": "workspace:0.6.6",

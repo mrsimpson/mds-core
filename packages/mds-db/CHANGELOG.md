@@ -1,5 +1,15 @@
 # @mds-core/mds-db
 
+## 0.6.9
+
+### Patch Changes
+
+- @mds-core/mds-attachment-service@0.5.18
+- @mds-core/mds-audit-service@0.5.18
+- @mds-core/mds-geography-service@0.10.14
+- @mds-core/mds-ingest-service@0.10.2
+- @mds-core/mds-policy-service@0.11.20
+
 ## 0.6.8
 
 ### Patch Changes

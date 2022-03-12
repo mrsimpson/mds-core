@@ -20,28 +20,20 @@ import fs from 'fs'
 import JSON5 from 'json5'
 import { homedir } from 'os'
 import { format, normalize } from 'path'
-import { promisify } from 'util'
+import YAML from 'yamljs'
 
-const readFileAsync = promisify(fs.readFile)
+const ConfigFileExtensions = <const>['json', 'json5', 'yaml']
+type ConfigFileExtension = typeof ConfigFileExtensions[number]
+
+type FileParser = <T>(file: string) => T
 
 const readFile = async (path: string): Promise<string> => {
   try {
-    return await readFileAsync(path, { encoding: 'utf8' })
+    return await fs.promises.readFile(path, { encoding: 'utf8' })
   } catch {
     throw new NotFoundError(`File Not Found: ${path}`, { path })
   }
 }
-
-const readJsonFile = <T>(path: string) => ({
-  parsedUsing: async (parser: Pick<JSON, 'parse'>): Promise<T> => {
-    const file = await readFile(path)
-    try {
-      return parser.parse(file) as T
-    } catch {
-      throw new UnsupportedTypeError(`Expected ${parser === JSON ? 'JSON' : 'JSON5'} File: ${path}`, { path })
-    }
-  }
-})
 
 const fileExists = (path: string) => fs.existsSync(path)
 
@@ -56,23 +48,60 @@ export const ConfigFileReader = {
     }
 
     const getFilePath = (name: string, ext?: string): string => {
-      const extension = ext && ext.startsWith('.') ? ext : `.${ext}`
-      return normalize(format({ dir, name, ext: extension }))
+      return normalize(format({ dir, name, ext: ext && (ext.startsWith('.') ? ext : `.${ext}`) }))
     }
+
+    const parseFile = <T>(name: string, ext: ConfigFileExtension) => {
+      const file = getFilePath(name, ext)
+      return {
+        using: async (parser: FileParser) => {
+          try {
+            return parser(await readFile(file)) as T
+          } catch (error) {
+            throw error instanceof NotFoundError
+              ? error
+              : new UnsupportedTypeError(`Expected ${ext.toUpperCase()} File: ${file}`, { file })
+          }
+        }
+      }
+    }
+
+    const parseJsonFile = <T>(name: string) => parseFile<T>(name, 'json').using(JSON.parse)
+    const parseJson5File = <T>(name: string) => parseFile<T>(name, 'json5').using(JSON5.parse)
+    const parseYamlFile = <T>(name: string) => parseFile<T>(name, 'yaml').using(YAML.parse)
 
     return {
       path: dir,
-      fileExists: (name: string, ext?: string) => fileExists(getFilePath(name, ext)),
-      readFile: async (name: string, ext?: string) => readFile(getFilePath(name, ext)),
-      jsonFileExists: (name: string) => fileExists(getFilePath(name, 'json')) || fileExists(getFilePath(name, 'json5')),
-      readJsonFile: async <T>(name: string): Promise<T> => {
-        try {
-          return await readJsonFile<T>(getFilePath(name, 'json5')).parsedUsing(JSON5)
-        } catch (error) {
-          if (error instanceof NotFoundError) {
-            return readJsonFile<T>(getFilePath(name, 'json')).parsedUsing(JSON)
-          }
-          throw error
+      fileExists: (name: string, extension?: string) => fileExists(getFilePath(name, extension)),
+      readFile: async (name: string, extension?: string) => readFile(getFilePath(name, extension)),
+      configFileExists: (name: string, extension?: ConfigFileExtension) =>
+        extension
+          ? fileExists(getFilePath(name, extension))
+          : ConfigFileExtensions.some(ext => fileExists(getFilePath(name, ext))),
+      readConfigFile: async <T>(name: string, extension?: ConfigFileExtension): Promise<T> => {
+        switch (extension) {
+          case 'json':
+            return await parseJsonFile(name)
+          case 'json5':
+            return await parseJson5File(name)
+          case 'yaml':
+            return await parseYamlFile(name)
+          default:
+            try {
+              return await parseJson5File(name)
+            } catch (json5) {
+              if (json5 instanceof NotFoundError) {
+                try {
+                  return await parseJsonFile(name)
+                } catch (json) {
+                  if (json instanceof NotFoundError) {
+                    return await parseYamlFile(name)
+                  }
+                  throw json
+                }
+              }
+              throw json5
+            }
         }
       }
     }

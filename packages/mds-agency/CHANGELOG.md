@@ -1,5 +1,14 @@
 # @mds-core/mds-agency
 
+## 0.5.4
+
+### Patch Changes
+
+- @mds-core/mds-ingest-service@0.10.2
+- @mds-core/mds-db@0.6.9
+- @mds-core/mds-stream@0.2.12
+- @mds-core/mds-api-helpers@0.2.17
+
 ## 0.5.3
 
 ### Patch Changes
