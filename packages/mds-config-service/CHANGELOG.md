@@ -1,5 +1,13 @@
 # @mds-core/mds-config-service
 
+## 0.4.2
+
+### Patch Changes
+
+- e90243cd: Add yaml support to mds-config-service
+- Updated dependencies [e90243cd]
+  - @mds-core/mds-config-files@0.1.2
+
 ## 0.4.1
 
 ### Patch Changes

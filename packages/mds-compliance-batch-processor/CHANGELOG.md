@@ -1,5 +1,16 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.2.16
+
+### Patch Changes
+
+- @mds-core/mds-compliance-service@0.10.23
+- @mds-core/mds-geography-service@0.10.14
+- @mds-core/mds-ingest-service@0.10.2
+- @mds-core/mds-policy-service@0.11.20
+- @mds-core/mds-db@0.6.9
+- @mds-core/mds-compliance-engine@0.8.16
+
 ## 0.2.15
 
 ### Patch Changes

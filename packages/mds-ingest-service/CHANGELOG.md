@@ -1,5 +1,13 @@
 # @mds-core/mds-ingest-service
 
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies [e90243cd]
+  - @mds-core/mds-repository@0.1.44
+  - @mds-core/mds-stream@0.2.12
+
 ## 0.10.1
 
 ### Patch Changes
