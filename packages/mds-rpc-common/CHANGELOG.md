@@ -1,5 +1,11 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.14
+
+### Patch Changes
+
+- bf1f3c4d: Add optional top-level onStart/onStop handlers to RpcServiceManager
+
 ## 0.3.13
 
 ### Patch Changes

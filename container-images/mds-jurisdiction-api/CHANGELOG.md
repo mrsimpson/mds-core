@@ -1,5 +1,11 @@
 # @container-images/mds-jurisdiction-api
 
+## 0.0.65
+
+### Patch Changes
+
+- @mds-core/mds-jurisdiction-api@0.1.64
+
 ## 0.0.64
 
 ### Patch Changes

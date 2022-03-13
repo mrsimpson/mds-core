@@ -1,5 +1,13 @@
 # @mds-core/mds-collector-service
 
+## 0.4.19
+
+### Patch Changes
+
+- Updated dependencies [bf1f3c4d]
+  - @mds-core/mds-rpc-common@0.3.14
+  - @mds-core/mds-stream@0.2.13
+
 ## 0.4.18
 
 ### Patch Changes

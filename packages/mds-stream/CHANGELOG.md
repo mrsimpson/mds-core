@@ -1,5 +1,11 @@
 # @mds-core/mds-stream
 
+## 0.2.13
+
+### Patch Changes
+
+- @mds-core/mds-ingest-service@0.10.3
+
 ## 0.2.12
 
 ### Patch Changes
