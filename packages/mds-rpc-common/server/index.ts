@@ -42,7 +42,7 @@ export interface RpcServiceHandlers {
   onStop: () => Promise<void>
 }
 
-export interface RpcServiceManagerOptions {
+export interface RpcServiceManagerOptions extends RpcServiceHandlers {
   // Override the default RPC port
   port: string | number
   // Read Eval Print Loop options
@@ -120,6 +120,9 @@ export const RpcServiceManager = (options: Partial<RpcServiceManagerOptions> = {
           if (!server) {
             const port = Number(options.port || process.env.RPC_PORT || RPC_PORT)
             RpcCommonLogger.info(`Starting RPC server listening for ${RPC_CONTENT_TYPE} requests on port ${port}`)
+            if (options.onStart) {
+              await options.onStart()
+            }
             await Promise.all(services.map(({ handlers: { onStart } }) => onStart()))
             server = httpServer(
               services.reduce(
@@ -165,6 +168,9 @@ export const RpcServiceManager = (options: Partial<RpcServiceManagerOptions> = {
             }
             RpcCommonLogger.info(`Stopping RPC server listening for ${RPC_CONTENT_TYPE} requests`)
             await Promise.all(services.map(({ handlers: { onStop } }) => onStop()))
+            if (options.onStop) {
+              await options.onStop()
+            }
           }
         }
       })
