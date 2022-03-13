@@ -1,5 +1,17 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.17
+
+### Patch Changes
+
+- @mds-core/mds-compliance-service@0.10.24
+- @mds-core/mds-geography-service@0.10.15
+- @mds-core/mds-ingest-service@0.10.3
+- @mds-core/mds-policy-service@0.11.21
+- @mds-core/mds-db@0.6.10
+- @mds-core/mds-stream@0.2.13
+- @mds-core/mds-api-helpers@0.2.18
+
 ## 0.8.16
 
 ### Patch Changes
