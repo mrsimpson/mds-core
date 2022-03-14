@@ -16,8 +16,7 @@
 
 import cache from '@mds-core/mds-agency-cache'
 import db from '@mds-core/mds-db'
-import { IngestServiceClient } from '@mds-core/mds-ingest-service'
-import stream from '@mds-core/mds-stream'
+import { IngestServiceClient, IngestStream } from '@mds-core/mds-ingest-service'
 import type {
   BoundingBox,
   Device,
@@ -277,7 +276,7 @@ export function eventValidForMode({ modality }: Pick<Device, 'modality'>, event:
 export async function writeTelemetry(telemetry: Telemetry | Telemetry[]) {
   const recorded_telemetry = await db.writeTelemetry(Array.isArray(telemetry) ? telemetry : [telemetry])
   try {
-    await Promise.all([cache.writeTelemetry(recorded_telemetry), stream.writeTelemetry(recorded_telemetry)])
+    await Promise.all([cache.writeTelemetry(recorded_telemetry), IngestStream.writeTelemetry(recorded_telemetry)])
   } catch (err) {
     AgencyLogger.warn(`Failed to write telemetry to cache/stream, ${err}`)
   }

@@ -1,7 +1,7 @@
 import cache from '@mds-core/mds-agency-cache'
 import { ApiServer } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
-import stream from '@mds-core/mds-stream'
+import { IngestStream } from '@mds-core/mds-ingest-service'
 import { uuid } from '@mds-core/mds-utils'
 import { StatusCodes } from 'http-status-codes'
 import supertest from 'supertest'
@@ -26,7 +26,7 @@ describe('Taxi Tests', () => {
   })
 
   afterAll(async () => {
-    if (!HOSTNAME) await Promise.all([cache.shutdown(), stream.shutdown(), db.shutdown()])
+    if (!HOSTNAME) await Promise.all([cache.shutdown(), IngestStream.shutdown(), db.shutdown()])
   })
 
   describe('Scenarios', () => {

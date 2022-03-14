@@ -465,7 +465,6 @@ importers:
       '@mds-core/mds-providers': workspace:0.2.9
       '@mds-core/mds-schema-validators': workspace:0.5.7
       '@mds-core/mds-service-helpers': workspace:0.6.6
-      '@mds-core/mds-stream': workspace:0.2.13
       '@mds-core/mds-test-data': workspace:0.4.21
       '@mds-core/mds-types': workspace:0.9.2
       '@mds-core/mds-utils': workspace:0.4.2
@@ -483,7 +482,6 @@ importers:
       '@mds-core/mds-providers': link:../mds-providers
       '@mds-core/mds-schema-validators': link:../mds-schema-validators
       '@mds-core/mds-service-helpers': link:../mds-service-helpers
-      '@mds-core/mds-stream': link:../mds-stream
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
       '@types/express': 4.17.13
@@ -1357,7 +1355,6 @@ importers:
 
   packages/mds-stream:
     specifiers:
-      '@mds-core/mds-ingest-service': workspace:0.10.3
       '@mds-core/mds-logger': workspace:0.5.7
       '@mds-core/mds-types': workspace:0.9.2
       '@mds-core/mds-utils': workspace:0.4.2
@@ -1366,7 +1363,6 @@ importers:
       nats: 2.2.0
       sinon: 11.1.2
     dependencies:
-      '@mds-core/mds-ingest-service': link:../mds-ingest-service
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
