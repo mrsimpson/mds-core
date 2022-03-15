@@ -1,5 +1,12 @@
 # @mds-core/mds-stream
 
+## 0.3.0
+
+### Minor Changes
+
+- 775efc9c: Stream writes telemetry with id
+- 3ca785d0: Remove AgencyStream
+
 ## 0.2.13
 
 ### Patch Changes

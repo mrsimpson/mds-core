@@ -1,5 +1,14 @@
 # @mds-core/mds-geography-service
 
+## 0.10.16
+
+### Patch Changes
+
+- Updated dependencies [88984496]
+- Updated dependencies [88984496]
+  - @mds-core/mds-repository@0.1.45
+  - @mds-core/mds-test-data@0.4.22
+
 ## 0.10.15
 
 ### Patch Changes

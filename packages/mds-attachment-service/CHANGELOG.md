@@ -1,5 +1,13 @@
 # @mds-core/mds-attachment-service
 
+## 0.5.20
+
+### Patch Changes
+
+- Updated dependencies [88984496]
+- Updated dependencies [88984496]
+  - @mds-core/mds-repository@0.1.45
+
 ## 0.5.19
 
 ### Patch Changes

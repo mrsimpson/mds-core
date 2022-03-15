@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-stream",
-  "version": "0.2.13",
+  "version": "0.3.0",
   "description": "Mobility Data Specification stream interface",
   "keywords": [
     "mds",
