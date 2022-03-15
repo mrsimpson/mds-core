@@ -1,5 +1,14 @@
 # @mds-core/mds-repository
 
+## 0.1.45
+
+### Patch Changes
+
+- 88984496: Add MapModels helper function for invoking model mappers
+- 88984496: Allow using data files from different locations for seeding repository tables
+- Updated dependencies [88984496]
+  - @mds-core/mds-config-files@0.1.3
+
 ## 0.1.44
 
 ### Patch Changes

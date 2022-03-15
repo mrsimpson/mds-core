@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-config-files",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Mobility Data Specification config file reader",
   "keywords": [
     "mds",

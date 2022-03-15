@@ -1,5 +1,18 @@
 # @mds-core/mds-ingest-service
 
+## 0.10.4
+
+### Patch Changes
+
+- 775efc9c: Add TelemetryAnnotation type, entity, and create method
+- 3ca785d0: Move mds-stream's AgencyStream to mds-ingest-service, rename to IngestStream
+- Updated dependencies [88984496]
+- Updated dependencies [775efc9c]
+- Updated dependencies [3ca785d0]
+- Updated dependencies [88984496]
+  - @mds-core/mds-repository@0.1.45
+  - @mds-core/mds-stream@0.3.0
+
 ## 0.10.3
 
 ### Patch Changes

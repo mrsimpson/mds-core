@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import stream from '@mds-core/mds-stream'
 import type { Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
 import { getEnvVar } from '@mds-core/mds-utils'
-import type { AgencyStreamInterface } from '../agency-stream-interface'
-import { safeWrite } from '../helpers'
-import { KafkaStreamProducer } from './stream-producer'
+import type { DeviceDomainModel } from '../../@types'
+import type { IngestStreamInterface } from '../types'
 
 const { TENANT_ID } = getEnvVar({
   TENANT_ID: 'mds'
 })
-const deviceProducer = KafkaStreamProducer<DeviceDomainModel>(`${TENANT_ID}.device`, { partitionKey: 'device_id' })
-const eventProducer = KafkaStreamProducer<VehicleEvent>(`${TENANT_ID}.event`, { partitionKey: 'device_id' })
-const eventErrorProducer = KafkaStreamProducer<Partial<VehicleEvent>>(`${TENANT_ID}.event.error`)
-const telemetryProducer = KafkaStreamProducer<Telemetry>(`${TENANT_ID}.telemetry`, { partitionKey: 'device_id' })
-const tripMetadataProducer = KafkaStreamProducer<TripMetadata>(`${TENANT_ID}.trip_metadata`, {
+const deviceProducer = stream.KafkaStreamProducer<DeviceDomainModel>(`${TENANT_ID}.device`, {
+  partitionKey: 'device_id'
+})
+const eventProducer = stream.KafkaStreamProducer<VehicleEvent>(`${TENANT_ID}.event`, { partitionKey: 'device_id' })
+const eventErrorProducer = stream.KafkaStreamProducer<Partial<VehicleEvent>>(`${TENANT_ID}.event.error`)
+const telemetryProducer = stream.KafkaStreamProducer<Telemetry>(`${TENANT_ID}.telemetry`, { partitionKey: 'device_id' })
+const tripMetadataProducer = stream.KafkaStreamProducer<TripMetadata>(`${TENANT_ID}.trip_metadata`, {
   partitionKey: 'trip_id'
 })
 
-export const AgencyStreamKafka: AgencyStreamInterface = {
+export const IngestStreamKafka: IngestStreamInterface = {
   initialize: async () => {
     await Promise.all([
       deviceProducer.initialize(),
@@ -42,11 +43,11 @@ export const AgencyStreamKafka: AgencyStreamInterface = {
       tripMetadataProducer.initialize()
     ])
   },
-  writeEventError: async msg => await safeWrite(eventErrorProducer, msg),
-  writeEvent: async msg => await safeWrite(eventProducer, msg),
-  writeTelemetry: async msg => await safeWrite(telemetryProducer, msg),
-  writeDevice: async msg => await safeWrite(deviceProducer, msg),
-  writeTripMetadata: async msg => await safeWrite(tripMetadataProducer, msg),
+  writeEventError: async msg => await stream.safeWrite(eventErrorProducer, msg),
+  writeEvent: async msg => await stream.safeWrite(eventProducer, msg),
+  writeTelemetry: async msg => await stream.safeWrite(telemetryProducer, msg),
+  writeDevice: async msg => await stream.safeWrite(deviceProducer, msg),
+  writeTripMetadata: async msg => await stream.safeWrite(tripMetadataProducer, msg),
   shutdown: async () => {
     await Promise.all([
       deviceProducer.shutdown(),

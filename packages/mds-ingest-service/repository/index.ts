@@ -39,6 +39,7 @@ import type {
   GetVehicleEventsResponse,
   ReadDeviceEventsQueryParams,
   ReadTripEventsQueryParams,
+  TelemetryAnnotationDomainCreateModel,
   TelemetryDomainCreateModel,
   TelemetryDomainModel
 } from '../@types'
@@ -46,6 +47,7 @@ import entities from './entities'
 import { DeviceEntity } from './entities/device-entity'
 import { EventAnnotationEntity } from './entities/event-annotation-entity'
 import { EventEntity } from './entities/event-entity'
+import { TelemetryAnnotationEntity } from './entities/telemetry-annotation-entity'
 import { TelemetryEntity } from './entities/telemetry-entity'
 import {
   DeviceDomainToEntityCreate,
@@ -58,6 +60,10 @@ import {
   TelemetryDomainToEntityCreate,
   TelemetryEntityToDomain
 } from './mappers'
+import {
+  TelemetryAnnotationDomainToEntityCreate,
+  TelemetryAnnotationEntityToDomain
+} from './mappers/telemetry-annotation-mappers'
 import migrations from './migrations'
 import views from './views'
 import type { EventWithDeviceAndTelemetryInfoEntityModel } from './views/event-with-device-and-telemetry-info'
@@ -477,6 +483,23 @@ export const IngestRepository = ReadWriteRepository.Create(
         try {
           const entities = await createTelemetriesEntityReturning(telemetries)
           return entities.map(TelemetryEntityToDomain.mapper())
+        } catch (error) {
+          throw RepositoryError(error)
+        }
+      },
+
+      createTelemetryAnnotations: async (telemetryAnnotations: TelemetryAnnotationDomainCreateModel[]) => {
+        try {
+          const connection = await repository.connect('rw')
+          const { raw: entities }: InsertReturning<TelemetryAnnotationEntity> = await connection
+            .getRepository(TelemetryAnnotationEntity)
+            .createQueryBuilder()
+            .insert()
+            .values(telemetryAnnotations.map(TelemetryAnnotationDomainToEntityCreate.mapper()))
+            .returning('*')
+            .execute()
+
+          return entities.map(TelemetryAnnotationEntityToDomain.mapper())
         } catch (error) {
           throw RepositoryError(error)
         }

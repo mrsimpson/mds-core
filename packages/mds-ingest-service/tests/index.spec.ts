@@ -21,6 +21,7 @@ import type {
   DeviceDomainModel,
   EventAnnotationDomainCreateModel,
   EventDomainCreateModel,
+  TelemetryAnnotationDomainCreateModel,
   TelemetryDomainCreateModel
 } from '../@types'
 import { IngestServiceClient } from '../client'
@@ -99,6 +100,20 @@ const TEST_TELEMETRY_B2: TelemetryDomainCreateModel = {
   },
   charge: 0.5,
   timestamp: testTimestamp + 1000
+}
+
+const TEST_TELEMETRY_ANNOTATION_A1: TelemetryAnnotationDomainCreateModel = {
+  device_id: DEVICE_UUID_A,
+  provider_id: TEST1_PROVIDER_ID,
+  timestamp: testTimestamp,
+  h3_08: '123451234512345',
+  h3_09: '123451234512345',
+  h3_10: '123451234512345',
+  h3_11: '123451234512345',
+  h3_12: '123451234512345',
+  h3_13: '123451234512345',
+  telemetry_row_id: 12341234,
+  geography_ids: []
 }
 
 const TEST_DEVICE_A: Omit<DeviceDomainModel, 'recorded'> = {
@@ -858,6 +873,21 @@ describe('Ingest Service Tests', () => {
       await expect(IngestServiceClient.writeEvents([eventWithoutTelemetry as any])).rejects.toMatchObject({
         type: 'ValidationError'
       })
+    })
+  })
+
+  describe('Tests createTelemetryAnnotations service method', () => {
+    /**
+     * Clear DB after each test runs, and after the file is finished. No side-effects for you.
+     */
+    beforeEach(async () => {
+      await IngestRepository.deleteAll()
+    })
+
+    it('Tests writing a TelemetryAnnotation', async () => {
+      const result = await IngestRepository.createTelemetryAnnotations([TEST_TELEMETRY_ANNOTATION_A1])
+
+      expect(result).toEqual([TEST_TELEMETRY_ANNOTATION_A1])
     })
   })
 

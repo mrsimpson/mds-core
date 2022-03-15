@@ -31,8 +31,7 @@ import cache from '@mds-core/mds-agency-cache'
 import { ApiServer } from '@mds-core/mds-api-server'
 import db from '@mds-core/mds-db'
 import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
-import { IngestServiceManager } from '@mds-core/mds-ingest-service'
-import stream from '@mds-core/mds-stream'
+import { IngestServiceManager, IngestStream } from '@mds-core/mds-ingest-service'
 import {
   JUMP_TEST_DEVICE_1,
   makeDevices,
@@ -167,7 +166,7 @@ describe('Agency Tests', () => {
   })
 
   afterAll(async () => {
-    await Promise.all([db.shutdown(), cache.shutdown(), stream.shutdown()])
+    await Promise.all([db.shutdown(), cache.shutdown(), IngestStream.shutdown()])
     await IngestServer.stop()
   })
 

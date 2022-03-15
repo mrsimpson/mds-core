@@ -1,5 +1,11 @@
 # @mds-core/mds-config-files
 
+## 0.1.3
+
+### Patch Changes
+
+- 88984496: Add proper typing to ConfigFileReader so it can be passed as a parameter
+
 ## 0.1.2
 
 ### Patch Changes
