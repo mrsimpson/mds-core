@@ -50,6 +50,7 @@ export const IngestServiceClientFactory = (
       RpcRequest(options, IngestServiceRpcClient.getLatestTelemetryForDevices, args),
     writeEvents: (...args) => RpcRequest(options, IngestServiceRpcClient.writeEvents, args),
     writeEventAnnotations: (...args) => RpcRequest(options, IngestServiceRpcClient.writeEventAnnotations, args),
+    writeTelemetryAnnotations: (...args) => RpcRequest(options, IngestServiceRpcClient.writeTelemetryAnnotations, args),
     getTripEvents: (...args) =>
       process.env.ENABLE_RPC === 'true'
         ? RpcRequest(options, IngestServiceRpcClient.getTripEvents, args)

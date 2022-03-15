@@ -27,6 +27,7 @@ import {
   validateGetDevicesOptions,
   validateGetEventsWithDeviceAndTelemetryInfoOptions,
   validateGetVehicleEventsFilterParams,
+  validateTelemetryAnnotationDomainCreateModel,
   validateUUIDs
 } from './validators'
 
@@ -136,6 +137,20 @@ export const IngestServiceProvider: ServiceProvider<IngestService, IngestService
     } catch (error) {
       const exception = ServiceException('Error in writeEventAnnotations', error)
       IngestServiceLogger.error('writeEventAnnotations exception', { exception, error })
+      return exception
+    }
+  },
+
+  writeTelemetryAnnotations: async (context, telemetryAnnotations) => {
+    try {
+      return ServiceResult(
+        await IngestRepository.createTelemetryAnnotations(
+          telemetryAnnotations.map(validateTelemetryAnnotationDomainCreateModel)
+        )
+      )
+    } catch (error) {
+      const exception = ServiceException('Error in writeTelemetryAnnotation', error)
+      IngestServiceLogger.error('writeTelemetryAnnotation exception', { exception, error })
       return exception
     }
   },

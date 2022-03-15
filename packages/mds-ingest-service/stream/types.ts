@@ -1,4 +1,4 @@
-import type { DeepPartial, Telemetry, Timestamp, TripMetadata, UUID, VehicleEvent } from '@mds-core/mds-types'
+import type { DeepPartial, Recorded, Telemetry, Timestamp, TripMetadata, UUID, VehicleEvent } from '@mds-core/mds-types'
 import type { DeviceDomainModel } from '../@types'
 
 export interface BadDataError {
@@ -11,7 +11,7 @@ export interface BadDataError {
 export interface IngestStreamInterface {
   writeEvent: (event: VehicleEvent) => Promise<void>
   writeEventError: (error: BadDataError) => Promise<void>
-  writeTelemetry: (telemetry: Telemetry[]) => Promise<void>
+  writeTelemetry: (telemetry: Recorded<Telemetry>[]) => Promise<void>
   writeDevice: (device: DeviceDomainModel) => Promise<void>
   writeTripMetadata: (metadata: TripMetadata) => Promise<void>
   shutdown: () => Promise<void>

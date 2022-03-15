@@ -6,7 +6,7 @@ export type {
   StreamProducer
 } from '@mds-core/mds-stream'
 export * from './types'
-import type { Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
+import type { Recorded, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
 import { now } from '@mds-core/mds-utils'
 import type { DeviceDomainModel } from '../@types'
 import { IngestServiceLogger } from '../logger'
@@ -71,7 +71,7 @@ async function writeEventError(error: BadDataError) {
 }
 
 // put latest locations in the cache
-async function writeTelemetry(telemetry: Telemetry[]) {
+async function writeTelemetry(telemetry: Recorded<Telemetry>[]) {
   if (env.NATS) {
     try {
       await IngestStreamNats.writeTelemetry(telemetry)

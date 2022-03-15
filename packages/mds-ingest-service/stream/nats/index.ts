@@ -15,7 +15,7 @@
  */
 
 import stream from '@mds-core/mds-stream'
-import type { Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
+import type { Recorded, Telemetry, TripMetadata, VehicleEvent } from '@mds-core/mds-types'
 import { getEnvVar } from '@mds-core/mds-utils'
 import type { DeviceDomainModel } from '../../@types'
 import type { IngestStreamInterface } from '../types'
@@ -27,7 +27,7 @@ const { TENANT_ID } = getEnvVar({
 const deviceProducer = stream.NatsStreamProducer<DeviceDomainModel>(`${TENANT_ID}.device`)
 const eventProducer = stream.NatsStreamProducer<VehicleEvent>(`${TENANT_ID}.event`)
 const eventErrorProducer = stream.NatsStreamProducer<Partial<VehicleEvent>>(`${TENANT_ID}.event.error`)
-const telemetryProducer = stream.NatsStreamProducer<Telemetry>(`${TENANT_ID}.telemetry`)
+const telemetryProducer = stream.NatsStreamProducer<Recorded<Telemetry>>(`${TENANT_ID}.telemetry`)
 const tripMetadataProducer = stream.NatsStreamProducer<TripMetadata>(`${TENANT_ID}.trip_metadata`)
 
 export const IngestStreamNats: IngestStreamInterface = {

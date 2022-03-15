@@ -137,9 +137,7 @@ export const createEventHandler = async (
     await refreshDeviceCache(device, event)
 
     const { telemetry } = event
-    if (telemetry) {
-      await db.writeTelemetry(normalizeToArray(telemetry))
-    }
+    const recorded_telemetry = await db.writeTelemetry(normalizeToArray(telemetry))
 
     // database write is crucial; failures of cache/stream should be noted and repaired
     const recorded_event = await db.writeEvent(event)
@@ -149,7 +147,7 @@ export const createEventHandler = async (
         cache.writeEvents([recorded_event]),
         IngestStream.writeEvent(recorded_event),
         cache.writeTelemetry([telemetry]),
-        IngestStream.writeTelemetry([telemetry])
+        IngestStream.writeTelemetry(recorded_telemetry)
       ])
     } catch (eventPersistenceError) {
       AgencyLogger.warn('/event exception cache/stream', { error: eventPersistenceError })

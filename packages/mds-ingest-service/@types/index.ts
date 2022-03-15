@@ -199,6 +199,22 @@ export interface TelemetryLabel {
   telemetry_charge: Nullable<number>
 }
 
+export interface TelemetryAnnotationDomainModel {
+  device_id: UUID
+  provider_id: UUID
+  timestamp: Timestamp
+  h3_08: string
+  h3_09: string
+  h3_10: string
+  h3_11: string
+  h3_12: string
+  h3_13: string
+  telemetry_row_id: number
+  geography_ids: UUID[]
+}
+
+export type TelemetryAnnotationDomainCreateModel = TelemetryAnnotationDomainModel
+
 /**
  * An object to persist the above (non-telemetry) event labels,
  * joinable to EventDomainModels by device_id + timestamp. Can
@@ -240,6 +256,9 @@ export interface IngestService {
   getLatestTelemetryForDevices: (device_ids: UUID[]) => TelemetryDomainModel[]
   writeEvents: (event: EventDomainCreateModel[]) => EventDomainModel[]
   writeEventAnnotations: (params: EventAnnotationDomainCreateModel[]) => EventAnnotationDomainModel[]
+  writeTelemetryAnnotations: (
+    telemetryAnnotations: TelemetryAnnotationDomainCreateModel[]
+  ) => TelemetryAnnotationDomainModel[]
   /**
    * Gets all trip-related events grouped by trip_id, with an optional time_range.
    * When a time_range is supplied, all trip_ids within that time_range will be considered,
@@ -267,6 +286,7 @@ export const IngestServiceDefinition: RpcServiceDefinition<IngestService> = {
   getLatestTelemetryForDevices: RpcRoute<IngestService['getLatestTelemetryForDevices']>(),
   writeEvents: RpcRoute<IngestService['writeEvents']>(),
   writeEventAnnotations: RpcRoute<IngestService['writeEventAnnotations']>(),
+  writeTelemetryAnnotations: RpcRoute<IngestService['writeTelemetryAnnotations']>(),
   getTripEvents: RpcRoute<IngestService['getTripEvents']>(),
   getEventsWithDeviceAndTelemetryInfoUsingOptions:
     RpcRoute<IngestService['getEventsWithDeviceAndTelemetryInfoUsingOptions']>(),
