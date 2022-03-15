@@ -19,7 +19,6 @@ import type { BBox, BoundingBox, SingleOrArray, Telemetry, Timestamp, UUID } fro
 import circleToPolygon from 'circle-to-polygon'
 import type { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson'
 import pointInPoly from 'point-in-polygon'
-import { getCurrentDate, parseRelative } from './date-time-utils'
 import { IndexError, RuntimeError } from './exceptions/exceptions'
 import { hasOwnProperty } from './hasOwnProperty'
 import { UtilsLogger } from './logger'
@@ -636,7 +635,6 @@ export {
   csv,
   days,
   filterDefined,
-  getCurrentDate,
   getEnvVar,
   getNextStates,
   head,
@@ -659,7 +657,6 @@ export {
   now,
   nullKeys,
   parseBBox,
-  parseRelative,
   pathPrefix,
   pluralize,
   pointInGeometry,
