@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import type { MountedConfigFileReader } from '@mds-core/mds-config-files'
 import { ConfigFileReader } from '@mds-core/mds-config-files'
 import { pluralize, tail } from '@mds-core/mds-utils'
 import { bool, cleanEnv } from 'envalid'
@@ -22,6 +23,7 @@ import type { ConnectionManagerCliOptions, ConnectionManagerOptions } from './co
 import { ConnectionManager } from './connection'
 import { RepositoryLogger as logger } from './logger'
 import type { ModelMapper } from './mapper'
+import { MapModels } from './mapper'
 import { RepositoryMigrations } from './migrations'
 
 type Entity = Required<ConnectionManagerOptions>['entities'][number]
@@ -31,6 +33,7 @@ type Migration = Required<ConnectionManagerOptions>['migrations'][number]
 interface EntitySeeder<From = any, To = any> {
   entity: Entity
   mapper: ModelMapper<From, To>
+  reader?: MountedConfigFileReader
 }
 
 export type ReadOnlyRepositoryOptions = { entities: Array<Entity> }
@@ -85,20 +88,26 @@ const revertAllMigrationsUsingConnection = async (connection: ManagedConnection)
 const DataSeeder = (connection: ManagedConnection, path?: string) => {
   try {
     const mount = ConfigFileReader.mount(path)
-    logger.info(`R/W repository using seed data files mounted at ${mount.path}`)
+    logger.info(`R/W repository using data files mounted at ${mount.path}`)
 
     return {
-      using: async <From, To>({ entity, mapper }: EntitySeeder<From, To>): Promise<void> => {
+      using: async <From, To>({ entity, mapper, reader = mount }: EntitySeeder<From, To>): Promise<void> => {
         const repository = connection.getRepository(entity)
+
         const {
           metadata: { tableName: table }
         } = repository
 
-        // Make sure the source data file exists
-        if (!mount.configFileExists(table)) {
-          return logger.info(`No seed data file found for "${table}`)
+        // Additional log if entity not using default data file mount
+        if (reader !== mount) {
+          logger.info(`R/W repository using data file mounted at ${reader.path} for "${table}"`)
         }
-        logger.info(`Found seed data file for "${table}"`)
+
+        // Make sure the source data file exists
+        if (!reader.configFileExists(table)) {
+          return logger.info(`No data file found for "${table} at ${reader.path}`)
+        }
+        logger.info(`Found data file for "${table}"`)
 
         // Make sure the target table is empty
         const count = await repository.createQueryBuilder().getCount()
@@ -110,18 +119,14 @@ const DataSeeder = (connection: ManagedConnection, path?: string) => {
         logger.info(`Seeding will be attempted ("${table}" table is empty)`)
 
         try {
-          const insert = await mount.readConfigFile<Array<From>>(table)
-          if (insert.length === 0) {
-            return logger.info(`Seed data file was empty or not an array`)
+          const data = await reader.readConfigFile<Array<From>>(table)
+          if (data.length === 0) {
+            return logger.info(`Data file was empty or not an array`)
           }
 
           const {
             identifiers: { length: inserted }
-          } = await repository
-            .createQueryBuilder()
-            .insert()
-            .values(insert.map(row => mapper.map(row)))
-            .execute()
+          } = await repository.createQueryBuilder().insert().values(MapModels(data).using(mapper)).execute()
 
           logger.info(`Inserted ${inserted} ${pluralize(inserted, 'row', 'rows')} into "${table}"`)
         } catch (error) {
@@ -130,7 +135,7 @@ const DataSeeder = (connection: ManagedConnection, path?: string) => {
       }
     }
   } catch {
-    logger.info(`R/W repository seed data files not mounted`)
+    logger.info(`R/W repository data files not mounted`)
   }
 }
 

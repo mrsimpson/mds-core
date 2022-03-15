@@ -25,8 +25,6 @@ import YAML from 'yamljs'
 const ConfigFileExtensions = <const>['json', 'json5', 'yaml']
 type ConfigFileExtension = typeof ConfigFileExtensions[number]
 
-type FileParser = <T>(file: string) => T
-
 const readFile = async (path: string): Promise<string> => {
   try {
     return await fs.promises.readFile(path, { encoding: 'utf8' })
@@ -37,8 +35,16 @@ const readFile = async (path: string): Promise<string> => {
 
 const fileExists = (path: string) => fs.existsSync(path)
 
+export interface MountedConfigFileReader {
+  path: string
+  fileExists: (name: string, extension?: string) => boolean
+  readFile: (name: string, extension?: string) => Promise<string>
+  configFileExists: (name: string, extension?: ConfigFileExtension) => boolean
+  readConfigFile: <T>(name: string, extension?: ConfigFileExtension) => Promise<T>
+}
+
 export const ConfigFileReader = {
-  mount: (path?: string) => {
+  mount: (path?: string): MountedConfigFileReader => {
     const dir = (
       path ?? cleanEnv(process.env, { MDS_CONFIG_PATH: str({ default: '/mds-config' }) }).MDS_CONFIG_PATH
     ).replace('~', homedir())
@@ -47,20 +53,22 @@ export const ConfigFileReader = {
       throw new NotFoundError(`Mount Path Not Found: ${dir}`, { path: dir })
     }
 
-    const getFilePath = (name: string, ext?: string): string => {
-      return normalize(format({ dir, name, ext: ext && (ext.startsWith('.') ? ext : `.${ext}`) }))
+    const getFilePath = (name: string, extension?: string): string => {
+      return normalize(
+        format({ dir, name, ext: extension && (extension.startsWith('.') ? extension : `.${extension}`) })
+      )
     }
 
-    const parseFile = <T>(name: string, ext: ConfigFileExtension) => {
-      const file = getFilePath(name, ext)
+    const parseFile = <T>(name: string, extension: ConfigFileExtension) => {
+      const file = getFilePath(name, extension)
       return {
-        using: async (parser: FileParser) => {
+        using: async (parser: <T>(file: string) => T) => {
           try {
             return parser(await readFile(file)) as T
           } catch (error) {
             throw error instanceof NotFoundError
               ? error
-              : new UnsupportedTypeError(`Expected ${ext.toUpperCase()} File: ${file}`, { file })
+              : new UnsupportedTypeError(`Expected ${extension.toUpperCase()} File: ${file}`, { file })
           }
         }
       }
@@ -72,13 +80,13 @@ export const ConfigFileReader = {
 
     return {
       path: dir,
-      fileExists: (name: string, extension?: string) => fileExists(getFilePath(name, extension)),
-      readFile: async (name: string, extension?: string) => readFile(getFilePath(name, extension)),
-      configFileExists: (name: string, extension?: ConfigFileExtension) =>
+      fileExists: (name, extension) => fileExists(getFilePath(name, extension)),
+      readFile: async (name, extension) => readFile(getFilePath(name, extension)),
+      configFileExists: (name, extension) =>
         extension
           ? fileExists(getFilePath(name, extension))
           : ConfigFileExtensions.some(ext => fileExists(getFilePath(name, ext))),
-      readConfigFile: async <T>(name: string, extension?: ConfigFileExtension): Promise<T> => {
+      readConfigFile: async (name, extension) => {
         switch (extension) {
           case 'json':
             return await parseJsonFile(name)
