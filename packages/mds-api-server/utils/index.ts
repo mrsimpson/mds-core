@@ -52,7 +52,7 @@ export const serverVersion = () => {
 
 export type AccessTokenScopeValidator<AccessTokenScope extends string = never> = (
   scopes: AccessTokenScope[],
-  claims: AuthorizerClaims | null
+  claims: AuthorizerClaims['claims']
 ) => boolean | Promise<boolean>
 
 /* istanbul ignore next */

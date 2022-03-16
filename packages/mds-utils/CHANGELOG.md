@@ -1,5 +1,11 @@
 # @mds-core/mds-utils
 
+## 0.5.0
+
+### Minor Changes
+
+- 03a110c1: removed date-time-utils, refactored tests from mocha to jest
+
 ## 0.4.2
 
 ### Patch Changes

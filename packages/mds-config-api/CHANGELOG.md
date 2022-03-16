@@ -1,5 +1,16 @@
 # @mds-core/mds-config-api
 
+## 0.4.5
+
+### Patch Changes
+
+- Updated dependencies [af3631da]
+- Updated dependencies [03a110c1]
+  - @mds-core/mds-api-server@0.4.9
+  - @mds-core/mds-utils@0.5.0
+  - @mds-core/mds-config-service@0.4.5
+  - @mds-core/mds-service-helpers@0.6.7
+
 ## 0.4.4
 
 ### Patch Changes

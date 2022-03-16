@@ -61,10 +61,11 @@ export type ApiResponseLocals<P extends string, T> = {
 }
 
 export type ApiResponseLocalsClaims<AccessTokenScope extends string = never> = ApiResponseLocals<
-  'scopes',
-  Array<AccessTokenScope>
+  'authorization',
+  AuthorizerClaims['authorization']
 > &
-  ApiResponseLocals<'claims', AuthorizerClaims | null>
+  ApiResponseLocals<'claims', AuthorizerClaims['claims']> &
+  ApiResponseLocals<'scopes', Array<AccessTokenScope>>
 
 export type ApiResponseLocalsVersion<V extends string> = ApiResponseLocals<'version', V>
 
