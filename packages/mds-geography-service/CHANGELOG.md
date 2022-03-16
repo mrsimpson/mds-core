@@ -1,5 +1,12 @@
 # @mds-core/mds-geography-service
 
+## 0.10.18
+
+### Patch Changes
+
+- @mds-core/mds-rpc-common@0.3.16
+- @mds-core/mds-test-data@0.4.24
+
 ## 0.10.17
 
 ### Patch Changes

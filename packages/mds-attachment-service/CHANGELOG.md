@@ -1,5 +1,11 @@
 # @mds-core/mds-attachment-service
 
+## 0.5.22
+
+### Patch Changes
+
+- @mds-core/mds-rpc-common@0.3.16
+
 ## 0.5.21
 
 ### Patch Changes

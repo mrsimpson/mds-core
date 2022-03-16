@@ -1,5 +1,11 @@
 # @mds-core/mds-api-authorizer
 
+## 0.1.65
+
+### Patch Changes
+
+- abde42f5: Redefine AuthorizationContext type so that it can be passed as part of a tuple or spread parameter
+
 ## 0.1.64
 
 ### Patch Changes

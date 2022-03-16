@@ -1,5 +1,13 @@
 # @mds-core/mds-compliance-service
 
+## 0.10.27
+
+### Patch Changes
+
+- @mds-core/mds-rpc-common@0.3.16
+- @mds-core/mds-policy-service@0.11.24
+- @mds-core/mds-db@0.6.13
+
 ## 0.10.26
 
 ### Patch Changes
