@@ -17,13 +17,15 @@
 import { asJsonApiLinks, parsePagingQueryParams, parseRequest } from '@mds-core/mds-api-helpers'
 import type { AccessTokenScopeValidator } from '@mds-core/mds-api-server'
 import { checkAccess } from '@mds-core/mds-api-server'
+import type { AuditTelemetry } from '@mds-core/mds-audit-service'
+import { validateAuditTelemetryDomainCreateModel } from '@mds-core/mds-audit-service'
 import db from '@mds-core/mds-db'
 import type { TelemetryDomainModel } from '@mds-core/mds-ingest-service'
-import { IngestServiceClient, validateTelemetryDomainCreateModel } from '@mds-core/mds-ingest-service'
+import { IngestServiceClient } from '@mds-core/mds-ingest-service'
 import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
 import { ValidationError } from '@mds-core/mds-schema-validators'
 import { isError } from '@mds-core/mds-service-helpers'
-import type { AuditEvent, Telemetry, TelemetryData, Timestamp } from '@mds-core/mds-types'
+import type { AuditEvent, TelemetryData, Timestamp } from '@mds-core/mds-types'
 import { AUDIT_EVENT_TYPES } from '@mds-core/mds-types'
 import {
   AuthorizationError,
@@ -99,7 +101,7 @@ const logGenericAuditError = (req: AuditApiRequest<any>, res: AuditApiResponse<a
   AuditApiLogger.error(`fail ${req.method} ${req.originalUrl}`, err.stack || JSON.stringify(err))
 
 // TODO lib
-function flattenTelemetry(telemetry?: Telemetry): TelemetryData {
+function flattenTelemetry(telemetry?: AuditTelemetry): TelemetryData {
   return telemetry
     ? {
         ...telemetry.gps,
@@ -316,7 +318,7 @@ function api(app: express.Express): express.Express {
           const { telemetry, audit_event_id = uuid(), timestamp } = req.body
 
           // Validate input params
-          validateTelemetryDomainCreateModel(telemetry)
+          validateAuditTelemetryDomainCreateModel(telemetry)
           validateTimestamp(timestamp)
           // Create the telemetry event
           await writeAuditEvent({
