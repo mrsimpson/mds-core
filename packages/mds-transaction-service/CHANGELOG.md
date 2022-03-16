@@ -1,5 +1,12 @@
 # @mds-core/mds-transaction-service
 
+## 0.6.21
+
+### Patch Changes
+
+- @mds-core/mds-rpc-common@0.3.16
+- @mds-core/mds-ingest-service@0.10.6
+
 ## 0.6.20
 
 ### Patch Changes

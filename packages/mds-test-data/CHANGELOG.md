@@ -1,5 +1,11 @@
 # @mds-core/mds-test-data
 
+## 0.4.24
+
+### Patch Changes
+
+- @mds-core/mds-ingest-service@0.10.6
+
 ## 0.4.23
 
 ### Patch Changes

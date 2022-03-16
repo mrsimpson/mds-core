@@ -1,5 +1,11 @@
 # @mds-core/mds-collector-service
 
+## 0.4.22
+
+### Patch Changes
+
+- @mds-core/mds-rpc-common@0.3.16
+
 ## 0.4.21
 
 ### Patch Changes

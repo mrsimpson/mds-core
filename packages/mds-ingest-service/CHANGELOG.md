@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.10.6
+
+### Patch Changes
+
+- @mds-core/mds-rpc-common@0.3.16
+
 ## 0.10.5
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @mds-core/mds-policy-service
 
+## 0.11.24
+
+### Patch Changes
+
+- @mds-core/mds-rpc-common@0.3.16
+- @mds-core/mds-geography-service@0.10.18
+
 ## 0.11.23
 
 ### Patch Changes

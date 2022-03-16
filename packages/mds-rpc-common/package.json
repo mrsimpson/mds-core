@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-rpc-common",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "description": "MDS RPC Common Utilities",
   "keywords": [],
   "license": "Apache-2.0",
@@ -16,8 +16,8 @@
   "dependencies": {
     "@improbable-eng/grpc-web-node-http-transport": "0.14.1",
     "@lacuna-tech/rpc_ts": "2.1.2-alpha.14",
-    "@mds-core/mds-api-authorizer": "workspace:0.1.64",
-    "@mds-core/mds-api-server": "workspace:0.4.9",
+    "@mds-core/mds-api-authorizer": "workspace:0.1.65",
+    "@mds-core/mds-api-server": "workspace:0.4.10",
     "@mds-core/mds-logger": "workspace:0.5.7",
     "@mds-core/mds-service-helpers": "workspace:0.6.7",
     "@mds-core/mds-types": "workspace:0.9.2",

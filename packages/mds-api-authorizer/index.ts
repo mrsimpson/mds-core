@@ -19,12 +19,10 @@ import { AuthorizationError, getEnvVar } from '@mds-core/mds-utils'
 import type express from 'express'
 import jwt from 'jsonwebtoken'
 
-export type AuthorizationContext =
-  | { token_type: 'None' }
-  | {
-      token_type: 'Basic' | 'Bearer'
-      access_token: string
-    }
+export interface AuthorizationContext {
+  token_type: 'None' | 'Basic' | 'Bearer'
+  access_token?: string
+}
 
 export interface AuthorizerClaims {
   authorization: AuthorizationContext
