@@ -1,5 +1,17 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.15
+
+### Patch Changes
+
+- af3631da: Stash API authorization context so it can be passed to RPC services without reparsing
+- Updated dependencies [af3631da]
+- Updated dependencies [03a110c1]
+  - @mds-core/mds-api-authorizer@0.1.64
+  - @mds-core/mds-api-server@0.4.9
+  - @mds-core/mds-utils@0.5.0
+  - @mds-core/mds-service-helpers@0.6.7
+
 ## 0.3.14
 
 ### Patch Changes
