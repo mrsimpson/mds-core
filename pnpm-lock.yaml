@@ -1301,6 +1301,7 @@ importers:
     specifiers:
       '@improbable-eng/grpc-web-node-http-transport': 0.14.1
       '@lacuna-tech/rpc_ts': 2.1.2-alpha.14
+      '@mds-core/mds-api-authorizer': workspace:0.1.63
       '@mds-core/mds-api-server': workspace:0.4.8
       '@mds-core/mds-logger': workspace:0.5.7
       '@mds-core/mds-service-helpers': workspace:0.6.6
@@ -1311,6 +1312,7 @@ importers:
     dependencies:
       '@improbable-eng/grpc-web-node-http-transport': 0.14.1
       '@lacuna-tech/rpc_ts': 2.1.2-alpha.14
+      '@mds-core/mds-api-authorizer': link:../mds-api-authorizer
       '@mds-core/mds-api-server': link:../mds-api-server
       '@mds-core/mds-logger': link:../mds-logger
       '@mds-core/mds-service-helpers': link:../mds-service-helpers

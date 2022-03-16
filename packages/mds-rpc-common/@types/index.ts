@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import type { AuthorizationContext } from '@mds-core/mds-api-authorizer'
 import type { ServiceResponse } from '@mds-core/mds-service-helpers'
 import type { AnyFunction } from '@mds-core/mds-types'
 
@@ -37,3 +38,4 @@ export const RPC_CONTEXT_KEY = 'x-rpc-context'
 export const REPL_PORT = 7375 // 7375 spells REPL
 
 export type RpcEmptyRequestContext = { [K in number | string | symbol]: never }
+export type RpcAuthorizedRequestContext = AuthorizationContext

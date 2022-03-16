@@ -28,8 +28,9 @@ export const AuthorizationMiddleware =
     res: ApiResponse & ApiResponseLocalsClaims<AccessTokenScope>,
     next: express.NextFunction
   ) => {
-    const claims = authorizer(req)
-    res.locals.claims = claims
-    res.locals.scopes = claims && claims.scope ? (claims.scope.split(' ') as AccessTokenScope[]) : []
+    const result = authorizer(req)
+    res.locals.authorization = result.authorization
+    res.locals.claims = result.claims
+    res.locals.scopes = result.claims?.scope ? (result.claims.scope.split(' ') as AccessTokenScope[]) : []
     next()
   }
