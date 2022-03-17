@@ -1,5 +1,20 @@
 # @mds-core/mds-audit-api
 
+## 0.4.0
+
+### Minor Changes
+
+- 6868c2c4: No longer require provider_id on audit event telemetry
+
+### Patch Changes
+
+- Updated dependencies [6868c2c4]
+  - @mds-core/mds-audit-service@0.6.0
+  - @mds-core/mds-attachment-service@0.5.23
+  - @mds-core/mds-ingest-service@0.10.7
+  - @mds-core/mds-db@0.6.14
+  - @mds-core/mds-api-helpers@0.2.22
+
 ## 0.3.30
 
 ### Patch Changes

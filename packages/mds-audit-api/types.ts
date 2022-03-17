@@ -22,7 +22,8 @@ import type {
   ApiResponseLocalsClaims,
   ApiVersionedResponse
 } from '@mds-core/mds-api-server'
-import type { TelemetryDomainCreateModel, TelemetryDomainModel } from '@mds-core/mds-ingest-service'
+import type { AuditTelemetry } from '@mds-core/mds-audit-service'
+import type { TelemetryDomainModel } from '@mds-core/mds-ingest-service'
 import type {
   AttachmentSummary,
   Audit,
@@ -52,21 +53,21 @@ export type AuditApiAuditStartRequest = AuditApiTripRequest<{
   audit_event_id: UUID
   provider_id: UUID
   provider_vehicle_id: string
-  telemetry?: TelemetryDomainCreateModel
+  telemetry?: AuditTelemetry
   timestamp: Timestamp
 }>
 
 export type AuditApiVehicleEventRequest = AuditApiTripRequest<{
   audit_event_id: UUID
   event_type: VEHICLE_EVENT
-  telemetry?: TelemetryDomainCreateModel
+  telemetry?: AuditTelemetry
   trip_id: UUID
   timestamp: Timestamp
 }>
 
 export type AuditApiVehicleTelemetryRequest = AuditApiTripRequest<{
   audit_event_id: UUID
-  telemetry: TelemetryDomainCreateModel
+  telemetry: AuditTelemetry
   timestamp: Timestamp
 }>
 
@@ -75,7 +76,7 @@ export type AuditApiAuditNoteRequest = AuditApiTripRequest<{
   audit_event_type: AUDIT_EVENT_TYPE
   audit_issue_code?: string
   note?: string
-  telemetry?: TelemetryDomainCreateModel
+  telemetry?: AuditTelemetry
   timestamp: Timestamp
 }>
 
@@ -83,7 +84,7 @@ export interface AuditApiAuditEndRequest extends AuditApiTripRequest {
   body: {
     audit_event_id: UUID
     audit_event_type: string
-    telemetry?: TelemetryDomainCreateModel
+    telemetry?: AuditTelemetry
     timestamp: Timestamp
   }
 }

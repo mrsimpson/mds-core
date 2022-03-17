@@ -1,5 +1,11 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.17
+
+### Patch Changes
+
+- f010700b: Resolve TS2742 error for non-portable type export
+
 ## 0.3.16
 
 ### Patch Changes

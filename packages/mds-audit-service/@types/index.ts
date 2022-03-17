@@ -32,6 +32,9 @@ export interface AuditDomainModel {
 
 export type AuditDomainCreateModel = DomainModelCreate<AuditDomainModel>
 
+// Telemetry from an auditor using the mobile audit app
+export type AuditTelemetry = Omit<Telemetry, 'provider_id' | 'device_id' | 'timestamp' | 'recorded'>
+
 export interface AuditEventDomainModel {
   audit_trip_id: UUID
   timestamp: Timestamp
@@ -40,7 +43,7 @@ export interface AuditEventDomainModel {
   audit_issue_code: Nullable<string>
   audit_subject_id: string
   note: Nullable<string>
-  telemetry: Omit<Telemetry, 'provider_id' | 'device_id' | 'timestamp' | 'recorded'>
+  telemetry: AuditTelemetry
 }
 
 export type AuditEventDomainCreateModel = DomainModelCreate<AuditEventDomainModel>
