@@ -1,5 +1,16 @@
 # @mds-core/mds-audit-service
 
+## 0.6.0
+
+### Minor Changes
+
+- 6868c2c4: No longer require provider_id on audit event telemetry
+
+### Patch Changes
+
+- Updated dependencies [f010700b]
+  - @mds-core/mds-rpc-common@0.3.17
+
 ## 0.5.22
 
 ### Patch Changes
