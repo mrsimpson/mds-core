@@ -34,9 +34,7 @@ import { makeDevices, makeEventsWithTelemetry, makeTelemetryInArea, SCOPED_AUTH 
 import type { Attachment, Audit, AuditAttachment, Telemetry, Timestamp, VehicleEvent } from '@mds-core/mds-types'
 import { AUDIT_EVENT_TYPES } from '@mds-core/mds-types'
 import { NotFoundError, now, pathPrefix, rangeRandomInt, uuid } from '@mds-core/mds-utils'
-import Sinon from 'sinon'
 import supertest from 'supertest'
-import test from 'unit.js'
 import { api } from '../api'
 import * as attachments from '../attachments'
 import { AUDIT_API_DEFAULT_VERSION } from '../types'
@@ -67,12 +65,12 @@ const OLD_EVENT = Date.now() - 60000
 
 const audit_subject_id = 'user@mds-testing.info'
 
-before('Initializing Database', async () => {
+beforeAll(async () => {
   await Promise.all([db.reinitialize(), cache.reinitialize()])
 })
 
 describe('Testing API', () => {
-  before(done => {
+  beforeAll(done => {
     const baseTelemetry = {
       provider_id,
       device_id: provider_device_id,
@@ -114,7 +112,7 @@ describe('Testing API', () => {
       recorded: AUDIT_START
     }
 
-    Sinon.replace(IngestServiceClient, 'getDevice', Sinon.fake.resolves(device))
+    jest.spyOn(IngestServiceClient, 'getDevice').mockImplementation(async () => device)
 
     db.writeDevice(device).then(() => {
       db.writeEvent({
@@ -149,12 +147,12 @@ describe('Testing API', () => {
       })
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.object(result).hasProperty('body')
-        test.object(result.body).hasProperty('provider_device')
-        test.object(result.body.provider_device).hasProperty('vehicle_id')
-        test.value(result.body.provider_device.vehicle_id).is(provider_vehicle_id)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result).toHaveProperty('body')
+        expect(result.body).toHaveProperty('provider_device')
+        expect(result.body.provider_device).toHaveProperty('vehicle_id')
+        expect(result.body.provider_device.vehicle_id).toStrictEqual(provider_vehicle_id)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -165,7 +163,7 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH(['audits:write'], audit_subject_id))
       .expect(409)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -176,7 +174,7 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH([], ''))
       .expect(403)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -195,8 +193,8 @@ describe('Testing API', () => {
       })
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body, { version: AUDIT_API_DEFAULT_VERSION })
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body).toMatchObject({ version: AUDIT_API_DEFAULT_VERSION })
         done(err)
       })
   })
@@ -215,8 +213,7 @@ describe('Testing API', () => {
       })
       .expect(403)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -233,9 +230,9 @@ describe('Testing API', () => {
       })
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-        test.value(Object.keys(result.body)).is(['version'])
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+        expect(Object.keys(result.body)).toStrictEqual(['version'])
         done(err)
       })
   })
@@ -250,9 +247,9 @@ describe('Testing API', () => {
       })
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-        test.value(Object.keys(result.body)).is(['version'])
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+        expect(Object.keys(result.body)).toStrictEqual(['version'])
         done(err)
       })
   })
@@ -267,8 +264,7 @@ describe('Testing API', () => {
       })
       .expect(403)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -285,8 +281,8 @@ describe('Testing API', () => {
       })
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body, { version: AUDIT_API_DEFAULT_VERSION })
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -304,9 +300,8 @@ describe('Testing API', () => {
       })
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-        test.value(result.body, { version: AUDIT_API_DEFAULT_VERSION })
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -324,9 +319,8 @@ describe('Testing API', () => {
       })
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-        test.value(result.body, { version: AUDIT_API_DEFAULT_VERSION })
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -342,8 +336,7 @@ describe('Testing API', () => {
       })
       .expect(403)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -357,8 +350,7 @@ describe('Testing API', () => {
         .set('Authorization', SCOPED_AUTH(['audits:write'], audit_subject_id))
         .expect(404)
         .end((err, result) => {
-          test.value(result).hasHeader('content-type', APP_JSON)
-          test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+          expect(result.header).toHaveProperty('content-type', APP_JSON)
           done(err)
         })
     })
@@ -370,13 +362,13 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH(['audits:read'], audit_subject_id))
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-        test.value(result.body.events.length).is(7)
-        test.value(result.body.provider_event_types).is(['agency_drop_off'])
-        test.value(result.body.provider_vehicle_state).is('available')
-        test.value(result.body.provider_telemetry.charge).is(0.5)
-        test.value(result.body.provider_event_time).is(AUDIT_START)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+        expect(result.body.events.length).toStrictEqual(7)
+        expect(result.body.provider_event_types).toStrictEqual(['agency_drop_off'])
+        expect(result.body.provider_vehicle_state).toStrictEqual('available')
+        expect(result.body.provider_telemetry.charge).toStrictEqual(0.5)
+        expect(result.body.provider_event_time).toStrictEqual(AUDIT_START)
         done(err)
       })
   })
@@ -387,8 +379,7 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH([], ''))
       .expect(403)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -399,8 +390,7 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH(['audits:read'], audit_subject_id))
       .expect(404)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -411,8 +401,7 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH([], ''))
       .expect(403)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -438,10 +427,10 @@ describe('Testing API', () => {
         .set('Authorization', SCOPED_AUTH(['audits:read'], audit_subject_id))
         .expect(200)
         .end((err, result) => {
-          test.value(result).hasHeader('content-type', APP_JSON)
-          test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-          test.value(result.body.count).is(count)
-          test.value(result.body.audits.length).is(count)
+          expect(result.header).toHaveProperty('content-type', APP_JSON)
+          expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+          expect(result.body.count).toStrictEqual(count)
+          expect(result.body.audits.length).toStrictEqual(count)
           done(err)
         })
     })
@@ -453,8 +442,7 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH([], ''))
       .expect(403)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -465,8 +453,7 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH(['audits:delete'], audit_subject_id))
       .expect(404)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
         done(err)
       })
   })
@@ -477,9 +464,8 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH(['audits:delete'], audit_subject_id))
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-        test.value(result.body, { version: AUDIT_API_DEFAULT_VERSION })
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
         done(err)
       })
   })
@@ -498,11 +484,11 @@ describe('Testing API', () => {
       })
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-        test.object(result).hasProperty('body')
-        test.object(result.body).hasProperty('provider_device')
-        test.value(result.body.provider_device).is(null)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+        expect(result).toHaveProperty('body')
+        expect(result.body).toHaveProperty('provider_device')
+        expect(result.body.provider_device).toStrictEqual(null)
         done(err)
       })
   })
@@ -513,9 +499,9 @@ describe('Testing API', () => {
       .set('Authorization', SCOPED_AUTH(['audits:read'], audit_subject_id))
       .expect(200)
       .end((err, result) => {
-        test.value(result).hasHeader('content-type', APP_JSON)
-        test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-        test.value(result.body.events.length).is(1)
+        expect(result.header).toHaveProperty('content-type', APP_JSON)
+        expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+        expect(result.body.events.length).toStrictEqual(1)
         done(err)
       })
   })
@@ -544,12 +530,12 @@ describe('Testing API', () => {
         })
         .expect(200)
         .end((err, result) => {
-          test.value(result).hasHeader('content-type', APP_JSON)
-          test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-          test.object(result).hasProperty('body')
-          test.object(result.body).hasProperty('provider_device')
-          test.object(result.body.provider_device).hasProperty('vehicle_id')
-          test.value(result.body.provider_device.vehicle_id).is(provider_vehicle_id)
+          expect(result.header).toHaveProperty('content-type', APP_JSON)
+          expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+          expect(result).toHaveProperty('body')
+          expect(result.body).toHaveProperty('provider_device')
+          expect(result.body.provider_device).toHaveProperty('vehicle_id')
+          expect(result.body.provider_device.vehicle_id).toStrictEqual(provider_vehicle_id)
           done(err)
         })
     })
@@ -558,7 +544,7 @@ describe('Testing API', () => {
     let devices_a: DeviceDomainModel[] // Have events and telemetry outside our BBOX
     let devices_b: DeviceDomainModel[] // Have events and telemetry inside our BBOX
     let devices_c: DeviceDomainModel[] // No events or telemetry
-    before(done => {
+    beforeAll(done => {
       devices_a = makeDevices(10, now(), JEST_PROVIDER_ID)
       const events_a = makeEventsWithTelemetry(devices_a, now(), SAN_FERNANDO_VALLEY, {
         event_types: ['trip_start'],
@@ -605,14 +591,14 @@ describe('Testing API', () => {
         .set('Authorization', SCOPED_AUTH(['audits:vehicles:read'], audit_subject_id))
         .expect(200)
         .end((err, result) => {
-          test.value(result).hasHeader('content-type', APP_JSON)
-          test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-          test.assert(result.body.vehicles.length === 10)
+          expect(result.header).toHaveProperty('content-type', APP_JSON)
+          expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+          expect(result.body.vehicles.length === 10).toBeTruthy()
           result.body.vehicles.forEach(
             (device: DeviceDomainModel & { updated?: Timestamp | null; telemetry: Telemetry }) => {
-              test.assert(typeof device.telemetry.gps.lat === 'number')
-              test.assert(typeof device.telemetry.gps.lng === 'number')
-              test.assert(typeof device.updated === 'number')
+              expect(typeof device.telemetry.gps.lat === 'number').toBeTruthy()
+              expect(typeof device.telemetry.gps.lng === 'number').toBeTruthy()
+              expect(typeof device.updated === 'number').toBeTruthy()
             }
           )
           done(err)
@@ -625,15 +611,15 @@ describe('Testing API', () => {
         .set('Authorization', SCOPED_AUTH(['audits:vehicles:read'], audit_subject_id))
         .expect(200)
         .end((err, result) => {
-          test.value(result).hasHeader('content-type', APP_JSON)
-          test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-          test.object(result).hasProperty('body')
-          test.object(result.body).hasProperty('vehicles')
-          test.value(result.body.vehicles[0].provider_id).is(devices_a[0]?.provider_id)
-          test.value(result.body.vehicles[0].vehicle_id).is(devices_a[0]?.vehicle_id)
-          test.value(result.body.vehicles[0].updated).is(result.body.vehicles[0].timestamp)
-          test.value(result.body.vehicles[0].vehicle_state).is('on_trip')
-          test.value(result.body.vehicles[0].telemetry.charge > 0).is(true)
+          expect(result.header).toHaveProperty('content-type', APP_JSON)
+          expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+          expect(result).toHaveProperty('body')
+          expect(result.body).toHaveProperty('vehicles')
+          expect(result.body.vehicles[0].provider_id).toStrictEqual(devices_a[0]?.provider_id)
+          expect(result.body.vehicles[0].vehicle_id).toStrictEqual(devices_a[0]?.vehicle_id)
+          expect(result.body.vehicles[0].updated).toStrictEqual(result.body.vehicles[0].timestamp)
+          expect(result.body.vehicles[0].vehicle_state).toStrictEqual('on_trip')
+          expect(result.body.vehicles[0].telemetry.charge > 0).toStrictEqual(true)
           done(err)
         })
     })
@@ -644,8 +630,7 @@ describe('Testing API', () => {
         .set('Authorization', SCOPED_AUTH(['audits:vehicles:read'], audit_subject_id))
         .expect(404)
         .end((err, result) => {
-          test.value(result).hasHeader('content-type', APP_JSON)
-          test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
+          expect(result.header).toHaveProperty('content-type', APP_JSON)
           done(err)
         })
     })
@@ -656,9 +641,9 @@ describe('Testing API', () => {
         .set('Authorization', SCOPED_AUTH(['audits:vehicles:read'], audit_subject_id))
         .expect(200)
         .end((err, result) => {
-          test.value(result.body.vehicles[0].provider_id).is(devices_c[0]?.provider_id)
-          test.value(result.body.vehicles[0].vehicle_id).is(devices_c[0]?.vehicle_id)
-          test.object(result.body.vehicles[0]).hasNotProperty('vehicle_state')
+          expect(result.body.vehicles[0].provider_id).toStrictEqual(devices_c[0]?.provider_id)
+          expect(result.body.vehicles[0].vehicle_id).toStrictEqual(devices_c[0]?.vehicle_id)
+          expect(result.body.vehicles[0]).not.toHaveProperty('vehicle_state')
           done(err)
         })
     })
@@ -669,13 +654,13 @@ describe('Testing API', () => {
         .set('Authorization', SCOPED_AUTH(['audits:vehicles:read'], audit_subject_id))
         .expect(200)
         .end((err, result) => {
-          test.value(result).hasHeader('content-type', APP_JSON)
-          test.value(result.body.version, AUDIT_API_DEFAULT_VERSION)
-          test.object(result).hasProperty('body')
-          test.object(result.body).hasProperty('vehicles')
-          test.value(result.body.vehicles[0].provider_id).is(devices_c[0]?.provider_id)
-          test.value(result.body.vehicles[0].vehicle_id).is(devices_c[0]?.vehicle_id)
-          test.value(result.body.vehicles[0].device_id).isNot(devices_c[0]?.device_id)
+          expect(result.header).toHaveProperty('content-type', APP_JSON)
+          expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
+          expect(result).toHaveProperty('body')
+          expect(result.body).toHaveProperty('vehicles')
+          expect(result.body.vehicles[0].provider_id).toStrictEqual(devices_c[0]?.provider_id)
+          expect(result.body.vehicles[0].vehicle_id).toStrictEqual(devices_c[0]?.vehicle_id)
+          expect(result.body.vehicles[0].device_id).not.toStrictEqual(devices_c[0]?.device_id)
           done(err)
         })
     })
@@ -683,7 +668,7 @@ describe('Testing API', () => {
   const attachment_id = uuid()
   const baseUrl = 'http://example.com/'
   describe('Tests for attachments', () => {
-    before(done => {
+    beforeAll(done => {
       const audit = {
         audit_trip_id,
         audit_device_id,
@@ -731,7 +716,7 @@ describe('Testing API', () => {
     })
 
     afterEach(() => {
-      Sinon.restore()
+      jest.restoreAllMocks()
     })
 
     it('verify get audit by id with attachments', done => {
@@ -740,9 +725,11 @@ describe('Testing API', () => {
         .set('Authorization', SCOPED_AUTH(['audits:read'], audit_subject_id))
         .expect(200)
         .end((err, result) => {
-          test.value(result.body.attachments[0].attachment_id).is(attachment_id)
-          test.value(result.body.attachments[0].attachment_url).is(`http://example.com/${attachment_id}.jpg`)
-          test.value(result.body.attachments[0].thumbnail_url).is(`http://example.com/${attachment_id}.thumbnail.jpg`)
+          expect(result.body.attachments[0].attachment_id).toStrictEqual(attachment_id)
+          expect(result.body.attachments[0].attachment_url).toStrictEqual(`http://example.com/${attachment_id}.jpg`)
+          expect(result.body.attachments[0].thumbnail_url).toStrictEqual(
+            `http://example.com/${attachment_id}.thumbnail.jpg`
+          )
           done(err)
         })
     })
@@ -753,11 +740,13 @@ describe('Testing API', () => {
         .set('Authorization', SCOPED_AUTH(['audits:read'], audit_subject_id))
         .expect(200)
         .end((err, result) => {
-          test.value(result.body.audits[0].attachments[0].attachment_id).is(attachment_id)
-          test.value(result.body.audits[0].attachments[0].attachment_url).is(`http://example.com/${attachment_id}.jpg`)
-          test
-            .value(result.body.audits[0].attachments[0].thumbnail_url)
-            .is(`http://example.com/${attachment_id}.thumbnail.jpg`)
+          expect(result.body.audits[0].attachments[0].attachment_id).toStrictEqual(attachment_id)
+          expect(result.body.audits[0].attachments[0].attachment_url).toStrictEqual(
+            `http://example.com/${attachment_id}.jpg`
+          )
+          expect(result.body.audits[0].attachments[0].thumbnail_url).toStrictEqual(
+            `http://example.com/${attachment_id}.thumbnail.jpg`
+          )
           done(err)
         })
     })
@@ -769,11 +758,13 @@ describe('Testing API', () => {
         .expect(200)
         .end((err, result) => {
           /* Expect a 200 response with the audit records for that provider returned (only 1 in this case) */
-          test.value(result.body.audits[0].attachments[0].attachment_id).is(attachment_id)
-          test.value(result.body.audits[0].attachments[0].attachment_url).is(`http://example.com/${attachment_id}.jpg`)
-          test
-            .value(result.body.audits[0].attachments[0].thumbnail_url)
-            .is(`http://example.com/${attachment_id}.thumbnail.jpg`)
+          expect(result.body.audits[0].attachments[0].attachment_id).toStrictEqual(attachment_id)
+          expect(result.body.audits[0].attachments[0].attachment_url).toStrictEqual(
+            `http://example.com/${attachment_id}.jpg`
+          )
+          expect(result.body.audits[0].attachments[0].thumbnail_url).toStrictEqual(
+            `http://example.com/${attachment_id}.thumbnail.jpg`
+          )
           done(err)
         })
     })
@@ -785,7 +776,7 @@ describe('Testing API', () => {
         .expect(200)
         .end((err, result) => {
           /* Expect a 200 response with no audits returned */
-          test.value(result.body.audits).is([])
+          expect(result.body.audits).toStrictEqual([])
           done(err)
         })
     })
@@ -797,8 +788,8 @@ describe('Testing API', () => {
         .send({}) // TODO: include file
         .expect(404)
         .end((err, result) => {
-          test.value(result.body.error.name).is('NotFoundError')
-          test.value(result.body.error.reason).is('audit not found')
+          expect(result.body.error.name).toStrictEqual('NotFoundError')
+          expect(result.body.error.reason).toStrictEqual('audit not found')
           done(err)
         })
     })
@@ -829,7 +820,7 @@ describe('Testing API', () => {
 
     attachmentTests.forEach(testCase =>
       it(`verify post bad attachment (${testCase.name})`, done => {
-        Sinon.stub(AttachmentServiceClient, 'writeAttachment').rejects(
+        jest.spyOn(AttachmentServiceClient, 'writeAttachment').mockRejectedValue(
           ServiceError({
             type: testCase.errName,
             message: 'Error Writing Attachment',
@@ -842,91 +833,93 @@ describe('Testing API', () => {
           .attach('file', `./tests/${testCase.file}`)
           .expect(testCase.status)
           .end((err, result) => {
-            test.value(result.body.error.type).is(testCase.errName)
-            test.value(result.body.error.details).is(testCase.errReason)
+            expect(result.body.error.type).toStrictEqual(testCase.errName)
+            expect(result.body.error.details).toStrictEqual(testCase.errReason)
             done(err)
           })
       })
     )
 
     it('verify audit attach (success)', done => {
-      const fake = Sinon.fake.returns({
-        audit_trip_id,
-        attachment_id,
-        recorded: AUDIT_START,
-        attachment_filename: `${attachment_id}.jpg`,
-        base_url: baseUrl,
-        mimetype: 'image/jpeg'
-      } as Attachment)
-      Sinon.replace(attachments, 'writeAttachment', fake)
+      // const fake = Sinon.fake.returns()
+      jest.spyOn(attachments, 'writeAttachment').mockImplementation(
+        async () =>
+          ({
+            audit_trip_id,
+            attachment_id,
+            recorded: AUDIT_START,
+            attachment_filename: `${attachment_id}.jpg`,
+            base_url: baseUrl,
+            mimetype: 'image/jpeg'
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any)
+      )
       request
         .post(pathPrefix(`/trips/${audit_trip_id}/attach/image%2Fpng`))
         .set('Authorization', SCOPED_AUTH(['audits:write'], audit_subject_id))
         .attach('file', `./tests/sample.png`)
         .expect(200)
         .end((err, result) => {
-          test.value(result.body.attachment_id).is(attachment_id)
-          test.value(result.body.attachment_url).is(`${baseUrl + attachment_id}.jpg`)
-          test.value(result.body.thumbnail_url).is('')
+          expect(result.body.attachment_id).toStrictEqual(attachment_id)
+          expect(result.body.attachment_url).toStrictEqual(`${baseUrl + attachment_id}.jpg`)
+          expect(result.body.thumbnail_url).toStrictEqual('')
           done(err)
         })
     })
 
     it('verify audit attach (error)', done => {
-      const fake = Sinon.fake.returns(null)
-      Sinon.replace(attachments, 'writeAttachment', fake)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(attachments, 'writeAttachment').mockImplementation(async () => null as any)
       request
         .post(pathPrefix(`/trips/${audit_trip_id}/attach/image%2Fpng`))
         .set('Authorization', SCOPED_AUTH(['audits:write'], audit_subject_id))
         .attach('file', `./tests/sample.png`)
         .expect(500)
         .end((err, result) => {
-          test.value(result.body.error.name).is('ServerError')
+          expect(result.body.error.name).toStrictEqual('ServerError')
           done(err)
         })
     })
 
     it('verify audit delete (success)', done => {
-      const fake = Sinon.fake.returns(null)
-      Sinon.replace(attachments, 'deleteAuditAttachment', fake)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(attachments, 'deleteAuditAttachment').mockImplementation(async () => null as any)
       request
         .delete(pathPrefix(`/trips/${audit_trip_id}/attachment/${attachment_id}`))
         .set('Authorization', SCOPED_AUTH(['audits:write'], audit_subject_id))
         .expect(200)
         .end((err, result) => {
-          test.value(result.body, { version: AUDIT_API_DEFAULT_VERSION })
+          expect(result.body.version).toStrictEqual(AUDIT_API_DEFAULT_VERSION)
           done(err)
         })
     })
 
     it('verify audit delete (not found)', done => {
-      const fake = Sinon.fake.throws(new NotFoundError())
-      Sinon.replace(attachments, 'deleteAuditAttachment', fake)
+      jest.spyOn(attachments, 'deleteAuditAttachment').mockRejectedValue(new NotFoundError())
       request
         .delete(pathPrefix(`/trips/${audit_trip_id}/attachment/${attachment_id}`))
         .set('Authorization', SCOPED_AUTH(['audits:write'], audit_subject_id))
         .expect(404)
         .end((err, result) => {
-          test.value(result.body.error.name).is('NotFoundError')
+          expect(result.body.error.name).toStrictEqual('NotFoundError')
           done(err)
         })
     })
 
     it('verify audit delete (error)', done => {
-      const fake = Sinon.fake.throws(new Error())
-      Sinon.replace(attachments, 'deleteAuditAttachment', fake)
+      jest.spyOn(attachments, 'deleteAuditAttachment').mockRejectedValue(new Error())
       request
         .delete(pathPrefix(`/trips/${audit_trip_id}/attachment/${attachment_id}`))
         .set('Authorization', SCOPED_AUTH(['audits:write'], audit_subject_id))
         .expect(500)
         .end((err, result) => {
-          test.value(result.body.error.name).is('ServerError')
+          expect(result.body.error.name).toStrictEqual('ServerError')
           done(err)
         })
     })
   })
 })
 
-after('Shutting down Database/Cache', async () => {
+afterAll(async () => {
   await Promise.all([db.shutdown(), cache.shutdown()])
 })
