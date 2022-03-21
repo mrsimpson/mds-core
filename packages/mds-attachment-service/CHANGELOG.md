@@ -1,5 +1,11 @@
 # @mds-core/mds-attachment-service
 
+## 0.5.24
+
+### Patch Changes
+
+- @mds-core/mds-schema-validators@0.5.9
+
 ## 0.5.23
 
 ### Patch Changes

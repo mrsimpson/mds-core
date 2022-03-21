@@ -1,6 +1,6 @@
 FROM node:16.11.1-alpine
 
-RUN apk add --no-cache tini
+RUN apk add --no-cache tini rlwrap
 
 RUN mkdir /mds
 

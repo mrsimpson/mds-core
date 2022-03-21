@@ -1,5 +1,11 @@
 # @mds-core/mds-providers
 
+## 0.2.10
+
+### Patch Changes
+
+- f9090232: Add Veo Ride and Divvy Provider entries
+
 ## 0.2.9
 
 ### Patch Changes

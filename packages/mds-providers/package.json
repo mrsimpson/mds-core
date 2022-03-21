@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-providers",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Mobility Data Specification provider details",
   "keywords": [
     "mds",

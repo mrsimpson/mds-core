@@ -1,5 +1,21 @@
 # @mds-core/mds-audit-api
 
+## 0.4.1
+
+### Patch Changes
+
+- d41535db: Refactored mds-audit-api test suite to use Jest instead of mocha/assert/unitjs
+- Updated dependencies [f9090232]
+- Updated dependencies [e66dced4]
+  - @mds-core/mds-providers@0.2.10
+  - @mds-core/mds-db@0.6.15
+  - @mds-core/mds-schema-validators@0.5.9
+  - @mds-core/mds-api-helpers@0.2.23
+  - @mds-core/mds-agency-cache@0.4.22
+  - @mds-core/mds-attachment-service@0.5.24
+  - @mds-core/mds-audit-service@0.6.1
+  - @mds-core/mds-ingest-service@0.10.8
+
 ## 0.4.0
 
 ### Minor Changes

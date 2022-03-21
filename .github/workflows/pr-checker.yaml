@@ -58,6 +58,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v2
         with:
           node-version: "16.11.1"
@@ -92,4 +94,4 @@ jobs:
           REDIS_HOST: redis
           NODE_OPTIONS: "--max_old_space_size=4096"
         run: |
-          pnpm test
+          pnpm test -- --filter "...[origin/develop]"
