@@ -1,5 +1,16 @@
 # @mds-core/mds-db
 
+## 0.6.15
+
+### Patch Changes
+
+- e66dced4: await IngestServiceClient.getDevice in writeEvent method
+  - @mds-core/mds-attachment-service@0.5.24
+  - @mds-core/mds-audit-service@0.6.1
+  - @mds-core/mds-geography-service@0.10.20
+  - @mds-core/mds-ingest-service@0.10.8
+  - @mds-core/mds-policy-service@0.11.26
+
 ## 0.6.14
 
 ### Patch Changes

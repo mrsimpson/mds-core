@@ -1,5 +1,12 @@
 # @mds-core/mds-policy-service
 
+## 0.11.26
+
+### Patch Changes
+
+- @mds-core/mds-schema-validators@0.5.9
+- @mds-core/mds-geography-service@0.10.20
+
 ## 0.11.25
 
 ### Patch Changes

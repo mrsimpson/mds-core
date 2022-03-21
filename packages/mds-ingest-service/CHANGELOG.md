@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.10.8
+
+### Patch Changes
+
+- @mds-core/mds-schema-validators@0.5.9
+
 ## 0.10.7
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @mds-core/mds-collector-service
 
+## 0.4.24
+
+### Patch Changes
+
+- @mds-core/mds-schema-validators@0.5.9
+
 ## 0.4.23
 
 ### Patch Changes

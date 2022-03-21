@@ -1,5 +1,12 @@
 # @mds-core/mds-geography-service
 
+## 0.10.20
+
+### Patch Changes
+
+- @mds-core/mds-schema-validators@0.5.9
+- @mds-core/mds-test-data@0.4.26
+
 ## 0.10.19
 
 ### Patch Changes

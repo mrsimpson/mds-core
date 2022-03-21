@@ -1,5 +1,11 @@
 # @mds-core/mds-audit-service
 
+## 0.6.1
+
+### Patch Changes
+
+- @mds-core/mds-schema-validators@0.5.9
+
 ## 0.6.0
 
 ### Minor Changes
