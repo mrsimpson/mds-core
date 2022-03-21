@@ -18,6 +18,7 @@ import type { ComplianceSnapshotDomainModel } from '@mds-core/mds-compliance-ser
 import db from '@mds-core/mds-db'
 import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
+import { IngestServiceManager } from '@mds-core/mds-ingest-service'
 import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry, TEST1_PROVIDER_ID } from '@mds-core/mds-test-data'
 import type { VehicleEvent } from '@mds-core/mds-types'
@@ -49,9 +50,16 @@ function now(): number {
   return Date.now()
 }
 
+const IngestServer = IngestServiceManager.controller()
+
 describe('Tests General Compliance Engine Functionality', () => {
   before(async () => {
     policies = (await readJson('test_data/policies.json')) as Required<PolicyDomainModel>[]
+    await IngestServer.start()
+  })
+
+  after(async () => {
+    await IngestServer.stop()
   })
 
   beforeEach(async () => {
@@ -109,6 +117,15 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
   beforeEach(async () => {
     await db.reinitialize()
   })
+
+  before(async () => {
+    await IngestServer.start()
+  })
+
+  after(async () => {
+    await IngestServer.stop()
+  })
+
   it('should process count violation vehicles with the most recent event last', async () => {
     const devices = makeDevices(6, now())
     const start_time = now() - 10000000
@@ -201,6 +218,14 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
 })
 
 describe('Verifies errors are being properly thrown', async () => {
+  before(async () => {
+    await IngestServer.start()
+  })
+
+  after(async () => {
+    await IngestServer.stop()
+  })
+
   it('Verifies RuntimeErrors are being thrown with an invalid TIMEZONE env_var', async () => {
     const oldTimezone = process.env.TIMEZONE
     process.env.TIMEZONE = 'Pluto/Potato_Land'
