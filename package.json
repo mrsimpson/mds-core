@@ -18,7 +18,7 @@
     "images": "pnpm run:concurrent image",
     "preinstall": "npx check-node-version --package && npx only-allow pnpm && pnpm i -g pnpm",
     "lint": "pnpm lint:audit && pnpm lint:prettier '**/package.json' && pnpm lint:markdown && pnpm lint:eslint '**/*.ts'",
-    "lint:audit": "pnpm-ci audit --strict -i GHSA-93q8-gq69-wqmw GHSA-92xj-mqp7-vmcj GHSA-w7rc-rwvf-8q5r GHSA-5rrq-pxf6-6jx5 GHSA-wxgw-qj99-44c2 GHSA-gf8q-jrpm-jvxq GHSA-8fr3-hfg3-gpgp GHSA-r683-j2x4-v87g",
+    "lint:audit": "pnpm-ci audit --strict -i GHSA-93q8-gq69-wqmw GHSA-92xj-mqp7-vmcj GHSA-w7rc-rwvf-8q5r GHSA-5rrq-pxf6-6jx5 GHSA-wxgw-qj99-44c2 GHSA-gf8q-jrpm-jvxq GHSA-8fr3-hfg3-gpgp GHSA-r683-j2x4-v87g GHSA-xvch-5gv4-984h GHSA-2r2c-g63r-vccr GHSA-x4jg-mjrx-434g GHSA-cfm4-qjh2-4765",
     "lint:eslint": "eslint --ignore-path .gitignore --ignore-path .eslintignore",
     "lint:markdown": "markdownlint-cli2 '**/*.md' '!**/CHANGELOG.md' '!**/node_modules/**'",
     "lint:prettier": "prettier --check",

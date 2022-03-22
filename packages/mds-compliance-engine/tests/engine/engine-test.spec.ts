@@ -22,9 +22,8 @@ import { IngestServiceManager } from '@mds-core/mds-ingest-service'
 import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry, TEST1_PROVIDER_ID } from '@mds-core/mds-test-data'
 import type { VehicleEvent } from '@mds-core/mds-types'
-import assert from 'assert'
+import { RuntimeError } from '@mds-core/mds-utils'
 import type { FeatureCollection } from 'geojson'
-import test from 'unit.js'
 import type { VehicleEventWithTelemetry } from '../../@types'
 import { filterEvents, getAllInputs, getSupersedingPolicies } from '../../engine/helpers'
 import { processPolicy } from '../../engine/mds-compliance-engine'
@@ -53,12 +52,12 @@ function now(): number {
 const IngestServer = IngestServiceManager.controller()
 
 describe('Tests General Compliance Engine Functionality', () => {
-  before(async () => {
+  beforeAll(async () => {
     policies = (await readJson('test_data/policies.json')) as Required<PolicyDomainModel>[]
     await IngestServer.start()
   })
 
-  after(async () => {
+  afterAll(async () => {
     await IngestServer.stop()
   })
 
@@ -69,18 +68,18 @@ describe('Tests General Compliance Engine Functionality', () => {
   it('Verifies not considering events older than 48 hours', async () => {
     const TWO_DAYS_IN_MS = 172800000
     const curTime = now()
-    const devices = makeDevices(400, curTime)
+    const devices = makeDevices(40, curTime)
     const events = makeEventsWithTelemetry(devices, curTime - TWO_DAYS_IN_MS, CITY_OF_LA, {
       event_types: ['trip_end'],
       vehicle_state: 'available',
       speed: 0
     })
+
     await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
 
     // make sure this helper works
     const recentEvents = filterEvents(events) as VehicleEventWithTelemetry[]
-    test.assert.deepEqual(recentEvents.length, 0)
-
+    expect(recentEvents.length).toStrictEqual(0)
     // Mimic what we do in the real world to get inputs to feed into the compliance engine.
     const supersedingPolicies = getSupersedingPolicies(policies)
     const inputs = await getAllInputs()
@@ -89,7 +88,7 @@ describe('Tests General Compliance Engine Functionality', () => {
     )
     policyResults.forEach(complianceSnapshots => {
       complianceSnapshots.forEach(complianceSnapshot => {
-        test.assert.deepEqual(complianceSnapshot?.vehicles_found.length, 0)
+        expect(complianceSnapshot?.vehicles_found.length).toStrictEqual(0)
       })
     })
   })
@@ -109,20 +108,26 @@ describe('Tests General Compliance Engine Functionality', () => {
     await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
     const inputs = await getAllInputs()
     const result = await processPolicy(EXPIRED_POLICY, geographies, inputs)
-    test.assert.deepEqual(result, [])
+    expect(result).toStrictEqual([])
   })
 })
 
 describe('Verifies compliance engine processes by vehicle most recent event', () => {
+  beforeAll(async () => {
+    await IngestServer.start()
+  })
+  afterAll(async () => {
+    await IngestServer.stop()
+  })
   beforeEach(async () => {
     await db.reinitialize()
   })
 
-  before(async () => {
+  beforeAll(async () => {
     await IngestServer.start()
   })
 
-  after(async () => {
+  afterAll(async () => {
     await IngestServer.stop()
   })
 
@@ -145,12 +150,12 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
     const { 0: result } = complianceResults.filter(
       complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
     ) as ComplianceSnapshotDomainModel[]
-    test.assert.deepEqual(result?.total_violations, 1)
+    expect(result?.total_violations).toStrictEqual(1)
     const [device] =
       result?.vehicles_found.filter(vehicle => {
         return !vehicle.rule_applied
       }) ?? []
-    test.assert.deepEqual(latest_device.device_id, device?.device_id)
+    expect(latest_device.device_id).toStrictEqual(device?.device_id)
   })
 
   it('Verifies arbitrary event_types can be set for a state in a rule', async () => {
@@ -171,7 +176,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
     const { 0: result } = complianceResults.filter(
       complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
     ) as ComplianceSnapshotDomainModel[]
-    test.assert.deepEqual(result?.total_violations, 1)
+    expect(result?.total_violations).toStrictEqual(1)
   })
 
   it('Verifies no match when event types do not match policy', async () => {
@@ -192,7 +197,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
     const { 0: result } = complianceResults.filter(
       complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
     )
-    test.assert.deepEqual(result?.total_violations, 0)
+    expect(result?.total_violations).toStrictEqual(0)
   })
 
   it('Verifies state wildcard matching works', async () => {
@@ -213,16 +218,15 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
     const { 0: result } = complianceResults.filter(
       complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
     ) as ComplianceSnapshotDomainModel[]
-    test.assert.deepEqual(result?.total_violations, 1)
+    expect(result?.total_violations).toStrictEqual(1)
   })
 })
 
-describe('Verifies errors are being properly thrown', async () => {
-  before(async () => {
+describe('Verifies errors are being properly thrown', () => {
+  beforeAll(async () => {
     await IngestServer.start()
   })
-
-  after(async () => {
+  afterAll(async () => {
     await IngestServer.stop()
   })
 
@@ -238,14 +242,12 @@ describe('Verifies errors are being properly thrown', async () => {
 
     await db.seed({ devices, events, telemetry: events.map(({ telemetry }) => telemetry) })
 
-    await assert.rejects(
-      async () => {
-        const inputs = await getAllInputs()
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await processPolicy(policies[0]!, geographies, inputs)
-      },
-      { name: 'RuntimeError' }
-    )
+    await expect(async () => {
+      const inputs = await getAllInputs()
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await processPolicy(policies[0]!, geographies, inputs)
+    }).rejects.toThrowError(RuntimeError)
+
     process.env.TIMEZONE = oldTimezone
   })
 })

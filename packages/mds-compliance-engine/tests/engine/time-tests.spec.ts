@@ -73,7 +73,7 @@ const TIME_POLICY: TimePolicy = {
 }
 
 describe('Tests Compliance Engine Time Functionality', () => {
-  it('Verifies time compliance', done => {
+  it('Verifies time compliance', async () => {
     const devices = makeDevices(400, now())
     const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
       event_types: ['trip_end'],
@@ -86,11 +86,9 @@ describe('Tests Compliance Engine Time Functionality', () => {
     const result = processTimePolicy(TIME_POLICY, events, geographies, deviceMap) as ComplianceEngineResult
     test.assert.deepEqual(result.vehicles_found.length, 0)
     test.assert.deepEqual(result.total_violations, 0)
-
-    done()
   })
 
-  it('Verifies time compliance violation (simple case)', done => {
+  it('Verifies time compliance violation (simple case)', async () => {
     const badDevices = makeDevices(400, now())
     const badEvents = makeEventsWithTelemetry(badDevices, now() - minutes(21), CITY_OF_LA, {
       event_types: ['trip_end'],
@@ -127,10 +125,9 @@ describe('Tests Compliance Engine Time Functionality', () => {
       return count
     }, 0)
     test.assert.deepEqual(finalCount, 400)
-    done()
   })
 
-  it('Verifies time compliance violation with overlapping geographies and rules_matched and rule_applied are correct', done => {
+  it('Verifies time compliance violation with overlapping geographies and rules_matched and rule_applied are correct', async () => {
     const devicesA = makeDevices(4, now())
     const eventsA = makeEventsWithTelemetry(devicesA, now() - minutes(30), INNER_POLYGON, {
       event_types: ['trip_end'],
@@ -187,10 +184,9 @@ describe('Tests Compliance Engine Time Functionality', () => {
       return count
     }, 0)
     test.assert.deepEqual(rule_count_2, 5)
-    done()
   })
 
-  it('verifies time match rule', done => {
+  it('verifies time match rule', async () => {
     const { 0: rule } = TIME_POLICY.rules
     const goodDevices = makeDevices(1, now())
     const goodEvents = makeEventsWithTelemetry(goodDevices, now(), CITY_OF_LA, {
@@ -222,6 +218,5 @@ describe('Tests Compliance Engine Time Functionality', () => {
         badEvents[0] as VehicleEvent & { telemetry: Telemetry }
       )
     )
-    done()
   })
 })

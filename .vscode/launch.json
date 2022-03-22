@@ -641,6 +641,26 @@
       }
     },
     {
+      "name": "Tests: mds-compliance-engine-2",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
+        "--runInBand",
+        "--coverage",
+        "false"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector",
+      "cwd": "${workspaceFolder}/packages/mds-compliance-engine",
+      "env": {
+        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "npm_package_name": "@mds-core/mds-compliance-engine"
+      }
+    },
+    {
       "name": "Tests: mds-compliance-service",
       "type": "node",
       "request": "launch",
