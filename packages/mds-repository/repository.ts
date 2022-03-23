@@ -216,7 +216,7 @@ export const ReadWriteRepository = {
       migrations: migrations.length === 0 ? [] : RepositoryMigrations(migrationsTableName).concat(migrations)
     })
 
-    const cli = (options?: ConnectionManagerCliOptions) => ormconfig('rw')
+    const cli = (options?: ConnectionManagerCliOptions) => ormconfig('rw', options)
 
     const runAllMigrations = async (): Promise<void> => runAllMigrationsUsingConnection(await connect('rw'))
 
