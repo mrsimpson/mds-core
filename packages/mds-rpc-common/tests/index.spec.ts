@@ -17,7 +17,6 @@
 import type { ServiceClient } from '@mds-core/mds-service-helpers'
 import { ServiceError, ServiceResult } from '@mds-core/mds-service-helpers'
 import supertest from 'supertest'
-import test from 'unit.js'
 import type { RpcEmptyRequestContext, RpcServiceDefinition } from '../@types'
 import { RPC_HOST } from '../@types'
 import type { RpcRequestOptions } from '../client'
@@ -85,7 +84,7 @@ describe('Test RPC Client', () => {
     })
 
     it('Test Service Result', async () => {
-      test.value(await TestClient().length(TEST_WORD)).is(TEST_WORD.length)
+      expect(await TestClient().length(TEST_WORD)).toStrictEqual(TEST_WORD.length)
     })
 
     it('Test Service Error', async () => {

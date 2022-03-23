@@ -289,12 +289,6 @@ const providers: { [k in PROVIDER_ID]: ProviderInfo } = {
     provider_name: 'Divvy',
     gbfs_api_url: 'https://gbfs.divvybikes.com'
   },
-  /*
-   * Keeping these test IDs in for now, because removing them would require mocking out
-   * .getProviders, which is necessary for the compliance engine tests. However, the engine
-   * tests are still on mocha, and I don't want to create a sinon mock when there's a ticket
-   * in the backlog for migrating the remaining packages not on jest yet.
-   */
   [TEST1_PROVIDER_ID]: {
     provider_id: TEST1_PROVIDER_ID,
     provider_name: 'Test 1'

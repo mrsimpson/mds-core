@@ -583,7 +583,7 @@
       "request": "launch",
       "runtimeArgs": [
         "--inspect-brk",
-        "${workspaceRoot}/node_modules/.bin/jest",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
         "--runInBand",
         "--coverage",
         "false"
@@ -604,7 +604,7 @@
       "request": "launch",
       "runtimeArgs": [
         "--inspect-brk",
-        "${workspaceRoot}/node_modules/.bin/jest",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
         "--runInBand",
         "--coverage",
         "false"
@@ -620,28 +620,6 @@
     },
     {
       "name": "Tests: mds-compliance-engine",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "--project",
-        "${workspaceFolder}/tsconfig.json",
-        "-r",
-        "ts-node/register",
-        "--timeout",
-        "0"
-      ],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
-      "cwd": "${workspaceFolder}/packages/mds-compliance-engine",
-      "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-compliance-engine"
-      }
-    },
-    {
-      "name": "Tests: mds-compliance-engine-2",
       "type": "node",
       "request": "launch",
       "runtimeArgs": [
@@ -786,14 +764,12 @@
       "name": "Tests: mds-geography-author-api",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "--project",
-        "${workspaceFolder}/tsconfig.json",
-        "-r",
-        "ts-node/register",
-        "--timeout",
-        "0"
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
+        "--runInBand",
+        "--coverage",
+        "false"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -801,8 +777,7 @@
       "cwd": "${workspaceFolder}/packages/mds-geography-author-api",
       "env": {
         "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
-        "npm_package_name": "@mds-core/mds-geography-author-api",
-        "PATH_PREFIX": "/geography-author"
+        "npm_package_name": "@mds-core/mds-geography-author-api"
       }
     },
     {
