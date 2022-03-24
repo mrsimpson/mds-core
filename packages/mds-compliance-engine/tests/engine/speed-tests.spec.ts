@@ -21,7 +21,6 @@ import type { SpeedPolicy, SpeedRule } from '@mds-core/mds-policy-service'
 import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import type { Telemetry, VehicleEvent } from '@mds-core/mds-types'
 import type { FeatureCollection } from 'geojson'
-import test from 'unit.js'
 import type { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { filterEvents, generateDeviceMap } from '../../engine/helpers'
 import { isSpeedRuleMatch, processSpeedPolicy } from '../../engine/speed_processors'
@@ -72,7 +71,7 @@ function now(): number {
 }
 
 describe('Tests Compliance Engine Speed Violations', () => {
-  it('Verifies speed compliance', done => {
+  it('Verifies speed compliance', async () => {
     const devices = makeDevices(5, now())
     const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
       event_types: ['trip_start'],
@@ -83,12 +82,11 @@ describe('Tests Compliance Engine Speed Violations', () => {
     const deviceMap: { [d: string]: DeviceDomainModel } = generateDeviceMap(devices)
 
     const result = processSpeedPolicy(SPEED_POLICY, events, geographies, deviceMap) as ComplianceEngineResult
-    test.assert.deepEqual(result.total_violations, 0)
-    test.assert.deepEqual(result.vehicles_found, [])
-    done()
+    expect(result.total_violations).toStrictEqual(0)
+    expect(result.vehicles_found).toStrictEqual([])
   })
 
-  it('verifies speed compliance violation (simple case)', done => {
+  it('verifies speed compliance violation (simple case)', async () => {
     const devicesA = makeDevices(5, now())
     const eventsA = makeEventsWithTelemetry(devicesA, now(), CITY_OF_LA, {
       event_types: ['trip_start'],
@@ -111,8 +109,9 @@ describe('Tests Compliance Engine Speed Violations', () => {
       geographies,
       deviceMap
     ) as ComplianceEngineResult
-    test.assert.deepEqual(result.vehicles_found.length, 5)
-    test.assert.deepEqual(result.total_violations, 5)
+    expect(result.vehicles_found.length).toStrictEqual(5)
+    expect(result.total_violations).toStrictEqual(5)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { rule_id } = SPEED_POLICY.rules[0]!
     // Note that for speed rule matches, `rule_applied` is never null.
     const speedingCount = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
@@ -122,11 +121,10 @@ describe('Tests Compliance Engine Speed Violations', () => {
       }
       return count
     }, 0)
-    test.assert.deepEqual(speedingCount, 5)
-    done()
+    expect(speedingCount).toStrictEqual(5)
   })
 
-  it('correctly handles a speed policy with overlapping geos and assigns the values of `rules_matched` and `rule_applied`', done => {
+  it('correctly handles a speed policy with overlapping geos and assigns the values of `rules_matched` and `rule_applied`', async () => {
     const devicesA = makeDevices(3, now())
     const eventsA = makeEventsWithTelemetry(devicesA, now(), INNER_POLYGON, {
       event_types: ['trip_start'],
@@ -149,10 +147,12 @@ describe('Tests Compliance Engine Speed Violations', () => {
       [INNER_GEO, OUTER_GEO],
       deviceMap
     ) as ComplianceEngineResult
-    test.assert.deepEqual(result.vehicles_found.length, 8)
-    test.assert.deepEqual(result.total_violations, 8)
+    expect(result.vehicles_found.length).toStrictEqual(8)
+    expect(result.total_violations).toStrictEqual(8)
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { rule_id } = OVERLAPPING_GEOS_SPEED_POLICY.rules[0]!
-    const rule_id_2 = OVERLAPPING_GEOS_SPEED_POLICY.rules[1]!.rule_id
+    const rule_id_2 = OVERLAPPING_GEOS_SPEED_POLICY.rules[1]?.rule_id as string
 
     // Note that for speed rule matches, `rule_applied` is never null.
     const speedingCount_1 = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
@@ -169,7 +169,7 @@ describe('Tests Compliance Engine Speed Violations', () => {
       }
       return count
     }, 0)
-    test.assert.deepEqual(speedingCount_1, 3)
+    expect(speedingCount_1).toStrictEqual(3)
     const speedingCount_2 = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
       if (
         vehicle.rule_applied === rule_id_2 &&
@@ -183,11 +183,10 @@ describe('Tests Compliance Engine Speed Violations', () => {
       }
       return count
     }, 0)
-    test.assert.deepEqual(speedingCount_2, 5)
-    done()
+    expect(speedingCount_2).toStrictEqual(5)
   })
 
-  it('Verifies isSpeedRuleMatch', done => {
+  it('Verifies isSpeedRuleMatch', async () => {
     const speedingDevices = makeDevices(1, now())
     const speedingEvents = makeEventsWithTelemetry(speedingDevices, now(), CITY_OF_LA, {
       event_types: ['trip_start'],
@@ -204,23 +203,22 @@ describe('Tests Compliance Engine Speed Violations', () => {
 
     const rule = SPEED_POLICY.rules[0] as SpeedRule
 
-    test.assert(
+    expect(
       isSpeedRuleMatch(
         rule,
         geographies,
         speedingDevices[0],
         speedingEvents[0] as VehicleEvent & { telemetry: Telemetry }
       )
-    )
+    ).toBeTruthy()
 
-    test.assert(
+    expect(
       !isSpeedRuleMatch(
         rule,
         geographies,
         nonSpeedingDevices[0],
         nonSpeedingEvents[0] as VehicleEvent & { telemetry: Telemetry }
       )
-    )
-    done()
+    ).toBeTruthy()
   })
 })

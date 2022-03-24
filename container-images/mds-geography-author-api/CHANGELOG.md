@@ -1,5 +1,16 @@
 # @container-images/mds-geography-author-api
 
+## 0.1.0
+
+### Minor Changes
+
+- d2839e9e: Upgrade to node:16.14.2-alpine3.15 to resolve rlwrap installation bug
+
+### Patch Changes
+
+- Updated dependencies [9131527c]
+  - @mds-core/mds-geography-author-api@0.4.24
+
 ## 0.0.70
 
 ### Patch Changes

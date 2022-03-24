@@ -17,10 +17,12 @@
 import type { Nullable } from '@mds-core/mds-types'
 import {
   AlreadyPublishedError,
+  AuthorizationError,
   BadParamsError,
   ConflictError,
   DependencyMissingError,
   hours,
+  InsufficientPermissionsError,
   minutes,
   NotFoundError,
   seconds,
@@ -191,6 +193,16 @@ export const ServiceException = (message: string, error?: unknown) => {
   /* istanbul ignore if */
   if (error instanceof BadParamsError) {
     return ServiceError({ type: 'BadParamsError', message, details })
+  }
+
+  /* istanbul ignore if */
+  if (error instanceof InsufficientPermissionsError) {
+    return ServiceError({ type: 'InsufficientPermissionsError', message, details })
+  }
+
+  /* istanbul ignore if */
+  if (error instanceof AuthorizationError) {
+    return ServiceError({ type: 'AuthorizationError', message, details })
   }
 
   return ServiceError({ type: 'ServiceException', message, details })

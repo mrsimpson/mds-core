@@ -1,5 +1,15 @@
 # @container-images/mds-collector-api
 
+## 0.1.0
+
+### Minor Changes
+
+- d2839e9e: Upgrade to node:16.14.2-alpine3.15 to resolve rlwrap installation bug
+
+### Patch Changes
+
+- @mds-core/mds-collector-api@0.1.71
+
 ## 0.0.71
 
 ### Patch Changes
