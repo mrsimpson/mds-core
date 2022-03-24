@@ -1,5 +1,20 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.23
+
+### Patch Changes
+
+- 28fcf788: Migrate test suite of mds-compliance engine from mocha to jest
+- Updated dependencies [5d7601e8]
+  - @mds-core/mds-service-helpers@0.6.8
+  - @mds-core/mds-api-server@0.4.11
+  - @mds-core/mds-compliance-service@0.10.30
+  - @mds-core/mds-geography-service@0.10.21
+  - @mds-core/mds-ingest-service@0.10.9
+  - @mds-core/mds-policy-service@0.11.27
+  - @mds-core/mds-api-helpers@0.2.24
+  - @mds-core/mds-db@0.6.16
+
 ## 0.8.22
 
 ### Patch Changes

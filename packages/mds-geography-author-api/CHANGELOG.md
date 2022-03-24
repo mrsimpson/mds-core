@@ -1,5 +1,16 @@
 # @mds-core/mds-geography-author-api
 
+## 0.4.24
+
+### Patch Changes
+
+- 9131527c: refactors tests from mocha to jest, removed all references to mocha from entire repo
+- Updated dependencies [5d7601e8]
+  - @mds-core/mds-service-helpers@0.6.8
+  - @mds-core/mds-api-server@0.4.11
+  - @mds-core/mds-geography-service@0.10.21
+  - @mds-core/mds-api-helpers@0.2.24
+
 ## 0.4.23
 
 ### Patch Changes

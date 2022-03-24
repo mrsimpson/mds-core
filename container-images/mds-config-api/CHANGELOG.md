@@ -1,5 +1,15 @@
 # @container-images/mds-config-api
 
+## 0.5.0
+
+### Minor Changes
+
+- d2839e9e: Upgrade to node:16.14.2-alpine3.15 to resolve rlwrap installation bug
+
+### Patch Changes
+
+- @mds-core/mds-config-api@0.4.8
+
 ## 0.4.7
 
 ### Patch Changes
