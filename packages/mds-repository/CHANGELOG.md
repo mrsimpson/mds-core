@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.1.47
+
+### Patch Changes
+
+- c9e36e94: Resolve an issue with the output directory not being set properly when generating migrations
+
 ## 0.1.46
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @mds-core/mds-service-helpers
 
+## 0.6.8
+
+### Patch Changes
+
+- 5d7601e8: Allow AuthorizationError/InsufficientPermissionsError to be service exceptions
+
 ## 0.6.7
 
 ### Patch Changes

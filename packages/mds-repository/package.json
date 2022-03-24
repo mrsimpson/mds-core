@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-repository",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "description": "Mobility Data Specification ORM",
   "keywords": [
     "mds",
