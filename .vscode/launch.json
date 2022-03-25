@@ -5,6 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Attach",
+      "port": 9229,
+      "request": "attach",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node"
+    },
+    {
       "name": "Server: mds-agency",
       "type": "node",
       "request": "launch",
@@ -16,7 +25,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server.ts"],
+      "args": [
+        "server.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -39,7 +50,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -61,7 +74,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server.ts"],
+      "args": [
+        "server.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -84,7 +99,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -106,7 +123,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -129,7 +148,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -151,7 +172,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server.ts"],
+      "args": [
+        "server.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -174,7 +197,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -197,7 +222,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -219,7 +246,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server.ts"],
+      "args": [
+        "server.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -242,7 +271,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server.ts"],
+      "args": [
+        "server.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -265,7 +296,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -287,7 +320,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -309,7 +344,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server.ts"],
+      "args": [
+        "server.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -332,7 +369,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -354,7 +393,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server.ts"],
+      "args": [
+        "server.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -377,7 +418,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server.ts"],
+      "args": [
+        "server.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -400,7 +443,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -422,7 +467,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -445,7 +492,9 @@
         "-r",
         "dotenv/config"
       ],
-      "args": ["server/index.ts"],
+      "args": [
+        "server/index.ts"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
