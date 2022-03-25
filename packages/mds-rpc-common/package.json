@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand"
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@improbable-eng/grpc-web-node-http-transport": "0.14.1",

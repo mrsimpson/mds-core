@@ -33,7 +33,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-agency",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-agency",
         "PATH_PREFIX": "/agency"
       }
@@ -58,7 +58,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-attachment-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-attachment-service"
       }
     },
@@ -82,7 +82,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-audit-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-audit-api",
         "PATH_PREFIX": "/audit"
       }
@@ -107,7 +107,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-audit-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-audit-service"
       }
     },
@@ -131,7 +131,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-collector-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-collector-api",
         "PATH_PREFIX": "/collector"
       }
@@ -156,7 +156,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-collector-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-collector-service"
       }
     },
@@ -180,7 +180,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-compliance",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-compliance",
         "PATH_PREFIX": "/compliance"
       }
@@ -205,7 +205,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@lacuna-core/mds-config-api",
         "PATH_PREFIX": "/config"
       }
@@ -230,7 +230,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@lacuna-core/mds-config-service"
       }
     },
@@ -254,7 +254,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-geography-api",
         "PATH_PREFIX": "/geography"
       }
@@ -279,7 +279,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-author-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-geography-author-api",
         "PATH_PREFIX": "/geography-author"
       }
@@ -304,7 +304,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-geography-service"
       }
     },
@@ -328,7 +328,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-ingest-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-ingest-service"
       }
     },
@@ -352,7 +352,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-jurisdiction-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-jurisdiction-api",
         "PATH_PREFIX": "/jurisdiction"
       }
@@ -377,7 +377,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-jurisdiction-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-jurisdiction-service"
       }
     },
@@ -401,7 +401,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-policy",
         "PATH_PREFIX": "/policy"
       }
@@ -426,7 +426,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy-author-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-policy-author-api",
         "PATH_PREFIX": "/policy-author"
       }
@@ -451,7 +451,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-policy-service"
       }
     },
@@ -475,7 +475,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-transaction-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-transaction-api",
         "PATH_PREFIX": "/transaction"
       }
@@ -500,7 +500,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-transaction-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-transaction-service"
       }
     },
@@ -520,7 +520,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-agency",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-agency",
         "PATH_PREFIX": "/agency"
       }
@@ -541,7 +541,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-api-authorizer",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-api-authorizer"
       }
     },
@@ -561,7 +561,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-api-server",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-api-server"
       }
     },
@@ -581,7 +581,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-attachment-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-attachment-service"
       }
     },
@@ -601,7 +601,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-audit-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-audit-api",
         "PATH_PREFIX": "/audit"
       }
@@ -622,7 +622,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-audit-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-audit-service"
       }
     },
@@ -642,7 +642,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-collector-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-collector-api",
         "PATH_PREFIX": "/collector"
       }
@@ -663,7 +663,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-collector-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-collector-service"
       }
     },
@@ -683,7 +683,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-compliance-engine",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-compliance-engine"
       }
     },
@@ -703,7 +703,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-compliance-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-compliance-service"
       }
     },
@@ -723,7 +723,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@lacuna-core/mds-config-api",
         "PATH_PREFIX": "/config"
       }
@@ -744,7 +744,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-files",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@lacuna-core/mds-config-files"
       }
     },
@@ -764,7 +764,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@lacuna-core/mds-config-service"
       }
     },
@@ -784,7 +784,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-db",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-db"
       }
     },
@@ -804,7 +804,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-geography-api",
         "PATH_PREFIX": "/geography"
       }
@@ -825,7 +825,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-author-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-geography-author-api"
       }
     },
@@ -845,7 +845,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-geography-service"
       }
     },
@@ -865,7 +865,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-ingest-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-ingest-service"
       }
     },
@@ -885,7 +885,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-jurisdiction-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-jurisdiction-api",
         "PATH_PREFIX": "/jurisdictions"
       }
@@ -906,7 +906,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-jurisdiction-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-jurisdiction-service"
       }
     },
@@ -926,7 +926,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-logger",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-logger"
       }
     },
@@ -946,7 +946,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-policy"
       }
     },
@@ -966,7 +966,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy-author-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-policy-author-api"
       }
     },
@@ -986,7 +986,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "PG_DEBUG": "true",
         "npm_package_name": "@mds-core/mds-policy-service"
       }
@@ -1007,7 +1007,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-repository",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-repository"
       }
     },
@@ -1027,7 +1027,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-rpc-common",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "PG_DEBUG": "true",
         "npm_package_name": "@mds-core/mds-rpc-common"
       }
@@ -1048,7 +1048,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-service-helpers",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-service-helpers"
       }
     },
@@ -1068,7 +1068,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-schema-validators",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-schema-validators"
       }
     },
@@ -1088,7 +1088,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-stream",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-stream"
       }
     },
@@ -1108,7 +1108,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-stream-processor",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-stream-processor"
       }
     },
@@ -1128,7 +1128,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-transaction-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-transaction-api"
       }
     },
@@ -1148,7 +1148,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-transaction-service",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-transaction-service"
       }
     },
@@ -1168,7 +1168,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-types",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "npm_package_name": "@mds-core/mds-types"
       }
     },
@@ -1188,7 +1188,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-utils",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env"
+        "DOTENV_FLOW_PATH": "${workspaceFolder}"
       }
     },
     {
@@ -1207,7 +1207,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-schema-validators",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env"
+        "DOTENV_FLOW_PATH": "${workspaceFolder}"
       }
     },
     {
@@ -1226,7 +1226,7 @@
       "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-compliance-api",
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env",
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
         "PATH_PREFIX": "/compliance-api"
       }
     }

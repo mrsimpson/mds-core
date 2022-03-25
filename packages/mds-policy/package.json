@@ -13,8 +13,8 @@
     "generate": "pnpm generate:schema",
     "generate:schema": "ts-node ./generate-schemas.ts && git add schema-gen",
     "start": "PATH_PREFIX=/policy pnpm watch server",
-    "test": "PATH_PREFIX=/policy DOTENV_CONFIG_PATH=../../.env jest --runInBand",
-    "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "test": "PATH_PREFIX=/policy jest --runInBand",
+    "ts-node": "pnpm build && DOTENV_FLOW_PATH=../.. ts-node",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {

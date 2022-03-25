@@ -14,8 +14,8 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand --passWithNoTests",
-    "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "test": "jest --runInBand --passWithNoTests",
+    "ts-node": "pnpm build && DOTENV_FLOW_PATH=../.. ts-node",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {

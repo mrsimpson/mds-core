@@ -14,8 +14,8 @@
     "generate:flatspec": "ts-node ./generate-flat-spec.ts && git add spec/flat-spec.json",
     "generate:schema": "ts-node ./generate-schemas.ts && git add schema-gen",
     "start": "PATH_PREFIX=/compliance-api pnpm watch server",
-    "test": "PATH_PREFIX=/compliance-api DOTENV_CONFIG_PATH=../../.env jest --runInBand",
-    "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "test": "PATH_PREFIX=/compliance-api jest --runInBand",
+    "ts-node": "pnpm build && DOTENV_FLOW_PATH=../.. ts-node",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {

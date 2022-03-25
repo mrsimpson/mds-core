@@ -11,8 +11,8 @@
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "start": "PATH_PREFIX=/agency pnpm watch server",
-    "test": "PATH_PREFIX=/agency DOTENV_CONFIG_PATH=../../.env jest --runInBand --forceExit ",
-    "ts-node": "DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "test": "PATH_PREFIX=/agency jest --runInBand --forceExit ",
+    "ts-node": "ts-node",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
