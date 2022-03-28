@@ -34,9 +34,11 @@ import type {
   GetDevicesResponse,
   GetEventsWithDeviceAndTelemetryInfoOptions,
   GetEventsWithDeviceAndTelemetryInfoResponse,
+  GetH3BinOptions,
   GetVehicleEventsFilterParams,
   GetVehicleEventsOrderOption,
   GetVehicleEventsResponse,
+  H3Bin,
   ReadDeviceEventsQueryParams,
   ReadTripEventsQueryParams,
   TelemetryAnnotationDomainCreateModel,
@@ -505,6 +507,29 @@ export const IngestRepository = ReadWriteRepository.Create(
         }
       },
 
+      getH3Bins: async (params: GetH3BinOptions) => {
+        try {
+          const { start, end, h3_resolution, k } = params
+
+          const connection = await repository.connect('ro')
+          const entities = await connection
+            .createQueryBuilder()
+            .select(['provider_id'])
+            .addSelect(h3_resolution, 'h3_identifier')
+            .addSelect(`COUNT(${h3_resolution})`, 'count')
+            .from('telemetry_annotations', 'annotation')
+            .where('timestamp >= :start', { start })
+            .andWhere('timestamp <= :end', { end })
+            .groupBy(`provider_id, ${h3_resolution}`)
+            .having(`COUNT(${h3_resolution}) >= :k`, { k })
+            .execute()
+
+          return entities as H3Bin[]
+        } catch (error) {
+          throw RepositoryError(error)
+        }
+      },
+
       createDevices: async (events: DeviceDomainCreateModel[]) => {
         try {
           const connection = await repository.connect('rw')
@@ -717,7 +742,9 @@ export const IngestRepository = ReadWriteRepository.Create(
           const connection = await repository.connect('rw')
           await connection
             .getRepository(EventEntity)
-            .query('TRUNCATE "events", "devices", "telemetry", "event_annotations" RESTART IDENTITY')
+            .query(
+              'TRUNCATE "events", "devices", "telemetry", "event_annotations", "telemetry_annotations" RESTART IDENTITY'
+            )
         } catch (error) {
           throw RepositoryError(error)
         }

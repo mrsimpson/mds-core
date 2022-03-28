@@ -21,6 +21,7 @@ import type {
   DeviceDomainModel,
   EventAnnotationDomainCreateModel,
   EventDomainCreateModel,
+  H3Bin,
   TelemetryAnnotationDomainCreateModel,
   TelemetryDomainCreateModel
 } from '../@types'
@@ -102,18 +103,55 @@ const TEST_TELEMETRY_B2: TelemetryDomainCreateModel = {
   timestamp: testTimestamp + 1000
 }
 
-const TEST_TELEMETRY_ANNOTATION_A1: TelemetryAnnotationDomainCreateModel = {
+const BASE_TEST_TELEMETRY_ANNOTATION = {
   device_id: DEVICE_UUID_A,
   provider_id: TEST1_PROVIDER_ID,
-  timestamp: testTimestamp,
   h3_08: '123451234512345',
   h3_09: '123451234512345',
   h3_10: '123451234512345',
   h3_11: '123451234512345',
   h3_12: '123451234512345',
   h3_13: '123451234512345',
-  telemetry_row_id: 12341234,
   geography_ids: []
+}
+
+const TEST_TELEMETRY_ANNOTATION_A1: TelemetryAnnotationDomainCreateModel = {
+  timestamp: testTimestamp,
+  telemetry_row_id: 12341234,
+  ...BASE_TEST_TELEMETRY_ANNOTATION
+}
+
+const TEST_TELEMETRY_ANNOTATION_A2: TelemetryAnnotationDomainCreateModel = {
+  timestamp: testTimestamp + 1000,
+  telemetry_row_id: 12341235,
+  ...BASE_TEST_TELEMETRY_ANNOTATION
+}
+
+const TEST_TELEMETRY_ANNOTATION_A3: TelemetryAnnotationDomainCreateModel = {
+  timestamp: testTimestamp + 2000,
+  telemetry_row_id: 12341236,
+  ...BASE_TEST_TELEMETRY_ANNOTATION
+}
+
+const TEST_TELEMETRY_ANNOTATION_A4: TelemetryAnnotationDomainCreateModel = {
+  timestamp: testTimestamp + 3000,
+  telemetry_row_id: 12341237,
+  ...BASE_TEST_TELEMETRY_ANNOTATION,
+  h3_09: 'imunlikeother09'
+}
+
+const TEST_TELEMETRY_ANNOTATION_A5: TelemetryAnnotationDomainCreateModel = {
+  timestamp: testTimestamp + 4000,
+  telemetry_row_id: 12341238,
+  ...BASE_TEST_TELEMETRY_ANNOTATION,
+  h3_09: 'IMUNLIKEOTHER09'
+}
+
+const TEST_TELEMETRY_ANNOTATION_A6: TelemetryAnnotationDomainCreateModel = {
+  timestamp: testTimestamp + 5000,
+  telemetry_row_id: 12341239,
+  ...BASE_TEST_TELEMETRY_ANNOTATION,
+  h3_09: 'IMUNLIKEOTHER09'
 }
 
 const TEST_DEVICE_A: Omit<DeviceDomainModel, 'recorded'> = {
@@ -877,6 +915,83 @@ describe('Ingest Service Tests', () => {
       const result = await IngestRepository.createTelemetryAnnotations([TEST_TELEMETRY_ANNOTATION_A1])
 
       expect(result).toEqual([TEST_TELEMETRY_ANNOTATION_A1])
+    })
+  })
+
+  describe('Tests getH3Bins service method', () => {
+    /**
+     * Clear DB after each test runs, and after the file is finished. No side-effects for you.
+     */
+    beforeEach(async () => {
+      await IngestRepository.deleteAll()
+    })
+
+    it('Tests writing a TelemetryAnnotation', async () => {
+      function sortBins(a: H3Bin, b: H3Bin) {
+        if (a.count > b.count) return 1
+        if (a.count < b.count) return -1
+        return 0
+      }
+
+      await IngestRepository.createTelemetryAnnotations([
+        TEST_TELEMETRY_ANNOTATION_A1,
+        TEST_TELEMETRY_ANNOTATION_A2,
+        TEST_TELEMETRY_ANNOTATION_A3,
+        TEST_TELEMETRY_ANNOTATION_A4,
+        TEST_TELEMETRY_ANNOTATION_A5,
+        TEST_TELEMETRY_ANNOTATION_A6
+      ])
+
+      const k2minResult = await IngestRepository.getH3Bins({
+        k: 2,
+        start: testTimestamp,
+        end: now() + 10000,
+        h3_resolution: 'h3_09'
+      })
+
+      k2minResult.sort(sortBins)
+
+      expect(k2minResult).toEqual([
+        {
+          provider_id: TEST1_PROVIDER_ID,
+          count: 2,
+          h3_identifier: 'IMUNLIKEOTHER09'
+        },
+        {
+          provider_id: TEST1_PROVIDER_ID,
+          count: 3,
+          h3_identifier: '123451234512345'
+        }
+      ])
+
+      expect(k2minResult.length).toEqual(2)
+
+      const k1minResult = await IngestRepository.getH3Bins({
+        k: 1,
+        start: testTimestamp,
+        end: now() + 10000,
+        h3_resolution: 'h3_09'
+      })
+
+      k1minResult.sort(sortBins)
+
+      expect(k1minResult).toEqual([
+        {
+          provider_id: TEST1_PROVIDER_ID,
+          count: 1,
+          h3_identifier: 'imunlikeother09'
+        },
+        {
+          provider_id: TEST1_PROVIDER_ID,
+          count: 2,
+          h3_identifier: 'IMUNLIKEOTHER09'
+        },
+        {
+          provider_id: TEST1_PROVIDER_ID,
+          count: 3,
+          h3_identifier: '123451234512345'
+        }
+      ])
     })
   })
 

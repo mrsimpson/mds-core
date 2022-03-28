@@ -16,8 +16,8 @@
 
 import type { ProcessController, ServiceProvider } from '@mds-core/mds-service-helpers'
 import { ServiceException, ServiceResult } from '@mds-core/mds-service-helpers'
-import { NotFoundError } from '@mds-core/mds-utils'
-import type { IngestService, IngestServiceRequestContext } from '../@types'
+import { NotFoundError, now } from '@mds-core/mds-utils'
+import type { GetH3BinOptions, IngestService, IngestServiceRequestContext } from '../@types'
 import { IngestServiceLogger } from '../logger'
 import { IngestRepository } from '../repository'
 import {
@@ -26,6 +26,7 @@ import {
   validateGetDeviceOptions,
   validateGetDevicesOptions,
   validateGetEventsWithDeviceAndTelemetryInfoOptions,
+  validateGetH3BinsOptions,
   validateGetVehicleEventsFilterParams,
   validateTelemetryAnnotationDomainCreateModel,
   validateUUIDs
@@ -151,6 +152,17 @@ export const IngestServiceProvider: ServiceProvider<IngestService, IngestService
     } catch (error) {
       const exception = ServiceException('Error in writeTelemetryAnnotation', error)
       IngestServiceLogger.error('writeTelemetryAnnotation exception', { exception, error })
+      return exception
+    }
+  },
+
+  getH3Bins: async (context, params: GetH3BinOptions) => {
+    try {
+      const { start, end = now(), h3_resolution, k } = params
+      return ServiceResult(await IngestRepository.getH3Bins(validateGetH3BinsOptions({ start, end, h3_resolution, k })))
+    } catch (error) {
+      const exception = ServiceException('Error in getH3Bins', error)
+      IngestServiceLogger.error('getH3Bins exception', { exception, error })
       return exception
     }
   },
