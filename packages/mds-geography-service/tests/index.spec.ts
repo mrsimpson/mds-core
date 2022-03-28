@@ -23,21 +23,10 @@ import { GeographyServiceManager } from '../service/manager'
 const geography_id = uuid()
 
 describe('Geography Repository Tests', () => {
-  beforeAll(async () => {
-    await GeographyRepository.initialize()
-  })
-
-  it('Run Migrations', async () => {
-    await GeographyRepository.runAllMigrations()
-  })
-
-  it('Revert Migrations', async () => {
-    await GeographyRepository.revertAllMigrations()
-  })
-
-  afterAll(async () => {
-    await GeographyRepository.shutdown()
-  })
+  beforeAll(GeographyRepository.initialize)
+  it('Run Migrations', GeographyRepository.runAllMigrations)
+  it('Revert Migrations', GeographyRepository.revertAllMigrations)
+  afterAll(GeographyRepository.shutdown)
 })
 
 const GeographyServer = GeographyServiceManager.controller()

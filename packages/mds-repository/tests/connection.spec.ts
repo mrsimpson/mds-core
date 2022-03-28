@@ -23,17 +23,17 @@ const manager = new ConnectionManager(TEST_REPOSITORY_NAME)
 describe('Test Connections', () => {
   it('Create R/W Connection', async () => {
     const rw = await manager.connect('rw')
-    expect(rw.name).toMatch(new RegExp(`^${TEST_REPOSITORY_NAME}-rw.*$`))
-    expect(rw.isConnected).toEqual(true)
+    expect(rw.name).toEqual(`${TEST_REPOSITORY_NAME}-rw`)
+    expect(rw.isInitialized).toEqual(true)
     await manager.disconnect('rw')
-    expect(rw.isConnected).toEqual(false)
+    expect(rw.isInitialized).toEqual(false)
   })
 
   it('Create R/O Connection', async () => {
     const ro = await manager.connect('ro')
-    expect(ro.name).toMatch(new RegExp(`^${TEST_REPOSITORY_NAME}-ro.*$`))
-    expect(ro.isConnected).toEqual(true)
+    expect(ro.name).toEqual(`${TEST_REPOSITORY_NAME}-ro`)
+    expect(ro.isInitialized).toEqual(true)
     await manager.disconnect('ro')
-    expect(ro.isConnected).toEqual(false)
+    expect(ro.isInitialized).toEqual(false)
   })
 })

@@ -14,128 +14,109 @@
  * limitations under the License.
  */
 
-import type { Nullable, UUID } from '@mds-core/mds-types'
+import type { UUID } from '@mds-core/mds-types'
 import { uuid } from '@mds-core/mds-utils'
 import AwaitLock from 'await-lock'
+import { bool, cleanEnv, num, str } from 'envalid'
 import { types as PostgresTypes } from 'pg'
-import type { Connection, ConnectionOptions } from 'typeorm'
-import { createConnection } from 'typeorm'
-import type { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
-import type { LoggerOptions } from 'typeorm/logger/LoggerOptions'
+import type { DataSourceOptions } from 'typeorm'
+import { DataSource } from 'typeorm'
 import { RepositoryError } from './exceptions'
 import { RepositoryLogger } from './logger'
 import { MdsNamingStrategy } from './naming-strategies'
 
-const loggingOption = (options: string): LoggerOptions => {
-  return ['false', 'true', 'all'].includes(options) ? options !== 'false' : (options.split(' ') as LoggerOptions)
-}
-
-const ConnectionModes = ['ro', 'rw'] as const
+const ConnectionModes = <const>['ro', 'rw']
 export type ConnectionMode = typeof ConnectionModes[number]
+const connectionMode = (mode: ConnectionMode) => (mode === 'ro' ? 'R/O' : 'R/W')
 
 // Use parseInt for bigint columns so the values get returned as numbers instead of strings
 PostgresTypes.setTypeParser(20, Number)
 
-export type ConnectionManagerOptions = Partial<Omit<PostgresConnectionOptions, 'cli'>>
-export type ConnectionManagerCliOptions = Partial<PostgresConnectionOptions['cli']>
-
-export class ConnectionManager<TConnectionMode extends ConnectionMode> {
-  private readonly connections: Map<TConnectionMode, Nullable<Connection>> = new Map()
-
+export class ConnectionManager {
+  private readonly connections: Map<ConnectionMode, DataSource>
   private readonly lock = new AwaitLock()
 
   private readonly instance: UUID = uuid()
 
-  private connectionName = (mode: TConnectionMode): string => {
-    const { prefix, instance } = this
-    return `${prefix}-${mode}-${instance}`
-  }
-
-  private connectionMode = (mode: TConnectionMode): string => (mode === 'ro' ? 'R/O' : 'R/W')
-
-  private connectionOptions = (mode: TConnectionMode): ConnectionOptions => {
-    const { connectionName, options } = this
-    const {
-      PG_DEBUG = 'false',
-      PG_HOST,
-      PG_HOST_READER,
-      PG_NAME,
-      PG_PASS,
-      PG_PASS_READER,
-      PG_PORT,
-      PG_USER,
-      PG_USER_READER
-    } = process.env
-
-    return {
-      name: connectionName(mode),
-      type: 'postgres',
-      host: (mode === 'rw' ? PG_HOST : PG_HOST_READER) || PG_HOST || 'localhost',
-      port: Number(PG_PORT) || 5432,
-      username: (mode === 'rw' ? PG_USER : PG_USER_READER) || PG_USER,
-      password: (mode === 'rw' ? PG_PASS : PG_PASS_READER) || PG_PASS,
-      database: PG_NAME,
-      logging: loggingOption(PG_DEBUG.toLowerCase()),
-      maxQueryExecutionTime: 3000,
-      logger: 'simple-console',
-      synchronize: false,
-      migrationsRun: false,
-      namingStrategy: new MdsNamingStrategy(),
-      ...options
-    }
-  }
-
-  public connect = async (mode: TConnectionMode): Promise<Connection> => {
-    const { lock, connections, connectionOptions, connectionMode, connectionName } = this
-    await lock.acquireAsync()
-    try {
-      if (!connections.has(mode)) {
-        const options = connectionOptions(mode)
-        RepositoryLogger.info(`Initializing ${connectionMode(mode)} connection: ${options.name}`)
-        connections.set(mode, await createConnection(options))
-      }
-    } finally {
-      lock.release()
-    }
-    const connection = connections.get(mode)
+  private connection = (mode: ConnectionMode): DataSource => {
+    const connection = this.connections.get(mode)
     if (!connection) {
-      /* istanbul ignore next */
-      throw RepositoryError(Error(`Connection ${connectionName(mode)} not found`))
-    }
-    if (!connection.isConnected) {
-      try {
-        await connection.connect()
-      } catch (error) /* istanbul ignore next */ {
-        throw RepositoryError(error)
-      }
+      throw RepositoryError(Error(`${connectionMode(mode)} connection not found`))
     }
     return connection
   }
 
-  public disconnect = async (mode: TConnectionMode) => {
-    const { lock, connections, connectionOptions, connectionMode } = this
-    const options = connectionOptions(mode)
-    RepositoryLogger.info(`Terminating ${connectionMode(mode)} connection: ${options.name}`)
+  public ormconfig = (mode: ConnectionMode): DataSourceOptions => this.connection(mode).options
+
+  public connect = async (mode: ConnectionMode) => {
+    const connection = this.connection(mode)
+    await this.lock.acquireAsync()
     try {
-      await lock.acquireAsync()
-      const connection = connections.get(mode)
-      if (connection) {
-        if (connection.isConnected) {
-          await connection.close()
+      if (!connection.isInitialized) {
+        try {
+          RepositoryLogger.info(`Initializing ${connectionMode(mode)} connection`)
+          await connection.initialize()
+        } catch (error) /* istanbul ignore next */ {
+          throw RepositoryError(error)
         }
-        connections.delete(mode)
       }
     } finally {
-      lock.release()
+      this.lock.release()
+    }
+    return connection
+  }
+
+  public disconnect = async (mode: ConnectionMode) => {
+    const connection = this.connection(mode)
+    await this.lock.acquireAsync()
+    try {
+      if (connection.isInitialized) {
+        try {
+          RepositoryLogger.info(`Terminating ${connectionMode(mode)} connection`)
+          await connection.destroy()
+        } catch (error) /* istanbul ignore next */ {
+          throw RepositoryError(error)
+        }
+      }
+    } finally {
+      this.lock.release()
     }
   }
 
-  public ormconfig = (mode: TConnectionMode, options: ConnectionManagerCliOptions = {}): ConnectionOptions => {
-    const { connectionOptions } = this
-    // Make the "rw" connection the default for the TypeORM CLI by removing the connection name
-    const { name, ...ormconfig } = connectionOptions(mode)
-    return { ...ormconfig, cli: options }
-  }
+  constructor(private prefix: string, private options: Partial<DataSourceOptions> = {}) {
+    const { PG_DEBUG, PG_HOST, PG_HOST_READER, PG_NAME, PG_PASS, PG_PASS_READER, PG_PORT, PG_USER, PG_USER_READER } =
+      cleanEnv(process.env, {
+        PG_DEBUG: bool({ default: false }),
+        PG_HOST: str({ default: 'localhost' }),
+        PG_HOST_READER: str({ default: undefined }),
+        PG_NAME: str(),
+        PG_PASS: str({ default: undefined }),
+        PG_PASS_READER: str({ default: undefined }),
+        PG_PORT: num({ default: 5432 }),
+        PG_USER: str({ default: undefined }),
+        PG_USER_READER: str({ default: undefined })
+      })
 
-  constructor(private prefix: string, private options: ConnectionManagerOptions = {}) {}
+    this.connections = new Map(
+      ConnectionModes.map(mode => [
+        mode,
+        new DataSource({
+          ...options,
+          name: `${prefix}-${mode}`,
+          type: 'postgres',
+          host: mode === 'rw' ? PG_HOST : PG_HOST_READER || PG_HOST,
+          port: PG_PORT,
+          username: mode === 'rw' ? PG_USER : PG_USER_READER || PG_USER,
+          password: mode === 'rw' ? PG_PASS : PG_PASS_READER || PG_PASS,
+          database: PG_NAME,
+          logging: PG_DEBUG,
+          maxQueryExecutionTime: 3000,
+          logger: 'simple-console',
+          synchronize: false,
+          migrationsRun: false,
+          namingStrategy: new MdsNamingStrategy()
+        })
+      ])
+    )
+  }
 }

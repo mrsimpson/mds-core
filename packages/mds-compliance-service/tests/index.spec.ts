@@ -17,10 +17,9 @@
 import type { ServiceErrorDescriptor } from '@mds-core/mds-service-helpers'
 import stream from '@mds-core/mds-stream'
 import { days, now } from '@mds-core/mds-utils'
-import type { ConnectionOptions } from 'typeorm'
-import { createConnection } from 'typeorm'
 import type { ComplianceAggregateDomainModel } from '../@types'
 import { ComplianceServiceClient } from '../client'
+import { ComplianceRepository } from '../repository'
 import { ComplianceServiceManager } from '../service/manager'
 import { ComplianceSnapshotStreamKafka } from '../service/stream'
 import {
@@ -36,20 +35,12 @@ import {
   PROVIDER_ID_2,
   TIME
 } from './fixtures'
-import ormconfig = require('../ormconfig')
 
-describe('Test Migrations', () => {
-  it('Run Migrations', async () => {
-    const connection = await createConnection(ormconfig as ConnectionOptions)
-    await connection.runMigrations()
-    await connection.close()
-  })
-
-  it('Revert Migrations', async () => {
-    const connection = await createConnection(ormconfig as ConnectionOptions)
-    await connection.migrations.reduce(p => p.then(() => connection.undoLastMigration()), Promise.resolve())
-    await connection.close()
-  })
+describe('Compliance Repository Tests', () => {
+  beforeAll(ComplianceRepository.initialize)
+  it('Run Migrations', ComplianceRepository.runAllMigrations)
+  it('Revert Migrations', ComplianceRepository.revertAllMigrations)
+  afterAll(ComplianceRepository.shutdown)
 })
 
 const complianceServer = ComplianceServiceManager.controller()

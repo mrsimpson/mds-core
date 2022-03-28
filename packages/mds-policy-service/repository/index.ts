@@ -238,7 +238,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
   const isPolicyPublished = async (policy_id: UUID) => {
     try {
       const connection = await repository.connect('ro')
-      const entity = await connection.getRepository(PolicyEntity).findOneOrFail({ policy_id })
+      const entity = await connection.getRepository(PolicyEntity).findOneOrFail({ where: { policy_id } })
       if (!entity) {
         return false
       }
@@ -254,7 +254,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
   const readSinglePolicyMetadata = async (policy_id: UUID) => {
     try {
       const connection = await repository.connect('ro')
-      const entity = await connection.getRepository(PolicyMetadataEntity).findOneOrFail({ policy_id })
+      const entity = await connection.getRepository(PolicyMetadataEntity).findOneOrFail({ where: { policy_id } })
       return PolicyMetadataEntityToDomain.map(entity)
     } catch (error) {
       if (error instanceof Error && error.name === 'EntityNotFoundError') {
@@ -298,7 +298,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
     readPolicy: async (policy_id: UUID, presentationOptions: PresentationOptions = {}) => {
       try {
         const connection = await repository.connect('ro')
-        const entity = await connection.getRepository(PolicyEntity).findOneOrFail({ policy_id })
+        const entity = await connection.getRepository(PolicyEntity).findOneOrFail({ where: { policy_id } })
         return PolicyEntityToDomain.map(entity, presentationOptions)
       } catch (error) {
         if (error instanceof Error && error.name === 'EntityNotFoundError') {
@@ -520,7 +520,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
 
         const { superseded_by, superseded_at } = await connection
           .getRepository(PolicyEntity)
-          .findOneOrFail({ policy_id })
+          .findOneOrFail({ where: { policy_id } })
 
         const updatedSupersededBy = superseded_by ? [...superseded_by, superseding_policy_id] : [superseding_policy_id]
         const updatedSupersededAt = superseded_at ? [...superseded_at, policy_superseded_at] : [policy_superseded_at]

@@ -78,7 +78,7 @@ export const AttachmentRepository = ReadWriteRepository.Create('attachments', { 
       try {
         const connection = await repository.connect('rw')
 
-        const entity = await connection.getRepository(AttachmentEntity).findOne({ attachment_id })
+        const entity = await connection.getRepository(AttachmentEntity).findOne({ where: { attachment_id } })
 
         return entity ? AttachmentEntityToDomain.map(entity) : undefined
       } catch (error) {
@@ -99,12 +99,12 @@ export const AttachmentRepository = ReadWriteRepository.Create('attachments', { 
         const attachments = await (async () => {
           if (isAttachmentIdsOption(options)) {
             const { attachment_ids } = options
-            return connection.getRepository(AttachmentEntity).find({ attachment_id: In(attachment_ids) })
+            return connection.getRepository(AttachmentEntity).find({ where: { attachment_id: In(attachment_ids) } })
           }
 
           if (isAttachmentListIdOption(options)) {
             const { attachment_list_id } = options
-            return connection.getRepository(AttachmentEntity).find({ attachment_list_id })
+            return connection.getRepository(AttachmentEntity).find({ where: { attachment_list_id } })
           }
 
           return []

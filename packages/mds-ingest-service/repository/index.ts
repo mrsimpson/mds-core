@@ -568,7 +568,7 @@ export const IngestRepository = ReadWriteRepository.Create(
           if (isDefined(entity)) {
             return DeviceEntityToDomain.map(entity)
           }
-          return entity
+          return entity ?? undefined
         } catch (error) {
           throw RepositoryError(error)
         }

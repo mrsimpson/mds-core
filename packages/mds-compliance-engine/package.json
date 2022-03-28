@@ -13,8 +13,10 @@
     "dist/"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
-    "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand --forceExit",
+    "_build": "tsc --build tsconfig.build.json",
+    "_test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand --forceExit",
+    "build": "pnpm _build",
+    "test": "pnpm _test",
     "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },

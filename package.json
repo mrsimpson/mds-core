@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
   "scripts": {
-    "build": "tsc --version && pnpm run:concurrent build",
+    "build": "echo Typescript $(tsc --version) && pnpm run -r _build",
     "bundle": "webpack --version && pnpm run:concurrent bundle",
     "bundle:development": "pnpm run:concurrent bundle:development",
     "bundle:production": "pnpm run:concurrent bundle:production",
@@ -25,8 +25,7 @@
     "prepare": "husky install",
     "push": "bin/build-helper pushImages",
     "run:concurrent": "pnpm recursive run --filter=!root",
-    "run:sequential": "pnpm recursive run --workspace-concurrency=1 --filter=!root",
-    "test": "pnpm run:sequential test",
+    "test": "echo Jest Version $(jest -v) && pnpm run -r --workspace-concurrency=1 _test",
     "values": "bin/build-helper templateValues"
   },
   "devDependencies": {
