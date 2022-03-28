@@ -17,4 +17,4 @@
 import { JurisdictionRepository } from './repository'
 
 // Make connection options available to TypeORM CLI
-module.exports = JurisdictionRepository.cli({ migrationsDir: 'repository/migrations' })
+export default JurisdictionRepository.cli()

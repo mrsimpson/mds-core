@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-jurisdiction-service",
-  "version": "0.5.25",
+  "version": "0.5.26",
   "description": "Mobility Data Specification Jurisdiction Service",
   "keywords": [
     "mds",
@@ -13,24 +13,25 @@
     "dist/"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
+    "_build": "tsc --build tsconfig.build.json",
+    "_test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand",
+    "build": "pnpm _build",
     "start": "pnpm watch server",
-    "pretest": "pnpm typeorm -- schema:drop",
-    "test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand",
+    "test": "pnpm _test",
     "ts-node": "DOTENV_CONFIG_PATH=../../.env node --experimental-repl-await -r ts-node/register -r dotenv/config",
-    "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+    "typeorm": "typeorm-ts-node-commonjs -d ormconfig",
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-repository": "workspace:0.1.47",
-    "@mds-core/mds-rpc-common": "workspace:0.3.18",
-    "@mds-core/mds-schema-validators": "workspace:0.5.9",
+    "@mds-core/mds-repository": "workspace:0.2.0",
+    "@mds-core/mds-rpc-common": "workspace:0.3.19",
+    "@mds-core/mds-schema-validators": "workspace:0.5.10",
     "@mds-core/mds-service-helpers": "workspace:0.6.8",
     "@mds-core/mds-types": "workspace:0.9.2",
     "@mds-core/mds-utils": "workspace:0.5.0",
     "pg": "8.7.3",
-    "typeorm": "0.2.43"
+    "typeorm": "0.3.4"
   },
   "publishConfig": {
     "main": "dist/index.js"

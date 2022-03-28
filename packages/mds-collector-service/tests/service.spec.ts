@@ -25,29 +25,18 @@ const TEST_COLLECTOR_MESSAGES: Array<TestSchema> = [
   { id: uuid(), name: 'Prime Minister', country: 'CA', zip: 'K1M 1M4' }
 ]
 
+describe('Collector Repository Tests', () => {
+  beforeAll(CollectorRepository.initialize)
+  it('Run Migrations', CollectorRepository.runAllMigrations)
+  it('Revert Migrations', CollectorRepository.revertAllMigrations)
+  afterAll(CollectorRepository.shutdown)
+})
+
 describe('Collector Service', () => {
   it('Service Unavailable', async () => {
     await expect(CollectorServiceClient.getMessageSchema(TEST_SCHEMA_ID)).rejects.toMatchObject({
       isServiceError: true,
       type: 'ServiceUnavailable'
-    })
-  })
-
-  describe('Repository Migrations', () => {
-    beforeAll(async () => {
-      await CollectorRepository.initialize()
-    })
-
-    it('Run Migrations', async () => {
-      await CollectorRepository.runAllMigrations()
-    })
-
-    it('Revert Migrations', async () => {
-      await CollectorRepository.revertAllMigrations()
-    })
-
-    afterAll(async () => {
-      await CollectorRepository.shutdown()
     })
   })
 

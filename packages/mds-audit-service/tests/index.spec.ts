@@ -19,21 +19,10 @@ import { AuditRepository } from '../repository'
 import { AuditServiceManager } from '../service/manager'
 
 describe('Audit Repository Tests', () => {
-  beforeAll(async () => {
-    await AuditRepository.initialize()
-  })
-
-  it('Run Migrations', async () => {
-    await AuditRepository.runAllMigrations()
-  })
-
-  it('Revert Migrations', async () => {
-    await AuditRepository.revertAllMigrations()
-  })
-
-  afterAll(async () => {
-    await AuditRepository.shutdown()
-  })
+  beforeAll(AuditRepository.initialize)
+  it('Run Migrations', AuditRepository.runAllMigrations)
+  it('Revert Migrations', AuditRepository.revertAllMigrations)
+  afterAll(AuditRepository.shutdown)
 })
 
 const AuditServer = AuditServiceManager.controller()

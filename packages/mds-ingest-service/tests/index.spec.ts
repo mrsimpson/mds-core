@@ -220,21 +220,10 @@ const TEST_EVENT_ANNOTATION_B: EventAnnotationDomainCreateModel = {
 }
 
 describe('Ingest Repository Tests', () => {
-  beforeAll(async () => {
-    await IngestRepository.initialize()
-  })
-
-  it('Run Migrations', async () => {
-    await IngestRepository.runAllMigrations()
-  })
-
-  it('Revert Migrations', async () => {
-    await IngestRepository.revertAllMigrations()
-  })
-
-  afterAll(async () => {
-    await IngestRepository.shutdown()
-  })
+  beforeAll(IngestRepository.initialize)
+  it('Run Migrations', IngestRepository.runAllMigrations)
+  it('Revert Migrations', IngestRepository.revertAllMigrations)
+  afterAll(IngestRepository.shutdown)
 })
 
 const IngestServer = IngestServiceManager.controller()

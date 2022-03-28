@@ -1,5 +1,11 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.19
+
+### Patch Changes
+
+- 91159748: removed unit.js tests, convert to jest
+
 ## 0.3.18
 
 ### Patch Changes

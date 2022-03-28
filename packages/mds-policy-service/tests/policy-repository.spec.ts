@@ -52,21 +52,10 @@ const SIMPLE_POLICY_JSON: PolicyDomainCreateModel = {
 }
 
 describe('Policy Repository Tests', () => {
-  beforeAll(async () => {
-    await PolicyRepository.initialize()
-  })
-
-  it('Run Migrations', async () => {
-    await PolicyRepository.runAllMigrations()
-  })
-
-  it('Revert Migrations', async () => {
-    await PolicyRepository.revertAllMigrations()
-  })
-
-  afterAll(async () => {
-    await PolicyRepository.shutdown()
-  })
+  beforeAll(PolicyRepository.initialize)
+  it('Run Migrations', PolicyRepository.runAllMigrations)
+  it('Revert Migrations', PolicyRepository.revertAllMigrations)
+  afterAll(PolicyRepository.shutdown)
 })
 
 describe('spot check unit test policy functions with SimplePolicy', () => {

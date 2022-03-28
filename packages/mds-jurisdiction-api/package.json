@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-jurisdiction-api",
-  "version": "0.1.70",
+  "version": "0.1.71",
   "description": "MDS Jurisdictions API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -9,16 +9,18 @@
     "dist/"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
+    "_build": "tsc --build tsconfig.build.json",
+    "_test": "PATH_PREFIX=/jurisdiction DOTENV_CONFIG_PATH=../../.env jest --runInBand",
+    "build": "pnpm _build",
     "start": "PATH_PREFIX=/jurisdiction pnpm watch server",
-    "test": "PATH_PREFIX=/jurisdiction DOTENV_CONFIG_PATH=../../.env jest --runInBand",
+    "test": "pnpm _test",
     "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-helpers": "workspace:0.2.24",
+    "@mds-core/mds-api-helpers": "workspace:0.2.25",
     "@mds-core/mds-api-server": "workspace:0.4.11",
-    "@mds-core/mds-jurisdiction-service": "workspace:0.5.25",
+    "@mds-core/mds-jurisdiction-service": "workspace:0.5.26",
     "@mds-core/mds-logger": "workspace:0.5.7",
     "@mds-core/mds-service-helpers": "workspace:0.6.8",
     "@mds-core/mds-utils": "workspace:0.5.0",
@@ -26,7 +28,7 @@
     "express": "4.17.1"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "workspace:0.4.27"
+    "@mds-core/mds-test-data": "workspace:0.4.28"
   },
   "publishConfig": {
     "main": "dist/index.js"

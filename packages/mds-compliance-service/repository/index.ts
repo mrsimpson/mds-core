@@ -19,7 +19,6 @@ import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import type { UUID } from '@mds-core/mds-types'
 import { isDefined, NotFoundError, now, testEnvSafeguard } from '@mds-core/mds-utils'
 import type { EntityManager } from 'typeorm'
-import { getManager } from 'typeorm'
 import type {
   ComplianceSnapshotDomainModel,
   ComplianceViolationDomainModel,
@@ -244,7 +243,6 @@ export const ComplianceRepository = ReadWriteRepository.Create(
         const { start_time, end_time = now(), policy_ids = [], provider_ids = [] } = options
         try {
           const connection = await repository.connect('ro')
-          const entityManager = getManager(connection.name)
           const mainQueryPart1 = `select
           provider_id, policy_id,
           start_time,
@@ -274,7 +272,7 @@ export const ComplianceRepository = ReadWriteRepository.Create(
                     ELSE
                       row_number() OVER (partition BY provider_id, policy_id order by compliance_as_of)
                     END group_number
-                    from ${entityManager.getRepository(ComplianceSnapshotEntity).metadata.tableName}
+                    from ${connection.getRepository(ComplianceSnapshotEntity).metadata.tableName}
                     where
                       `
           const mainQueryPart2 = `
@@ -301,7 +299,7 @@ export const ComplianceRepository = ReadWriteRepository.Create(
           }
           queryArray.push(mainQueryPart2)
 
-          return await entityManager.query(queryArray.join('\n'), vals.values())
+          return await connection.query(queryArray.join('\n'), vals.values())
         } catch (error) {
           throw RepositoryError(error)
         }

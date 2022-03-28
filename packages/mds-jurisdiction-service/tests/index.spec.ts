@@ -29,21 +29,10 @@ const LAST_WEEK = TODAY - days(7)
 const JurisdictionServer = JurisdictionServiceManager.controller()
 
 describe('Jurisdiction Repository Tests', () => {
-  beforeAll(async () => {
-    await JurisdictionRepository.initialize()
-  })
-
-  it('Run Migrations', async () => {
-    await JurisdictionRepository.runAllMigrations()
-  })
-
-  it('Revert Migrations', async () => {
-    await JurisdictionRepository.revertAllMigrations()
-  })
-
-  afterAll(async () => {
-    await JurisdictionRepository.shutdown()
-  })
+  beforeAll(JurisdictionRepository.initialize)
+  it('Run Migrations', JurisdictionRepository.runAllMigrations)
+  it('Revert Migrations', JurisdictionRepository.revertAllMigrations)
+  afterAll(JurisdictionRepository.shutdown)
 })
 
 describe('Jurisdiction Service Tests', () => {

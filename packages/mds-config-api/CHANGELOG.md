@@ -1,5 +1,11 @@
 # @mds-core/mds-config-api
 
+## 0.4.9
+
+### Patch Changes
+
+- @mds-core/mds-config-service@0.4.9
+
 ## 0.4.8
 
 ### Patch Changes

@@ -1,24 +1,26 @@
 {
   "name": "@mds-core/mds-policy-author-api",
-  "version": "0.7.33",
+  "version": "0.7.34",
   "description": "MDS Policy Author API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
+    "_build": "tsc --build tsconfig.build.json",
+    "_test": "PATH_PREFIX=/policy-author DOTENV_CONFIG_PATH=../../.env jest --runInBand",
+    "build": "pnpm _build",
     "start": "PATH_PREFIX=/policy-author pnpm watch server",
-    "test": "PATH_PREFIX=/policy-author DOTENV_CONFIG_PATH=../../.env jest --runInBand",
+    "test": "pnpm _test",
     "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-helpers": "workspace:0.2.24",
+    "@mds-core/mds-api-helpers": "workspace:0.2.25",
     "@mds-core/mds-api-server": "workspace:0.4.11",
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-policy-service": "workspace:0.11.27",
-    "@mds-core/mds-providers": "workspace:0.2.10",
-    "@mds-core/mds-schema-validators": "workspace:0.5.9",
+    "@mds-core/mds-policy-service": "workspace:0.11.28",
+    "@mds-core/mds-providers": "workspace:0.2.11",
+    "@mds-core/mds-schema-validators": "workspace:0.5.10",
     "@mds-core/mds-service-helpers": "workspace:0.6.8",
     "@mds-core/mds-types": "workspace:0.9.2",
     "@mds-core/mds-utils": "workspace:0.5.0",
@@ -27,9 +29,9 @@
     "http-status-codes": "2.1.4"
   },
   "devDependencies": {
-    "@mds-core/mds-geography-service": "workspace:0.10.21",
+    "@mds-core/mds-geography-service": "workspace:0.10.22",
     "@mds-core/mds-stream": "workspace:0.3.1",
-    "@mds-core/mds-test-data": "workspace:0.4.27"
+    "@mds-core/mds-test-data": "workspace:0.4.28"
   },
   "publishConfig": {
     "main": "dist/index.js"
