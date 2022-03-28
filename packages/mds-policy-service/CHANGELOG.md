@@ -1,5 +1,17 @@
 # @mds-core/mds-policy-service
 
+## 0.11.28
+
+### Patch Changes
+
+- ed8ecc80: Upgrade to TypeORM v3
+- Updated dependencies [91159748]
+- Updated dependencies [ed8ecc80]
+  - @mds-core/mds-rpc-common@0.3.19
+  - @mds-core/mds-repository@0.2.0
+  - @mds-core/mds-geography-service@0.10.22
+  - @mds-core/mds-schema-validators@0.5.10
+
 ## 0.11.27
 
 ### Patch Changes

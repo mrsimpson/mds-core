@@ -1,5 +1,17 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.34
+
+### Patch Changes
+
+- ed8ecc80: Upgrade to TypeORM v3
+- Updated dependencies [91159748]
+- Updated dependencies [ed8ecc80]
+  - @mds-core/mds-providers@0.2.11
+  - @mds-core/mds-transaction-service@0.6.25
+  - @mds-core/mds-schema-validators@0.5.10
+  - @mds-core/mds-api-helpers@0.2.25
+
 ## 0.2.33
 
 ### Patch Changes

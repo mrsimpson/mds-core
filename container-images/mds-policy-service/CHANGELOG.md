@@ -1,5 +1,12 @@
 # @container-images/mds-policy-service
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [ed8ecc80]
+  - @mds-core/mds-policy-service@0.11.28
+
 ## 0.1.0
 
 ### Minor Changes

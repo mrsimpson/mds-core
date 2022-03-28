@@ -1,5 +1,17 @@
 # @mds-core/mds-jurisdiction-service
 
+## 0.5.26
+
+### Patch Changes
+
+- 91159748: removed unit.js tests, convert to jest
+- ed8ecc80: Upgrade to TypeORM v3
+- Updated dependencies [91159748]
+- Updated dependencies [ed8ecc80]
+  - @mds-core/mds-rpc-common@0.3.19
+  - @mds-core/mds-repository@0.2.0
+  - @mds-core/mds-schema-validators@0.5.10
+
 ## 0.5.25
 
 ### Patch Changes
