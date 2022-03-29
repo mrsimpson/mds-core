@@ -841,7 +841,6 @@ describe('Testing API', () => {
     )
 
     it('verify audit attach (success)', done => {
-      // const fake = Sinon.fake.returns()
       jest.spyOn(attachments, 'writeAttachment').mockImplementation(
         async () =>
           ({
