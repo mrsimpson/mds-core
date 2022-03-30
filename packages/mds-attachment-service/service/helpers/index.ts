@@ -21,7 +21,7 @@ import aws from 'aws-sdk'
 import path from 'path'
 import sharp from 'sharp'
 
-/* eslint-disable-next-line */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const multer = require('multer')
 const { env } = process
 const supportedMimetypes = ['image/png', 'image/jpeg']

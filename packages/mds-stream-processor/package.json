@@ -12,11 +12,13 @@
     "dist/"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
+    "_build": "tsc --build tsconfig.build.json",
+    "_test": "jest --runInBand --passWithNoTests",
+    "build": "pnpm _build",
     "process": "pnpm watch",
     "start": "pnpm watch",
-    "test": "jest --runInBand --passWithNoTests",
-    "ts-node": "node --experimental-repl-await -r ts-node/register",
+    "test": "pnpm _test",
+    "ts-node": "node --experimental-repl-await -r ts-node/register -r ../../dotenv-flow.js",
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {

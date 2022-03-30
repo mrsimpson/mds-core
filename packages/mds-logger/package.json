@@ -13,8 +13,10 @@
     "dist/"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
-    "test": "jest --runInBand"
+    "_build": "tsc --build tsconfig.build.json",
+    "_test": "jest --runInBand",
+    "build": "pnpm _build",
+    "test": "pnpm _test"
   },
   "dependencies": {
     "@types/debug": "4.1.7",

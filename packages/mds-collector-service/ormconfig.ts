@@ -17,4 +17,4 @@
 import { CollectorRepository } from './repository'
 
 // Make connection options available to TypeORM CLI
-module.exports = CollectorRepository.cli({ migrationsDir: 'repository/migrations' })
+export default CollectorRepository.cli()

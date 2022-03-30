@@ -1,5 +1,17 @@
 # @mds-core/mds-policy-author-api
 
+## 0.7.34
+
+### Patch Changes
+
+- 91159748: removed unit.js tests, convert to jest
+- Updated dependencies [91159748]
+- Updated dependencies [ed8ecc80]
+  - @mds-core/mds-providers@0.2.11
+  - @mds-core/mds-policy-service@0.11.28
+  - @mds-core/mds-schema-validators@0.5.10
+  - @mds-core/mds-api-helpers@0.2.25
+
 ## 0.7.33
 
 ### Patch Changes

@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-// eslint directives:
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable promise/prefer-await-to-callbacks */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-useless-concat */
-/* eslint-disable prefer-destructuring */
-
 import { ApiServer } from '@mds-core/mds-api-server'
 import { GeographyServiceManager } from '@mds-core/mds-geography-service'
 import { GeographyFactory, writePublishedGeography } from '@mds-core/mds-geography-service/tests/helpers'
@@ -56,8 +49,6 @@ import { POLICY_API_DEFAULT_VERSION } from '../types'
 const TEST1_PROVIDER_ID = uuid()
 stream.mockStream(PolicyStreamKafka)
 
-/* eslint-disable-next-line @typescript-eslint/no-var-requires */
-
 /* eslint-disable-next-line no-console */
 const log = console.log.bind(console)
 
@@ -85,7 +76,7 @@ const createPolicyAndGeographyFactory = async (policy?: PolicyDomainCreateModel,
   await writePublishedGeography(
     GeographyFactory({
       name: 'VENICE',
-      geography_id: createdPolicy.rules[0].geographies[0],
+      geography_id: createdPolicy.rules[0]?.geographies[0],
       geography_json: venice,
       ...geography_overrides
     })

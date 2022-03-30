@@ -278,7 +278,6 @@ async function readDevices(device_ids: UUID[]) {
 async function readDeviceStatus(device_id: UUID) {
   // Read event and device in parallel, catching NotFoundErrors
   const promises = [readEvent(device_id), readDevice(device_id)].map((p: Promise<{}>) =>
-    /* eslint-disable-next-line promise/prefer-await-to-callbacks */
     p.catch((err: Error) => {
       if (err.name !== 'NotFoundError') {
         throw err
@@ -303,9 +302,6 @@ async function readDeviceStatus(device_id: UUID) {
   }
 }
 
-/* eslint-reason redis external lib weirdness */
-/* eslint-disable promise/prefer-await-to-then */
-/* eslint-disable promise/catch-or-return */
 async function readDevicesStatus(query: {
   since?: number
   skip?: number

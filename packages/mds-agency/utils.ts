@@ -105,7 +105,7 @@ export const agencyValidationErrorParser = (error: ValidationError): AgencyApiEr
   }
 
   AgencyLogger.error('agencyErrorParser unmatched error', error)
-  return { error: 'bad_param', error_description: 'A validation error occurred.', error_details: { error } }
+  return { error: 'bad_param', error_description: 'A validation error occurred.', error_details: [{ error }] }
 }
 
 export async function getVehicles(

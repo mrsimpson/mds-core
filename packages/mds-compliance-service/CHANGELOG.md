@@ -1,5 +1,19 @@
 # @mds-core/mds-compliance-service
 
+## 0.10.31
+
+### Patch Changes
+
+- ed8ecc80: Upgrade to TypeORM v3
+- Updated dependencies [91159748]
+- Updated dependencies [ed8ecc80]
+  - @mds-core/mds-providers@0.2.11
+  - @mds-core/mds-rpc-common@0.3.19
+  - @mds-core/mds-repository@0.2.0
+  - @mds-core/mds-db@0.6.17
+  - @mds-core/mds-policy-service@0.11.28
+  - @mds-core/mds-schema-validators@0.5.10
+
 ## 0.10.30
 
 ### Patch Changes

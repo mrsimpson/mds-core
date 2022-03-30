@@ -24,21 +24,10 @@ import { TransactionStreamKafka } from '../service/stream'
 import { transactionsGenerator } from '../test-fixtures'
 
 describe('Transaction Repository Tests', () => {
-  beforeAll(async () => {
-    await TransactionRepository.initialize()
-  })
-
-  it('Run Migrations', async () => {
-    await TransactionRepository.runAllMigrations()
-  })
-
-  it('Revert Migrations', async () => {
-    await TransactionRepository.revertAllMigrations()
-  })
-
-  afterAll(async () => {
-    await TransactionRepository.shutdown()
-  })
+  beforeAll(TransactionRepository.initialize)
+  it('Run Migrations', TransactionRepository.runAllMigrations)
+  it('Revert Migrations', TransactionRepository.revertAllMigrations)
+  afterAll(TransactionRepository.shutdown)
 })
 
 const TransactionServer = TransactionServiceManager.controller()

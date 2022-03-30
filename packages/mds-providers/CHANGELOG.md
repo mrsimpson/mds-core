@@ -1,5 +1,11 @@
 # @mds-core/mds-providers
 
+## 0.2.11
+
+### Patch Changes
+
+- 91159748: removed unit.js tests, convert to jest
+
 ## 0.2.10
 
 ### Patch Changes

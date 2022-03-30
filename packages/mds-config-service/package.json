@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-config-service",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "Mobility Data Specification configuration service",
   "keywords": [
     "mds",
@@ -14,16 +14,18 @@
     "dist/"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
+    "_build": "tsc --build tsconfig.build.json",
+    "_test": "jest",
+    "build": "pnpm _build",
     "start": "pnpm watch server",
-    "test": "jest",
-    "ts-node": "node --experimental-repl-await -r ts-node/register",
+    "test": "pnpm _test",
+    "ts-node": "node --experimental-repl-await -r ts-node/register -r ../../dotenv-flow.js",
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
     "@mds-core/mds-config-files": "workspace:0.1.4",
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-rpc-common": "workspace:0.3.18",
+    "@mds-core/mds-rpc-common": "workspace:0.3.19",
     "@mds-core/mds-service-helpers": "workspace:0.6.8",
     "@mds-core/mds-utils": "workspace:0.5.0",
     "json5": "2.2.0"

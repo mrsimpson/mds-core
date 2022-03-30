@@ -55,6 +55,7 @@ export type GetPublishedGeographiesOptions = GetGeographiesOptions &
     publishedAfter: Timestamp
   }>
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GeographyWithMetadataDomainModel<M extends Record<string, any> = Record<string, any>> =
   GeographyDomainModel & Partial<Pick<GeographyMetadataDomainModel<M>, 'geography_metadata'>>
 

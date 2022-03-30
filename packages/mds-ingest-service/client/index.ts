@@ -51,6 +51,7 @@ export const IngestServiceClientFactory = (
     writeEvents: (...args) => RpcRequest(options, IngestServiceRpcClient.writeEvents, args),
     writeEventAnnotations: (...args) => RpcRequest(options, IngestServiceRpcClient.writeEventAnnotations, args),
     writeTelemetryAnnotations: (...args) => RpcRequest(options, IngestServiceRpcClient.writeTelemetryAnnotations, args),
+    getH3Bins: (...args) => RpcRequest(options, IngestServiceRpcClient.getH3Bins, args),
     getTripEvents: (...args) =>
       process.env.ENABLE_RPC === 'true'
         ? RpcRequest(options, IngestServiceRpcClient.getTripEvents, args)

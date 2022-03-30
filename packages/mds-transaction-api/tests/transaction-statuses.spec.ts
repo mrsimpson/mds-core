@@ -41,7 +41,7 @@ describe('Test Transactions API: Transactions', () => {
       }
       const { transaction_id } = status
 
-      jest.spyOn(TransactionServiceClient, 'setTransactionStatus').mockImplementationOnce(async t => t as any)
+      jest.spyOn(TransactionServiceClient, 'setTransactionStatus').mockImplementationOnce(async t => t)
 
       const result = await request
         .post(pathPrefix(`/transaction/${transaction_id}/statuses`))

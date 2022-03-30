@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-// eslint directives:
-/* eslint-disable no-plusplus */
-/* eslint-disable no-useless-concat */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable promise/prefer-await-to-callbacks */
-/* eslint-disable promise/catch-or-return */
-/* eslint-disable promise/prefer-await-to-then */
-/* eslint-disable promise/always-return */
-/* eslint-disable promise/no-nesting */
-/* eslint-disable promise/no-callback-in-promise */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
 import cache from '@mds-core/mds-agency-cache'
@@ -1428,7 +1417,6 @@ describe('Agency Tests', () => {
       it(`Tests invalid TripMetadata payload without ${key}`, async () => {
         const { [key]: foo, ...subsetMetadata } = metadata()
 
-        // eslint-disable-next-line no-await-in-loop
         const result = await request
           .post(pathPrefix('/trips'))
           .set('Authorization', AUTH)

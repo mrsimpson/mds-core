@@ -3,7 +3,6 @@ import db from '@mds-core/mds-db'
 import { IngestServiceClient, IngestStream } from '@mds-core/mds-ingest-service'
 import type { Device } from '@mds-core/mds-types'
 import { uuid } from '@mds-core/mds-utils'
-import Sinon from 'sinon'
 import {
   getVehicleById,
   getVehiclesByProvider,
@@ -30,6 +29,8 @@ function getLocals(provider_id: string) {
 
 describe('Agency API request handlers', () => {
   describe('Register vehicle', () => {
+    afterEach(jest.restoreAllMocks)
+
     const getFakeBody = () => {
       const device_id = uuid()
       const vehicle_id = uuid()
@@ -52,105 +53,76 @@ describe('Agency API request handlers', () => {
       const body = getFakeBody()
       body.device_id = '' // falsey empty string FTW
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
       await registerVehicle({ body } as AgencyApiRegisterVehicleRequest, res)
-      expect(statusHandler.calledWith(400)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(400)
+      expect(sendMock).toHaveBeenCalled()
     })
 
     it('Handles db write failure gracefully', async () => {
       const provider_id = uuid()
       const body = getFakeBody()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(db, 'writeDevice', Sinon.fake.rejects('fake-rejects-db'))
+      jest.spyOn(db, 'writeDevice').mockRejectedValue('fake-rejects-db')
       await registerVehicle({ body } as AgencyApiRegisterVehicleRequest, res)
-      expect(statusHandler.calledWith(500)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(500)
     })
 
     it('Handles misc. write failure gracefully', async () => {
       const provider_id = uuid()
       const body = getFakeBody()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(db, 'writeDevice', Sinon.fake.rejects('fake-rejects-other'))
+      jest.spyOn(db, 'writeDevice').mockRejectedValue('fake-rejects-other')
       await registerVehicle({ body } as AgencyApiRegisterVehicleRequest, res)
-      expect(statusHandler.calledWith(500)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(500)
     })
 
     it('Handles duplicate gracefully', async () => {
       const provider_id = uuid()
       const body = getFakeBody()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(db, 'writeDevice', Sinon.fake.rejects('fake-rejects-duplicate'))
+      jest.spyOn(db, 'writeDevice').mockRejectedValue('fake-rejects-duplicate')
       await registerVehicle({ body } as AgencyApiRegisterVehicleRequest, res)
-      expect(statusHandler.calledWith(409)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(409)
     })
 
     it('Inserts device successfully', async () => {
       const provider_id = uuid()
       const body = getFakeBody()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(db, 'writeDevice', Sinon.fake.resolves('it-worked'))
-      Sinon.replace(cache, 'writeDevices', Sinon.fake.resolves('it-worked'))
-      Sinon.replace(IngestStream, 'writeDevice', Sinon.fake.resolves('it-worked'))
+      jest.spyOn(db, 'writeDevice').mockResolvedValue('it-worked' as any)
+      jest.spyOn(cache, 'writeDevices').mockResolvedValue('it-worked' as any)
+      jest.spyOn(IngestStream, 'writeDevice').mockResolvedValue('it-worked' as any)
       await registerVehicle({ body } as AgencyApiRegisterVehicleRequest, res)
-      expect(statusHandler.calledWith(201)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(201)
     })
 
     it('Handles cache/stream write errors as warnings', async () => {
       const provider_id = uuid()
       const body = getFakeBody()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(db, 'writeDevice', Sinon.fake.resolves('it-worked'))
-      Sinon.replace(cache, 'writeDevices', Sinon.fake.rejects('it-broke'))
-      Sinon.replace(IngestStream, 'writeDevice', Sinon.fake.resolves('it-worked'))
+      jest.spyOn(db, 'writeDevice').mockResolvedValue('it-worked' as any)
+      jest.spyOn(cache, 'writeDevices').mockResolvedValue('it-worked' as any)
+      jest.spyOn(IngestStream, 'writeDevice').mockResolvedValue('it-worked' as any)
       await registerVehicle({ body } as AgencyApiRegisterVehicleRequest, res)
-      expect(statusHandler.calledWith(201)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(201)
     })
   })
 
@@ -159,24 +131,13 @@ describe('Agency API request handlers', () => {
       const provider_id = uuid()
       const device_id = uuid()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(
-        IngestServiceClient,
-        'getDevices',
-        Sinon.fake.resolves([
-          {
-            provider_id
-          }
-        ])
-      )
-      Sinon.replace(db, 'readEvent', Sinon.fake.resolves({}))
-      Sinon.replace(db, 'readTelemetry', Sinon.fake.resolves({}))
-      Sinon.replace(utils, 'computeCompositeVehicleData', Sinon.fake.resolves('it-worked'))
+      jest.spyOn(IngestServiceClient, 'getDevices').mockResolvedValue([{ provider_id } as any])
+      jest.spyOn(db, 'readEvent').mockResolvedValue({} as any)
+      jest.spyOn(db, 'readTelemetry').mockResolvedValue({} as any)
+      jest.spyOn(utils, 'computeCompositeVehicleData').mockResolvedValue('it-worked' as never)
       await getVehicleById(
         {
           params: { device_id },
@@ -184,9 +145,7 @@ describe('Agency API request handlers', () => {
         } as unknown as AgencyApiGetVehicleByIdRequest,
         res
       )
-      expect(statusHandler.calledWith(200)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(200)
     })
   })
 
@@ -195,50 +154,41 @@ describe('Agency API request handlers', () => {
       const provider_id = uuid()
       const device_id = uuid()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(utils, 'getVehicles', Sinon.fake.rejects('it-broke'))
+      jest.spyOn(utils, 'getVehicles').mockRejectedValue('it-broke' as any)
       await getVehiclesByProvider(
         {
           params: { device_id },
           query: { cached: false },
-          get: Sinon.fake.returns('foo') as any
+          get: jest.fn().mockImplementation(() => 'asdf')
         } as unknown as AgencyApiGetVehiclesByProviderRequest,
         res
       )
-      expect(statusHandler.calledWith(500)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(500)
     })
 
     it('Gets vehicles by provider', async () => {
       const provider_id = uuid()
       const device_id = uuid()
       const res: AgencyApiGetVehiclesByProviderResponse = {} as AgencyApiGetVehiclesByProviderResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
 
       const stubbedResponse = { total: 0, links: { first: '0', last: '0', prev: null, next: null }, vehicles: [] }
-      Sinon.replace(utils, 'getVehicles', Sinon.fake.resolves(stubbedResponse))
+      jest.spyOn(utils, 'getVehicles').mockResolvedValue(stubbedResponse)
       await getVehiclesByProvider(
         {
           params: { device_id },
           query: { cached: false },
-          get: Sinon.fake.returns('foo') as any
+          get: jest.fn().mockImplementation(() => 'asdf')
         } as unknown as AgencyApiGetVehiclesByProviderRequest,
         res
       )
-      expect(statusHandler.calledWith(200)).toBeTruthy()
-      expect(sendHandler.calledWith({ ...stubbedResponse })).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(200)
+      expect(sendMock).toHaveBeenCalledWith({ ...stubbedResponse })
     })
   })
 
@@ -248,113 +198,94 @@ describe('Agency API request handlers', () => {
         const provider_id = uuid()
         const device_id = uuid()
         const res: AgencyApiResponse = {} as AgencyApiResponse
-        const sendHandler = Sinon.fake.returns('asdf')
-        const statusHandler = Sinon.fake.returns({
-          send: sendHandler
-        } as any)
-        res.status = statusHandler
+        const sendMock = jest.fn().mockImplementation(() => 'asdf')
+        res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
         res.locals = getLocals(provider_id) as any
-        Sinon.replace(utils, 'getVehicles', Sinon.fake.rejects('it-broke'))
+        jest.spyOn(utils, 'getVehicles').mockResolvedValue('it-broke' as any)
+        jest.spyOn(utils, 'getVehicles').mockResolvedValue('it-broke' as any)
         await updateVehicleFail(
           {
             params: { device_id },
             query: { cached: false },
-            get: Sinon.fake.returns('foo') as any
+            get: jest.fn().mockImplementation(() => 'asdf')
           } as unknown as AgencyApiUpdateVehicleRequest,
           res,
           provider_id,
           device_id,
           'not found'
         )
-        expect(statusHandler.calledWith(404)).toBeTruthy()
-        expect(sendHandler.called).toBeTruthy()
-        Sinon.restore()
+        expect(res.status).toBeCalledWith(404)
       })
 
       it('Handles invalid data', async () => {
         const provider_id = uuid()
         const device_id = uuid()
         const res: AgencyApiResponse = {} as AgencyApiResponse
-        const sendHandler = Sinon.fake.returns('asdf')
-        const statusHandler = Sinon.fake.returns({
-          send: sendHandler
-        } as any)
-        res.status = statusHandler
+        const sendMock = jest.fn().mockImplementation(() => 'asdf')
+        res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
         res.locals = getLocals(provider_id) as any
-        Sinon.replace(utils, 'getVehicles', Sinon.fake.rejects('it-broke'))
+        jest.spyOn(utils, 'getVehicles').mockResolvedValue('it-broke' as any)
         await updateVehicleFail(
           {
             params: { device_id },
             query: { cached: false },
-            get: Sinon.fake.returns('foo') as any
+            get: jest.fn()
           } as unknown as AgencyApiUpdateVehicleRequest,
           res,
           provider_id,
           device_id,
           'invalid'
         )
-        expect(statusHandler.calledWith(400)).toBeTruthy()
-        expect(
-          sendHandler.calledWith({
-            error: 'bad_param',
-            error_description: 'Invalid parameters for vehicle were sent'
-          })
-        ).toBeTruthy()
-        Sinon.restore()
+        expect(res.status).toBeCalledWith(400)
+        expect(sendMock).toHaveBeenCalledWith({
+          error: 'bad_param',
+          error_description: 'Invalid parameters for vehicle were sent'
+        })
       })
 
       it('404s with no provider_id', async () => {
         const provider_id = ''
         const device_id = uuid()
         const res: AgencyApiResponse = {} as AgencyApiResponse
-        const sendHandler = Sinon.fake.returns('asdf')
-        const statusHandler = Sinon.fake.returns({
-          send: sendHandler
-        } as any)
-        res.status = statusHandler
+        const sendMock = jest.fn().mockImplementation(() => 'asdf')
+        res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
         res.locals = getLocals(provider_id) as any
-        Sinon.replace(utils, 'getVehicles', Sinon.fake.rejects('it-broke'))
+        jest.spyOn(utils, 'getVehicles').mockResolvedValue('it-broke' as any)
         await updateVehicleFail(
           {
             params: { device_id },
             query: { cached: false },
-            get: Sinon.fake.returns('foo') as any
+            get: jest.fn()
           } as unknown as AgencyApiUpdateVehicleRequest,
           res,
           provider_id,
           device_id,
           'not found'
         )
-        expect(statusHandler.calledWith(404)).toBeTruthy()
-        expect(sendHandler.called).toBeTruthy()
-        Sinon.restore()
+
+        expect(res.status).toBeCalledWith(404)
       })
 
       it('handles misc error', async () => {
         const provider_id = uuid()
         const device_id = uuid()
         const res: AgencyApiResponse = {} as AgencyApiResponse
-        const sendHandler = Sinon.fake.returns('asdf')
-        const statusHandler = Sinon.fake.returns({
-          send: sendHandler
-        } as any)
-        res.status = statusHandler
+        const sendMock = jest.fn().mockImplementation(() => 'asdf')
+        res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
         res.locals = getLocals(provider_id) as any
-        Sinon.replace(utils, 'getVehicles', Sinon.fake.rejects('it-broke'))
+        jest.spyOn(utils, 'getVehicles').mockResolvedValue('it-broke' as any)
         await updateVehicleFail(
           {
             params: { device_id },
             query: { cached: false },
-            get: Sinon.fake.returns('foo') as any
+            get: jest.fn()
           } as unknown as AgencyApiUpdateVehicleRequest,
           res,
           provider_id,
           device_id,
           'misc-error'
         )
-        expect(statusHandler.calledWith(500)).toBeTruthy()
-        expect(sendHandler.called).toBeTruthy()
-        Sinon.restore()
+        expect(res.status).toHaveBeenCalledWith(500)
       })
     })
 
@@ -362,24 +293,19 @@ describe('Agency API request handlers', () => {
       const provider_id = uuid()
       const device_id = uuid()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(utils, 'getVehicles', Sinon.fake.rejects('it-broke'))
+      jest.spyOn(utils, 'getVehicles').mockRejectedValue('it-broke' as any)
       await getVehiclesByProvider(
         {
           params: { device_id },
           query: { cached: false },
-          get: Sinon.fake.returns('foo') as any
+          get: jest.fn()
         } as unknown as AgencyApiRequest,
         res
       )
-      expect(statusHandler.calledWith(500)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toHaveBeenCalledWith(500)
     })
 
     it('Fails to read vehicle', async () => {
@@ -387,25 +313,21 @@ describe('Agency API request handlers', () => {
       const device_id = uuid()
       const vehicle_id = uuid()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(IngestServiceClient, 'getDevice', Sinon.fake.rejects('it-broke'))
+      jest.spyOn(utils, 'getVehicles').mockResolvedValue('it-broke' as any)
       await updateVehicle(
         {
           params: { device_id },
           query: { cached: false },
-          get: Sinon.fake.returns('foo') as any,
+          get: jest.fn(),
           body: { vehicle_id }
         } as unknown as AgencyApiUpdateVehicleRequest,
         res
       )
-      expect(statusHandler.calledWith(404)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+
+      expect(res.status).toBeCalledWith(404)
     })
 
     it('Handles mismatched provider', async () => {
@@ -413,25 +335,21 @@ describe('Agency API request handlers', () => {
       const device_id = uuid()
       const vehicle_id = uuid()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(IngestServiceClient, 'getDevice', Sinon.fake.resolves({ provider_id: 'not-your-provider' }))
+      jest.spyOn(IngestServiceClient, 'getDevice').mockResolvedValue({ provider_id: 'not-your-provider' } as any)
       await updateVehicle(
         {
           params: { device_id },
           query: { cached: false },
-          get: Sinon.fake.returns('foo') as any,
+          get: jest.fn(),
           body: { vehicle_id }
         } as unknown as AgencyApiUpdateVehicleRequest,
         res
       )
-      expect(statusHandler.calledWith(404)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+
+      expect(res.status).toBeCalledWith(404)
     })
 
     it('Updates vehicle successfully', async () => {
@@ -439,28 +357,25 @@ describe('Agency API request handlers', () => {
       const device_id = uuid()
       const vehicle_id = uuid()
       const res: AgencyApiResponse = {} as AgencyApiResponse
-      const sendHandler = Sinon.fake.returns('asdf')
-      const statusHandler = Sinon.fake.returns({
-        send: sendHandler
-      } as any)
-      res.status = statusHandler
+      const sendMock = jest.fn().mockImplementation(() => 'asdf')
+      res.status = jest.fn().mockImplementation(() => ({ send: sendMock }))
       res.locals = getLocals(provider_id) as any
-      Sinon.replace(IngestServiceClient, 'getDevice', Sinon.fake.resolves({ provider_id }))
-      Sinon.replace(db, 'updateDevice', Sinon.fake.resolves({ provider_id }))
-      Sinon.replace(cache, 'writeDevices', Sinon.fake.resolves({ provider_id }))
-      Sinon.replace(IngestStream, 'writeDevice', Sinon.fake.resolves({ provider_id }))
+      jest.spyOn(IngestServiceClient, 'getDevice').mockResolvedValue({ provider_id } as any)
+      jest.spyOn(db, 'updateDevice').mockResolvedValue({ provider_id } as any)
+      jest.spyOn(cache, 'writeDevices').mockResolvedValue({ provider_id } as any)
+      jest.spyOn(IngestStream, 'writeDevice').mockResolvedValue({ provider_id } as any)
       await updateVehicle(
         {
           params: { device_id },
           query: { cached: false },
-          get: Sinon.fake.returns('foo') as any,
+          get: jest.fn(),
           body: { vehicle_id }
         } as unknown as AgencyApiUpdateVehicleRequest,
         res
       )
-      expect(statusHandler.calledWith(201)).toBeTruthy()
-      expect(sendHandler.called).toBeTruthy()
-      Sinon.restore()
+      expect(res.status).toBeCalledWith(201)
     })
   })
 })
+
+/* eslint-enable @typescript-eslint/no-explicit-any */

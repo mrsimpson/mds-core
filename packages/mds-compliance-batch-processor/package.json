@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-batch-processor",
-  "version": "0.2.23",
+  "version": "0.2.24",
   "description": "MDS Compliance Batch Processor",
   "keywords": [
     "mds",
@@ -13,21 +13,23 @@
     "dist/"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
-    "test": "jest --runInBand --passWithNoTests",
-    "ts-node": "pnpm build && DOTENV_FLOW_PATH=../.. ts-node",
+    "_build": "tsc --build tsconfig.build.json",
+    "_test": "jest --runInBand --passWithNoTests",
+    "build": "pnpm _build",
+    "test": "pnpm _test",
+    "ts-node": "pnpm build && ts-node -r ../../dotenv-flow.js",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
     "@mds-core/mds-api-server": "workspace:0.4.11",
-    "@mds-core/mds-compliance-engine": "workspace:0.8.23",
-    "@mds-core/mds-compliance-service": "workspace:0.10.30",
-    "@mds-core/mds-db": "workspace:0.6.16",
-    "@mds-core/mds-geography-service": "0.10.21",
-    "@mds-core/mds-ingest-service": "0.10.9",
+    "@mds-core/mds-compliance-engine": "workspace:0.8.24",
+    "@mds-core/mds-compliance-service": "workspace:0.10.31",
+    "@mds-core/mds-db": "workspace:0.6.17",
+    "@mds-core/mds-geography-service": "0.10.22",
+    "@mds-core/mds-ingest-service": "0.10.10",
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-policy-service": "workspace:0.11.27",
-    "@mds-core/mds-providers": "0.2.10",
+    "@mds-core/mds-policy-service": "workspace:0.11.28",
+    "@mds-core/mds-providers": "0.2.11",
     "@mds-core/mds-service-helpers": "workspace:0.6.8",
     "@mds-core/mds-types": "workspace:0.9.2",
     "@mds-core/mds-utils": "workspace:0.5.0",
@@ -36,7 +38,7 @@
     "yargs": "17.0.1"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "workspace:0.4.27"
+    "@mds-core/mds-test-data": "workspace:0.4.28"
   },
   "publishConfig": {
     "main": "dist/index.js"

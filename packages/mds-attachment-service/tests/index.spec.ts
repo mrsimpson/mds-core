@@ -19,21 +19,10 @@ import { AttachmentRepository } from '../repository'
 import { AttachmentServiceManager } from '../service/manager'
 
 describe('Attachment Repository Tests', () => {
-  beforeAll(async () => {
-    await AttachmentRepository.initialize()
-  })
-
-  it('Run Migrations', async () => {
-    await AttachmentRepository.runAllMigrations()
-  })
-
-  it('Revert Migrations', async () => {
-    await AttachmentRepository.revertAllMigrations()
-  })
-
-  afterAll(async () => {
-    await AttachmentRepository.shutdown()
-  })
+  beforeAll(AttachmentRepository.initialize)
+  it('Run Migrations', AttachmentRepository.runAllMigrations)
+  it('Revert Migrations', AttachmentRepository.revertAllMigrations)
+  afterAll(AttachmentRepository.shutdown)
 })
 
 const AttachmentServer = AttachmentServiceManager.controller()

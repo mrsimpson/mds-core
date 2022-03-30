@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-repository",
-  "version": "0.1.47",
+  "version": "0.2.0",
   "description": "Mobility Data Specification ORM",
   "keywords": [
     "mds",
@@ -13,25 +13,27 @@
     "dist/"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
-    "test": "jest --runInBand"
+    "_build": "tsc --build tsconfig.build.json",
+    "_test": "jest --runInBand",
+    "build": "pnpm _build",
+    "test": "pnpm _test"
   },
   "dependencies": {
     "@mds-core/mds-config-files": "0.1.4",
     "@mds-core/mds-logger": "workspace:0.5.7",
     "@mds-core/mds-types": "workspace:0.9.2",
     "@mds-core/mds-utils": "workspace:0.5.0",
-    "@types/pg": "8.6.4",
+    "@types/pg": "8.6.5",
     "await-lock": "2.1.0",
     "envalid": "7.2.1"
   },
   "devDependencies": {
     "pg": "8.7.3",
-    "typeorm": "0.2.43"
+    "typeorm": "0.3.4"
   },
   "peerDependencies": {
     "pg": "8.7.3",
-    "typeorm": "0.2.43"
+    "typeorm": "0.3.4"
   },
   "publishConfig": {
     "main": "dist/index.js"

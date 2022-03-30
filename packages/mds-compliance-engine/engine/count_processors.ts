@@ -81,11 +81,10 @@ export function processCountPolicy(
         if (isCountRuleMatch(rule as CountRule, geographies, device, event)) {
           if (num_matches < maximum) {
             matchedVehicles[device.device_id] = { device, rule_applied: rule_id, rules_matched: [rule_id] }
-            /* eslint-reason need to remove matched vehicles */
-            /* eslint-disable-next-line no-param-reassign */
             delete devicesToCheck[device.device_id]
             delete overflowedVehicles[device.device_id]
           } else if (overflowedVehicles[device.device_id]) {
+            // eslint-reason We literally check in the line above that this device entry exists in the overflowedVehicles map
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             overflowedVehicles[device.device_id]!.rules_matched.push(rule_id)
           } else {

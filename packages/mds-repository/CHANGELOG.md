@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.2.0
+
+### Minor Changes
+
+- ed8ecc80: Upgrade to TypeORM v3
+
 ## 0.1.47
 
 ### Patch Changes

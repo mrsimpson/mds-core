@@ -18,16 +18,17 @@ import type { MountedConfigFileReader } from '@mds-core/mds-config-files'
 import { ConfigFileReader } from '@mds-core/mds-config-files'
 import { pluralize, tail } from '@mds-core/mds-utils'
 import { bool, cleanEnv } from 'envalid'
-import type { Connection, ConnectionOptions } from 'typeorm'
-import type { ConnectionManagerCliOptions, ConnectionManagerOptions } from './connection'
+import { DataSource } from 'typeorm'
+import type { ConnectionMode } from './connection'
 import { ConnectionManager } from './connection'
 import { RepositoryLogger as logger } from './logger'
 import type { ModelMapper } from './mapper'
 import { MapModels } from './mapper'
 import { RepositoryMigrations } from './migrations'
+export type { DataSource } from 'typeorm'
 
-type Entity = Required<ConnectionManagerOptions>['entities'][number]
-type Migration = Required<ConnectionManagerOptions>['migrations'][number]
+type Entity = Function
+type Migration = Function
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface EntitySeeder<From = any, To = any> {
@@ -41,9 +42,7 @@ export type ReadWriteRepositoryOptions = ReadOnlyRepositoryOptions & { migration
   seeders?: Array<EntitySeeder>
 }
 
-export type ManagedConnection = Omit<Connection, 'connect' | 'close'>
-
-const runAllMigrationsUsingConnection = async (connection: ManagedConnection): Promise<void> => {
+const runAllMigrationsUsingConnection = async (connection: DataSource): Promise<void> => {
   const {
     options: { migrationsTableName }
   } = connection
@@ -66,7 +65,7 @@ const runAllMigrationsUsingConnection = async (connection: ManagedConnection): P
   }
 }
 
-const revertAllMigrationsUsingConnection = async (connection: ManagedConnection): Promise<void> => {
+const revertAllMigrationsUsingConnection = async (connection: DataSource): Promise<void> => {
   const {
     options: { migrationsTableName }
   } = connection
@@ -85,7 +84,7 @@ const revertAllMigrationsUsingConnection = async (connection: ManagedConnection)
   }
 }
 
-const DataSeeder = (connection: ManagedConnection, path?: string) => {
+const DataSeeder = (connection: DataSource, path?: string) => {
   try {
     const mount = ConfigFileReader.mount(path)
     logger.info(`R/W repository using data files mounted at ${mount.path}`)
@@ -163,7 +162,12 @@ export interface RepositoryPublicMethods {
   shutdown: () => Promise<void>
 }
 
-export type ReadOnlyRepositoryProtectedMethods = Pick<ConnectionManager<'ro'>, 'connect' | 'disconnect'>
+type RepositoryConnectionMethods<TConnectionMode extends ConnectionMode> = {
+  connect: (mode: TConnectionMode) => Promise<DataSource>
+  disconnect: (mode: TConnectionMode) => Promise<void>
+}
+
+export type ReadOnlyRepositoryProtectedMethods = RepositoryConnectionMethods<'ro'>
 
 export type ReadOnlyRepositoryPublicMethods<T> = T & RepositoryPublicMethods
 
@@ -173,29 +177,33 @@ export const ReadOnlyRepository = {
     { entities }: ReadOnlyRepositoryOptions,
     methods: (repository: ReadOnlyRepositoryProtectedMethods) => T
   ): ReadOnlyRepositoryPublicMethods<T> => {
-    const { connect, disconnect } = new ConnectionManager<'ro'>(name, { entities })
+    const manager = new ConnectionManager(name, { entities })
 
-    return {
-      initialize: async () => {
-        logger.info(`Initializing R/O repository: ${name}`)
-        await connect('ro')
-      },
-      shutdown: async () => {
-        logger.info(`Terminating R/O repository: ${name}`)
-        await disconnect('ro')
-      },
-      ...methods({ connect, disconnect })
+    const connect = (mode: 'ro') => manager.connect(mode)
+
+    const disconnect = (mode: 'ro') => manager.disconnect(mode)
+
+    const initialize = async () => {
+      logger.info(`Initializing R/O repository: ${name}`)
+      await connect('ro')
     }
+
+    const shutdown = async () => {
+      logger.info(`Terminating R/O repository: ${name}`)
+      await disconnect('ro')
+    }
+
+    return { connect, disconnect, initialize, shutdown, ...methods({ connect, disconnect }) }
   }
 }
 
-export type ReadWriteRepositoryProtectedMethods = Pick<ConnectionManager<'ro' | 'rw'>, 'connect' | 'disconnect'> & {
+export type ReadWriteRepositoryProtectedMethods = RepositoryConnectionMethods<ConnectionMode> & {
   asChunksForInsert: <TEntity>(entities: TEntity[], size?: number) => Array<TEntity[]>
 }
 
 export type ReadWriteRepositoryPublicMethods<T extends {}> = T &
   RepositoryPublicMethods & {
-    cli: (options?: ConnectionManagerCliOptions) => ConnectionOptions
+    cli: () => DataSource
     runAllMigrations: () => Promise<void>
     revertAllMigrations: () => Promise<void>
   }
@@ -209,14 +217,12 @@ export const ReadWriteRepository = {
     const migrationsTableName = `${name}-migrations`
     const metadataTableName = `${name}-migration-metadata`
 
-    const { connect, disconnect, ormconfig } = new ConnectionManager<'ro' | 'rw'>(name, {
+    const { connect, disconnect, ormconfig } = new ConnectionManager(name, {
       migrationsTableName,
       metadataTableName,
       entities,
       migrations: migrations.length === 0 ? [] : RepositoryMigrations(migrationsTableName).concat(migrations)
     })
-
-    const cli = (options?: ConnectionManagerCliOptions) => ormconfig('rw', options)
 
     const runAllMigrations = async (): Promise<void> => runAllMigrationsUsingConnection(await connect('rw'))
 
@@ -254,7 +260,7 @@ export const ReadWriteRepository = {
     return {
       initialize,
       shutdown,
-      cli,
+      cli: () => new DataSource(ormconfig('rw')),
       runAllMigrations,
       revertAllMigrations,
       ...methods({ connect, disconnect, asChunksForInsert })

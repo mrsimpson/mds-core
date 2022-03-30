@@ -186,8 +186,10 @@ describe('Redis Tests', () => {
       await redis.hset('foo', 'qux', 'quux')
       const res = await redis.multihgetall('foo')
 
-      if (!res) throw new Error('Res should be defined')
-      const [[, realRes]] = res as any
+      const [firstRes] = res
+      if (!firstRes) throw new Error('Expected firstRes to be defined')
+      const [, realRes] = firstRes
+
       expect(realRes).toEqual({ bar: 'baz', qux: 'quux' })
     })
 

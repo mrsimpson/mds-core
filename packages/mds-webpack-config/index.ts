@@ -20,7 +20,6 @@ import type { Configuration } from 'webpack'
 import { BannerPlugin, ContextReplacementPlugin, IgnorePlugin } from 'webpack'
 import { merge as WebpackMerge } from 'webpack-merge'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 // const nodeExternals = require('webpack-node-externals')
 
 const gitRevisionPlugin = new GitRevisionPlugin({ commithashCommand: 'rev-parse --short HEAD' })
@@ -70,9 +69,7 @@ const MergeConfigurations =
               new ContextReplacementPlugin(
                 new RegExp(`node_modules[\\/\\\\]${module}`),
                 (data: { dependencies: { critical: unknown }[] }) => {
-                  // eslint-disable-next-line no-param-reassign
                   data.dependencies = data.dependencies.map(dependency => {
-                    // eslint-disable-next-line no-param-reassign
                     delete dependency.critical
                     return dependency
                   })
