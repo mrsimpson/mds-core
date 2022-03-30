@@ -10,11 +10,11 @@
   ],
   "scripts": {
     "_build": "tsc --build tsconfig.build.json",
-    "_test": "PATH_PREFIX=/agency DOTENV_CONFIG_PATH=../../.env jest --runInBand --forceExit ",
+    "_test": "PATH_PREFIX=/agency jest --runInBand --forceExit",
     "build": "pnpm _build",
     "start": "PATH_PREFIX=/agency pnpm watch server",
     "test": "pnpm _test",
-    "ts-node": "DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "ts-node": "ts-node",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {

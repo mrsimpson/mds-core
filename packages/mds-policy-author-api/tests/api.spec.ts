@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { ApiServer } from '@mds-core/mds-api-server'
 import { GeographyFactory, GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
 import type { PolicyDomainCreateModel, PolicyMetadataDomainModel } from '@mds-core/mds-policy-service'
@@ -70,7 +69,10 @@ const createPolicyAndGeographyFactory = async (policy?: PolicyDomainCreateModel,
   })
   await GeographyServiceClient.writeGeographies([newGeography])
   if (publish_date) {
-    GeographyServiceClient.publishGeography({ geography_id: newPolicy.rules[0]?.geographies[0] as UUID, publish_date })
+    await GeographyServiceClient.publishGeography({
+      geography_id: newPolicy.rules[0]?.geographies[0] as UUID,
+      publish_date
+    })
   }
   const createdPolicy = await PolicyServiceClient.writePolicy(newPolicy)
 

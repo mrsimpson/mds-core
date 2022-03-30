@@ -10,14 +10,14 @@
   ],
   "scripts": {
     "_build": "tsc --build tsconfig.build.json",
-    "_test": "PATH_PREFIX=/compliance-api DOTENV_CONFIG_PATH=../../.env jest --runInBand",
+    "_test": "PATH_PREFIX=/compliance-api jest --runInBand",
     "build": "pnpm _build",
     "generate": "pnpm generate:schema && pnpm generate:flatspec",
     "generate:flatspec": "ts-node ./generate-flat-spec.ts && git add spec/flat-spec.json",
     "generate:schema": "ts-node ./generate-schemas.ts && git add schema-gen",
     "start": "PATH_PREFIX=/compliance-api pnpm watch server",
     "test": "pnpm _test",
-    "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "ts-node": "pnpm build && ts-node -r ../../dotenv-flow.js",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {

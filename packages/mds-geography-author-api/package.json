@@ -7,11 +7,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "_build": "tsc --build tsconfig.build.json",
-    "_test": "PATH_PREFIX=/geography-author DOTENV_CONFIG_PATH=../../.env jest --runInBand --forceExit",
+    "_test": "PATH_PREFIX=/geography-author jest --runInBand --forceExit",
     "build": "pnpm _build",
     "start": "PATH_PREFIX=/geography-author pnpm watch server",
     "test": "pnpm _test",
-    "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "ts-node": "pnpm build && ts-node -r ../../dotenv-flow.js",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {

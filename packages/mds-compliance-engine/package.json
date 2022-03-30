@@ -14,10 +14,10 @@
   ],
   "scripts": {
     "_build": "tsc --build tsconfig.build.json",
-    "_test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand --forceExit",
+    "_test": "jest --runInBand --forceExit",
     "build": "pnpm _build",
     "test": "pnpm _test",
-    "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "ts-node": "pnpm build && ts-node -r ../../dotenv-flow.js",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
