@@ -3,7 +3,7 @@ import db from '@mds-core/mds-db'
 import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import { IngestServiceClient, IngestStream, validateEventDomainModel } from '@mds-core/mds-ingest-service'
 import type { DeepPartial, UUID, VehicleEvent } from '@mds-core/mds-types'
-import { isDefined, normalizeToArray, NotFoundError, now, ValidationError } from '@mds-core/mds-utils'
+import { hasOwnProperty, isDefined, normalizeToArray, NotFoundError, now, ValidationError } from '@mds-core/mds-utils'
 import { AgencyLogger } from '../logger'
 import type { AgencyApiSubmitVehicleEventRequest, AgencyApiSubmitVehicleEventResponse } from '../types'
 import { AgencyServerError } from '../types'
@@ -12,11 +12,14 @@ import { agencyValidationErrorParser, eventValidForMode } from '../utils'
 const handleDbError = async (
   req: AgencyApiSubmitVehicleEventRequest,
   res: AgencyApiSubmitVehicleEventResponse,
-  err: Error | Partial<{ message: string }>,
+  err: unknown,
   provider_id: UUID,
   event: DeepPartial<VehicleEvent>
 ): Promise<void> => {
-  const message = err.message || String(err)
+  const message =
+    typeof err === 'object' && err !== null && hasOwnProperty(err, 'message') && typeof err.message === 'string'
+      ? err.message
+      : String(err)
 
   await IngestStream.writeEventError({
     provider_id,
@@ -157,6 +160,6 @@ export const createEventHandler = async (
   } catch (error) {
     if (error instanceof ValidationError) return res.status(400).send(agencyValidationErrorParser(error))
 
-    await handleDbError(req, res, error as any, provider_id, unparsedEvent)
+    await handleDbError(req, res, error, provider_id, unparsedEvent)
   }
 }

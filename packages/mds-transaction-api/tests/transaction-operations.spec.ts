@@ -40,7 +40,7 @@ describe('Test Transactions API: Transaction Operations', () => {
       }
       const { transaction_id } = operation
 
-      jest.spyOn(TransactionServiceClient, 'addTransactionOperation').mockImplementationOnce(async o => o as any)
+      jest.spyOn(TransactionServiceClient, 'addTransactionOperation').mockImplementationOnce(async o => o)
 
       const result = await request
         .post(pathPrefix(`/transactions/${transaction_id}/operations`))
@@ -53,9 +53,7 @@ describe('Test Transactions API: Transaction Operations', () => {
     it('Can GET operations for a transaction', async () => {
       const transaction_id = uuid()
       const mockOperations = [...transactionOperationsGenerator(5, transaction_id)]
-      jest
-        .spyOn(TransactionServiceClient, 'getTransactionOperations')
-        .mockImplementationOnce(async _ => mockOperations as any)
+      jest.spyOn(TransactionServiceClient, 'getTransactionOperations').mockImplementationOnce(async _ => mockOperations)
 
       const result = await request
         .get(pathPrefix(`/transactions/${transaction_id}/operations`))

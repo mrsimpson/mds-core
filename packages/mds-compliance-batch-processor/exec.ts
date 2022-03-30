@@ -32,7 +32,8 @@ ProcessManager(
      * Usually this is called to stop the process, but the snapshot computation stops itself,
      * so we leave this empty.
      */
-   stop: async () => { } // eslint-disable-line
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    stop: async () => {}
   },
   { retries: 3, maxTimeout: minutes(15) }
 ).monitor()

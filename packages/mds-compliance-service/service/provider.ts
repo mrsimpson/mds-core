@@ -162,7 +162,6 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService, Compl
         const key = `${provider_id}:${policy_id}`
 
         if (!isDefined(acc[key])) {
-          // eslint-disable-next-line no-param-reassign
           acc[key] = []
         }
         if (violationPeriodEntity.sum_total_violations > 0) {

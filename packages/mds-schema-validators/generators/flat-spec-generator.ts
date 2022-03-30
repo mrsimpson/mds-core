@@ -12,6 +12,7 @@ export const GenerateFlatSpec = (path: string) => {
       return
     })
     .catch(err => {
+      // eslint-disable-next-line no-console
       console.error('Error generating flat-spec!', err)
       process.exit(1)
     })

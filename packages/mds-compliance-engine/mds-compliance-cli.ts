@@ -107,7 +107,6 @@ main()
     // eslint-disable-next-line no-console
     console.dir(result, { depth: null })
   })
-  /* eslint-disable-next-line promise/prefer-await-to-callbacks */
   .catch(async err => {
     ComplianceEngineLogger.error('exception:', err.stack)
   })

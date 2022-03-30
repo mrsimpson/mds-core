@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { days, uuid } from '@mds-core/mds-utils'
 import { JurisdictionServiceClient } from '../index'
 import { JurisdictionRepository } from '../repository'

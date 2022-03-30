@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-/* eslint-disable promise/no-callback-in-promise */
-/* eslint-disable promise/no-nesting */
-/* eslint-disable promise/prefer-await-to-then */
-/* eslint-disable promise/always-return */
-/* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable promise/catch-or-return */
 
 import type { AttachmentDomainModel } from '@mds-core/mds-attachment-service'
 import { AttachmentServiceClient } from '@mds-core/mds-attachment-service'
@@ -31,9 +25,6 @@ import fs from 'fs'
 import { getWriteableClient } from '../../mds-db/client'
 import schema from '../../mds-db/schema'
 import { attachmentSummary, deleteAuditAttachment, readAttachments, writeAttachment } from '../attachments'
-
-/* eslint-disable-next-line */
-const aws = require('aws-sdk')
 
 describe('Testing Attachments Service', () => {
   const attachmentId = uuid()

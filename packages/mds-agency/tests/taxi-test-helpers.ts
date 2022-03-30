@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import { PROVIDER_SCOPES, TEST1_PROVIDER_ID } from '@mds-core/mds-test-data'
 import type { TripMetadata, UUID, VehicleEvent } from '@mds-core/mds-types'

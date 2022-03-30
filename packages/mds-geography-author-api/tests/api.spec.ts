@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 
-// eslint directives:
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-useless-concat */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable promise/prefer-await-to-callbacks */
-/* eslint-reason extends object.prototype */
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 
 import { ApiServer } from '@mds-core/mds-api-server'
 import type { GeographyWithMetadataDomainModel } from '@mds-core/mds-geography-service'

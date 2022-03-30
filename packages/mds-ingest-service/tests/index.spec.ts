@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Copyright 2020 City of Los Angeles
  *
@@ -397,7 +396,7 @@ describe('Ingest Service Tests', () => {
         const limit = 1
         const {
           events,
-          cursor: { next, prev }
+          cursor: { next }
         } = await IngestServiceClient.getEventsUsingOptions({
           time_range: { start: testTimestamp, end: testTimestamp + 2000 },
           grouping_type: 'all_events',
@@ -481,10 +480,7 @@ describe('Ingest Service Tests', () => {
       })
 
       it('uses secondary (timestamp) sort order when primary sort values are equal', async () => {
-        const {
-          events,
-          cursor: { next }
-        } = await IngestServiceClient.getEventsUsingOptions({
+        const { events } = await IngestServiceClient.getEventsUsingOptions({
           time_range: { start: testTimestamp, end: testTimestamp + 2000 },
           order: { column: 'provider_id', direction: 'ASC' },
           grouping_type: 'all_events',
@@ -493,10 +489,7 @@ describe('Ingest Service Tests', () => {
 
         expect(events[0]?.timestamp).toBeLessThan(events[events.length - 1]?.timestamp ?? 0)
 
-        const {
-          events: descEvents,
-          cursor: { next: descNext }
-        } = await IngestServiceClient.getEventsUsingOptions({
+        const { events: descEvents } = await IngestServiceClient.getEventsUsingOptions({
           time_range: { start: testTimestamp, end: testTimestamp + 2000 },
           order: { column: 'provider_id', direction: 'DESC' },
           grouping_type: 'all_events',
@@ -897,6 +890,7 @@ describe('Ingest Service Tests', () => {
 
       const { telemetry, ...eventWithoutTelemetry } = TEST_EVENT_A1
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(IngestServiceClient.writeEvents([eventWithoutTelemetry as any])).rejects.toMatchObject({
         type: 'ValidationError'
       })

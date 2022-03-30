@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type { UUID } from '@mds-core/mds-types'
 import {
   clone,
@@ -26,7 +25,6 @@ import {
 } from '../test_data/policies'
 import { PolicyFactory, RulesFactory } from './helpers'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ACTIVE_POLICY_JSON = { ...POLICY_JSON, publish_date: yesterday(), start_date: yesterday() }
 
 const SIMPLE_POLICY_JSON: PolicyDomainCreateModel = {

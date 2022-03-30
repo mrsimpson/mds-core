@@ -22,7 +22,8 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:import/typescript",
     "plugin:promise/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:eslint-comments/recommended"
   ],
   "ignorePatterns": ["*.d.ts"],
   "rules": {
@@ -32,6 +33,10 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      { "checksVoidReturn": false }
+    ],
     "@typescript-eslint/no-parameter-properties": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
@@ -44,6 +49,8 @@
     "class-methods-use-this": "off",
     "consistent-return": "off",
     "eqeqeq": "error",
+    "eslint-comments/no-unused-disable": "error",
+    "eslint-comments/disable-enable-pair": "off",
     "import/extensions": ["error", "ignorePackages", { "ts": "never" }],
     "import/no-extraneous-dependencies": "error",
     "import/no-unresolved": "off",

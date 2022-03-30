@@ -113,12 +113,12 @@ describe('Tests Compliance Engine Time Functionality', () => {
     expect(result.vehicles_found.length).toStrictEqual(400)
     expect(result.total_violations).toStrictEqual(400)
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { rule_id } = TIME_POLICY.rules[0]!
 
     // Note that for time rule matches, `rule_applied` is never null.
     const finalCount = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
       if (vehicle.rule_applied === rule_id && vehicle.rules_matched.includes(rule_id)) {
-        // eslint-disable-next-line no-param-reassign
         count += 1
       }
       return count
@@ -152,7 +152,9 @@ describe('Tests Compliance Engine Time Functionality', () => {
     expect(result.vehicles_found.length).toStrictEqual(9)
     expect(result.total_violations).toStrictEqual(9)
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { rule_id } = OVERLAPPING_GEOS_TIME_POLICY.rules[0]!
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const rule_id_2 = OVERLAPPING_GEOS_TIME_POLICY.rules[1]!.rule_id
 
     // Note that for time rule matches, `rule_applied` is never null.
@@ -164,7 +166,6 @@ describe('Tests Compliance Engine Time Functionality', () => {
         vehicle.rules_matched.includes(rule_id_2) &&
         vehicle.rules_matched.length === 2
       ) {
-        // eslint-disable-next-line no-param-reassign
         count += 1
       }
       return count
@@ -177,7 +178,6 @@ describe('Tests Compliance Engine Time Functionality', () => {
         vehicle.rules_matched.includes(rule_id_2) &&
         vehicle.rules_matched.length === 1
       ) {
-        // eslint-disable-next-line no-param-reassign
         count += 1
       }
       return count

@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-// eslint directives:
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-useless-concat */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable promise/prefer-await-to-callbacks */
-
-/* eslint-reason extends object.prototype */
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-enable prettier/prettier */
-/* eslint-enable @typescript-eslint/no-unused-vars */
 import { ApiServer } from '@mds-core/mds-api-server'
 import { GeographyFactory, GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
-// eslint-disable-next-line prettier/prettier
-import type { PolicyDomainCreateModel, PolicyMetadataDomainModel } from '@mds-core/mds-policy-service';
+import type { PolicyDomainCreateModel, PolicyMetadataDomainModel } from '@mds-core/mds-policy-service'
 import { PolicyServiceClient, PolicyStreamKafka } from '@mds-core/mds-policy-service'
 import { PolicyRepository } from '@mds-core/mds-policy-service/repository'
 import { PolicyServiceManager } from '@mds-core/mds-policy-service/service/manager'

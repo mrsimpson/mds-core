@@ -25,6 +25,7 @@ import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
 import { minutes, now } from '@mds-core/mds-utils'
 import type { FeatureCollection } from 'geojson'
+import { ComplianceBatchProcessorLogger as logger } from '../logger'
 import { readJson } from './helpers'
 
 let policies: PolicyDomainModel[] = []
@@ -68,5 +69,4 @@ async function main() {
 
 main()
   .then(res => db.shutdown())
-  // eslint-disable-next-line no-console
-  .catch(err => console.log(err))
+  .catch(err => logger.error(err))

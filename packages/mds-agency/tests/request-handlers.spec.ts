@@ -377,3 +377,5 @@ describe('Agency API request handlers', () => {
     })
   })
 })
+
+/* eslint-enable @typescript-eslint/no-explicit-any */

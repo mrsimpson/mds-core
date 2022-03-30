@@ -75,8 +75,6 @@ export function processTimePolicy(
             rule_applied: rule.rule_id,
             rules_matched: [rule.rule_id]
           }
-          /* eslint-reason need to remove matched vehicles */
-          /* eslint-disable-next-line no-param-reassign */
           delete devicesToCheck[device.device_id]
         }
       }

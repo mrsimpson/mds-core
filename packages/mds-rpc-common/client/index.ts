@@ -54,7 +54,7 @@ export const RpcClient = <Service, RequestContext extends {}>(
   })
 }
 
-const RpcClientError = (error: {}) =>
+const RpcClientError = (error: unknown) =>
   ServiceError(
     error instanceof ModuleRpcClient.ClientRpcError
       ? {
@@ -64,7 +64,12 @@ const RpcClientError = (error: {}) =>
         }
       : {
           type: 'ServiceException',
-          message: error instanceof Error ? error.message : error.toString()
+          message:
+            error instanceof Error
+              ? error.message
+              : typeof error === 'object' && error !== null
+              ? error.toString()
+              : 'unknown error'
         }
   ).error
 
@@ -83,7 +88,7 @@ const RpcResponse = async <Method extends RpcMethod>(
   try {
     const response = await request(...args)
     return response
-  } catch (error: any) {
+  } catch (error) {
     throw RpcClientError(error)
   }
 }

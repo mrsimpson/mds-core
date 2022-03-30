@@ -24,7 +24,6 @@ Promise.all([cache.startup(), IngestStream.initialize()])
   .then(() => {
     return HttpServer(ApiServer(api), { port: process.env.AGENCY_API_HTTP_PORT })
   })
-  // eslint-disable-next-line promise/prefer-await-to-callbacks
   .catch(err => {
     AgencyLogger.error('mds-agency startup failure', err)
   })
