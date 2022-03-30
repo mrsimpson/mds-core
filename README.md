@@ -127,6 +127,7 @@ The tests require a local PostgreSQL and Redis to be running on default ports.
 There is a docker compose file in `/test` where you can fire up both services preparing an environment which is suitable for automated tests.
 
 The configuration defined in `.env.test` will be respected when doing so. If you need deviating settings, feel free to define the im a `.env.test.local` file.
+
 ## Debugging with Visual Studio Code
 
 ### Node.js: Express Server
