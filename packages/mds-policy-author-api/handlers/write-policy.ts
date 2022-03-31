@@ -29,7 +29,7 @@ export const WritePolicyHandler = async (
   }
   try {
     const newPolicy = req.body
-    if (newPolicy.publish_date) throw new ValidationError('publish_date cannot be set via policy creation endpoint')
+    if (newPolicy.published_date) throw new ValidationError('published_date cannot be set via policy creation endpoint')
 
     const policy = await PolicyServiceClient.writePolicy(req.body)
     const { version } = res.locals

@@ -64,7 +64,7 @@ export interface PolicyService {
   readActivePolicies: (timestamp: Timestamp) => Required<PolicyDomainModel>[]
   deletePolicy: (policy_id: UUID) => UUID
   editPolicy: (policy: PolicyDomainCreateModel) => PolicyDomainModel
-  publishPolicy: (policy_id: UUID, publish_date: Timestamp) => PolicyDomainModel
+  publishPolicy: (policy_id: UUID, published_date: Timestamp) => PolicyDomainModel
   readBulkPolicyMetadata: <M>(params: ReadPolicyQueryParams) => PolicyMetadataDomainModel<M>[]
   readPolicy: (policy_id: UUID, presentationOptions?: PresentationOptions) => PolicyDomainModel
   readSinglePolicyMetadata: <M>(policy_id: UUID) => PolicyMetadataDomainModel<M>

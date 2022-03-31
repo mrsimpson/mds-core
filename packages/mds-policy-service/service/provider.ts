@@ -78,7 +78,7 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyService
     serviceErrorWrapper('writePolicyMetadata', () =>
       PolicyRepository.writePolicyMetadata(validatePolicyMetadataDomainModel(policy_metadata))
     ),
-  publishPolicy: (context, policy_id, publish_date) =>
+  publishPolicy: (context, policy_id, published_date) =>
     serviceErrorWrapper('publishPolicy', async () => {
       const { rules, prev_policies } = await PolicyRepository.readPolicy(policy_id)
       const geographies = await GeographyServiceClient.getGeographiesByIds(rules.map(r => r.geographies).flat())
@@ -86,7 +86,7 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyService
       if (geographies.some(geography => !geography?.publish_date))
         throw new DependencyMissingError(`some geographies not published!`)
 
-      const publishedPolicy = await PolicyRepository.publishPolicy(policy_id, publish_date, {
+      const publishedPolicy = await PolicyRepository.publishPolicy(policy_id, published_date, {
         beforeCommit: process.env.KAFKA_HOST ? async policy => PolicyStreamKafka.write(policy) : undefined
       })
 

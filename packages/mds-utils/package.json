@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-utils",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Mobility Data Specification utility functions",
   "keywords": [
     "mds",
@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "_build": "tsc --build tsconfig.build.json",
-    "_test": "DOTENV_CONFIG_PATH=../../.env jest --runInBand ",
+    "_test": "jest --runInBand ",
     "build": "pnpm _build",
     "test": "pnpm _test"
   },

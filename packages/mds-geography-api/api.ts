@@ -134,9 +134,6 @@ function api(app: express.Express): express.Express {
     }
   )
 
-  /* eslint-reason global error handling middleware */
-  /* istanbul ignore next */
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   app.use(async (error: Error, req: ApiRequest, res: ApiResponse, next: NextFunction) => {
     const { method, originalUrl } = req
     GeographyLogger.error('Fatal MDS Geography Error (global error handling middleware)', {

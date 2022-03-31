@@ -8,6 +8,7 @@ type MockedSink<T> = {
   [key in keyof StreamSink<T>]: jest.MockedFunction<any>
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const MockSinkFactory = <T = any>(overrides?: Partial<MockedSink<T>>) => {
   const mockedMethods = {
     initialize: jest.fn(async () => undefined),

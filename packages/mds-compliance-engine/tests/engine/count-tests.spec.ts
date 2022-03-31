@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-/* eslint-disable promise/prefer-await-to-then */
-/* eslint-disable promise/no-callback-in-promise */
-/* eslint-disable promise/no-nesting */
-/* eslint-disable promise/always-return */
-/* eslint-disable promise/catch-or-return */
-/* eslint-disable promise/prefer-await-to-callbacks */
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import type { CountPolicy, CountRule } from '@mds-core/mds-policy-service'
@@ -341,7 +334,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         description: 'LADOT Venice Drop-off/no-fly zones',
         policy_id: VENICE_POLICY_UUID,
         start_date: 1558389669540,
-        publish_date: 1558389669540,
+        published_date: 1558389669540,
         end_date: null,
         prev_policies: null,
         currency: null,

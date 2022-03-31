@@ -14,35 +14,22 @@
  * limitations under the License.
  */
 
-// eslint directives:
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-useless-concat */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable promise/prefer-await-to-callbacks */
-
-/* eslint-reason extends object.prototype */
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-enable prettier/prettier */
-/* eslint-enable @typescript-eslint/no-unused-vars */
-import { ApiServer } from '@mds-core/mds-api-server';
-import { GeographyFactory, GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service';
-// eslint-disable-next-line prettier/prettier
-import type { PolicyDomainCreateModel, PolicyMetadataDomainModel } from '@mds-core/mds-policy-service';
-import { PolicyServiceClient, PolicyStreamKafka } from '@mds-core/mds-policy-service';
-import { PolicyRepository } from '@mds-core/mds-policy-service/repository';
-import { PolicyServiceManager } from '@mds-core/mds-policy-service/service/manager';
-import { PolicyFactory } from '@mds-core/mds-policy-service/tests/helpers';
-import stream from '@mds-core/mds-stream';
-import { SCOPED_AUTH, venice } from '@mds-core/mds-test-data';
-import type { Timestamp, UUID } from '@mds-core/mds-types';
-import { days, isUUID, now, pathPrefix, uuid } from '@mds-core/mds-utils';
-import { StatusCodes } from 'http-status-codes';
-import supertest from 'supertest';
-import { api } from '../api';
-import { injectVersionMiddleware } from '../middleware';
-import { POLICY_AUTHOR_API_DEFAULT_VERSION } from '../types';
+import { ApiServer } from '@mds-core/mds-api-server'
+import { GeographyFactory, GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
+import type { PolicyDomainCreateModel, PolicyMetadataDomainModel } from '@mds-core/mds-policy-service'
+import { PolicyServiceClient, PolicyStreamKafka } from '@mds-core/mds-policy-service'
+import { PolicyRepository } from '@mds-core/mds-policy-service/repository'
+import { PolicyServiceManager } from '@mds-core/mds-policy-service/service/manager'
+import { PolicyFactory } from '@mds-core/mds-policy-service/tests/helpers'
+import stream from '@mds-core/mds-stream'
+import { SCOPED_AUTH, venice } from '@mds-core/mds-test-data'
+import type { Timestamp, UUID } from '@mds-core/mds-types'
+import { days, isUUID, now, pathPrefix, uuid } from '@mds-core/mds-utils'
+import { StatusCodes } from 'http-status-codes'
+import supertest from 'supertest'
+import { api } from '../api'
+import { injectVersionMiddleware } from '../middleware'
+import { POLICY_AUTHOR_API_DEFAULT_VERSION } from '../types'
 
 stream.mockStream(PolicyStreamKafka)
 
@@ -82,7 +69,10 @@ const createPolicyAndGeographyFactory = async (policy?: PolicyDomainCreateModel,
   })
   await GeographyServiceClient.writeGeographies([newGeography])
   if (publish_date) {
-    GeographyServiceClient.publishGeography({ geography_id: newPolicy.rules[0]?.geographies[0] as UUID, publish_date })
+    await GeographyServiceClient.publishGeography({
+      geography_id: newPolicy.rules[0]?.geographies[0] as UUID,
+      publish_date
+    })
   }
   const createdPolicy = await PolicyServiceClient.writePolicy(newPolicy)
 
@@ -383,7 +373,7 @@ describe('Tests app', () => {
         .expect(StatusCodes.CONFLICT)
     })
 
-    it('cannot publish a policy if the start_date would precede the publish_date', async () => {
+    it('cannot publish a policy if the start_date would precede the published_date', async () => {
       const policy = await createPolicyAndGeographyFactory(PolicyFactory({ start_date: now() - days(30) }), now())
       const result = await request
         .post(pathPrefix(`/policies/${policy.policy_id}/publish`))
@@ -532,7 +522,7 @@ describe('Tests app', () => {
       expect(isUUID(result.body.data.policy.policy_id)).toBeTruthy()
     })
 
-    it('Cannot PUT a policy with publish_date set', async () => {
+    it('Cannot PUT a policy with published_date set', async () => {
       const policy = await createPublishedPolicy()
       const result = await request
         .put(pathPrefix(`/policies/${policy.policy_id}`))
@@ -540,11 +530,11 @@ describe('Tests app', () => {
         .send(policy)
         .expect(400)
       expect(result.body.error.name).toStrictEqual(`ValidationError`)
-      expect(result.body.error.reason.includes('publish_date')).toBeTruthy()
+      expect(result.body.error.reason.includes('published_date')).toBeTruthy()
       expect(result.headers).toHaveProperty('content-type', APP_JSON)
     })
 
-    it('Cannot POST a policy with publish_date set', async () => {
+    it('Cannot POST a policy with published_date set', async () => {
       const policy = await createPublishedPolicy()
       const result = await request
         .post(pathPrefix(`/policies`))
@@ -552,7 +542,7 @@ describe('Tests app', () => {
         .send(policy)
         .expect(400)
       expect(result.body.error.name).toStrictEqual(`ValidationError`)
-      expect(result.body.error.reason.includes('publish_date')).toBeTruthy()
+      expect(result.body.error.reason.includes('published_date')).toBeTruthy()
       expect(result.headers).toHaveProperty('content-type', APP_JSON)
     })
   })

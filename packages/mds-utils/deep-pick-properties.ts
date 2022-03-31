@@ -59,6 +59,7 @@ export const deepPickProperties = <T, P extends DeepPickPath<T>[] = ['*']>(
           ...oneLevelPaths.reduce((oneLevelAcc, [, tail]) => {
             oneLevelAcc[tail] = value[tail]
             return oneLevelAcc
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           }, {} as any),
           /**
            * Recursively extract values from paths that are more than one level deep (if applicable)
@@ -75,5 +76,6 @@ export const deepPickProperties = <T, P extends DeepPickPath<T>[] = ['*']>(
       }
     }
     return acc
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }, {} as any)
 }

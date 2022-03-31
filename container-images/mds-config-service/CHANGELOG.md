@@ -1,5 +1,17 @@
 # @container-images/mds-config-service
 
+## 0.6.0
+
+### Minor Changes
+
+- de647705: Optimize Dockerfiles for caching layers
+
+### Patch Changes
+
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-webpack-config@0.1.13
+  - @mds-core/mds-config-service@0.4.10
+
 ## 0.5.1
 
 ### Patch Changes

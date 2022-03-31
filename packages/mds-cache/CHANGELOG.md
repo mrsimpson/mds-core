@@ -1,5 +1,14 @@
 # @mds-core/mds-cache
 
+## 0.0.36
+
+### Patch Changes
+
+- c9759b66: Resolve linter warnings
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-utils@0.5.1
+
 ## 0.0.35
 
 ### Patch Changes

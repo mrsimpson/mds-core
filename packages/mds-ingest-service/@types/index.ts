@@ -14,22 +14,30 @@
  * limitations under the License.
  */
 
-import type { DomainModelCreate, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import type { RpcEmptyRequestContext, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { RpcRoute } from '@mds-core/mds-rpc-common'
 import type {
-  ACCESSIBILITY_OPTION,
-  MODALITY,
   Nullable,
   PROPULSION_TYPE,
-  TelemetryData,
   Timestamp,
-  TRIP_STATE,
   UUID,
   VEHICLE_EVENT,
   VEHICLE_STATE,
   VEHICLE_TYPE
 } from '@mds-core/mds-types'
+import type {
+  DeviceDomainModel,
+  EventAnnotationDomainCreateModel,
+  EventAnnotationDomainModel,
+  EventDomainCreateModel,
+  EventDomainModel,
+  EventWithDeviceAndTelemetryInfoDomainModel,
+  GROUPING_TYPE,
+  H3_RESOLUTIONS,
+  TelemetryAnnotationDomainCreateModel,
+  TelemetryAnnotationDomainModel,
+  TelemetryDomainModel
+} from './models'
 
 type ResponseWithCursor<T extends {}> = T & {
   cursor: {
@@ -51,40 +59,6 @@ export interface GetDeviceOptions {
 export type GetDevicesResponse = ResponseWithCursor<{
   devices: DeviceDomainModel[]
 }>
-
-export interface DeviceDomainModel extends RecordedColumn {
-  device_id: UUID
-  provider_id: UUID
-  vehicle_id: string
-  vehicle_type: VEHICLE_TYPE
-  propulsion_types: PROPULSION_TYPE[]
-
-  year: Nullable<number>
-  mfgr: Nullable<string>
-  model: Nullable<string>
-  accessibility_options: Nullable<ACCESSIBILITY_OPTION[]>
-  modality: MODALITY
-}
-
-export type DeviceDomainCreateModel = DomainModelCreate<Omit<DeviceDomainModel, keyof RecordedColumn>>
-
-export type GpsData = Omit<TelemetryData, 'charge'>
-
-export interface TelemetryDomainModel extends RecordedColumn {
-  device_id: UUID
-  provider_id: UUID
-  timestamp: Timestamp
-  gps: GpsData
-  charge: Nullable<number>
-  stop_id: Nullable<UUID>
-}
-
-export type TelemetryDomainCreateModel = DomainModelCreate<Omit<TelemetryDomainModel, keyof RecordedColumn | 'gps'>> & {
-  gps: DomainModelCreate<GpsData>
-}
-
-export const GROUPING_TYPES = ['latest_per_vehicle', 'latest_per_trip', 'all_events'] as const
-export type GROUPING_TYPE = typeof GROUPING_TYPES[number]
 
 export type TimeRange = {
   start: Timestamp
@@ -138,97 +112,6 @@ export interface ReadDeviceEventsQueryParams {
   end_time?: number | string
   provider_id?: UUID
 }
-
-export interface EventDomainModel extends RecordedColumn {
-  device_id: UUID
-  provider_id: UUID
-  timestamp: Timestamp
-  event_types: VEHICLE_EVENT[]
-  vehicle_state: VEHICLE_STATE
-  trip_state: Nullable<TRIP_STATE>
-
-  telemetry_timestamp: Timestamp
-  telemetry: TelemetryDomainModel
-  annotation: Nullable<EventAnnotationDomainModel>
-  trip_id: Nullable<UUID>
-}
-
-export type EventDomainCreateModel = DomainModelCreate<
-  Omit<EventDomainModel, keyof RecordedColumn | 'telemetry' | 'telemetry_timestamp'>
-> & {
-  telemetry: TelemetryDomainCreateModel
-}
-
-export type MigratedEventDomainModel = Omit<EventDomainModel & IdentityColumn, 'telemetry' | 'annotation'>
-
-/**
- * Labels which can be used to annotate events.
- */
-export interface DeviceLabel {
-  vehicle_id: string
-  vehicle_type: VEHICLE_TYPE
-  propulsion_types: PROPULSION_TYPE[]
-}
-
-export interface GeographyLabel {
-  geography_type: Nullable<string>
-  geography_id: UUID
-}
-
-export interface GeographiesLabel {
-  geographies: Array<GeographyLabel>
-}
-
-interface FlatGeographiesLabel {
-  geography_ids: UUID[]
-  geography_types: (string | null)[]
-}
-
-export interface LatencyLabel {
-  latency_ms: Timestamp
-}
-
-export interface TelemetryLabel {
-  telemetry_timestamp: Timestamp
-  telemetry_gps_lat: number
-  telemetry_gps_lng: number
-  telemetry_gps_altitude: Nullable<number>
-  telemetry_gps_heading: Nullable<number>
-  telemetry_gps_speed: Nullable<number>
-  telemetry_gps_accuracy: Nullable<number>
-  telemetry_charge: Nullable<number>
-}
-
-export interface TelemetryAnnotationDomainModel {
-  device_id: UUID
-  provider_id: UUID
-  timestamp: Timestamp
-  h3_08: string
-  h3_09: string
-  h3_10: string
-  h3_11: string
-  h3_12: string
-  h3_13: string
-  telemetry_row_id: number
-  geography_ids: UUID[]
-}
-
-export type TelemetryAnnotationDomainCreateModel = TelemetryAnnotationDomainModel
-
-/**
- * An object to persist the above (non-telemetry) event labels,
- * joinable to EventDomainModels by device_id + timestamp. Can
- * also join by events_row_id.
- */
-export interface EventAnnotationDomainModel extends DeviceLabel, FlatGeographiesLabel, LatencyLabel, RecordedColumn {
-  device_id: UUID
-  timestamp: Timestamp
-}
-
-export type EventAnnotationDomainCreateModel = DomainModelCreate<
-  Omit<EventAnnotationDomainModel, keyof RecordedColumn>
-> & { events_row_id: number }
-
 export type GetEventsWithDeviceAndTelemetryInfoOptions = Partial<{
   limit: number
   follow: boolean
@@ -237,15 +120,20 @@ export type GetEventsWithDeviceAndTelemetryInfoOptions = Partial<{
   device_ids: UUID[]
 }>
 
-export type EventWithDeviceAndTelemetryInfoDomainModel = Omit<EventDomainModel, 'annotation'> & {
-  device: DeviceDomainModel
-  telemetry: TelemetryDomainModel
-}
-
 export type GetEventsWithDeviceAndTelemetryInfoResponse = ResponseWithCursor<{
   events: EventWithDeviceAndTelemetryInfoDomainModel[]
 }>
 
+export type GetH3BinOptions = {
+  k: number
+  h3_resolution: H3_RESOLUTIONS
+} & TimeRange
+
+export interface H3Bin {
+  count: number
+  h3_identifier: string
+  provider_id: UUID
+}
 export interface IngestService {
   getDevicesUsingOptions: (options: GetDevicesOptions) => GetDevicesResponse
   getDevice: (options: GetDeviceOptions) => DeviceDomainModel | undefined
@@ -259,6 +147,7 @@ export interface IngestService {
   writeTelemetryAnnotations: (
     telemetryAnnotations: TelemetryAnnotationDomainCreateModel[]
   ) => TelemetryAnnotationDomainModel[]
+  getH3Bins: (params: GetH3BinOptions) => H3Bin[]
   /**
    * Gets all trip-related events grouped by trip_id, with an optional time_range.
    * When a time_range is supplied, all trip_ids within that time_range will be considered,
@@ -287,6 +176,7 @@ export const IngestServiceDefinition: RpcServiceDefinition<IngestService> = {
   writeEvents: RpcRoute<IngestService['writeEvents']>(),
   writeEventAnnotations: RpcRoute<IngestService['writeEventAnnotations']>(),
   writeTelemetryAnnotations: RpcRoute<IngestService['writeTelemetryAnnotations']>(),
+  getH3Bins: RpcRoute<IngestService['getH3Bins']>(),
   getTripEvents: RpcRoute<IngestService['getTripEvents']>(),
   getEventsWithDeviceAndTelemetryInfoUsingOptions:
     RpcRoute<IngestService['getEventsWithDeviceAndTelemetryInfoUsingOptions']>(),
@@ -296,3 +186,4 @@ export const IngestServiceDefinition: RpcServiceDefinition<IngestService> = {
 }
 
 export type IngestServiceRequestContext = RpcEmptyRequestContext
+export * from './models'

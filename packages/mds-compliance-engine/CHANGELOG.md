@@ -1,5 +1,26 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.25
+
+### Patch Changes
+
+- c9759b66: Resolve linter warnings
+- Updated dependencies [a24824a4]
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+- Updated dependencies [1e32c275]
+  - @mds-core/mds-ingest-service@0.10.11
+  - @mds-core/mds-stream@0.3.2
+  - @mds-core/mds-utils@0.5.1
+  - @mds-core/mds-api-server@0.4.12
+  - @mds-core/mds-compliance-service@0.10.32
+  - @mds-core/mds-geography-service@0.10.23
+  - @mds-core/mds-policy-service@0.12.0
+  - @mds-core/mds-schema-validators@0.5.11
+  - @mds-core/mds-db@0.6.18
+  - @mds-core/mds-api-helpers@0.2.26
+  - @mds-core/mds-service-helpers@0.6.9
+
 ## 0.8.24
 
 ### Patch Changes

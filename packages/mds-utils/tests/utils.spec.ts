@@ -54,23 +54,6 @@ describe('Tests Utilities', () => {
       const expected = arr
       expect(actual).toStrictEqual(expected)
     })
-
-    // Can't seem to get TS to go along with Sinon.spy()
-    // See https://sinonjs.org/releases/latest/spies/
-
-    // it('Calls logger.warn', () => {
-    //   const spy = Sinon.spy(logger.warn)
-    //   const oldLogWarn = logger.warn
-    //   logger.warn = spy
-
-    //   const arr = [1, 2, null, 3, undefined, 4]
-    //   const actual = arr.filter(filterDefined())
-    //   const expected = [1, 2, 3, 4]
-    //   assert.deepStrictEqual(actual, expected)
-    //   assert.equal(spy.calledTwice, true)
-    //   Sinon.restore()
-    //   logger.warn = oldLogWarn
-    // })
   })
 
   describe('Normalize to array', () => {

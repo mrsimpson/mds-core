@@ -1,5 +1,14 @@
 # @mds-core/mds-schema-validators
 
+## 0.5.11
+
+### Patch Changes
+
+- c9759b66: Resolve linter warnings
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-utils@0.5.1
+
 ## 0.5.10
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # @container-images/mds-ingest-service
 
+## 0.2.0
+
+### Minor Changes
+
+- de647705: Optimize Dockerfiles for caching layers
+
+### Patch Changes
+
+- Updated dependencies [a24824a4]
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-ingest-service@0.10.11
+  - @mds-core/mds-webpack-config@0.1.13
+
 ## 0.1.1
 
 ### Patch Changes

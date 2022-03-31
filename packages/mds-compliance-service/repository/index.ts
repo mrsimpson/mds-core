@@ -71,7 +71,7 @@ export const ComplianceRepository = ReadWriteRepository.Create(
   repository => {
     return {
       getComplianceSnapshot: async (options: GetComplianceSnapshotOptions): Promise<ComplianceSnapshotDomainModel> => {
-        // TODO look for cleaner solution
+        // TODO: look for cleaner solution
         const isComplianceIdOption = (option: unknown): option is { compliance_snapshot_id: UUID } =>
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (option as any).compliance_snapshot_id
@@ -308,7 +308,7 @@ export const ComplianceRepository = ReadWriteRepository.Create(
       getComplianceViolation: async (
         options: GetComplianceViolationOptions
       ): Promise<ComplianceViolationDomainModel> => {
-        // TODO look for cleaner solution
+        // TODO: look for cleaner solution
         const isViolationIdOption = (option: unknown): option is { violation_id: UUID } =>
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (option as any).violation_id

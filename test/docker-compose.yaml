@@ -1,0 +1,21 @@
+---
+# yamllint disable rule:line-length
+version: "3.7"
+
+services:
+  postgres:
+    image: bitnami/postgresql:13
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./db-init-scripts:/docker-entrypoint-initdb.d
+
+  redis:
+    image: "redis:alpine"
+    command: redis-server
+    ports:
+     - "6379:6379"
+    environment:
+     - REDIS_REPLICATION_MODE=master

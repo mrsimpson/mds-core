@@ -1,5 +1,19 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.35
+
+### Patch Changes
+
+- c9759b66: Resolve linter warnings
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-utils@0.5.1
+  - @mds-core/mds-api-server@0.4.12
+  - @mds-core/mds-schema-validators@0.5.11
+  - @mds-core/mds-transaction-service@0.6.26
+  - @mds-core/mds-api-helpers@0.2.26
+  - @mds-core/mds-service-helpers@0.6.9
+
 ## 0.2.34
 
 ### Patch Changes

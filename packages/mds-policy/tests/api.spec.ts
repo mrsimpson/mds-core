@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-// eslint directives:
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable promise/prefer-await-to-callbacks */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-useless-concat */
-/* eslint-disable prefer-destructuring */
-
 import { ApiServer } from '@mds-core/mds-api-server'
 import { GeographyServiceManager } from '@mds-core/mds-geography-service'
 import { GeographyFactory, writePublishedGeography } from '@mds-core/mds-geography-service/tests/helpers'
@@ -56,19 +49,17 @@ import { POLICY_API_DEFAULT_VERSION } from '../types'
 const TEST1_PROVIDER_ID = uuid()
 stream.mockStream(PolicyStreamKafka)
 
-/* eslint-disable-next-line @typescript-eslint/no-var-requires */
-
 /* eslint-disable-next-line no-console */
 const log = console.log.bind(console)
 
 const request = supertest(ApiServer(api))
 
 const ACTIVE_POLICY_JSON = clone(POLICY_JSON)
-ACTIVE_POLICY_JSON.publish_date = yesterday()
+ACTIVE_POLICY_JSON.published_date = yesterday()
 ACTIVE_POLICY_JSON.start_date = yesterday()
 
 const ACTIVE_MONTH_OLD_POLICY_JSON = clone(POLICY2_JSON)
-ACTIVE_MONTH_OLD_POLICY_JSON.publish_date = START_ONE_MONTH_FROM_NOW
+ACTIVE_MONTH_OLD_POLICY_JSON.published_date = START_ONE_MONTH_FROM_NOW
 const APP_JSON = 'application/vnd.mds.policy+json; charset=utf-8; version=1.0'
 
 const AUTH = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}|${PROVIDER_SCOPES}`).toString('base64')}`
@@ -85,7 +76,7 @@ const createPolicyAndGeographyFactory = async (policy?: PolicyDomainCreateModel,
   await writePublishedGeography(
     GeographyFactory({
       name: 'VENICE',
-      geography_id: createdPolicy.rules[0].geographies[0],
+      geography_id: createdPolicy.rules[0]?.geographies[0],
       geography_json: venice,
       ...geography_overrides
     })
@@ -196,7 +187,7 @@ describe('Tests app', () => {
     // future policy
     await createPublishedPolicy(PolicyFactory({ start_date: START_ONE_MONTH_FROM_NOW }))
     // current policy
-    await createPublishedPolicy(PolicyFactory({ publish_date: yesterday(), start_date: yesterday() }))
+    await createPublishedPolicy(PolicyFactory({ published_date: yesterday(), start_date: yesterday() }))
 
     const result = await request
       .get(pathPrefix(`/policies?end_date=${now() + days(365)}`))

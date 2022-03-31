@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable promise/prefer-await-to-callbacks */
-
 import { pathPrefix } from '@mds-core/mds-utils'
 import HttpStatus from 'http-status-codes'
 import supertest from 'supertest'

@@ -42,7 +42,7 @@ export const POLICY_JSON: PolicyDomainModel = {
   policy_id: POLICY_UUID,
   start_date: START_TOMORROW,
   end_date: null,
-  publish_date: START_NOW,
+  published_date: START_NOW,
   prev_policies: null,
   currency: null,
   provider_ids: [],
@@ -70,7 +70,7 @@ export const SUPERSEDING_POLICY_JSON: PolicyDomainModel = {
   prev_policies: [POLICY_UUID],
   provider_ids: [],
   currency: null,
-  publish_date: null,
+  published_date: null,
   rules: [
     {
       rule_type: 'count',
@@ -95,7 +95,7 @@ export const POLICY2_JSON: PolicyDomainModel = {
   end_date: START_ONE_WEEK_AGO,
   prev_policies: null,
   currency: null,
-  publish_date: null,
+  published_date: null,
   provider_ids: [],
   rules: [
     {
@@ -131,7 +131,7 @@ export const POLICY3_JSON: PolicyDomainModel = {
   end_date: null,
   prev_policies: null,
   currency: null,
-  publish_date: null,
+  published_date: null,
   provider_ids: [],
   rules: [
     {
@@ -174,7 +174,7 @@ export const POLICY4_JSON: PolicyDomainModel = {
   prev_policies: null,
   provider_ids: [],
   currency: null,
-  publish_date: null,
+  published_date: null,
   rules: [
     {
       name: 'Greater LA',
@@ -197,7 +197,7 @@ export const POLICY5_JSON: PolicyDomainModel = {
   end_date: null,
   prev_policies: null,
   currency: null,
-  publish_date: null,
+  published_date: null,
   provider_ids: [],
   rules: [
     {
@@ -213,15 +213,15 @@ export const POLICY5_JSON: PolicyDomainModel = {
   ]
 }
 
-export const PUBLISH_DATE_VALIDATION_JSON: PolicyDomainModel = {
+export const PUBLISHED_DATE_VALIDATION_JSON: PolicyDomainModel = {
   policy_id: '682ab342-0127-4eed-8c26-fb674c25af74',
   name: 'Future MDSPolicy',
-  description: 'just here to help show that publish_date must be before start_date',
+  description: 'just here to help show that published_date must be before start_date',
   start_date: START_ONE_MONTH_AGO,
   end_date: null,
   prev_policies: null,
   currency: null,
-  publish_date: null,
+  published_date: null,
   provider_ids: [],
   rules: [
     {
@@ -266,7 +266,7 @@ export const POLICY_WITH_DUPE_RULE: PolicyDomainModel = {
   end_date: null,
   prev_policies: null,
   currency: null,
-  publish_date: null,
+  published_date: null,
   provider_ids: [],
   rules: [
     {
@@ -287,7 +287,7 @@ export const PUBLISHED_POLICY: PolicyDomainModel = {
   name: 'I am published but do not do much',
   description: 'LADOT Pilot Speed Limit Limitations',
   start_date: START_ONE_MONTH_AGO,
-  publish_date: START_ONE_MONTH_AGO,
+  published_date: START_ONE_MONTH_AGO,
   currency: null,
   end_date: null,
   prev_policies: null,
@@ -315,7 +315,7 @@ export const DELETEABLE_POLICY: PolicyDomainModel = {
   prev_policies: null,
   provider_ids: [],
   currency: null,
-  publish_date: null,
+  published_date: null,
   rules: [
     {
       name: 'Greater LA',
@@ -336,7 +336,7 @@ export const TAXI_POLICY: PolicyDomainModel = {
   policy_id: uuid(),
   start_date: START_TOMORROW,
   end_date: null,
-  publish_date: START_NOW,
+  published_date: START_NOW,
   prev_policies: null,
   currency: null,
   provider_ids: [],

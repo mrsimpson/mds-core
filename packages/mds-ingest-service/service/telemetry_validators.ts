@@ -17,11 +17,13 @@
 import type { Schema } from '@mds-core/mds-schema-validators'
 import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import type {
+  GetH3BinOptions,
   TelemetryAnnotationDomainCreateModel,
   TelemetryAnnotationDomainModel,
   TelemetryDomainCreateModel,
   TelemetryDomainModel
 } from '../@types'
+import { H3_RESOLUTIONS, K_HOURLY } from '../@types'
 import { nullableFloat, nullableInteger, timestampSchema, uuidSchema } from './util_schemas'
 
 export const telemetryDomainCreateModelSchema: Schema<TelemetryDomainCreateModel> = <const>{
@@ -112,3 +114,17 @@ export const { validate: validateTelemetryAnnotationDomainCreateModel, $schema: 
 
 export const { validate: validateTelemetryAnnotationDomainModel, $schema: TelemetryAnnotationSchema } =
   SchemaValidator<TelemetryAnnotationDomainModel>(telemetryAnnotationDomainModelSchema(), { useDefaults: true })
+
+export const getH3BinsOptionsSchema: Schema<GetH3BinOptions> = <const>{
+  type: 'object',
+  properties: {
+    k: { type: 'integer', minimum: 2, default: K_HOURLY },
+    h3_resolution: { type: 'string', enum: H3_RESOLUTIONS },
+    start: timestampSchema,
+    end: timestampSchema
+  },
+  required: ['k', 'h3_resolution', 'start', 'end']
+}
+
+export const { validate: validateGetH3BinsOptions, $schema: GetH3BinsOptionsSchema } =
+  SchemaValidator<GetH3BinOptions>(getH3BinsOptionsSchema)

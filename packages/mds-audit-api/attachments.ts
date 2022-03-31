@@ -19,7 +19,7 @@ import db from '@mds-core/mds-db'
 import type { Attachment, AttachmentSummary, AuditAttachment, Recorded, UUID } from '@mds-core/mds-types'
 import { AuditApiLogger } from './logger'
 
-/* eslint-disable-next-line */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const multer = require('multer')
 const memoryStorage = multer.memoryStorage()
 

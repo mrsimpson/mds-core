@@ -22,7 +22,6 @@ import type { StreamProducer } from '@mds-core/mds-stream'
 import stream from '@mds-core/mds-stream'
 import type { Nullable } from '@mds-core/mds-types'
 import { getEnvVar, isUUID, pluralize, ServerError } from '@mds-core/mds-utils'
-import type { ErrorObject } from 'ajv'
 import type { CollectorService, CollectorServiceRequestContext } from '../@types'
 import { CollectorServiceLogger } from '../logger'
 import { CollectorRepository } from '../repository'
@@ -113,17 +112,18 @@ export const CollectorServiceProvider: ServiceProvider<CollectorService, Collect
     try {
       const [validator, producer] = await Promise.all([getSchemaValidator(schema_id), getStreamProducer(schema_id)])
 
-      const invalid = messages.reduce<{ position: number; errors: Partial<ErrorObject>[] }[]>(
-        (failures, message, position) => {
-          try {
-            validator.validate(message)
-            return failures
-          } catch (errors: any) {
+      const invalid = messages.reduce<{ position: number; errors: unknown[] }[]>((failures, message, position) => {
+        try {
+          validator.validate(message)
+          return failures
+        } catch (errors) {
+          if (Array.isArray(errors)) {
             return failures.concat({ position, errors })
           }
-        },
-        []
-      )
+
+          return failures.concat({ position, errors: [errors] })
+        }
+      }, [])
 
       if (invalid.length > 0) {
         return ServiceError({

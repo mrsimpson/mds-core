@@ -41,7 +41,7 @@ const SPEED_POLICY: SpeedPolicy = {
   prev_policies: null,
   provider_ids: [],
   currency: null,
-  publish_date: null,
+  published_date: null,
   rules: [
     {
       name: 'Greater LA',
@@ -116,7 +116,6 @@ describe('Tests Compliance Engine Speed Violations', () => {
     // Note that for speed rule matches, `rule_applied` is never null.
     const speedingCount = result.vehicles_found.reduce((count: number, vehicle: MatchedVehicleInformation) => {
       if (vehicle.rule_applied === rule_id && vehicle.rules_matched.includes(rule_id)) {
-        // eslint-disable-next-line no-param-reassign
         count += 1
       }
       return count
@@ -164,7 +163,6 @@ describe('Tests Compliance Engine Speed Violations', () => {
         vehicle.rules_matched.length === 2 &&
         vehicle.speed === 500
       ) {
-        // eslint-disable-next-line no-param-reassign
         count += 1
       }
       return count
@@ -178,7 +176,6 @@ describe('Tests Compliance Engine Speed Violations', () => {
         vehicle.rules_matched.length === 1 &&
         vehicle.speed === 100
       ) {
-        // eslint-disable-next-line no-param-reassign
         count += 1
       }
       return count

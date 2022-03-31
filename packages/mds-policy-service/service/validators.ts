@@ -196,7 +196,7 @@ export const {
       start_date: timestampSchema,
       end_date: { ...timestampSchema, nullable: true, default: null },
       prev_policies: { type: 'array', items: uuidSchema, nullable: true, default: null },
-      publish_date: { ...timestampSchema, nullable: true, default: null },
+      published_date: { ...timestampSchema, nullable: true, default: null },
       rules: {
         type: 'array',
         items: ruleSchema

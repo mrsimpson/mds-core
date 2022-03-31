@@ -19,11 +19,13 @@ import { CreatePolicyMetadataTable1603045629619 } from './1603045629619-CreatePo
 import { AddSupersededByColumnToPoliciesTable1629221239968 } from './1629221239968-AddSupersededByColumnToPoliciesTable'
 import { AddColumnsToPoliciesTable1634142716521 } from './1634142716521-AddColumnsToPoliciesTable'
 import { AddSupersededAtColumn1646685180039 } from './1646685180039-AddSupersededAtColumn'
+import { RenamePublishDateToPublishedDate1648742662434 } from './1648742662434-RenamePublishDateToPublishedDate'
 
 export default [
   CreatePoliciesTable1603045382246,
   CreatePolicyMetadataTable1603045629619,
   AddSupersededByColumnToPoliciesTable1629221239968,
   AddColumnsToPoliciesTable1634142716521,
-  AddSupersededAtColumn1646685180039
+  AddSupersededAtColumn1646685180039,
+  RenamePublishDateToPublishedDate1648742662434
 ]

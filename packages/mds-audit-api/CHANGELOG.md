@@ -1,5 +1,25 @@
 # @mds-core/mds-audit-api
 
+## 0.4.4
+
+### Patch Changes
+
+- 455b9852: remove referneces to sinon
+- c9759b66: Resolve linter warnings
+- Updated dependencies [a24824a4]
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-ingest-service@0.10.11
+  - @mds-core/mds-utils@0.5.1
+  - @mds-core/mds-agency-cache@0.4.24
+  - @mds-core/mds-api-server@0.4.12
+  - @mds-core/mds-attachment-service@0.5.27
+  - @mds-core/mds-schema-validators@0.5.11
+  - @mds-core/mds-db@0.6.18
+  - @mds-core/mds-api-helpers@0.2.26
+  - @mds-core/mds-audit-service@0.6.4
+  - @mds-core/mds-service-helpers@0.6.9
+
 ## 0.4.3
 
 ### Patch Changes

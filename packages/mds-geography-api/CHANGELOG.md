@@ -1,5 +1,18 @@
 # @mds-core/mds-geography-api
 
+## 0.4.26
+
+### Patch Changes
+
+- c9759b66: Resolve linter warnings
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-utils@0.5.1
+  - @mds-core/mds-api-server@0.4.12
+  - @mds-core/mds-geography-service@0.10.23
+  - @mds-core/mds-schema-validators@0.5.11
+  - @mds-core/mds-api-helpers@0.2.26
+
 ## 0.4.25
 
 ### Patch Changes

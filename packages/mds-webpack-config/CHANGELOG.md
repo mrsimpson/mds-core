@@ -1,5 +1,11 @@
 # @mds-core/mds-webpack-config
 
+## 0.1.13
+
+### Patch Changes
+
+- c9759b66: Resolve linter warnings
+
 ## 0.1.12
 
 ### Patch Changes

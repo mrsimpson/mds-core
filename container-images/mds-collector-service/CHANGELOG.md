@@ -1,5 +1,17 @@
 # @container-images/mds-collector-service
 
+## 0.2.0
+
+### Minor Changes
+
+- de647705: Optimize Dockerfiles for caching layers
+
+### Patch Changes
+
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-collector-service@0.4.27
+  - @mds-core/mds-webpack-config@0.1.13
+
 ## 0.1.1
 
 ### Patch Changes

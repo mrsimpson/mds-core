@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-collector-api",
-  "version": "0.1.72",
+  "version": "0.1.73",
   "description": "Mobility Data Specification Collector API",
   "keywords": [
     "mds"
@@ -13,27 +13,27 @@
   ],
   "scripts": {
     "_build": "tsc --build tsconfig.build.json",
-    "_test": "PATH_PREFIX=/collector DOTENV_CONFIG_PATH=../../.env jest --runInBand",
+    "_test": "PATH_PREFIX=/collector jest --runInBand",
     "build": "pnpm _build",
     "start": "PATH_PREFIX=/collector pnpm watch server",
     "test": "pnpm _test",
-    "ts-node": "pnpm build && DOTENV_CONFIG_PATH=../../.env ts-node -r dotenv/config",
+    "ts-node": "pnpm build && ts-node -r ../../dotenv-flow.js",
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-helpers": "workspace:0.2.25",
-    "@mds-core/mds-api-server": "workspace:0.4.11",
-    "@mds-core/mds-collector-service": "workspace:0.4.26",
+    "@mds-core/mds-api-helpers": "workspace:0.2.26",
+    "@mds-core/mds-api-server": "workspace:0.4.12",
+    "@mds-core/mds-collector-service": "workspace:0.4.27",
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-service-helpers": "workspace:0.6.8",
+    "@mds-core/mds-service-helpers": "workspace:0.6.9",
     "@mds-core/mds-types": "workspace:0.9.2",
-    "@mds-core/mds-utils": "workspace:0.5.0",
+    "@mds-core/mds-utils": "workspace:0.5.1",
     "@types/express": "4.17.13",
     "express": "4.17.1",
     "http-status-codes": "2.1.4"
   },
   "devDependencies": {
-    "@mds-core/mds-schema-validators": "workspace:0.5.10"
+    "@mds-core/mds-schema-validators": "workspace:0.5.11"
   },
   "publishConfig": {
     "main": "dist/index.js"
