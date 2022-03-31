@@ -1,5 +1,18 @@
 # @container-images/mds-policy-service
 
+## 0.2.0
+
+### Minor Changes
+
+- de647705: Optimize Dockerfiles for caching layers
+
+### Patch Changes
+
+- Updated dependencies [c9759b66]
+- Updated dependencies [1e32c275]
+  - @mds-core/mds-policy-service@0.12.0
+  - @mds-core/mds-webpack-config@0.1.13
+
 ## 0.1.1
 
 ### Patch Changes

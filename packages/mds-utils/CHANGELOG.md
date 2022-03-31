@@ -1,5 +1,12 @@
 # @mds-core/mds-utils
 
+## 0.5.1
+
+### Patch Changes
+
+- 455b9852: remove referneces to sinon
+- c9759b66: Resolve linter warnings
+
 ## 0.5.0
 
 ### Minor Changes

@@ -1,5 +1,15 @@
 # @mds-core/mds-test-data
 
+## 0.4.29
+
+### Patch Changes
+
+- Updated dependencies [a24824a4]
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-ingest-service@0.10.11
+  - @mds-core/mds-utils@0.5.1
+
 ## 0.4.28
 
 ### Patch Changes

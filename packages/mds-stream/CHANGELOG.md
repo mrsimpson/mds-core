@@ -1,5 +1,14 @@
 # @mds-core/mds-stream
 
+## 0.3.2
+
+### Patch Changes
+
+- 455b9852: remove referneces to sinon
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-utils@0.5.1
+
 ## 0.3.1
 
 ### Patch Changes

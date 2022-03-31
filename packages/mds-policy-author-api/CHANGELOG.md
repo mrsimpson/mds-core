@@ -1,5 +1,24 @@
 # @mds-core/mds-policy-author-api
 
+## 0.8.0
+
+### Minor Changes
+
+- 1e32c275: Rename MDS Policy publish_date -> published_date to conform with MDS 1.0 spec
+
+### Patch Changes
+
+- c9759b66: Resolve linter warnings
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+- Updated dependencies [1e32c275]
+  - @mds-core/mds-utils@0.5.1
+  - @mds-core/mds-api-server@0.4.12
+  - @mds-core/mds-policy-service@0.12.0
+  - @mds-core/mds-schema-validators@0.5.11
+  - @mds-core/mds-api-helpers@0.2.26
+  - @mds-core/mds-service-helpers@0.6.9
+
 ## 0.7.34
 
 ### Patch Changes

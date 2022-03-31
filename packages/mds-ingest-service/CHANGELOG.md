@@ -1,5 +1,21 @@
 # @mds-core/mds-ingest-service
 
+## 0.10.11
+
+### Patch Changes
+
+- a24824a4: Adding `.getH3Bins`
+- 455b9852: remove referneces to sinon
+- c9759b66: Resolve linter warnings
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-stream@0.3.2
+  - @mds-core/mds-utils@0.5.1
+  - @mds-core/mds-rpc-common@0.3.20
+  - @mds-core/mds-schema-validators@0.5.11
+  - @mds-core/mds-repository@0.2.1
+  - @mds-core/mds-service-helpers@0.6.9
+
 ## 0.10.10
 
 ### Patch Changes

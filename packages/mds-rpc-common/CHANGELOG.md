@@ -1,5 +1,17 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.20
+
+### Patch Changes
+
+- c9759b66: Resolve linter warnings
+- Updated dependencies [455b9852]
+- Updated dependencies [c9759b66]
+  - @mds-core/mds-utils@0.5.1
+  - @mds-core/mds-api-server@0.4.12
+  - @mds-core/mds-api-authorizer@0.1.66
+  - @mds-core/mds-service-helpers@0.6.9
+
 ## 0.3.19
 
 ### Patch Changes
