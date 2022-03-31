@@ -1,0 +1,140 @@
+---
+# yamllint disable rule:line-length
+openapi: 3.0.3
+info:
+  title: MDS Geography API
+  description: This specification contains a collection of RESTful APIs used to read Geographies (descriptions of geographical information, e.g. multi-polygons, currently represented via GeoJSON).
+  version: "1.0"
+  contact:
+    url: https://github.com/openmobilityfoundation/mobility-data-specification/tree/main/geography
+
+paths:
+  /geographies:
+    get:
+      operationId: getGeographies
+      description: Get list of geographies
+      tags:
+        - Geography
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeographiesReadResult"
+
+  /geographies/{geographyId}:
+    get:
+      operationId: getGeography
+      description: Get a single geography
+      parameters:
+        - $ref: "#/components/schemas/uuid"
+      tags:
+        - Geography
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeographiesReadResult"
+components:
+  schemas:
+    geography:
+      type: object
+      title: The geography object schema
+      additionalProperties: false
+      required:
+        - name
+        - geography_id
+        - geography_json
+        - published_date
+      properties:
+        name:
+          $ref: '#/components/schemas/string'
+          description: Name of geography
+        description:
+          $ref: '#/components/schemas/string'
+          description: Description of geography
+        geography_id:
+          $ref: '#/components/schemas/uuid'
+          description: Unique ID of geography
+        geography_json:
+          $ref: https://geojson.org/schema/FeatureCollection.json
+          description: The GeoJSON FeatureCollection that defines the geographical coordinates
+        effective_date:
+          $ref: '#/components/schemas/nullable_timestamp'
+          description: The date at which a Geography is considered 'live'. Must be at or after published_date.
+        published_date:
+          $ref: '#/components/schemas/timestamp'
+          description: Timestamp at which the geography was published i.e. made immutable
+        retire_date:
+          $ref: '#/components/schemas/nullable_timestamp'
+          description: Time that the geography is slated to retire. Once the retire date is passed, new policies can no longer reference it and old policies referencing it should be updated. Retired geographies should continue to be returned in the geographies list. Must be after effective_date.
+        prev_geographies:
+          $ref: '#/components/schemas/nullable_uuid_array'
+          description: Unique IDs of prior geographies replaced by this one
+          uniqueItems: true
+    string:
+      type: string
+      description: A length-limited string type
+      maxLength: 255
+      default: ''
+      example:
+        - ABC123
+      pattern: ^(.*)$
+    timestamp:
+      type: number
+      description: Integer milliseconds since Unix epoch
+      multipleOf: 1
+      minimum: 1514764800000
+    uuid:
+      type: string
+      description: A UUID used to uniquely identifty an object
+      default: ''
+      example:
+        - 3c9604d6-b5ee-11e8-96f8-529269fb1459
+      pattern: ^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$
+    version:
+      type: string
+      description: The version of MDS this data represents
+      example:
+        - 1.2.0
+      pattern: ^1\.2\.[0-9]+$
+    uuid_array:
+      type: array
+      description: Array of UUID
+      items:
+        $id: '#/components/schemas/uuid_array/items'
+        $ref: '#/components/schemas/uuid'
+    nullable_timestamp:
+      nullable: true
+      type: number
+      description: Integer milliseconds since Unix epoch
+      multipleOf: 1
+      minimum: 1514764800000
+    nullable_uuid_array:
+      nullable: true
+      type: array
+      description: Array of UUID
+      items:
+        $ref: '#/components/schemas/uuid'
+    GeographiesReadResult:
+      type: object
+      additionalProperties: false
+      required:
+        - version
+        - data
+      properties:
+        data:
+          type: object
+          properties:
+            geographies:
+              type: array
+              title: The array of policy objects in this payload
+              items:
+                $ref: '#/components/schemas/geography'
+        version:
+          $id: '#/properties/version'
+          $ref: '#/components/schemas/version'
+          description: The version of MDS that the geographies represents
