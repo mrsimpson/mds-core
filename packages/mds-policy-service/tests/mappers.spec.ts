@@ -10,15 +10,14 @@ describe('Tests Model Mappers', () => {
       policy_id,
       start_date: now() + days(1),
       end_date: null,
-      publish_date: null,
+      published_date: null,
       policy_json: {
         ...policy,
         currency: null,
         provider_ids: [],
         end_date: null,
         prev_policies: [],
-        start_date: now() + days(1),
-        publish_date: null
+        start_date: now() + days(1)
       },
       superseded_by: null,
       superseded_at: null,
@@ -37,15 +36,14 @@ describe('Tests Model Mappers', () => {
       policy_id,
       start_date: now() + days(1),
       end_date: null,
-      publish_date: yesterday(),
+      published_date: yesterday(),
       policy_json: {
         ...policy,
         currency: null,
         provider_ids: [],
         end_date: null,
         prev_policies: [],
-        start_date: now() + days(1),
-        publish_date: yesterday()
+        start_date: now() + days(1)
       },
       superseded_by: null,
       superseded_at: null,
@@ -65,15 +63,14 @@ describe('Tests Model Mappers', () => {
         policy_id,
         start_date: yesterday(),
         end_date: null,
-        publish_date: yesterday(),
+        published_date: yesterday(),
         policy_json: {
           ...policy,
           currency: null,
           provider_ids: [],
           end_date: null,
           prev_policies: [],
-          start_date: yesterday(),
-          publish_date: yesterday()
+          start_date: yesterday()
         },
         superseded_by: null,
         superseded_at: null,
@@ -93,15 +90,14 @@ describe('Tests Model Mappers', () => {
       policy_id,
       start_date: now() - days(2),
       end_date: now() - days(1),
-      publish_date: now() - days(2),
+      published_date: now() - days(2),
       policy_json: {
         ...policy,
         currency: null,
         provider_ids: [],
         end_date: now() - days(1),
         prev_policies: [],
-        start_date: now() - days(2),
-        publish_date: now() - days(2)
+        start_date: now() - days(2)
       },
       superseded_by: null,
       superseded_at: null,
@@ -120,15 +116,14 @@ describe('Tests Model Mappers', () => {
       policy_id,
       start_date: yesterday(),
       end_date: null,
-      publish_date: yesterday(),
+      published_date: yesterday(),
       policy_json: {
         ...policy,
         currency: null,
         provider_ids: [],
         end_date: null,
         prev_policies: [],
-        start_date: yesterday(),
-        publish_date: yesterday()
+        start_date: yesterday()
       },
       superseded_by: [uuid()],
       superseded_at: [now() - hours(1)],

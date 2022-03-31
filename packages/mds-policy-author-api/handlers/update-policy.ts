@@ -26,7 +26,8 @@ export const UpdatePolicyHandler = async (
 ) => {
   const updatePolicy = req.body
   try {
-    if (updatePolicy.publish_date) throw new ValidationError('publish_date cannot be set via policy editing endpoint')
+    if (updatePolicy.published_date)
+      throw new ValidationError('published_date cannot be set via policy editing endpoint')
     const policy = await PolicyServiceClient.editPolicy(updatePolicy)
     return res.status(200).send({ version: res.locals.version, data: { policy } })
   } catch (error) {

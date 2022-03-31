@@ -46,7 +46,7 @@
       "nullable": true,
       "default": null
     },
-    "publish_date": {
+    "published_date": {
       "type": "integer",
       "minimum": 100000000000,
       "maximum": 99999999999999,

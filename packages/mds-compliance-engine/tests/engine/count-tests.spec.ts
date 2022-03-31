@@ -334,7 +334,7 @@ describe('Tests Compliance Engine Count Functionality:', () => {
         description: 'LADOT Venice Drop-off/no-fly zones',
         policy_id: VENICE_POLICY_UUID,
         start_date: 1558389669540,
-        publish_date: 1558389669540,
+        published_date: 1558389669540,
         end_date: null,
         prev_policies: null,
         currency: null,

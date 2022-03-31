@@ -23,12 +23,12 @@ import type { PolicyDomainModel } from '../../@types'
 
 export interface PolicyEntityModel extends IdentityColumn {
   policy_id: PolicyDomainModel['policy_id']
-  policy_json: Omit<PolicyDomainModel, 'start_date' | 'end_date' | 'publish_date'>
+  policy_json: Omit<PolicyDomainModel, 'start_date' | 'end_date' | 'published_date'>
   superseded_by: Nullable<UUID[]>
   superseded_at: Nullable<Timestamp[]>
   start_date: Timestamp
   end_date: Nullable<Timestamp>
-  publish_date: Nullable<Timestamp>
+  published_date: Nullable<Timestamp>
 }
 
 @Entity('policies')
@@ -55,7 +55,7 @@ export class PolicyEntity extends IdentityColumn(class {}) implements PolicyEnti
 
   @Column('bigint', { transformer: BigintTransformer, nullable: true })
   @Index()
-  publish_date: Nullable<Timestamp>
+  published_date: Nullable<Timestamp>
 }
 
 export type PolicyEntityCreateModel = EntityCreateModel<PolicyEntityModel>

@@ -55,11 +55,11 @@ const log = console.log.bind(console)
 const request = supertest(ApiServer(api))
 
 const ACTIVE_POLICY_JSON = clone(POLICY_JSON)
-ACTIVE_POLICY_JSON.publish_date = yesterday()
+ACTIVE_POLICY_JSON.published_date = yesterday()
 ACTIVE_POLICY_JSON.start_date = yesterday()
 
 const ACTIVE_MONTH_OLD_POLICY_JSON = clone(POLICY2_JSON)
-ACTIVE_MONTH_OLD_POLICY_JSON.publish_date = START_ONE_MONTH_FROM_NOW
+ACTIVE_MONTH_OLD_POLICY_JSON.published_date = START_ONE_MONTH_FROM_NOW
 const APP_JSON = 'application/vnd.mds.policy+json; charset=utf-8; version=1.0'
 
 const AUTH = `basic ${Buffer.from(`${TEST1_PROVIDER_ID}|${PROVIDER_SCOPES}`).toString('base64')}`
@@ -187,7 +187,7 @@ describe('Tests app', () => {
     // future policy
     await createPublishedPolicy(PolicyFactory({ start_date: START_ONE_MONTH_FROM_NOW }))
     // current policy
-    await createPublishedPolicy(PolicyFactory({ publish_date: yesterday(), start_date: yesterday() }))
+    await createPublishedPolicy(PolicyFactory({ published_date: yesterday(), start_date: yesterday() }))
 
     const result = await request
       .get(pathPrefix(`/policies?end_date=${now() + days(365)}`))

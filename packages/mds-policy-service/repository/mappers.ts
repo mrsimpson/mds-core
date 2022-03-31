@@ -29,10 +29,10 @@ import type { PolicyMetadataEntityCreateModel, PolicyMetadataEntityModel } from 
 type PolicyEntityToDomainOptions = Partial<{ withStatus: boolean }>
 
 export const derivePolicyStatus = (policy: PolicyEntityModel): POLICY_STATUS => {
-  const { superseded_by, superseded_at, start_date, publish_date, end_date } = policy
+  const { superseded_by, superseded_at, start_date, published_date, end_date } = policy
   const currentTime = now()
 
-  if (publish_date === null) {
+  if (published_date === null) {
     return 'draft'
   }
 
@@ -49,11 +49,11 @@ export const derivePolicyStatus = (policy: PolicyEntityModel): POLICY_STATUS => 
     return 'expired'
   }
 
-  if (publish_date < currentTime && start_date > currentTime) {
+  if (published_date < currentTime && start_date > currentTime) {
     return 'pending'
   }
 
-  if (start_date < currentTime && publish_date < currentTime) {
+  if (start_date < currentTime && published_date < currentTime) {
     return 'active'
   }
 
@@ -81,7 +81,7 @@ export const PolicyEntityToDomain = ModelMapper<PolicyEntityModel, PolicyDomainM
 type PolicyEntityCreateOptions = Partial<{}>
 
 /**
- * publish_date is set to null if passed through this mapper
+ * published_date is set to null if passed through this mapper
  */
 export const PolicyDomainToEntityCreate = ModelMapper<
   PolicyDomainCreateModel,
@@ -95,7 +95,7 @@ export const PolicyDomainToEntityCreate = ModelMapper<
     superseded_by: null,
     superseded_at: null,
     end_date,
-    publish_date: null,
+    published_date: null,
     start_date,
     policy_json: {
       currency,

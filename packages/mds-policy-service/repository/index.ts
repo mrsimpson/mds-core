@@ -71,8 +71,8 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
 
     /** Turns statuses into expressions with params */
     const DELIMITER = ' AND '
-    const PUBLISHED = 'publish_date IS NOT NULL'
-    const NOT_PUBLISHED = 'publish_date IS NULL'
+    const PUBLISHED = 'published_date IS NOT NULL'
+    const NOT_PUBLISHED = 'published_date IS NULL'
     const START_DATE_IN_PAST = 'start_date IS NOT NULL AND start_date <= :now'
     const START_DATE_IN_FUTURE = 'start_date IS NOT NULL AND start_date > :now'
     const END_DATE_IN_PAST = 'end_date IS NOT NULL AND end_date <= :now'
@@ -242,7 +242,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
       if (!entity) {
         return false
       }
-      return Boolean(PolicyEntityToDomain.map(entity).publish_date)
+      return Boolean(PolicyEntityToDomain.map(entity).published_date)
     } catch (error) {
       if (error instanceof Error && error.name === 'EntityNotFoundError') {
         throw new NotFoundError(error)
@@ -350,7 +350,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
         throw new NotFoundError(`no policy of id ${policy_id} was found`)
       }
       await throwIfRulesAlreadyExist(policy)
-      const { start_date, end_date, publish_date } = policy
+      const { start_date, end_date, published_date } = policy
       try {
         const connection = await repository.connect('rw')
         const {
@@ -359,9 +359,9 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
           .getRepository(PolicyEntity)
           .createQueryBuilder()
           .update()
-          .set({ start_date, end_date, publish_date, policy_json: { ...policy } })
+          .set({ start_date, end_date, published_date, policy_json: { ...policy } })
           .where('policy_id = :policy_id', { policy_id })
-          .andWhere('publish_date IS NULL')
+          .andWhere('published_date IS NULL')
           .returning('*')
           .execute()
         return PolicyEntityToDomain.map(updated)
@@ -384,7 +384,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
           .createQueryBuilder()
           .delete()
           .where('policy_id = :policy_id', { policy_id })
-          .andWhere('publish_date IS NULL')
+          .andWhere('published_date IS NULL')
           .returning('*')
           .execute()
         return PolicyEntityToDomain.map(deleted).policy_id
@@ -396,7 +396,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
     /* Only publish the policy if the geographies are successfully published first */
     publishPolicy: async (
       policy_id: UUID,
-      publish_date = now(),
+      published_date = now(),
       options: { beforeCommit?: (pendingPolicy: PolicyDomainModel) => Promise<void> } = {}
     ) => {
       try {
@@ -414,7 +414,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
           throw new NotFoundError('cannot publish nonexistent policy')
         }
 
-        if (policy.start_date < publish_date) {
+        if (policy.start_date < published_date) {
           throw new ConflictError('Policies cannot be published after their start_date')
         }
 
@@ -427,9 +427,9 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
               .getRepository(PolicyEntity)
               .createQueryBuilder()
               .update()
-              .set({ publish_date })
+              .set({ published_date })
               .where('policy_id = :policy_id', { policy_id })
-              .andWhere('publish_date IS NULL')
+              .andWhere('published_date IS NULL')
               .returning('*')
               .execute()
             const mappedPolicy = PolicyEntityToDomain.map(updated)

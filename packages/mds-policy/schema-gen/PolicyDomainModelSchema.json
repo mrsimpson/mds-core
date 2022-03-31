@@ -42,7 +42,7 @@
       },
       "nullable": true
     },
-    "publish_date": {
+    "published_date": {
       "type": "integer",
       "minimum": 100000000000,
       "maximum": 99999999999999,
@@ -58,9 +58,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "wheelchair_accessible"
-              ]
+              "enum": ["wheelchair_accessible"]
             },
             "nullable": true
           },
@@ -68,15 +66,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "sun",
-                "mon",
-                "tue",
-                "wed",
-                "thu",
-                "fri",
-                "sat"
-              ]
+              "enum": ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
             },
             "nullable": true
           },
@@ -106,11 +96,7 @@
           },
           "modality": {
             "type": "string",
-            "enum": [
-              "micromobility",
-              "taxi",
-              "tnc"
-            ]
+            "enum": ["micromobility", "taxi", "tnc"]
           },
           "name": {
             "type": "string"
@@ -121,13 +107,7 @@
           },
           "rule_type": {
             "type": "string",
-            "enum": [
-              "count",
-              "speed",
-              "time",
-              "user",
-              "rate"
-            ]
+            "enum": ["count", "speed", "time", "user", "rate"]
           },
           "rule_units": {
             "type": "string"
@@ -144,11 +124,7 @@
               },
               {
                 "type": "string",
-                "enum": [
-                  "once",
-                  "each_time_unit",
-                  "per_complete_time_unit"
-                ]
+                "enum": ["once", "each_time_unit", "per_complete_time_unit"]
               }
             ]
           },
@@ -408,13 +384,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "car",
-                "bicycle",
-                "scooter",
-                "moped",
-                "other"
-              ]
+              "enum": ["car", "bicycle", "scooter", "moped", "other"]
             },
             "nullable": true
           },
@@ -422,11 +392,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "standard",
-                "shared",
-                "luxury"
-              ]
+              "enum": ["standard", "shared", "luxury"]
             },
             "nullable": true,
             "default": null
@@ -450,10 +416,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "pick_up",
-                "drop_off"
-              ]
+              "enum": ["pick_up", "drop_off"]
             },
             "nullable": true,
             "default": null
@@ -468,9 +431,7 @@
                   "const": "micromobility"
                 }
               },
-              "required": [
-                "modality"
-              ]
+              "required": ["modality"]
             },
             "then": {
               "properties": {
@@ -729,9 +690,7 @@
                   "const": "taxi"
                 }
               },
-              "required": [
-                "modality"
-              ]
+              "required": ["modality"]
             },
             "then": {
               "properties": {
@@ -976,9 +935,7 @@
                   "const": "tnc"
                 }
               },
-              "required": [
-                "modality"
-              ]
+              "required": ["modality"]
             },
             "then": {
               "properties": {
@@ -1160,13 +1117,7 @@
             }
           }
         ],
-        "required": [
-          "geographies",
-          "name",
-          "rule_id",
-          "rule_type",
-          "states"
-        ]
+        "required": ["geographies", "name", "rule_id", "rule_type", "states"]
       }
     }
   },
@@ -1194,17 +1145,9 @@
             "type": "string"
           }
         },
-        "required": [
-          "currency"
-        ]
+        "required": ["currency"]
       }
     }
   ],
-  "required": [
-    "policy_id",
-    "name",
-    "description",
-    "start_date",
-    "rules"
-  ]
+  "required": ["policy_id", "name", "description", "start_date", "rules"]
 }

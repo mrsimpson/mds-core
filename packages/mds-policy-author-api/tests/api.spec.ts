@@ -373,7 +373,7 @@ describe('Tests app', () => {
         .expect(StatusCodes.CONFLICT)
     })
 
-    it('cannot publish a policy if the start_date would precede the publish_date', async () => {
+    it('cannot publish a policy if the start_date would precede the published_date', async () => {
       const policy = await createPolicyAndGeographyFactory(PolicyFactory({ start_date: now() - days(30) }), now())
       const result = await request
         .post(pathPrefix(`/policies/${policy.policy_id}/publish`))
@@ -522,7 +522,7 @@ describe('Tests app', () => {
       expect(isUUID(result.body.data.policy.policy_id)).toBeTruthy()
     })
 
-    it('Cannot PUT a policy with publish_date set', async () => {
+    it('Cannot PUT a policy with published_date set', async () => {
       const policy = await createPublishedPolicy()
       const result = await request
         .put(pathPrefix(`/policies/${policy.policy_id}`))
@@ -530,11 +530,11 @@ describe('Tests app', () => {
         .send(policy)
         .expect(400)
       expect(result.body.error.name).toStrictEqual(`ValidationError`)
-      expect(result.body.error.reason.includes('publish_date')).toBeTruthy()
+      expect(result.body.error.reason.includes('published_date')).toBeTruthy()
       expect(result.headers).toHaveProperty('content-type', APP_JSON)
     })
 
-    it('Cannot POST a policy with publish_date set', async () => {
+    it('Cannot POST a policy with published_date set', async () => {
       const policy = await createPublishedPolicy()
       const result = await request
         .post(pathPrefix(`/policies`))
@@ -542,7 +542,7 @@ describe('Tests app', () => {
         .send(policy)
         .expect(400)
       expect(result.body.error.name).toStrictEqual(`ValidationError`)
-      expect(result.body.error.reason.includes('publish_date')).toBeTruthy()
+      expect(result.body.error.reason.includes('published_date')).toBeTruthy()
       expect(result.headers).toHaveProperty('content-type', APP_JSON)
     })
   })

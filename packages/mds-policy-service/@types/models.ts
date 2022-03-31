@@ -147,7 +147,7 @@ export interface PolicyDomainModel {
   end_date: Nullable<Timestamp>
   prev_policies: Nullable<UUID[]>
   rules: Rule[]
-  publish_date: Nullable<Timestamp>
+  published_date: Nullable<Timestamp>
   status?: POLICY_STATUS // Computed property which is returned from the service, not written on creation.
 }
 

@@ -31,7 +31,7 @@ export const COUNT_POLICY_JSON: Required<CountPolicy> = {
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: COUNT_POLICY_UUID,
   start_date: 1558389669540,
-  publish_date: 1558389669540,
+  published_date: 1558389669540,
   status: 'active',
   end_date: null,
   prev_policies: null,
@@ -57,7 +57,7 @@ export const COUNT_POLICY_JSON_2: CountPolicy = {
   policy_id: COUNT_POLICY_UUID_2,
   start_date: 1558389669540,
   end_date: null,
-  publish_date: 1558389669540,
+  published_date: 1558389669540,
   prev_policies: null,
   provider_ids: [],
   currency: null,
@@ -80,7 +80,7 @@ export const COUNT_POLICY_JSON_3: CountPolicy = {
   description: 'Mobility caps as described in the One-Year Permit',
   policy_id: COUNT_POLICY_UUID_3,
   start_date: 1558389669540,
-  publish_date: 1558389669540,
+  published_date: 1558389669540,
   end_date: null,
   prev_policies: null,
   provider_ids: [],
@@ -120,7 +120,7 @@ export const COUNT_POLICY_JSON_5: CountPolicy = {
   currency: null,
   policy_id: '25851571-b53f-4426-a033-f375be0e7957',
   start_date: Date.now(),
-  publish_date: Date.now() - 10,
+  published_date: Date.now() - 10,
   description:
     'Prohibited areas for dockless vehicles within the City of Los Angeles for the LADOT Dockless On-Demand Personal Mobility Program',
   prev_policies: null
@@ -231,7 +231,7 @@ export const HIGH_COUNT_POLICY: CountPolicy = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
-  publish_date: null,
+  published_date: null,
   currency: null,
   rules: [
     {
@@ -258,7 +258,7 @@ export const ARBITRARY_EVENT_TYPES_POLICY: Required<CountPolicy> = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
-  publish_date: 1552678594428,
+  published_date: 1552678594428,
   status: 'active',
   currency: null,
   rules: [
@@ -285,7 +285,7 @@ export const LOW_COUNT_POLICY: Required<CountPolicy> = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
-  publish_date: 1552678594428,
+  published_date: 1552678594428,
   status: 'active',
   currency: null,
   rules: [
@@ -311,7 +311,7 @@ export const EXPIRED_POLICY: Required<CountPolicy> = {
   end_date: now() - days(1),
   prev_policies: null,
   provider_ids: [],
-  publish_date: now() - days(7),
+  published_date: now() - days(7),
   status: 'expired',
   currency: null,
   rules: [
@@ -334,7 +334,7 @@ export const VENICE_OVERFLOW_POLICY: CountPolicy = {
   description: 'what it says on the can',
   policy_id: VENICE_POLICY_UUID,
   start_date: 1558389669540,
-  publish_date: 1558389669540,
+  published_date: 1558389669540,
   end_date: null,
   prev_policies: null,
   provider_ids: [],
@@ -366,7 +366,7 @@ export const VENICE_MIXED_VIOLATIONS_POLICY: CountPolicy = {
   description: 'what it says on the can',
   policy_id: VENICE_POLICY_UUID,
   start_date: 1558389669540,
-  publish_date: 1558389669540,
+  published_date: 1558389669540,
   end_date: null,
   prev_policies: null,
   provider_ids: [],
@@ -399,7 +399,7 @@ export const MANY_OVERFLOWS_POLICY: CountPolicy = {
   description: 'what it says on the can',
   policy_id: VENICE_POLICY_UUID,
   start_date: 1558389669540,
-  publish_date: 1558389669540,
+  published_date: 1558389669540,
   end_date: null,
   prev_policies: null,
   provider_ids: [],
@@ -448,7 +448,7 @@ export const OVERLAPPING_GEOS_SPEED_POLICY: SpeedPolicy = {
   end_date: null,
   prev_policies: null,
   provider_ids: [],
-  publish_date: null,
+  published_date: null,
   currency: null,
   rules: [
     {
@@ -486,7 +486,7 @@ export const OVERLAPPING_GEOS_TIME_POLICY: TimePolicy = {
   end_date: null,
   prev_policies: null,
   currency: null,
-  publish_date: null,
+  published_date: null,
   provider_ids: [],
   rules: [
     {
