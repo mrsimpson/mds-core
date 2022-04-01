@@ -1,80 +1,235 @@
----
-# yamllint disable rule:line-length
 openapi: 3.0.3
 info:
   title: MDS Geography API
-  description: This specification contains a collection of RESTful APIs used to read Geographies (descriptions of geographical information, e.g. multi-polygons, currently represented via GeoJSON).
-  version: "1.0"
+  description: >-
+    This specification contains a collection of RESTful APIs used to read
+    Geographies (descriptions of geographical information, e.g. multi-polygons,
+    currently represented via GeoJSON).
+  version: '1.0'
   contact:
-    url: https://github.com/openmobilityfoundation/mobility-data-specification/tree/main/geography
-
+    url: >-
+      https://github.com/openmobilityfoundation/mobility-data-specification/tree/main/geography
 paths:
   /geographies:
     get:
       operationId: getGeographies
-      description: Get list of geographies
-      tags:
-        - Geography
+      description: Retrieve a list of geographies
+      parameters:
+        - $ref: '#/components/parameters/summary'
+        - $ref: '#/components/parameters/get_published'
+        - $ref: '#/components/parameters/get_unpublished'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GeographiesReadResult"
+                $ref: '#/components/schemas/GeographiesReadResult'
+              examples:
+                Unfiltered:
+                  description: >-
+                    With no filters applied, all geographies are being returned.
+                    Remark: On the real API, items may be filtered due to permissions defined in the scope of the JWT token
+                  value:
+                    version: "1.0"
+                    data:
+                      geographies: 
+                        - geography_id: 10000000-0000-0000-0000-000000000001
+                          name: Forum Romanum
+                          published_date: 1514764800000
+                          geography_json:
+                            type: FeatureCollection
+                            features:
+                              - type: Feature
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.487029433250427
+                                        - 41.89096085158265
+                                      - - 12.487362027168274
+                                        - 41.89164371307738
+                                      - - 12.485902905464172
+                                        - 41.89229462103982
+                                      - - 12.485275268554686
+                                        - 41.89152790667126
+                                      - - 12.487029433250427
+                                        - 41.89096085158265
+                        - geography_id: 10000000-0000-0000-0000-000000000002
+                          geography_json:
+                            type: FeatureCollection
+                            name: Around Roma Termini
+                            description: Public space next to Roma Termini central station
+                            published_date: 1514764800000
+                            effective_date: 2147480047000
+                            features:
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.508792877197266
+                                        - 41.89844397625825
+                                      - - 12.50943660736084
+                                        - 41.8988272930826
+                                      - - 12.507033348083496
+                                        - 41.90272421685849
+                                      - - 12.502999305725098
+                                        - 41.90483228960837
+                                      - - 12.50089645385742
+                                        - 41.90342691550862
+                                      - - 12.508792877197266
+                                        - 41.89844397625825
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.500553131103516
+                                        - 41.90352273745264
+                                      - - 12.497978210449217
+                                        - 41.90195762769289
+                                      - - 12.501025199890137
+                                        - 41.90026471068203
+                                      - - 12.503213882446289
+                                        - 41.90179792045829
+                                      - - 12.500553131103516
+                                        - 41.90352273745264
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.497935295104979
+                                        - 41.90186180340007
+                                      - - 12.495017051696776
+                                        - 41.89981751756279
+                                      - - 12.506303787231445
+                                        - 41.894323175085376
+                                      - - 12.5079345703125
+                                        - 41.895856527512976
+                                      - - 12.497935295104979
+                                        - 41.90186180340007
+                        - geography_id: 10000000-0000-0000-0000-000000000003
+                          name: Historic Rome
+                          description: Draft – unpublished
+                          geography_json:
+                            type: FeatureCollection
+                            features:
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.49746322631836
+                                        - 41.91134771078812
+                                      - - 12.491283416748047
+                                        - 41.9112199638231
+                                      - - 12.487506866455078
+                                        - 41.9085372185006
+                                      - - 12.472572326660156
+                                        - 41.89167166631636
+                                      - - 12.479610443115234
+                                        - 41.888476931243254
+                                      - - 12.475318908691406
+                                        - 41.883365022797314
+                                      - - 12.500381469726562
+                                        - 41.86700416724044
+                                      - - 12.531967163085938
+                                        - 41.90023276842022
+                                      - - 12.49746322631836
+                                        - 41.91134771078812
+                Summary:
+                  description: >-
+                    with `summary=true` requested, the GeoJSON descriptions are ommitted reducing the payload drastically
+                  value:
+                    version: "1.0"
+                    data:
+                      geographies: 
+                        - geography_id: 10000000-0000-0000-0000-000000000001
+                          name: Forum Romanum
+                          published_date: 1514764800000
+                        - geography_id: 10000000-0000-0000-0000-000000000002
+                          name: Around Roma Termini
+                          description: Public space next to Roma Termini central station
+                          published_date: 1514764800000
+                          effective_date: 2147480047000
+                        - geography_id: 10000000-0000-0000-0000-000000000003
+                          name: Historic Rome
+                          description: Draft – unpublished
 
   /geographies/{geographyId}:
     get:
       operationId: getGeography
-      description: Get a single geography
+      description: Retrieve a single geography
       parameters:
-        - $ref: "#/components/schemas/uuid"
-      tags:
-        - Geography
+        - $ref: '#/components/parameters/geographyId'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GeographiesReadResult"
+                $ref: '#/components/schemas/GeographiesReadResult'
+              examples:
+                ForumRomanum:
+                  $ref: '#/components/examples/ForumRomanumResponse'
+                AroundRomaTermini:
+                  $ref: '#/components/examples/AroundRomaTerminiResponse'
+                HistoricRome:
+                  $ref: '#/components/examples/HistoricRomeResponse'
 components:
   schemas:
     geography:
       type: object
-      title: The geography object schema
+      title: Geography
+      description: >
+        A geography describes a named, two-dimensional area.
+
+        In the context of the mobility data specification, this area is used to
+        create segments within an agency's boundary. A geography does not
+        necessarily have to be described by a closed polygon: It can be any
+        two-dimensional shape: in fact, a geography may also be a polygon line
+        or a shap composed of multiple polygons.
       additionalProperties: false
       required:
-        - name
         - geography_id
         - geography_json
-        - published_date
       properties:
-        name:
-          $ref: '#/components/schemas/string'
-          description: Name of geography
-        description:
-          $ref: '#/components/schemas/string'
-          description: Description of geography
         geography_id:
-          $ref: '#/components/schemas/uuid'
-          description: Unique ID of geography
-        geography_json:
-          $ref: https://geojson.org/schema/FeatureCollection.json
-          description: The GeoJSON FeatureCollection that defines the geographical coordinates
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+            - description: Unique ID of geography
+        name:
+          allOf:
+            - $ref: '#/components/schemas/string'
+            - description: Name of geography
+        description:
+          allOf:
+            - $ref: '#/components/schemas/string'
+            - description: Description of geography
         effective_date:
-          $ref: '#/components/schemas/nullable_timestamp'
-          description: The date at which a Geography is considered 'live'. Must be at or after published_date.
+          allOf:
+            - $ref: '#/components/schemas/nullable_timestamp'
+            - description: >-
+                The date at which a Geography is considered 'live'. Must be at
+                or after published_date.
         published_date:
-          $ref: '#/components/schemas/timestamp'
-          description: Timestamp at which the geography was published i.e. made immutable
-        retire_date:
-          $ref: '#/components/schemas/nullable_timestamp'
-          description: Time that the geography is slated to retire. Once the retire date is passed, new policies can no longer reference it and old policies referencing it should be updated. Retired geographies should continue to be returned in the geographies list. Must be after effective_date.
+          allOf:
+            - $ref: '#/components/schemas/timestamp'
+            - description: >-
+                Timestamp at which the geography was published i.e. made
+                immutable
         prev_geographies:
-          $ref: '#/components/schemas/nullable_uuid_array'
-          description: Unique IDs of prior geographies replaced by this one
-          uniqueItems: true
+          allOf:
+            - $ref: '#/components/schemas/nullable_uuid_array'
+            - description: Unique IDs of prior geographies replaced by this one
+            - uniqueItems: true
+        geography_json:
+          allOf:
+            - $ref: https://geojson.org/schema/FeatureCollection.json
+            - description: >-
+                The GeoJSON FeatureCollection that defines the geographical
+                coordinates
     string:
       type: string
       description: A length-limited string type
@@ -101,12 +256,6 @@ components:
       example:
         - 1.2.0
       pattern: ^1\.2\.[0-9]+$
-    uuid_array:
-      type: array
-      description: Array of UUID
-      items:
-        $id: '#/components/schemas/uuid_array/items'
-        $ref: '#/components/schemas/uuid'
     nullable_timestamp:
       nullable: true
       type: number
@@ -131,10 +280,167 @@ components:
           properties:
             geographies:
               type: array
-              title: The array of policy objects in this payload
               items:
                 $ref: '#/components/schemas/geography'
         version:
-          $id: '#/properties/version'
           $ref: '#/components/schemas/version'
-          description: The version of MDS that the geographies represents
+  parameters:
+    geographyId:
+      name: geographyId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/uuid'
+    summary:
+      name: summary
+      in: query
+      description: >
+        Excludes the geometry (the GeoJSON) from the result. 
+
+        Since the JSON representation of the are can be quite huge, this
+        parameter can be useful when only a list of geographies is necesssary
+        which is visualized in a second step.
+      schema:
+        type: boolean
+    get_published:
+      name: get_published
+      in: query
+      description: >
+        Restricts geographies to the ones that have been explicitly published.
+
+        Remark: This parameter is only effective if the permission expressed as
+        scope within the JWT-token matches the parameter value.
+      schema:
+        type: boolean
+    get_unpublished:
+      name: get_unpublished
+      in: query
+      description: >
+        Restricts geographies to the ones that have not yet been published.
+
+        Remark: This parameter is only effective if the permission expressed as
+        scope within the JWT-token matches the parameter value.
+      schema:
+        type: boolean
+  examples:
+    ForumRomanumResponse:
+      value:
+        version: "1.0"
+        data:
+          geographies: 
+            - geography_id: 10000000-0000-0000-0000-000000000001
+              name: Forum Romanum
+              published_date: 1514764800000
+              geography_json:
+                type: FeatureCollection
+                features:
+                  - type: Feature
+                    geometry:
+                      type: Polygon
+                      coordinates:
+                        - - - 12.487029433250427
+                            - 41.89096085158265
+                          - - 12.487362027168274
+                            - 41.89164371307738
+                          - - 12.485902905464172
+                            - 41.89229462103982
+                          - - 12.485275268554686
+                            - 41.89152790667126
+                          - - 12.487029433250427
+                            - 41.89096085158265
+    AroundRomaTerminiResponse:
+      value:
+        version: "1.0"
+        data:
+          geographies: 
+            - geography_id: 10000000-0000-0000-0000-000000000002
+              geography_json:
+                type: FeatureCollection
+                name: Around Roma Termini
+                description: Public space next to Roma Termini central station
+                published_date: 1514764800000
+                effective_date: 2147480047000
+                features:
+                  - type: Feature
+                    properties: {}
+                    geometry:
+                      type: Polygon
+                      coordinates:
+                        - - - 12.508792877197266
+                            - 41.89844397625825
+                          - - 12.50943660736084
+                            - 41.8988272930826
+                          - - 12.507033348083496
+                            - 41.90272421685849
+                          - - 12.502999305725098
+                            - 41.90483228960837
+                          - - 12.50089645385742
+                            - 41.90342691550862
+                          - - 12.508792877197266
+                            - 41.89844397625825
+                  - type: Feature
+                    properties: {}
+                    geometry:
+                      type: Polygon
+                      coordinates:
+                        - - - 12.500553131103516
+                            - 41.90352273745264
+                          - - 12.497978210449217
+                            - 41.90195762769289
+                          - - 12.501025199890137
+                            - 41.90026471068203
+                          - - 12.503213882446289
+                            - 41.90179792045829
+                          - - 12.500553131103516
+                            - 41.90352273745264
+                  - type: Feature
+                    properties: {}
+                    geometry:
+                      type: Polygon
+                      coordinates:
+                        - - - 12.497935295104979
+                            - 41.90186180340007
+                          - - 12.495017051696776
+                            - 41.89981751756279
+                          - - 12.506303787231445
+                            - 41.894323175085376
+                          - - 12.5079345703125
+                            - 41.895856527512976
+                          - - 12.497935295104979
+                            - 41.90186180340007
+    HistoricRomeResponse:
+      value:
+        version: "1.0"
+        data:
+          geographies: 
+            - geography_id: 10000000-0000-0000-0000-000000000003
+              name: Historic Rome
+              description: Draft – unpublished
+              geography_json:
+                type: FeatureCollection
+                features:
+                  - type: Feature
+                    properties: {}
+                    geometry:
+                      type: Polygon
+                      coordinates:
+                        - - - 12.49746322631836
+                            - 41.91134771078812
+                          - - 12.491283416748047
+                            - 41.9112199638231
+                          - - 12.487506866455078
+                            - 41.9085372185006
+                          - - 12.472572326660156
+                            - 41.89167166631636
+                          - - 12.479610443115234
+                            - 41.888476931243254
+                          - - 12.475318908691406
+                            - 41.883365022797314
+                          - - 12.500381469726562
+                            - 41.86700416724044
+                          - - 12.531967163085938
+                            - 41.90023276842022
+                          - - 12.49746322631836
+                            - 41.91134771078812
+    Y2K38:
+      value: 2147480047000
