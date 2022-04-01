@@ -9,6 +9,7 @@
     "_build": "tsc --build tsconfig.build.json",
     "_test": "PATH_PREFIX=/geography jest --runInBand",
     "build": "pnpm _build",
+    "mock": "prism mock spec/spec.yaml -p 7011",
     "start": "PATH_PREFIX=/geography pnpm watch server",
     "test": "pnpm _test",
     "ts-node": "pnpm build && ts-node -r ../../dotenv-flow.js",
@@ -27,7 +28,8 @@
     "express": "4.17.1"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "workspace:0.4.29"
+    "@mds-core/mds-test-data": "workspace:0.4.29",
+    "@stoplight/prism-cli": "4.8.0"
   },
   "publishConfig": {
     "main": "dist/index.js"
