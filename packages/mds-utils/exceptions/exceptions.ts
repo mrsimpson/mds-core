@@ -16,10 +16,10 @@
 
 import { hasOwnProperty } from '../hasOwnProperty'
 
-class BaseError extends Error {
+export abstract class MdsError extends Error {
   public constructor(public name: string, public reason?: string, public info?: unknown) {
     super(reason)
-    Error.captureStackTrace(this, BaseError)
+    Error.captureStackTrace(this, MdsError)
   }
 }
 
@@ -40,91 +40,91 @@ const reason = (error?: unknown) => {
 }
 
 /* istanbul ignore next */
-export class ServerError extends BaseError {
+export class ServerError extends MdsError {
   public constructor(error?: unknown, public info?: unknown) {
     super('ServerError', reason(error), info)
   }
 }
 
 /* istanbul ignore next */
-export class NotFoundError extends BaseError {
+export class NotFoundError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('NotFoundError', reason(error), info)
   }
 }
 
 /* istanbul ignore next */
-export class ConflictError extends BaseError {
+export class ConflictError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('ConflictError', reason(error), info)
   }
 }
 
 /* istanbul ignore next */
-export class AuthorizationError extends BaseError {
+export class AuthorizationError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('AuthorizationError', reason(error), info)
   }
 }
 
 /* istanbul ignore next */
-export class RuntimeError extends BaseError {
+export class RuntimeError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('RuntimeError', reason(error), info)
   }
 }
 
-export class IndexError extends BaseError {
+export class IndexError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('IndexError', reason(error), info)
   }
 }
 
 /* istanbul ignore next */
-export class ValidationError extends BaseError {
+export class ValidationError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('ValidationError', reason(error), info)
   }
 }
 
 /* istanbul ignore next */
-export class BadParamsError extends BaseError {
+export class BadParamsError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('BadParamsError', reason(error), info)
   }
 }
 
-export class AlreadyPublishedError extends BaseError {
+export class AlreadyPublishedError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('AlreadyPublishedError', reason(error), info)
   }
 }
 
-export class UnsupportedTypeError extends BaseError {
+export class UnsupportedTypeError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('UnsupportedTypeError', reason(error), info)
   }
 }
 
-export class ParseError extends BaseError {
+export class ParseError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('ParseError', reason(error), info)
   }
 }
 
-export class DependencyMissingError extends BaseError {
+export class DependencyMissingError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('DependencyMissingError', reason(error), info)
   }
 }
 
-export class InsufficientPermissionsError extends BaseError {
+export class InsufficientPermissionsError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('InsufficientPermissionsError', reason(error), info)
   }
 }
 
-export class ClientDisconnectedError extends BaseError {
+export class ClientDisconnectedError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('ClientDisconnectedError', reason(error), info)
   }

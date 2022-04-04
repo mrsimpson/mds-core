@@ -15,20 +15,7 @@
  */
 
 import type { Nullable } from '@mds-core/mds-types'
-import {
-  AlreadyPublishedError,
-  AuthorizationError,
-  BadParamsError,
-  ConflictError,
-  DependencyMissingError,
-  hours,
-  InsufficientPermissionsError,
-  minutes,
-  NotFoundError,
-  seconds,
-  UnsupportedTypeError,
-  ValidationError
-} from '@mds-core/mds-utils'
+import { hours, MdsError, minutes, seconds } from '@mds-core/mds-utils'
 import type { Options as RetryOptions } from 'async-retry'
 import retry from 'async-retry'
 import type { ProcessController, ServiceErrorDescriptor, ServiceErrorType, ServiceResultType } from '../@types'
@@ -151,59 +138,13 @@ export type ProcessManager = ReturnType<typeof ProcessManager>
 
 export const ServiceResult = <R>(result: R): ServiceResultType<R> => ({ error: null, result })
 
-export const ServiceError = <E extends string>(
-  error: Omit<ServiceErrorDescriptor<E>, 'isServiceError'>
-): ServiceErrorType<E> => ({
+export const ServiceError = (error: Omit<ServiceErrorDescriptor, 'isServiceError'>): ServiceErrorType => ({
   error: { isServiceError: true, ...error }
 })
 
-export const ServiceException = (message: string, error?: unknown) => {
-  const details = (error instanceof Error && error.message) || undefined
-
-  /* istanbul ignore if */
-  if (error instanceof NotFoundError) {
-    return ServiceError({ type: 'NotFoundError', message, details })
-  }
-
-  /* istanbul ignore if */
-  if (error instanceof AlreadyPublishedError) {
-    return ServiceError({ type: 'AlreadyPublishedError', message, details })
-  }
-
-  /* istanbul ignore if */
-  if (error instanceof ValidationError) {
-    return ServiceError({ type: 'ValidationError', message, details })
-  }
-
-  /* istanbul ignore if */
-  if (error instanceof ConflictError) {
-    return ServiceError({ type: 'ConflictError', message, details })
-  }
-
-  /* istanbul ignore if */
-  if (error instanceof UnsupportedTypeError) {
-    return ServiceError({ type: 'UnsupportedTypeError', message, details })
-  }
-
-  /* istanbul ignore if */
-  if (error instanceof DependencyMissingError) {
-    return ServiceError({ type: 'DependencyMissingError', message, details })
-  }
-
-  /* istanbul ignore if */
-  if (error instanceof BadParamsError) {
-    return ServiceError({ type: 'BadParamsError', message, details })
-  }
-
-  /* istanbul ignore if */
-  if (error instanceof InsufficientPermissionsError) {
-    return ServiceError({ type: 'InsufficientPermissionsError', message, details })
-  }
-
-  /* istanbul ignore if */
-  if (error instanceof AuthorizationError) {
-    return ServiceError({ type: 'AuthorizationError', message, details })
-  }
-
-  return ServiceError({ type: 'ServiceException', message, details })
-}
+export const ServiceException = (message: string, error?: unknown) =>
+  ServiceError({
+    type: (error instanceof MdsError && error.name) || 'ServiceException',
+    message,
+    details: (error instanceof Error && error.message) || undefined
+  })
