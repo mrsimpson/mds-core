@@ -42,7 +42,14 @@ import migrations from './migrations'
 
 export const GeographyRepository = ReadWriteRepository.Create(
   'geographies',
-  { entities: [GeographyEntity, GeographyMetadataEntity], migrations },
+  {
+    entities: [GeographyEntity, GeographyMetadataEntity],
+    migrations,
+    seeders: [
+      { entity: GeographyEntity, mapper: GeographyDomainToEntityCreate },
+      { entity: GeographyMetadataEntity, mapper: GeographyMetadataDomainToEntityCreate }
+    ]
+  },
   repository => {
     const getGeographyMetadataMap = async (
       geographies: GeographyDomainModel[]
