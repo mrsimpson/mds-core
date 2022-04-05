@@ -63,7 +63,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
     })
 
     beforeEach(async () => {
-      await PolicyRepository.deleteAll()
+      await PolicyRepository.truncateAllTables()
     })
 
     afterAll(async () => {
@@ -367,7 +367,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
     })
 
     beforeEach(async () => {
-      await PolicyRepository.deleteAll()
+      await PolicyRepository.truncateAllTables()
     })
 
     afterAll(async () => {

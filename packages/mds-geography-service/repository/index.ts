@@ -17,7 +17,7 @@
 import type { InsertReturning } from '@mds-core/mds-repository'
 import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import type { UUID } from '@mds-core/mds-types'
-import { AlreadyPublishedError, NotFoundError, testEnvSafeguard } from '@mds-core/mds-utils'
+import { AlreadyPublishedError, NotFoundError } from '@mds-core/mds-utils'
 import type { FindManyOptions } from 'typeorm'
 import { In, IsNull, MoreThan, Not } from 'typeorm'
 import type {
@@ -302,21 +302,6 @@ export const GeographyRepository = ReadWriteRepository.Create(
           return geography_id
         } catch (err) {
           throw RepositoryError(err)
-        }
-      },
-
-      /**
-       * Nukes everything from orbit. Boom.
-       */
-      deleteAll: async () => {
-        testEnvSafeguard()
-        try {
-          const connection = await repository.connect('rw')
-          await connection
-            .getRepository(GeographyEntity)
-            .query('TRUNCATE "geographies", "geography_metadata" RESTART IDENTITY')
-        } catch (error) {
-          throw RepositoryError(error)
         }
       }
     }

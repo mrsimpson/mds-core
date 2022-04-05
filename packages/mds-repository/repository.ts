@@ -16,7 +16,7 @@
 
 import type { MountedConfigFileReader } from '@mds-core/mds-config-files'
 import { ConfigFileReader } from '@mds-core/mds-config-files'
-import { pluralize, tail } from '@mds-core/mds-utils'
+import { pluralize, tail, testEnvSafeguard } from '@mds-core/mds-utils'
 import { bool, cleanEnv } from 'envalid'
 import { DataSource } from 'typeorm'
 import type { ConnectionMode } from './connection'
@@ -82,6 +82,17 @@ const revertAllMigrationsUsingConnection = async (connection: DataSource): Promi
       }`
     )
   }
+}
+
+const truncateAllTablesUsingConnection = async (
+  connection: DataSource,
+  entities: ReadWriteRepositoryOptions['entities']
+): Promise<void> => {
+  const tableNames = entities
+    .map(entity => connection.getMetadata(entity))
+    .filter(metadata => !metadata.expression) // An expression representing a ViewEntity which cannot be truncated
+    .map(metadata => metadata.tableName)
+  await connection.query(`TRUNCATE ${tableNames} RESTART IDENTITY`)
 }
 
 const DataSeeder = (connection: DataSource, path?: string) => {
@@ -206,6 +217,7 @@ export type ReadWriteRepositoryPublicMethods<T extends {}> = T &
     cli: () => DataSource
     runAllMigrations: () => Promise<void>
     revertAllMigrations: () => Promise<void>
+    truncateAllTables: (options?: Partial<{ unsafe: true }>) => Promise<void>
   }
 
 export const ReadWriteRepository = {
@@ -227,6 +239,13 @@ export const ReadWriteRepository = {
     const runAllMigrations = async (): Promise<void> => runAllMigrationsUsingConnection(await connect('rw'))
 
     const revertAllMigrations = async (): Promise<void> => revertAllMigrationsUsingConnection(await connect('rw'))
+
+    const truncateAllTables = async (options: Partial<{ unsafe: true }> = {}): Promise<void> => {
+      if (!options.unsafe) {
+        testEnvSafeguard()
+      }
+      return truncateAllTablesUsingConnection(await connect('rw'), entities)
+    }
 
     const initialize = async () => {
       logger.info(`Initializing R/W repository: ${name}`)
@@ -263,6 +282,7 @@ export const ReadWriteRepository = {
       cli: () => new DataSource(ormconfig('rw')),
       runAllMigrations,
       revertAllMigrations,
+      truncateAllTables,
       ...methods({ connect, disconnect, asChunksForInsert })
     }
   }

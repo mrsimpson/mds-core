@@ -50,7 +50,7 @@ describe('Tests app', () => {
   describe('Geography endpoint tests', () => {
     beforeAll(async () => {
       await GeographyRepository.initialize()
-      await GeographyRepository.deleteAll()
+      await GeographyRepository.truncateAllTables()
       await GeographyServer.start()
       await GeographyRepository.writeGeographies([
         { name: 'LA', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY }
