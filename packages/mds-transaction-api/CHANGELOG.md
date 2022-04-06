@@ -1,5 +1,12 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.37
+
+### Patch Changes
+
+- @mds-core/mds-transaction-service@0.6.28
+- @mds-core/mds-api-helpers@0.2.28
+
 ## 0.2.36
 
 ### Patch Changes
