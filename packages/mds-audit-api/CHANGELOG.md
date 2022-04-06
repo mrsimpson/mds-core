@@ -1,5 +1,15 @@
 # @mds-core/mds-audit-api
 
+## 0.4.7
+
+### Patch Changes
+
+- @mds-core/mds-attachment-service@0.5.30
+- @mds-core/mds-audit-service@0.6.7
+- @mds-core/mds-ingest-service@0.10.14
+- @mds-core/mds-db@0.6.21
+- @mds-core/mds-api-helpers@0.2.29
+
 ## 0.4.6
 
 ### Patch Changes

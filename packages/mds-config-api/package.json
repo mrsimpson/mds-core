@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-config-api",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "description": "Mobility Data Specification configuration API",
   "keywords": [
     "mds",
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@mds-core/mds-api-server": "workspace:0.4.13",
-    "@mds-core/mds-config-service": "workspace:0.4.11",
+    "@mds-core/mds-config-service": "workspace:0.4.12",
     "@mds-core/mds-logger": "workspace:0.5.7",
     "@mds-core/mds-service-helpers": "workspace:0.6.10",
     "@mds-core/mds-utils": "workspace:0.5.2",
@@ -33,7 +33,7 @@
     "query-string": "7.0.1"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "0.4.31",
+    "@mds-core/mds-test-data": "0.4.32",
     "http-status-codes": "2.1.4"
   }
 }

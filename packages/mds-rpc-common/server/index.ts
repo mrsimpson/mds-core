@@ -110,11 +110,6 @@ export const RpcServiceManager = (options: Partial<RpcServiceManagerOptions> = {
       let server: Nullable<http.Server> = null
       let repl: Nullable<net.Server> = null
 
-      const httpServer = (application: Express, port: number): http.Server => {
-        const { customize = s => s } = options
-        return HttpServer(customize(application), { port })
-      }
-
       return ProcessManager({
         start: async () => {
           if (!server) {
@@ -124,7 +119,18 @@ export const RpcServiceManager = (options: Partial<RpcServiceManagerOptions> = {
               await options.onStart()
             }
             await Promise.all(services.map(({ handlers: { onStart } }) => onStart()))
-            server = httpServer(
+
+            /* apply custom routes and middleware before allowing `registerRpcRoutes` to define catch-all middleware */
+            const { customize = s => s } = options
+            const expressApp = customize(
+              express()
+                .use(PrometheusMiddleware())
+                .use(RequestLoggingMiddleware({ includeRemoteAddress: true, excludePaths: [/\/health$/] }))
+                .use(RawBodyParserMiddleware({ type: RPC_CONTENT_TYPE, limit: options.maxRequestSize }))
+                .get('/health', HealthRequestHandler)
+            )
+
+            server = HttpServer(
               services.reduce(
                 (manager, { definition, routes }) =>
                   manager.use(
@@ -143,14 +149,11 @@ export const RpcServiceManager = (options: Partial<RpcServiceManagerOptions> = {
                       }
                     })
                   ),
-                express()
-                  .use(PrometheusMiddleware())
-                  .use(RequestLoggingMiddleware({ includeRemoteAddress: true, excludePaths: [/\/health$/] }))
-                  .use(RawBodyParserMiddleware({ type: RPC_CONTENT_TYPE, limit: options.maxRequestSize }))
-                  .get('/health', HealthRequestHandler)
+                expressApp
               ),
-              port
+              { port }
             )
+
             /* istanbul ignore next */
             if (options.repl && process.env.NODE_ENV !== 'test') {
               repl = await startRepl(options.repl)
