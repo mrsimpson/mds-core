@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.2.3
+
+### Patch Changes
+
+- 7e38afee: Truncate many-to-many join tables before referenced tables
+
 ## 0.2.2
 
 ### Patch Changes

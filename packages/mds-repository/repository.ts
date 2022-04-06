@@ -88,11 +88,14 @@ const truncateAllTablesUsingConnection = async (
   connection: DataSource,
   entities: ReadWriteRepositoryOptions['entities']
 ): Promise<void> => {
+  // Get the table names of every @Entity
   const tableNames = entities
     .map(entity => connection.getMetadata(entity))
-    .filter(metadata => !metadata.expression) // An expression representing a ViewEntity which cannot be truncated
+    .filter(metadata => !metadata.expression) // An expression indicates an @Entity is a @ViewEntity which cannot be truncated
     .map(metadata => metadata.tableName)
-  await connection.query(`TRUNCATE ${tableNames} RESTART IDENTITY`)
+
+  // Truncate all tables (including tables that have foreign-key references to any of the named tables) and restart the IDENTITY sequence
+  await connection.query(`TRUNCATE ${tableNames} RESTART IDENTITY CASCADE`)
 }
 
 const DataSeeder = (connection: DataSource, path?: string) => {

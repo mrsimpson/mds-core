@@ -1,5 +1,12 @@
 # @mds-core/mds-jurisdiction-service
 
+## 0.5.29
+
+### Patch Changes
+
+- Updated dependencies [7e38afee]
+  - @mds-core/mds-repository@0.2.3
+
 ## 0.5.28
 
 ### Patch Changes
