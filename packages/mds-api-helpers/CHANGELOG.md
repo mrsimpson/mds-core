@@ -1,5 +1,15 @@
 # @mds-core/mds-api-helpers
 
+## 0.2.27
+
+### Patch Changes
+
+- Updated dependencies [65d1c2b9]
+  - @mds-core/mds-utils@0.5.2
+  - @mds-core/mds-api-server@0.4.13
+  - @mds-core/mds-agency-cache@0.4.25
+  - @mds-core/mds-db@0.6.19
+
 ## 0.2.26
 
 ### Patch Changes

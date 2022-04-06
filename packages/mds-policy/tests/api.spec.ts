@@ -95,7 +95,7 @@ describe('Tests app', () => {
     await GeographyServer.start()
   })
 
-  beforeEach(async () => await PolicyRepository.deleteAll())
+  beforeEach(async () => await PolicyRepository.truncateAllTables())
 
   afterAll(async () => {
     await PolicyServer.stop()

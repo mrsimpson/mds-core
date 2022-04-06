@@ -1,5 +1,20 @@
 # @mds-core/mds-geography-service
 
+## 0.10.24
+
+### Patch Changes
+
+- e36b8a46: Add ability to seed initial jurisdictions from config data
+- ffc3c9f7: Create a standard repository method for truncating all table data
+- Updated dependencies [65d1c2b9]
+- Updated dependencies [ffc3c9f7]
+  - @mds-core/mds-service-helpers@0.6.10
+  - @mds-core/mds-utils@0.5.2
+  - @mds-core/mds-repository@0.2.2
+  - @mds-core/mds-rpc-common@0.3.21
+  - @mds-core/mds-schema-validators@0.5.12
+  - @mds-core/mds-test-data@0.4.30
+
 ## 0.10.23
 
 ### Patch Changes

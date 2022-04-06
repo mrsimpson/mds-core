@@ -42,15 +42,6 @@ import {
 } from './mappers'
 import migrations from './migrations'
 
-/**
- * Aborts execution if not running under a test environment.
- */
-const testEnvSafeguard = () => {
-  if (process.env.NODE_ENV !== 'test') {
-    throw new Error(`This method is only supported when executing tests`)
-  }
-}
-
 interface InsertTransactionOptions {
   beforeCommit: (pendingTransaction: TransactionDomainModel) => Promise<void>
 }
@@ -326,56 +317,6 @@ export const TransactionRepository = ReadWriteRepository.Create(
             const mappedStatuses = statuses.map(TransactionStatusEntityToDomain.mapper())
             return { ...acc, [transaction_id]: mappedStatuses }
           }, {})
-        } catch (error) {
-          throw RepositoryError(error)
-        }
-      },
-
-      /**
-       * @deprecated
-       * **WARNING: This should ONLY be used during tests! Hence adding the deprecated flag.**
-       * Deletes all transactions from the DB.
-       */
-      deleteAllTransactions: async () => {
-        testEnvSafeguard()
-        try {
-          const connection = await repository.connect('rw')
-
-          await connection.getRepository(TransactionEntity).query('TRUNCATE "transactions" RESTART IDENTITY')
-        } catch (error) {
-          throw RepositoryError(error)
-        }
-      },
-
-      /**
-       * @deprecated
-       * **WARNING: This should ONLY be used during tests! Hence adding the deprecated flag.**
-       * Deletes all transaction operations from the DB.
-       */
-      deleteAllTransactionOperations: async () => {
-        testEnvSafeguard()
-        try {
-          const connection = await repository.connect('rw')
-          await connection
-            .getRepository(TransactionOperationEntity)
-            .query('TRUNCATE "transaction_operations" RESTART IDENTITY')
-        } catch (error) {
-          throw RepositoryError(error)
-        }
-      },
-
-      /**
-       * @deprecated
-       * **WARNING: This should ONLY be used during tests! Hence adding the deprecated flag.**
-       * Deletes all transaction statuses from the DB.
-       */
-      deleteAllTransactionStatuses: async () => {
-        testEnvSafeguard()
-        try {
-          const connection = await repository.connect('rw')
-          await connection
-            .getRepository(TransactionStatusEntity)
-            .query('TRUNCATE "transaction_statuses" RESTART IDENTITY')
         } catch (error) {
           throw RepositoryError(error)
         }

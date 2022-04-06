@@ -177,7 +177,7 @@ describe('Geography Service Tests', () => {
     })
 
     beforeEach(async () => {
-      await GeographyRepository.deleteAll()
+      await GeographyRepository.truncateAllTables()
     })
 
     afterAll(async () => {

@@ -275,7 +275,7 @@ describe('Ingest Service Tests', () => {
    * Clear DB after each test runs, and after the file is finished. No side-effects for you.
    */
   beforeEach(async () => {
-    await IngestRepository.deleteAll()
+    await IngestRepository.truncateAllTables()
   })
 
   describe('getDevices', () => {
@@ -858,7 +858,7 @@ describe('Ingest Service Tests', () => {
      * Clear DB after each test runs, and after the file is finished. No side-effects for you.
      */
     beforeEach(async () => {
-      await IngestRepository.deleteAll()
+      await IngestRepository.truncateAllTables()
     })
 
     it('Tests writing an event w/ telemetry for a device that exists', async () => {
@@ -902,7 +902,7 @@ describe('Ingest Service Tests', () => {
      * Clear DB after each test runs, and after the file is finished. No side-effects for you.
      */
     beforeEach(async () => {
-      await IngestRepository.deleteAll()
+      await IngestRepository.truncateAllTables()
     })
 
     it('Tests writing a TelemetryAnnotation', async () => {
@@ -917,7 +917,7 @@ describe('Ingest Service Tests', () => {
      * Clear DB after each test runs, and after the file is finished. No side-effects for you.
      */
     beforeEach(async () => {
-      await IngestRepository.deleteAll()
+      await IngestRepository.truncateAllTables()
     })
 
     it('Tests writing a TelemetryAnnotation', async () => {

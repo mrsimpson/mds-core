@@ -29,7 +29,7 @@ describe('Test CRUD', () => {
     await ComplianceServer.start()
   })
   beforeEach(async () => {
-    await ComplianceRepository.deleteAll()
+    await ComplianceRepository.truncateAllTables()
   })
   afterAll(async () => {
     await ComplianceServer.stop()

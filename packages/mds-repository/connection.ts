@@ -89,7 +89,7 @@ export class ConnectionManager {
         PG_DEBUG: bool({ default: false }),
         PG_HOST: str({ default: 'localhost' }),
         PG_HOST_READER: str({ default: undefined }),
-        PG_NAME: str(),
+        PG_NAME: str({ default: undefined }),
         PG_PASS: str({ default: undefined }),
         PG_PASS_READER: str({ default: undefined }),
         PG_PORT: num({ default: 5432 }),

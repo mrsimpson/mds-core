@@ -17,7 +17,7 @@
 import type { InsertReturning } from '@mds-core/mds-repository'
 import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import type { Nullable, UUID } from '@mds-core/mds-types'
-import { head, isDefined, isUUID, tail, testEnvSafeguard, ValidationError, zip } from '@mds-core/mds-utils'
+import { head, isDefined, isUUID, tail, ValidationError, zip } from '@mds-core/mds-utils'
 import type { SelectQueryBuilder } from 'typeorm'
 import { Any } from 'typeorm'
 import type { Cursor, PagingResult } from 'typeorm-cursor-pagination'
@@ -730,25 +730,7 @@ export const IngestRepository = ReadWriteRepository.Create(
       getEventsWithDeviceAndTelemetryInfoUsingCursor: async (
         cursor: string
       ): Promise<GetEventsWithDeviceAndTelemetryInfoResponse> =>
-        getEventsWithDeviceAndTelemetryInfo(parseCursor<GetEventsWithDeviceAndTelemetryInfoOptions>(cursor)),
-
-      /**
-       * Nukes everything from orbit. Boom.
-       */
-
-      deleteAll: async () => {
-        testEnvSafeguard()
-        try {
-          const connection = await repository.connect('rw')
-          await connection
-            .getRepository(EventEntity)
-            .query(
-              'TRUNCATE "events", "devices", "telemetry", "event_annotations", "telemetry_annotations" RESTART IDENTITY'
-            )
-        } catch (error) {
-          throw RepositoryError(error)
-        }
-      }
+        getEventsWithDeviceAndTelemetryInfo(parseCursor<GetEventsWithDeviceAndTelemetryInfoOptions>(cursor))
     }
   }
 )

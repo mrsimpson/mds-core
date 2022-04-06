@@ -1,5 +1,20 @@
 # @mds-core/mds-agency
 
+## 0.5.14
+
+### Patch Changes
+
+- Updated dependencies [65d1c2b9]
+- Updated dependencies [ffc3c9f7]
+  - @mds-core/mds-service-helpers@0.6.10
+  - @mds-core/mds-utils@0.5.2
+  - @mds-core/mds-ingest-service@0.10.12
+  - @mds-core/mds-api-server@0.4.13
+  - @mds-core/mds-agency-cache@0.4.25
+  - @mds-core/mds-api-helpers@0.2.27
+  - @mds-core/mds-db@0.6.19
+  - @mds-core/mds-schema-validators@0.5.12
+
 ## 0.5.13
 
 ### Patch Changes

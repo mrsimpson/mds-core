@@ -17,7 +17,7 @@
 import type { InsertReturning } from '@mds-core/mds-repository'
 import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import type { Timestamp, UUID } from '@mds-core/mds-types'
-import { ConflictError, hasAtLeastOneEntry, NotFoundError, now, testEnvSafeguard } from '@mds-core/mds-utils'
+import { ConflictError, hasAtLeastOneEntry, NotFoundError, now } from '@mds-core/mds-utils'
 import { buildPaginator } from 'typeorm-cursor-pagination'
 import type {
   FILTER_POLICY_STATUS,
@@ -537,16 +537,6 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
           .execute()
 
         return PolicyEntityToDomain.map(updated)
-      } catch (error) {
-        throw RepositoryError(error)
-      }
-    },
-
-    deleteAll: async () => {
-      testEnvSafeguard()
-      try {
-        const connection = await repository.connect('rw')
-        await connection.getRepository(PolicyEntity).query('TRUNCATE "policies", "policy_metadata" RESTART IDENTITY')
       } catch (error) {
         throw RepositoryError(error)
       }

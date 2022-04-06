@@ -43,11 +43,7 @@ describe('Transaction Service Tests', () => {
    * Clear DB after each test runs, and after the file is finished. No side-effects for you.
    */
   beforeEach(async () => {
-    await Promise.all([
-      TransactionRepository.deleteAllTransactions(),
-      TransactionRepository.deleteAllTransactionOperations(),
-      TransactionRepository.deleteAllTransactionStatuses()
-    ])
+    await TransactionRepository.truncateAllTables()
   })
 
   afterEach(async () => {
@@ -425,11 +421,7 @@ describe('Transaction Service Tests', () => {
   })
 
   afterAll(async () => {
-    await Promise.all([
-      TransactionRepository.deleteAllTransactions(),
-      TransactionRepository.deleteAllTransactionOperations(),
-      TransactionRepository.deleteAllTransactionStatuses()
-    ])
+    await TransactionRepository.truncateAllTables()
     await TransactionServer.stop()
   })
 })

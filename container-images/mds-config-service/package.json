@@ -1,6 +1,6 @@
 {
   "name": "@container-images/mds-config-service",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
   "description": "Docker Image for MDS Config Service",
   "keywords": [
@@ -20,7 +20,7 @@
     "image:production": "pnpm bundle:production && ../../bin/build-helper buildImage mds-config-service:${npm_package_version}"
   },
   "dependencies": {
-    "@mds-core/mds-config-service": "workspace:0.4.10",
+    "@mds-core/mds-config-service": "workspace:0.4.11",
     "@mds-core/mds-webpack-config": "workspace:0.1.13",
     "dd-trace": "1.5.1",
     "express": "4.17.1",
