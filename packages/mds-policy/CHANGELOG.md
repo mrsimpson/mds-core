@@ -1,5 +1,19 @@
 # @mds-core/mds-policy
 
+## 0.8.1
+
+### Patch Changes
+
+- ffc3c9f7: Create a standard repository method for truncating all table data
+- Updated dependencies [65d1c2b9]
+- Updated dependencies [ffc3c9f7]
+  - @mds-core/mds-utils@0.5.2
+  - @mds-core/mds-policy-service@0.12.1
+  - @mds-core/mds-api-server@0.4.13
+  - @mds-core/mds-api-helpers@0.2.27
+  - @mds-core/mds-db@0.6.19
+  - @mds-core/mds-schema-validators@0.5.12
+
 ## 0.8.0
 
 ### Minor Changes

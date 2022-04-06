@@ -1,5 +1,20 @@
 # @mds-core/mds-geography-author-api
 
+## 0.4.27
+
+### Patch Changes
+
+- ffc3c9f7: Create a standard repository method for truncating all table data
+- Updated dependencies [65d1c2b9]
+- Updated dependencies [e36b8a46]
+- Updated dependencies [ffc3c9f7]
+  - @mds-core/mds-service-helpers@0.6.10
+  - @mds-core/mds-utils@0.5.2
+  - @mds-core/mds-geography-service@0.10.24
+  - @mds-core/mds-api-server@0.4.13
+  - @mds-core/mds-api-helpers@0.2.27
+  - @mds-core/mds-schema-validators@0.5.12
+
 ## 0.4.26
 
 ### Patch Changes

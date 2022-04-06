@@ -1,5 +1,11 @@
 # @mds-core/mds-utils
 
+## 0.5.2
+
+### Patch Changes
+
+- 65d1c2b9: Simplify ServiceException to handle MDS errors generically without requiring them to be enumerated
+
 ## 0.5.1
 
 ### Patch Changes

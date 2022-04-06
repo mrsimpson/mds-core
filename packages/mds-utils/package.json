@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-utils",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Mobility Data Specification utility functions",
   "keywords": [
     "mds",

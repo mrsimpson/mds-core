@@ -1,5 +1,14 @@
 # @mds-core/mds-repository
 
+## 0.2.2
+
+### Patch Changes
+
+- ffc3c9f7: Create a standard repository method for truncating all table data
+- Updated dependencies [65d1c2b9]
+  - @mds-core/mds-utils@0.5.2
+  - @mds-core/mds-config-files@0.1.6
+
 ## 0.2.1
 
 ### Patch Changes
