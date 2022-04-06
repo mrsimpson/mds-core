@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-config-service",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "description": "Mobility Data Specification configuration service",
   "keywords": [
     "mds",
@@ -25,7 +25,7 @@
   "dependencies": {
     "@mds-core/mds-config-files": "workspace:0.1.6",
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-rpc-common": "workspace:0.3.21",
+    "@mds-core/mds-rpc-common": "workspace:0.3.22",
     "@mds-core/mds-service-helpers": "workspace:0.6.10",
     "@mds-core/mds-utils": "workspace:0.5.2",
     "json5": "2.2.0"

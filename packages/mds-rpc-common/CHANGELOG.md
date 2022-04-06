@@ -1,5 +1,11 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.22
+
+### Patch Changes
+
+- 2ac7b542: Apply custom routes and middleware before registering grpc routes, allows other body parsers to be added before the catch-call
+
 ## 0.3.21
 
 ### Patch Changes
