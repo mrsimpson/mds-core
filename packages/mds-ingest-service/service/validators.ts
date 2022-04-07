@@ -17,4 +17,3 @@
 export * from './device_validators'
 export * from './event_validators'
 export * from './telemetry_validators'
-export * from './util_schemas'

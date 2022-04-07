@@ -1,5 +1,11 @@
 import type { Schema } from '@mds-core/mds-schema-validators'
-import { SchemaValidator } from '@mds-core/mds-schema-validators'
+import {
+  nullableArray,
+  nullableString,
+  SchemaValidator,
+  timestampSchema,
+  uuidSchema
+} from '@mds-core/mds-schema-validators'
 import type { WithNonNullableKeys } from '@mds-core/mds-types'
 import { PROPULSION_TYPES, TRIP_STATES, VEHICLE_EVENTS, VEHICLE_STATES, VEHICLE_TYPES } from '@mds-core/mds-types'
 import type {
@@ -12,7 +18,6 @@ import type {
 } from '../@types'
 import { GetVehicleEventsOrderColumn, GetVehicleEventsOrderDirection, GROUPING_TYPES } from '../@types'
 import { TelemetryCreateSchema } from './telemetry_validators'
-import { nullableArray, nullableString, timestampSchema, uuidSchema } from './util_schemas'
 
 export const { $schema: eventAnnotationDomainSchema } = SchemaValidator<EventAnnotationDomainModel>({
   type: 'object',

@@ -1,5 +1,5 @@
-import { SchemaValidator } from '@mds-core/mds-schema-validators'
 import type { UUID } from '@mds-core/mds-types'
+import { SchemaValidator } from './validators'
 
 export const uuidSchema = <const>{ type: 'string', format: 'uuid' }
 export const timestampSchema = <const>{

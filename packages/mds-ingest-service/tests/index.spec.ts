@@ -327,7 +327,7 @@ describe('Ingest Service Tests', () => {
           device_id: TEST_DEVICE_A.device_id,
           provider_id: TEST2_PROVIDER_ID
         })
-        expect(result).toBeUndefined
+        expect(result).toBeUndefined()
       })
 
       it('gets 0 devices', async () => {
