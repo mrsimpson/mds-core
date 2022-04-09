@@ -1,5 +1,36 @@
 # @mds-core/mds-transaction-service
 
+## 0.6.29
+
+### Patch Changes
+
+- Updated dependencies [2ac7b542]
+  - @mds-core/mds-rpc-common@0.3.22
+  - @mds-core/mds-ingest-service@0.10.14
+
+## 0.6.28
+
+### Patch Changes
+
+- Updated dependencies [7e38afee]
+  - @mds-core/mds-repository@0.2.3
+  - @mds-core/mds-ingest-service@0.10.13
+
+## 0.6.27
+
+### Patch Changes
+
+- ffc3c9f7: Create a standard repository method for truncating all table data
+- Updated dependencies [65d1c2b9]
+- Updated dependencies [ffc3c9f7]
+  - @mds-core/mds-service-helpers@0.6.10
+  - @mds-core/mds-utils@0.5.2
+  - @mds-core/mds-ingest-service@0.10.12
+  - @mds-core/mds-repository@0.2.2
+  - @mds-core/mds-rpc-common@0.3.21
+  - @mds-core/mds-schema-validators@0.5.12
+  - @mds-core/mds-stream@0.3.3
+
 ## 0.6.26
 
 ### Patch Changes

@@ -97,11 +97,11 @@ describe('Tests app', () => {
     })
 
     beforeEach(async () => {
-      await PolicyRepository.deleteAll()
+      await PolicyRepository.truncateAllTables()
     })
 
     afterAll(async () => {
-      await PolicyRepository.deleteAll()
+      await PolicyRepository.truncateAllTables()
       await PolicyRepository.shutdown()
       await GeographyServer.stop()
       await PolicyServer.stop()

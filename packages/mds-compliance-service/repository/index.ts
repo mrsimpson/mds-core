@@ -17,7 +17,7 @@
 import type { InsertReturning } from '@mds-core/mds-repository'
 import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import type { UUID } from '@mds-core/mds-types'
-import { isDefined, NotFoundError, now, testEnvSafeguard } from '@mds-core/mds-utils'
+import { isDefined, NotFoundError, now } from '@mds-core/mds-utils'
 import type { EntityManager } from 'typeorm'
 import type {
   ComplianceSnapshotDomainModel,
@@ -439,18 +439,6 @@ export const ComplianceRepository = ReadWriteRepository.Create(
             .insert()
             .values(compliance_snapshot_ids.map(compliance_snapshot_id => ({ compliance_snapshot_id, timestamp })))
             .execute()
-        } catch (error) {
-          throw RepositoryError(error)
-        }
-      },
-
-      deleteAll: async () => {
-        testEnvSafeguard()
-        try {
-          const connection = await repository.connect('rw')
-          await connection
-            .getRepository(ComplianceSnapshotEntity)
-            .query('TRUNCATE "compliance_snapshots", "compliance_violations" RESTART IDENTITY')
         } catch (error) {
           throw RepositoryError(error)
         }

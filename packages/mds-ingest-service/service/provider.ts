@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { validateUUIDs } from '@mds-core/mds-schema-validators'
 import type { ProcessController, ServiceProvider } from '@mds-core/mds-service-helpers'
 import { ServiceException, ServiceResult } from '@mds-core/mds-service-helpers'
 import { NotFoundError, now } from '@mds-core/mds-utils'
@@ -28,8 +29,7 @@ import {
   validateGetEventsWithDeviceAndTelemetryInfoOptions,
   validateGetH3BinsOptions,
   validateGetVehicleEventsFilterParams,
-  validateTelemetryAnnotationDomainCreateModel,
-  validateUUIDs
+  validateTelemetryAnnotationDomainCreateModel
 } from './validators'
 
 export const IngestServiceProvider: ServiceProvider<IngestService, IngestServiceRequestContext> & ProcessController = {

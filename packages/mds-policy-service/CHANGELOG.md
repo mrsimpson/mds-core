@@ -1,5 +1,37 @@
 # @mds-core/mds-policy-service
 
+## 0.12.3
+
+### Patch Changes
+
+- Updated dependencies [2ac7b542]
+  - @mds-core/mds-rpc-common@0.3.22
+  - @mds-core/mds-geography-service@0.10.26
+
+## 0.12.2
+
+### Patch Changes
+
+- Updated dependencies [7e38afee]
+  - @mds-core/mds-repository@0.2.3
+  - @mds-core/mds-geography-service@0.10.25
+
+## 0.12.1
+
+### Patch Changes
+
+- ffc3c9f7: Create a standard repository method for truncating all table data
+- Updated dependencies [65d1c2b9]
+- Updated dependencies [e36b8a46]
+- Updated dependencies [ffc3c9f7]
+  - @mds-core/mds-service-helpers@0.6.10
+  - @mds-core/mds-utils@0.5.2
+  - @mds-core/mds-geography-service@0.10.24
+  - @mds-core/mds-repository@0.2.2
+  - @mds-core/mds-rpc-common@0.3.21
+  - @mds-core/mds-schema-validators@0.5.12
+  - @mds-core/mds-stream@0.3.3
+
 ## 0.12.0
 
 ### Minor Changes

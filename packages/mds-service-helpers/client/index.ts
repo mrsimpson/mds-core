@@ -15,16 +15,13 @@
  */
 
 import type { AnyFunction } from '@mds-core/mds-types'
-import type { ServiceErrorDescriptor, ServiceErrorDescriptorType, ServiceResponse } from '../@types'
+import type { ServiceErrorDescriptor, ServiceResponse } from '../@types'
 
-export const isServiceError = <E extends string = ServiceErrorDescriptorType>(
-  error: unknown,
-  ...types: E[]
-): error is ServiceErrorDescriptor<E> =>
+export const isServiceError = (error: unknown, ...types: string[]): error is ServiceErrorDescriptor =>
   typeof error === 'object' &&
   error !== null &&
-  (error as ServiceErrorDescriptor<E>).isServiceError === true &&
-  (types.length === 0 || types.includes((error as ServiceErrorDescriptor<E>).type))
+  (error as ServiceErrorDescriptor).isServiceError === true &&
+  (types.length === 0 || types.includes((error as ServiceErrorDescriptor).type))
 
 /** Will match an error of the specified type if it's thrown locally, or from a service */
 export const isError = <E extends Error>(error: unknown, type: new () => E): error is E =>

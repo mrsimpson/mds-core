@@ -1,7 +1,13 @@
-import { SchemaValidator } from '@mds-core/mds-schema-validators'
+import {
+  nullableInteger,
+  nullableString,
+  nullableUUID,
+  SchemaValidator,
+  timestampSchema,
+  uuidSchema
+} from '@mds-core/mds-schema-validators'
 import { ACCESSIBILITY_OPTIONS, MODALITIES, PROPULSION_TYPES, VEHICLE_TYPES } from '@mds-core/mds-types'
 import type { DeviceDomainModel, GetDeviceOptions, GetDevicesOptions } from '../@types'
-import { nullableInteger, nullableString, nullableUUID, timestampSchema, uuidSchema } from './util_schemas'
 
 export const { validate: validateGetDevicesOptions } = SchemaValidator<GetDevicesOptions>({
   type: 'object',

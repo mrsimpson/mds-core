@@ -1,5 +1,23 @@
 # @container-images/mds-compliance-api
 
+## 0.3.3
+
+### Patch Changes
+
+- @mds-core/mds-compliance-api@0.4.40
+
+## 0.3.2
+
+### Patch Changes
+
+- @mds-core/mds-compliance-api@0.4.39
+
+## 0.3.1
+
+### Patch Changes
+
+- @mds-core/mds-compliance-api@0.4.38
+
 ## 0.3.0
 
 ### Minor Changes

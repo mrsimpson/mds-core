@@ -52,13 +52,13 @@ describe('Tests app', () => {
     })
 
     beforeAll(async () => {
-      await GeographyRepository.deleteAll()
+      await GeographyRepository.truncateAllTables()
       await GeographyServer.start()
     })
 
     afterAll(async () => {
       await GeographyServer.stop()
-      await GeographyRepository.deleteAll()
+      await GeographyRepository.truncateAllTables()
     })
 
     // Geography endpoints
@@ -213,7 +213,7 @@ describe('Tests app', () => {
     })
 
     beforeAll(async () => {
-      await GeographyRepository.deleteAll()
+      await GeographyRepository.truncateAllTables()
       await GeographyServer.start()
       await GeographyServiceClient.writeGeographies([
         { name: 'Geography 1', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY },
@@ -224,7 +224,7 @@ describe('Tests app', () => {
 
     afterAll(async () => {
       await GeographyServer.stop()
-      await GeographyRepository.deleteAll()
+      await GeographyRepository.truncateAllTables()
     })
 
     it('cannot GET geography metadata (no auth)', async () => {

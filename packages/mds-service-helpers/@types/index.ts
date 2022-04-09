@@ -16,31 +16,15 @@
 
 import type { AnyFunction, Nullable } from '@mds-core/mds-types'
 
-export const ServiceErrorDescriptorTypes = [
-  'BadParamsError',
-  'ConflictError',
-  'DependencyMissingError',
-  'NotFoundError',
-  'ServiceException',
-  'UnsupportedTypeError',
-  'ValidationError',
-  'ServiceUnavailable',
-  'AlreadyPublishedError',
-  'AuthorizationError',
-  'InsufficientPermissionsError'
-] as const
-
-export type ServiceErrorDescriptorType = typeof ServiceErrorDescriptorTypes[number]
-
-export type ServiceErrorDescriptor<E extends string> = Readonly<{
+export type ServiceErrorDescriptor = Readonly<{
   isServiceError: true
-  type: E
+  type: string
   message: string
   details?: unknown
 }>
 
-export interface ServiceErrorType<E extends string = ServiceErrorDescriptorType> {
-  error: ServiceErrorDescriptor<E>
+export interface ServiceErrorType {
+  error: ServiceErrorDescriptor
 }
 
 export interface ServiceResultType<R> {

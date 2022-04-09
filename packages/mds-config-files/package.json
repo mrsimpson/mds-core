@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-config-files",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Mobility Data Specification config file reader",
   "keywords": [
     "mds",
@@ -20,7 +20,7 @@
     "test": "pnpm _test"
   },
   "dependencies": {
-    "@mds-core/mds-utils": "workspace:0.5.1",
+    "@mds-core/mds-utils": "workspace:0.5.2",
     "@types/yamljs": "0.2.31",
     "envalid": "7.2.1",
     "json5": "2.2.0",
