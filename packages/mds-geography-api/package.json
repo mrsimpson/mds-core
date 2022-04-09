@@ -28,7 +28,7 @@
     "express": "4.17.1"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "workspace:0.4.32"
+    "@mds-core/mds-test-data": "workspace:0.4.32",
     "@stoplight/prism-cli": "4.8.0"
   },
   "publishConfig": {
