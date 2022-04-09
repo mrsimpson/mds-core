@@ -30,7 +30,151 @@ paths:
                   description: >-
                     With no filters applied, all geographies are being returned.
                     Remark: On the real API, items may be filtered due to permissions defined in the scope of the JWT token
-                  $ref: '#/components/examples/UnfilteredResponse'
+                  value:
+                    version: '1.0'
+                    data:
+                      geographies:
+                        - geography_id: 10000000-0000-0000-0000-000000000001
+                          name: Forum Romanum
+                          published_date: 1514764800000
+                          geography_json:
+                            type: FeatureCollection
+                            features:
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.487029433250427
+                                        - 41.89096085158265
+                                      - - 12.487362027168274
+                                        - 41.89164371307738
+                                      - - 12.485902905464172
+                                        - 41.89229462103982
+                                      - - 12.485275268554686
+                                        - 41.89152790667126
+                                      - - 12.487029433250427
+                                        - 41.89096085158265
+                        - geography_id: 10000000-0000-0000-0000-000000000002
+                          geography_json:
+                            type: FeatureCollection
+                            name: Around Roma Termini
+                            description: Public space next to Roma Termini central station
+                            published_date: 1514764800000
+                            effective_date: 2147480047000
+                            features:
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.508792877197266
+                                        - 41.89844397625825
+                                      - - 12.50943660736084
+                                        - 41.8988272930826
+                                      - - 12.507033348083496
+                                        - 41.90272421685849
+                                      - - 12.502999305725098
+                                        - 41.90483228960837
+                                      - - 12.50089645385742
+                                        - 41.90342691550862
+                                      - - 12.508792877197266
+                                        - 41.89844397625825
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.500553131103516
+                                        - 41.90352273745264
+                                      - - 12.497978210449217
+                                        - 41.90195762769289
+                                      - - 12.501025199890137
+                                        - 41.90026471068203
+                                      - - 12.503213882446289
+                                        - 41.90179792045829
+                                      - - 12.500553131103516
+                                        - 41.90352273745264
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.497935295104979
+                                        - 41.90186180340007
+                                      - - 12.495017051696776
+                                        - 41.89981751756279
+                                      - - 12.506303787231445
+                                        - 41.894323175085376
+                                      - - 12.5079345703125
+                                        - 41.895856527512976
+                                      - - 12.497935295104979
+                                        - 41.90186180340007
+                        - geography_id: 10000000-0000-0000-0000-000000000003
+                          name: Historic Rome
+                          description: Draft – unpublished
+                          geography_json:
+                            type: FeatureCollection
+                            features:
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.49746322631836
+                                        - 41.91134771078812
+                                      - - 12.491283416748047
+                                        - 41.9112199638231
+                                      - - 12.487506866455078
+                                        - 41.9085372185006
+                                      - - 12.472572326660156
+                                        - 41.89167166631636
+                                      - - 12.479610443115234
+                                        - 41.888476931243254
+                                      - - 12.475318908691406
+                                        - 41.883365022797314
+                                      - - 12.500381469726562
+                                        - 41.86700416724044
+                                      - - 12.531967163085938
+                                        - 41.90023276842022
+                                      - - 12.49746322631836
+                                        - 41.91134771078812
+                Unpublished:
+                  description: >-
+                    Represents the results with query parameter get_unpublished=true, get_published=false
+                  value:
+                    version: '1.0'
+                    data:
+                      geographies:
+                        - geography_id: 10000000-0000-0000-0000-000000000003
+                          name: Historic Rome
+                          description: Draft – unpublished
+                          geography_json:
+                            type: FeatureCollection
+                            features:
+                              - type: Feature
+                                properties: {}
+                                geometry:
+                                  type: Polygon
+                                  coordinates:
+                                    - - - 12.49746322631836
+                                        - 41.91134771078812
+                                      - - 12.491283416748047
+                                        - 41.9112199638231
+                                      - - 12.487506866455078
+                                        - 41.9085372185006
+                                      - - 12.472572326660156
+                                        - 41.89167166631636
+                                      - - 12.479610443115234
+                                        - 41.888476931243254
+                                      - - 12.475318908691406
+                                        - 41.883365022797314
+                                      - - 12.500381469726562
+                                        - 41.86700416724044
+                                      - - 12.531967163085938
+                                        - 41.90023276842022
+                                      - - 12.49746322631836
+                                        - 41.91134771078812
                 Summary:
                   description: >-
                     with `summary=true` requested, the GeoJSON descriptions are ommitted reducing the payload drastically
@@ -49,6 +193,10 @@ paths:
                         - geography_id: 10000000-0000-0000-0000-000000000003
                           name: Historic Rome
                           description: Draft – unpublished
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
 
   /geographies/{geographyId}:
     get:
@@ -70,6 +218,23 @@ paths:
                   $ref: '#/components/examples/AroundRomaTerminiResponse'
                 HistoricRome:
                   $ref: '#/components/examples/HistoricRomeResponse'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          description: Geography not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  name: 'NotFoundError'
+                  reason: 'A geography with the given ID does not exist'
+        '500':
+          $ref: '#/components/responses/500'
 components:
   schemas:
     geography:
@@ -177,6 +342,17 @@ components:
                 $ref: '#/components/schemas/geography'
         version:
           $ref: '#/components/schemas/version'
+    Error:
+      type: object
+      additionalProperties: true
+      required:
+        - name
+        - reason
+      properties:
+        name:
+          type: string
+        reaon:
+          type: string
   parameters:
     geographyId:
       name: geographyId
@@ -446,6 +622,30 @@ components:
                             - 41.90023276842022
                           - - 12.49746322631836
                             - 41.91134771078812
-
-    Y2K38:
-      value: 2147480047000
+  responses:
+    '403':
+      description: Insufficient Permissions Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: '#/components/schemas/Error'
+          example:
+            error:
+              name: 'InsufficientPermissionsError'
+              reason: 'No valid scope supplied in token'
+    '500':
+      description: Other Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: '#/components/schemas/Error'
+          example:
+            error:
+              name: 'ServerError'
+              reason: 'Error Getting Geography'
