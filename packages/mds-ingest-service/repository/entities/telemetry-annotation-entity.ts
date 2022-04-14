@@ -17,6 +17,13 @@
 import { BigintTransformer, DesignType, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import { Timestamp, UUID } from '@mds-core/mds-types'
 import { Column, Entity, Index } from 'typeorm'
+
+@Index(['provider_id', 'h3_08', 'timestamp'])
+@Index(['provider_id', 'h3_09', 'timestamp'])
+@Index(['provider_id', 'h3_10', 'timestamp'])
+@Index(['provider_id', 'h3_11', 'timestamp'])
+@Index(['provider_id', 'h3_12', 'timestamp'])
+@Index(['provider_id', 'h3_13', 'timestamp'])
 @Entity('telemetry_annotations')
 export class TelemetryAnnotationEntity extends IdentityColumn(RecordedColumn(class {})) {
   @Column('uuid', { primary: true })
