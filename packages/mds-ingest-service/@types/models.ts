@@ -82,7 +82,7 @@ export interface TelemetryAnnotationDomainModel {
   geography_ids: UUID[]
 }
 
-export const H3_RESOLUTIONS = ['h3_08', 'h3_09', 'h3_10', 'h3_11', 'h3_12', 'h3_13']
+export const H3_RESOLUTIONS = <const>['h3_08', 'h3_09', 'h3_10', 'h3_11', 'h3_12', 'h3_13']
 export type H3_RESOLUTIONS = typeof H3_RESOLUTIONS[number]
 
 export const K_HOURLY = 2

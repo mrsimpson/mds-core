@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@improbable-eng/grpc-web-node-http-transport": "0.14.1",
-    "@lacuna-tech/rpc_ts": "2.1.2-alpha.14",
+    "@lacuna-tech/rpc_ts": "2.1.2-alpha.17",
     "@mds-core/mds-api-authorizer": "workspace:0.1.67",
     "@mds-core/mds-api-server": "workspace:0.4.13",
     "@mds-core/mds-logger": "workspace:0.5.7",

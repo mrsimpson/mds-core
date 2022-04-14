@@ -18,7 +18,7 @@
     "images": "pnpm run:concurrent image",
     "preinstall": "npx check-node-version --package && npx only-allow pnpm && pnpm i -g pnpm",
     "lint": "pnpm lint:audit && pnpm lint:prettier '**/package.json' && pnpm lint:markdown && pnpm lint:eslint '**/*.ts'",
-    "lint:audit": "pnpm-ci audit --strict",
+    "lint:audit": "pnpm-ci audit --strict -i GHSA-fwr7-v2mv-hh25",
     "lint:eslint": "eslint --ignore-path .gitignore --ignore-path .eslintignore",
     "lint:markdown": "markdownlint-cli2 '**/*.md' '!**/CHANGELOG.md' '!**/node_modules/**'",
     "lint:prettier": "prettier --check",
