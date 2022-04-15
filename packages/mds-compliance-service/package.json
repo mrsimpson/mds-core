@@ -20,7 +20,7 @@
     "start": "pnpm watch server",
     "test": "pnpm _test",
     "ts-node": "node --experimental-repl-await -r ts-node/register -r ../../dotenv-flow.js",
-    "typeorm": "typeorm-ts-node-commonjs -r ../../dotenv-flow.js -d ormconfig",
+    "typeorm": "pnpm ts-node ./node_modules/typeorm/cli.js -- -d ormconfig",
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
