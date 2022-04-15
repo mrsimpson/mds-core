@@ -1,5 +1,22 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.29
+
+### Patch Changes
+
+- 3f86285a: removed dependency on moment
+- Updated dependencies [b3149e1c]
+- Updated dependencies [1565b288]
+- Updated dependencies [3b1abd83]
+- Updated dependencies [3f86285a]
+  - @mds-core/mds-ingest-service@0.10.15
+  - @mds-core/mds-schema-validators@0.5.13
+  - @mds-core/mds-policy-service@0.12.4
+  - @mds-core/mds-db@0.6.22
+  - @mds-core/mds-compliance-service@0.10.36
+  - @mds-core/mds-geography-service@0.10.27
+  - @mds-core/mds-api-helpers@0.2.30
+
 ## 0.8.28
 
 ### Patch Changes

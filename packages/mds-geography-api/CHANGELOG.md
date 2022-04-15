@@ -1,5 +1,14 @@
 # @mds-core/mds-geography-api
 
+## 0.4.30
+
+### Patch Changes
+
+- Updated dependencies [b3149e1c]
+  - @mds-core/mds-schema-validators@0.5.13
+  - @mds-core/mds-geography-service@0.10.27
+  - @mds-core/mds-api-helpers@0.2.30
+
 ## 0.4.29
 
 ### Patch Changes

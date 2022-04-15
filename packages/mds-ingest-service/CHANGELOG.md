@@ -1,5 +1,16 @@
 # @mds-core/mds-ingest-service
 
+## 0.10.15
+
+### Patch Changes
+
+- b3149e1c: Adding mds-provider-service package
+- 1565b288: Downgrade typeorm-cursor-pagination to fix regression introduced in v0.8.0
+- 3b1abd83: adds indicies to support getH3Bins index-only-scans
+- 3f86285a: H3_RESOLUTIONS should be exported const
+- Updated dependencies [b3149e1c]
+  - @mds-core/mds-schema-validators@0.5.13
+
 ## 0.10.14
 
 ### Patch Changes

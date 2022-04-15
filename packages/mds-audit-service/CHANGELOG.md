@@ -1,5 +1,12 @@
 # @mds-core/mds-audit-service
 
+## 0.6.8
+
+### Patch Changes
+
+- Updated dependencies [b3149e1c]
+  - @mds-core/mds-schema-validators@0.5.13
+
 ## 0.6.7
 
 ### Patch Changes

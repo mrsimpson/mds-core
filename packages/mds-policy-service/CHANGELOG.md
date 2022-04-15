@@ -1,5 +1,14 @@
 # @mds-core/mds-policy-service
 
+## 0.12.4
+
+### Patch Changes
+
+- 1565b288: Downgrade typeorm-cursor-pagination to fix regression introduced in v0.8.0
+- Updated dependencies [b3149e1c]
+  - @mds-core/mds-schema-validators@0.5.13
+  - @mds-core/mds-geography-service@0.10.27
+
 ## 0.12.3
 
 ### Patch Changes

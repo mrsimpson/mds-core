@@ -1,5 +1,12 @@
 # @mds-core/mds-attachment-service
 
+## 0.5.31
+
+### Patch Changes
+
+- Updated dependencies [b3149e1c]
+  - @mds-core/mds-schema-validators@0.5.13
+
 ## 0.5.30
 
 ### Patch Changes
