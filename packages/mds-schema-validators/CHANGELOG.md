@@ -1,5 +1,11 @@
 # @mds-core/mds-schema-validators
 
+## 0.5.13
+
+### Patch Changes
+
+- b3149e1c: Adding mds-provider-service package
+
 ## 0.5.12
 
 ### Patch Changes

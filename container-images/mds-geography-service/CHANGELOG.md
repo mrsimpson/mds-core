@@ -1,5 +1,11 @@
 # @container-images/mds-geography-service
 
+## 0.2.4
+
+### Patch Changes
+
+- @mds-core/mds-geography-service@0.10.27
+
 ## 0.2.3
 
 ### Patch Changes

@@ -15,7 +15,13 @@
  */
 
 import type { Schema } from '@mds-core/mds-schema-validators'
-import { SchemaValidator } from '@mds-core/mds-schema-validators'
+import {
+  nullableFloat,
+  nullableInteger,
+  SchemaValidator,
+  timestampSchema,
+  uuidSchema
+} from '@mds-core/mds-schema-validators'
 import type {
   GetH3BinOptions,
   TelemetryAnnotationDomainCreateModel,
@@ -24,7 +30,6 @@ import type {
   TelemetryDomainModel
 } from '../@types'
 import { H3_RESOLUTIONS, K_HOURLY } from '../@types'
-import { nullableFloat, nullableInteger, timestampSchema, uuidSchema } from './util_schemas'
 
 export const telemetryDomainCreateModelSchema: Schema<TelemetryDomainCreateModel> = <const>{
   $id: 'Telemetry',

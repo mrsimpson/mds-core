@@ -14,8 +14,7 @@ import { TIME_FORMAT } from '@mds-core/mds-policy-service'
 import { getProviders } from '@mds-core/mds-providers'
 import type { UUID, VehicleEvent } from '@mds-core/mds-types'
 import { areThereCommonElements, days, isDefined, now, RuntimeError } from '@mds-core/mds-utils'
-import { DateTime } from 'luxon'
-import moment from 'moment-timezone'
+import { DateTime, IANAZone } from 'luxon'
 import type { ProviderInputs, VehicleEventWithTelemetry } from '../@types'
 import { ComplianceEngineLogger as logger } from '../logger'
 const { env } = process
@@ -171,7 +170,7 @@ export function isRuleActive({ start_time, end_time, days }: Pick<Rule, 'start_t
     throw new RuntimeError('TIMEZONE environment variable must be declared!')
   }
 
-  if (!moment.tz.names().includes(env.TIMEZONE)) {
+  if (!IANAZone.isValidZone(env.TIMEZONE)) {
     throw new RuntimeError(`TIMEZONE environment variable ${env.TIMEZONE} is not a valid timezone!`)
   }
 

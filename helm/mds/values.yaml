@@ -125,6 +125,8 @@ deployments:
     pathPrefix: /policy-author
   mds-policy-service:
     enabled: false
+  mds-provider-service:
+    enabled: false
   mds-transaction-api:
     enabled: false
     pathPrefix: /transaction
