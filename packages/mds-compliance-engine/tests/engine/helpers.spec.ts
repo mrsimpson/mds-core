@@ -1,5 +1,7 @@
+import type { Rule } from '@mds-core/mds-policy-service'
+import type { VehicleEvent } from '@mds-core/mds-types'
 import { Settings } from 'luxon'
-import { isRuleActive } from '../../engine/helpers'
+import { isInStatesOrEvents, isRuleActive } from '../../engine/helpers'
 
 describe('Tests isRuleActive checking', () => {
   const oldTimezone = process.env.TIMEZONE
@@ -250,6 +252,170 @@ describe('Tests isRuleActive checking', () => {
             end_time: '05:00:00'
           })
         ).toStrictEqual(false)
+      })
+    })
+  })
+})
+
+describe('Tests isInStatesOrEvents', () => {
+  describe('Tests modality matching', () => {
+    it('Tests defined modality matching truthiness', () => {
+      const partialEvent: Pick<VehicleEvent, 'event_types' | 'vehicle_state'> = {
+        vehicle_state: 'available',
+        event_types: ['provider_drop_off']
+      }
+
+      const partialDevice = <const>{
+        modality: 'micromobility'
+      }
+
+      const partialRule: Pick<Rule, 'states' | 'modality'> = {
+        states: null,
+        modality: 'micromobility'
+      }
+
+      expect(isInStatesOrEvents(partialRule, partialDevice, partialEvent)).toBeTruthy()
+    })
+
+    it('Tests defined modality matching falsiness', () => {
+      const partialEvent: Pick<VehicleEvent, 'event_types' | 'vehicle_state'> = {
+        vehicle_state: 'available',
+        event_types: ['provider_drop_off']
+      }
+
+      const partialDevice = <const>{
+        modality: 'micromobility'
+      }
+
+      const partialRule: Pick<Rule, 'states' | 'modality'> = {
+        states: null,
+        modality: 'taxi'
+      }
+
+      expect(isInStatesOrEvents(partialRule, partialDevice, partialEvent)).toBeFalsy()
+    })
+  })
+
+  describe('Tests states & events matching', () => {
+    describe('Tests rule defined states & events', () => {
+      it('Tests defined states & events matching truthiness', () => {
+        const partialEvent: Pick<VehicleEvent, 'event_types' | 'vehicle_state'> = {
+          vehicle_state: 'available',
+          event_types: ['provider_drop_off']
+        }
+
+        const partialDevice = <const>{
+          modality: 'micromobility'
+        }
+
+        const partialRule: Pick<Rule, 'states' | 'modality'> = {
+          states: {
+            available: ['provider_drop_off']
+          },
+          modality: 'micromobility'
+        }
+
+        expect(isInStatesOrEvents(partialRule, partialDevice, partialEvent)).toBeTruthy()
+      })
+
+      it('Tests defined states & events matching falsiness', () => {
+        const partialEvent: Pick<VehicleEvent, 'event_types' | 'vehicle_state'> = {
+          vehicle_state: 'available',
+          event_types: ['trip_end']
+        }
+
+        const partialDevice = <const>{
+          modality: 'micromobility'
+        }
+
+        const partialRule: Pick<Rule, 'states' | 'modality'> = {
+          states: {
+            available: ['provider_drop_off']
+          },
+          modality: 'micromobility'
+        }
+
+        expect(isInStatesOrEvents(partialRule, partialDevice, partialEvent)).toBeFalsy()
+      })
+    })
+
+    describe('Tests rule defined states, empty events', () => {
+      it('Tests rule defined states, empty events truthiness', () => {
+        const partialEvent: Pick<VehicleEvent, 'event_types' | 'vehicle_state'> = {
+          vehicle_state: 'available',
+          event_types: ['provider_drop_off']
+        }
+
+        const partialDevice = <const>{
+          modality: 'micromobility'
+        }
+
+        const partialRule: Pick<Rule, 'states' | 'modality'> = {
+          states: {
+            available: []
+          },
+          modality: 'micromobility'
+        }
+
+        expect(isInStatesOrEvents(partialRule, partialDevice, partialEvent)).toBeTruthy()
+      })
+
+      it('Tests rule defined states, empty events falsiness', () => {
+        const partialEvent: Pick<VehicleEvent, 'event_types' | 'vehicle_state'> = {
+          vehicle_state: 'available',
+          event_types: ['provider_drop_off']
+        }
+
+        const partialDevice = <const>{
+          modality: 'micromobility'
+        }
+
+        const partialRule: Pick<Rule, 'states' | 'modality'> = {
+          states: {
+            non_operational: []
+          },
+          modality: 'micromobility'
+        }
+
+        expect(isInStatesOrEvents(partialRule, partialDevice, partialEvent)).toBeFalsy()
+      })
+    })
+
+    describe('Tests rule undefined states', () => {
+      it('Tests rule undefined states (empty object) truthiness', () => {
+        const partialEvent: Pick<VehicleEvent, 'event_types' | 'vehicle_state'> = {
+          vehicle_state: 'available',
+          event_types: ['provider_drop_off']
+        }
+
+        const partialDevice = <const>{
+          modality: 'micromobility'
+        }
+
+        const partialRule: Pick<Rule, 'states' | 'modality'> = {
+          states: {},
+          modality: 'micromobility'
+        }
+
+        expect(isInStatesOrEvents(partialRule, partialDevice, partialEvent)).toBeTruthy()
+      })
+
+      it('Tests rule undefined states (null) truthiness', () => {
+        const partialEvent: Pick<VehicleEvent, 'event_types' | 'vehicle_state'> = {
+          vehicle_state: 'available',
+          event_types: ['provider_drop_off']
+        }
+
+        const partialDevice = <const>{
+          modality: 'micromobility'
+        }
+
+        const partialRule: Pick<Rule, 'states' | 'modality'> = {
+          states: null,
+          modality: 'micromobility'
+        }
+
+        expect(isInStatesOrEvents(partialRule, partialDevice, partialEvent)).toBeTruthy()
       })
     })
   })
