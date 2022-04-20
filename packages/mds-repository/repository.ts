@@ -18,6 +18,7 @@ import type { MountedConfigFileReader } from '@mds-core/mds-config-files'
 import { ConfigFileReader } from '@mds-core/mds-config-files'
 import { pluralize, tail, testEnvSafeguard } from '@mds-core/mds-utils'
 import { bool, cleanEnv } from 'envalid'
+import type { EntityMetadata, InsertQueryBuilder, Repository } from 'typeorm'
 import { DataSource } from 'typeorm'
 import type { ConnectionMode } from './connection'
 import { ConnectionManager } from './connection'
@@ -35,6 +36,7 @@ interface EntitySeeder<From = any, To = any> {
   entity: Entity
   mapper: ModelMapper<From, To>
   reader?: MountedConfigFileReader
+  upsert?: boolean
 }
 
 export type ReadOnlyRepositoryOptions = { entities: Array<Entity> }
@@ -98,60 +100,6 @@ const truncateAllTablesUsingConnection = async (
   await connection.query(`TRUNCATE ${tableNames} RESTART IDENTITY CASCADE`)
 }
 
-const DataSeeder = (connection: DataSource, path?: string) => {
-  try {
-    const mount = ConfigFileReader.mount(path)
-    logger.info(`R/W repository using data files mounted at ${mount.path}`)
-
-    return {
-      using: async <From, To>({ entity, mapper, reader = mount }: EntitySeeder<From, To>): Promise<void> => {
-        const repository = connection.getRepository(entity)
-
-        const {
-          metadata: { tableName: table }
-        } = repository
-
-        // Additional log if entity not using default data file mount
-        if (reader !== mount) {
-          logger.info(`R/W repository using data file mounted at ${reader.path} for "${table}"`)
-        }
-
-        // Make sure the source data file exists
-        if (!reader.configFileExists(table)) {
-          return logger.info(`No data file found for "${table} at ${reader.path}`)
-        }
-        logger.info(`Found data file for "${table}"`)
-
-        // Make sure the target table is empty
-        const count = await repository.createQueryBuilder().getCount()
-        if (count > 0) {
-          return logger.info(
-            `Seeding will be skipped ("${table}" table contains ${count} ${pluralize(count, 'row', 'rows')})`
-          )
-        }
-        logger.info(`Seeding will be attempted ("${table}" table is empty)`)
-
-        try {
-          const data = await reader.readConfigFile<Array<From>>(table)
-          if (data.length === 0) {
-            return logger.info(`Data file was empty or not an array`)
-          }
-
-          const {
-            identifiers: { length: inserted }
-          } = await repository.createQueryBuilder().insert().values(MapModels(data).using(mapper)).execute()
-
-          logger.info(`Inserted ${inserted} ${pluralize(inserted, 'row', 'rows')} into "${table}"`)
-        } catch (error) {
-          logger.error(`Seeding failed for "${table}}`, { error })
-        }
-      }
-    }
-  } catch {
-    logger.info(`R/W repository data files not mounted`)
-  }
-}
-
 const asChunksForInsert = <TEntity>(entities: TEntity[], size = 4_000) => {
   const chunks =
     entities.length > size
@@ -169,6 +117,90 @@ const asChunksForInsert = <TEntity>(entities: TEntity[], size = 4_000) => {
     logger.info(`Splitting ${entities.length} records into ${chunks.length} chunks for insert`)
   }
   return chunks
+}
+
+const onConflictDoUpdate = <T>(insert: InsertQueryBuilder<T>, { metadata }: Repository<T>) => {
+  const getColumnNames = (predicate: (column: EntityMetadata['columns'][number]) => boolean) =>
+    metadata.columns.filter(predicate).map(column => column.propertyName)
+  insert.orUpdate(
+    getColumnNames(column => !(column.isPrimary || column.isGenerated)),
+    insert.connection.namingStrategy.primaryKeyName(
+      metadata.tableName,
+      metadata.primaryColumns.map(column => column.propertyName)
+    )
+  )
+  return insert
+}
+
+const DataSeeder = (connection: DataSource, path?: string) => {
+  try {
+    const mount = ConfigFileReader.mount(path)
+    logger.info(`R/W repository using data files mounted at ${mount.path}`)
+
+    return {
+      using: async <From, To>({
+        entity,
+        mapper,
+        reader = mount,
+        upsert = false
+      }: EntitySeeder<From, To>): Promise<void> => {
+        const repository = connection.getRepository(entity)
+
+        const {
+          metadata: { tableName: table }
+        } = repository
+
+        // Additional log if entity not using default data file mount
+        if (reader !== mount) {
+          logger.info(`R/W repository using data file mounted at ${reader.path} for "${table}"`)
+        }
+
+        // Make sure the source data file exists
+        if (!reader.configFileExists(table)) {
+          return logger.info(`No data file found for "${table} at ${reader.path}`)
+        }
+        logger.info(`Found data file for "${table}"`)
+
+        // Make sure the target table is empty or upsert mode is enabled
+        if (upsert) {
+          logger.info(`Seeding will be attempted ("upsert" mode is enabled)`)
+        } else {
+          const count = await repository.createQueryBuilder().getCount()
+          if (count > 0) {
+            return logger.info(
+              `Seeding will be skipped ("${table}" table contains ${count} ${pluralize(
+                count,
+                'row',
+                'rows'
+              )} and "upsert" mode is disabled)`
+            )
+          }
+          logger.info(`Seeding will be attempted ("${table}" table is empty)`)
+        }
+
+        try {
+          const data = await reader.readConfigFile<Array<From>>(table)
+          if (data.length === 0) {
+            return logger.info(`Data file was empty or not an array`)
+          }
+
+          const query = repository.createQueryBuilder().insert().values(MapModels(data).using(mapper))
+
+          const {
+            identifiers: { length: inserted }
+          } = await (upsert ? onConflictDoUpdate(query, repository) : query).execute()
+
+          logger.info(
+            `${upsert ? 'Upserted' : 'Inserted'} ${inserted} ${pluralize(inserted, 'row', 'rows')} into "${table}"`
+          )
+        } catch (error) {
+          logger.error(`Seeding failed for "${table}}`, { error })
+        }
+      }
+    }
+  } catch {
+    logger.info(`R/W repository data files not mounted`)
+  }
 }
 
 export interface RepositoryPublicMethods {
@@ -213,6 +245,7 @@ export const ReadOnlyRepository = {
 
 export type ReadWriteRepositoryProtectedMethods = RepositoryConnectionMethods<ConnectionMode> & {
   asChunksForInsert: <TEntity>(entities: TEntity[], size?: number) => Array<TEntity[]>
+  onConflictDoUpdate: <T>(insert: InsertQueryBuilder<T>, { metadata }: Repository<T>) => InsertQueryBuilder<T>
 }
 
 export type ReadWriteRepositoryPublicMethods<T extends {}> = T &
@@ -286,7 +319,7 @@ export const ReadWriteRepository = {
       runAllMigrations,
       revertAllMigrations,
       truncateAllTables,
-      ...methods({ connect, disconnect, asChunksForInsert })
+      ...methods({ connect, disconnect, asChunksForInsert, onConflictDoUpdate })
     }
   }
 }
