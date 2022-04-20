@@ -309,13 +309,16 @@ export async function getProviderIDs(provider_ids: UUID[] | undefined | null) {
  * every state is valid in between those event types.
  */
 export function isInStatesOrEvents(
-  rule: Pick<Rule, 'states'>,
+  rule: Pick<Rule, 'states' | 'modality'>,
   device: Pick<DeviceDomainModel, 'modality'>,
-  event: VehicleEvent
+  event: Pick<VehicleEvent, 'event_types' | 'vehicle_state'>
 ): boolean {
   const { states } = rule
+
+  if ((rule.modality ?? 'micromobility') !== device.modality) return false
+
   // If no states are specified, then the rule applies to all VehicleStates.
-  if (states === null || states === undefined) return true
+  if (states === null || states === undefined || Object.keys(states).length === 0) return true
 
   const { vehicle_state } = event
   // FIXME It might be possible to avoid this `any` cast...

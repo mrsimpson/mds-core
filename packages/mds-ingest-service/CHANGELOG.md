@@ -1,5 +1,13 @@
 # @mds-core/mds-ingest-service
 
+## 0.10.16
+
+### Patch Changes
+
+- 599d8918: indicies should be created if not exists, to allow for pre-deployment execution
+- Updated dependencies [f088ff72]
+  - @mds-core/mds-repository@0.2.4
+
 ## 0.10.15
 
 ### Patch Changes

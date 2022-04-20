@@ -1,5 +1,18 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.30
+
+### Patch Changes
+
+- e4dc319d: Verify that rule.modality === device.modality when evaluating if an event/device matches a rule, handle `states: {}` by matching all event/state combinations.
+- Updated dependencies [599d8918]
+  - @mds-core/mds-ingest-service@0.10.16
+  - @mds-core/mds-compliance-service@0.10.37
+  - @mds-core/mds-geography-service@0.10.28
+  - @mds-core/mds-policy-service@0.12.5
+  - @mds-core/mds-db@0.6.23
+  - @mds-core/mds-api-helpers@0.2.31
+
 ## 0.8.29
 
 ### Patch Changes

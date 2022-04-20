@@ -1,5 +1,16 @@
 # @mds-core/mds-db
 
+## 0.6.23
+
+### Patch Changes
+
+- Updated dependencies [599d8918]
+  - @mds-core/mds-ingest-service@0.10.16
+  - @mds-core/mds-attachment-service@0.5.32
+  - @mds-core/mds-audit-service@0.6.9
+  - @mds-core/mds-geography-service@0.10.28
+  - @mds-core/mds-policy-service@0.12.5
+
 ## 0.6.22
 
 ### Patch Changes
