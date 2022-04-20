@@ -1,5 +1,12 @@
 # @mds-core/mds-policy-author-api
 
+## 0.8.5
+
+### Patch Changes
+
+- @mds-core/mds-policy-service@0.12.5
+- @mds-core/mds-api-helpers@0.2.31
+
 ## 0.8.4
 
 ### Patch Changes

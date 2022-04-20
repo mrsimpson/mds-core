@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.2.4
+
+### Patch Changes
+
+- f088ff72: Add support for upserting evergreen seed data
+
 ## 0.2.3
 
 ### Patch Changes
