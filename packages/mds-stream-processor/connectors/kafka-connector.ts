@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import type { HealthStatus } from '@mds-core/mds-api-server'
 import type { KafkaStreamConsumerOptions, KafkaStreamProducerOptions } from '@mds-core/mds-stream'
 import stream from '@mds-core/mds-stream'
 import type { SingleOrArray } from '@mds-core/mds-types'
@@ -46,8 +47,11 @@ export const KafkaSource =
     topics: SingleOrArray<string>,
     {
       messageLogger,
+      healthStatus,
       ...options
-    }: Partial<KafkaStreamConsumerOptions & { messageLogger: (message: TMessage) => string | undefined }>
+    }: Partial<KafkaStreamConsumerOptions & { messageLogger: (message: TMessage) => string | undefined }> & {
+      healthStatus: HealthStatus
+    }
   ): StreamSource<TMessage> =>
   processor => {
     const messageCounter = new Counter()
@@ -76,6 +80,7 @@ export const KafkaSource =
           return messageCounter.increment()
         }
       },
+      healthStatus,
       options
     )
   }

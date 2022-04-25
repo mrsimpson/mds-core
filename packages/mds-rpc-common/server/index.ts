@@ -18,7 +18,7 @@ import type { ModuleRpcCommon } from '@lacuna-tech/rpc_ts/lib/common'
 import { ModuleRpcProtocolGrpcWebCommon } from '@lacuna-tech/rpc_ts/lib/protocol/grpc_web/common'
 import { ModuleRpcProtocolServer } from '@lacuna-tech/rpc_ts/lib/protocol/server'
 import type { ServiceHandlerFor } from '@lacuna-tech/rpc_ts/lib/server/server'
-import type { RawBodyParserMiddlewareOptions } from '@mds-core/mds-api-server'
+import type { HealthStatus, RawBodyParserMiddlewareOptions } from '@mds-core/mds-api-server'
 import {
   HealthRequestHandler,
   HttpServer,
@@ -28,6 +28,7 @@ import {
 } from '@mds-core/mds-api-server'
 import { ProcessManager } from '@mds-core/mds-service-helpers'
 import type { Nullable } from '@mds-core/mds-types'
+import { now } from '@mds-core/mds-utils'
 import type { Express } from 'express'
 import express from 'express'
 import type http from 'http'
@@ -58,6 +59,7 @@ export interface RpcServiceManagerOptions extends RpcServiceHandlers {
   // custom middleware or http routes. For example, to make custom readiness/liveliness checks
   // available via http.
   customize: (server: Express) => Express
+  healthStatus: HealthStatus
 }
 
 const stopServer = async (server: http.Server | net.Server): Promise<void> =>
@@ -127,7 +129,14 @@ export const RpcServiceManager = (options: Partial<RpcServiceManagerOptions> = {
                 .use(PrometheusMiddleware())
                 .use(RequestLoggingMiddleware({ includeRemoteAddress: true, excludePaths: [/\/health$/] }))
                 .use(RawBodyParserMiddleware({ type: RPC_CONTENT_TYPE, limit: options.maxRequestSize }))
-                .get('/health', HealthRequestHandler)
+                .get(
+                  '/health',
+                  HealthRequestHandler(options.healthStatus, {
+                    components: {
+                      rpc_server: { healthy: true, last_updated: now() }
+                    }
+                  })
+                )
             )
 
             server = HttpServer(

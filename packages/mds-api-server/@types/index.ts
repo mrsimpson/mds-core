@@ -71,3 +71,7 @@ export type ApiResponseLocalsVersion<V extends string> = ApiResponseLocals<'vers
 
 export type ApiVersionedResponse<V extends string, B = {}> = ApiResponse<B & { version: V }> &
   ApiResponseLocalsVersion<V>
+
+export type HealthStatus = {
+  components: Record<string, { last_updated: number; healthy: boolean; message?: string }>
+}

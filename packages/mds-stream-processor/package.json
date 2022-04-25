@@ -22,6 +22,7 @@
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
+    "@mds-core/mds-api-server": "0.4.13",
     "@mds-core/mds-logger": "workspace:0.5.7",
     "@mds-core/mds-service-helpers": "workspace:0.6.10",
     "@mds-core/mds-stream": "workspace:0.3.3",
