@@ -15,12 +15,21 @@
  */
 
 import type express from 'express'
-import type { ApiRequest, ApiResponse } from '../@types'
+import type { ApiRequest, ApiResponse, HealthStatus } from '../@types'
 import { healthInfo } from '../utils'
 
-export type MaintenanceModeMiddlewareOptions = Partial<{}>
-
+/**
+ *
+ * @param healthStatus Health Status object defined by the parent process and _passed through_ to the caller (e.g. ApiServer or RPC Server)
+ * @param baseHealthStatus _Base_ health status object defined _by_ the caller (e.g. ApiServer or RPCServer).
+ * @returns
+ */
 export const MaintenanceModeMiddleware =
-  (options: MaintenanceModeMiddlewareOptions = {}) =>
-  (req: ApiRequest, res: ApiResponse, next: express.NextFunction) =>
-    process.env.MAINTENANCE ? res.status(503).send(healthInfo()) : next()
+  (healthStatus?: HealthStatus, baseHealthStatus?: HealthStatus) =>
+  (req: ApiRequest, res: ApiResponse, next: express.NextFunction) => {
+    const compositeHealthStatus = {
+      components: { ...healthStatus?.components, ...baseHealthStatus?.components }
+    }
+
+    return process.env.MAINTENANCE ? res.status(503).send(healthInfo(compositeHealthStatus)) : next()
+  }

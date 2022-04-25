@@ -15,8 +15,9 @@
  */
 
 import { JurisdictionsClaim, ProviderIdClaim, UserEmailClaim } from '@mds-core/mds-api-authorizer'
-import { pathPrefix } from '@mds-core/mds-utils'
+import { now, pathPrefix } from '@mds-core/mds-utils'
 import express from 'express'
+import type { HealthStatus } from './@types'
 import { HealthRequestHandler } from './handlers/health'
 import { ApiServerLogger } from './logger'
 import type { AuthorizationMiddlewareOptions } from './middleware/authorization'
@@ -27,7 +28,6 @@ import type { CorsMiddlewareOptions } from './middleware/cors'
 import { CorsMiddleware } from './middleware/cors'
 import type { JsonBodyParserMiddlewareOptions } from './middleware/json-body-parser'
 import { JsonBodyParserMiddleware } from './middleware/json-body-parser'
-import type { MaintenanceModeMiddlewareOptions } from './middleware/maintenance-mode'
 import { MaintenanceModeMiddleware } from './middleware/maintenance-mode'
 import type { PrometheusMiddlewareOptions } from './middleware/prometheus'
 import { PrometheusMiddleware } from './middleware/prometheus'
@@ -41,10 +41,12 @@ export interface ApiServerOptions {
   compression: CompressionMiddlewareOptions
   cors: CorsMiddlewareOptions
   jsonBodyParser: JsonBodyParserMiddlewareOptions
-  maintenanceMode: MaintenanceModeMiddlewareOptions
   requestLogging: RequestLoggingMiddlewareOptions
   prometheus: PrometheusMiddlewareOptions
+  healthStatus: HealthStatus
 }
+
+const baseHealthStatus = { components: { api_server: { healthy: true, last_updated: now() } } }
 
 export const ApiServer = (
   api: (server: express.Express) => express.Express,
@@ -82,10 +84,10 @@ export const ApiServer = (
   )
 
   // Health Route
-  app.get(pathPrefix('/health'), HealthRequestHandler)
+  app.get(pathPrefix('/health'), HealthRequestHandler(options.healthStatus, baseHealthStatus))
 
   // Everything except /health will return a 503 when in maintenance mode
-  app.use(MaintenanceModeMiddleware(options.maintenanceMode))
+  app.use(MaintenanceModeMiddleware(options.healthStatus, baseHealthStatus))
 
   return api(app)
 }

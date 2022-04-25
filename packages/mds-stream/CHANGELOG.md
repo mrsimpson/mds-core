@@ -1,5 +1,17 @@
 # @mds-core/mds-stream
 
+## 0.4.0
+
+### Minor Changes
+
+- 85b7280e: Add a new `healthStatus` option to the `StreamConsumer` which will allow consumers to provide information externally about their healthiness. At the moment, this is only used by the Kafka Consumer, which will update this status upon a KafkaJS `CRASH`, or the `HEARTBEAT` not being sent to the coordinator in over a minute.
+
+### Patch Changes
+
+- b6e9a2f6: Chunk messages sent to producer so as not to go over the kafka broker's limit
+- Updated dependencies [85b7280e]
+  - @mds-core/mds-api-server@0.4.14
+
 ## 0.3.3
 
 ### Patch Changes

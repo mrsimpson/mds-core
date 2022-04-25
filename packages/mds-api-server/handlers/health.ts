@@ -14,7 +14,22 @@
  * limitations under the License.
  */
 
-import type { ApiRequest, ApiResponse } from '../@types'
+import type { ApiRequest, ApiResponse, HealthStatus } from '../@types'
 import { healthInfo } from '../utils'
 
-export const HealthRequestHandler = async (req: ApiRequest, res: ApiResponse) => res.status(200).send(healthInfo())
+/**
+ *
+ * @param healthStatus Health Status object defined by the parent process and _passed through_ to the caller (e.g. ApiServer or RPC Server)
+ * @param baseHealthStatus _Base_ health status object defined _by_ the caller (e.g. ApiServer or RPCServer).
+ * @returns
+ */
+export const HealthRequestHandler =
+  (healthStatus?: HealthStatus, baseHealthStatus?: HealthStatus) => async (req: ApiRequest, res: ApiResponse) => {
+    const compositeHealthStatus = {
+      components: { ...healthStatus?.components, ...baseHealthStatus?.components }
+    }
+
+    return res
+      .status(Object.values(compositeHealthStatus.components).every(({ healthy }) => healthy) ? 200 : 503)
+      .send(healthInfo(compositeHealthStatus))
+  }

@@ -15,10 +15,10 @@
  */
 
 import type { ExtendedKeys, Nullable, RequiredKeys } from '@mds-core/mds-types'
-import { ClientDisconnectedError, ExceptionMessages, isDefined } from '@mds-core/mds-utils'
+import { asArray, ClientDisconnectedError, ExceptionMessages, isDefined } from '@mds-core/mds-utils'
+import { cleanEnv, num } from 'envalid'
 import type { Producer } from 'kafkajs'
 import { Kafka } from 'kafkajs'
-import { isArray } from 'util'
 import { StreamLogger } from '../logger'
 import type { StreamProducer } from '../stream-interface'
 import { getKafkaBrokers } from './helpers'
@@ -27,6 +27,11 @@ import { getKafkaBrokers } from './helpers'
  * Gets all the keys of all required properties of T that extend string
  */
 type RequiredStringKeys<T extends object> = RequiredKeys<T> & ExtendedKeys<T, string>
+
+const env = cleanEnv(process.env, {
+  KAFKA_PRODUCER_BATCH_SIZE: num({ default: 1000 })
+})
+const { KAFKA_PRODUCER_BATCH_SIZE } = env
 
 export interface KafkaStreamProducerOptions<TMessage> {
   clientId: string
@@ -87,13 +92,18 @@ export const KafkaStreamProducer = <TMessage>(
     },
     write: async (message: TMessage[] | TMessage) => {
       if (isDefined(producer)) {
-        const messages = (isArray(message) ? message : [message]).map(msg => {
+        const messages = asArray(message).map(msg => {
           return { value: JSON.stringify(msg), ...getKey(msg, options) }
         })
-        await producer.send({
-          topic,
-          messages
-        })
+
+        const numChunks = Math.ceil(messages.length / KAFKA_PRODUCER_BATCH_SIZE)
+        for (let i = 0; i < numChunks; i++) {
+          const batch = messages.slice(i * KAFKA_PRODUCER_BATCH_SIZE, (i + 1) * KAFKA_PRODUCER_BATCH_SIZE)
+          await producer.send({
+            topic,
+            messages: batch
+          })
+        }
         return
       }
       throw new ClientDisconnectedError(ExceptionMessages.INITIALIZE_CLIENT_MESSAGE)

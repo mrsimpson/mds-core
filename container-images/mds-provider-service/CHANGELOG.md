@@ -1,5 +1,11 @@
 # @container-images/mds-provider-service
 
+## 0.1.3
+
+### Patch Changes
+
+- @mds-core/mds-provider-service@0.2.3
+
 ## 0.1.2
 
 ### Patch Changes

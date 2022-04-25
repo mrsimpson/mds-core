@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { pathPrefix } from '@mds-core/mds-utils'
+import { now, pathPrefix } from '@mds-core/mds-utils'
 import HttpStatus from 'http-status-codes'
 import supertest from 'supertest'
-import type { ApiVersionedResponse } from '../@types'
+import type { ApiVersionedResponse, HealthStatus } from '../@types'
 import { ApiServer } from '../api-server'
 import { HttpServer } from '../http-server'
 import { ApiVersionMiddleware } from '../middleware/api-version'
@@ -27,13 +27,18 @@ const TEST_API_VERSIONS = ['0.1.0', '0.2.0'] as const
 type TEST_API_VERSION = typeof TEST_API_VERSIONS[number]
 const [DEFAULT_TEST_API_VERSION, ALTERNATE_TEST_API_VERSION] = TEST_API_VERSIONS
 
-const api = ApiServer(app => {
-  app.use(ApiVersionMiddleware(TEST_API_MIME_TYPE, TEST_API_VERSIONS).withDefaultVersion(DEFAULT_TEST_API_VERSION))
-  app.get('/api-version-middleware-test', (req, res: ApiVersionedResponse<TEST_API_VERSION>) =>
-    res.status(HttpStatus.OK).send({ version: res.locals.version })
-  )
-  return app
-})
+const healthStatus: HealthStatus = { components: {} }
+
+const api = ApiServer(
+  app => {
+    app.use(ApiVersionMiddleware(TEST_API_MIME_TYPE, TEST_API_VERSIONS).withDefaultVersion(DEFAULT_TEST_API_VERSION))
+    app.get('/api-version-middleware-test', (req, res: ApiVersionedResponse<TEST_API_VERSION>) =>
+      res.status(HttpStatus.OK).send({ version: res.locals.version })
+    )
+    return app
+  },
+  { healthStatus }
+)
 
 const request = supertest(api)
 
@@ -71,8 +76,103 @@ describe('Testing API Server', () => {
       process: expect.any(Number),
       memory: expect.any(Object),
       uptime: expect.any(Number),
-      status: expect.stringContaining('Running')
+      status: expect.stringContaining('Running'),
+      healthy: true
     })
+  })
+
+  it('verifies health (custom components all healthy)', async () => {
+    // clone so we can restore at the end of this test
+    const clonedHealthStatus = { ...healthStatus }
+
+    healthStatus.components = {
+      test1: {
+        healthy: true,
+        last_updated: now()
+      },
+      test2: {
+        healthy: true,
+        last_updated: now()
+      }
+    }
+
+    const result = await request.get(pathPrefix('/health')).expect(HttpStatus.OK)
+    expect(result.headers['content-type']).toStrictEqual(APP_JSON)
+    expect(result.body).toMatchObject({
+      name: expect.any(String),
+      version: expect.any(String),
+      node: expect.any(String),
+      build: expect.any(Object),
+      process: expect.any(Number),
+      memory: expect.any(Object),
+      uptime: expect.any(Number),
+      status: expect.stringContaining('Running'),
+      healthy: true,
+      components: expect.objectContaining({
+        api_server: expect.objectContaining({
+          healthy: true,
+          last_updated: expect.any(Number)
+        }),
+        test1: expect.objectContaining({
+          healthy: true,
+          last_updated: expect.any(Number)
+        }),
+        test2: expect.objectContaining({
+          healthy: true,
+          last_updated: expect.any(Number)
+        })
+      })
+    })
+
+    // restore healthStatus
+    healthStatus.components = clonedHealthStatus.components
+  })
+
+  it('verifies health (some component unhealthy)', async () => {
+    // clone so we can restore at the end of this test
+    const clonedHealthStatus = { ...healthStatus }
+
+    healthStatus.components = {
+      test1: {
+        healthy: true,
+        last_updated: now()
+      },
+      test2: {
+        healthy: false,
+        last_updated: now()
+      }
+    }
+
+    const result = await request.get(pathPrefix('/health')).expect(HttpStatus.SERVICE_UNAVAILABLE)
+    expect(result.headers['content-type']).toStrictEqual(APP_JSON)
+    expect(result.body).toMatchObject({
+      name: expect.any(String),
+      version: expect.any(String),
+      node: expect.any(String),
+      build: expect.any(Object),
+      process: expect.any(Number),
+      memory: expect.any(Object),
+      uptime: expect.any(Number),
+      status: expect.stringContaining('Running'),
+      healthy: false,
+      components: expect.objectContaining({
+        api_server: expect.objectContaining({
+          healthy: true,
+          last_updated: expect.any(Number)
+        }),
+        test1: expect.objectContaining({
+          healthy: true,
+          last_updated: expect.any(Number)
+        }),
+        test2: expect.objectContaining({
+          healthy: false,
+          last_updated: expect.any(Number)
+        })
+      })
+    })
+
+    // restore healthStatus
+    healthStatus.components = clonedHealthStatus.components
   })
 
   it('verifies health (MAINTENANCE)', async () => {

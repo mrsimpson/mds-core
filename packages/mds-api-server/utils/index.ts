@@ -17,9 +17,9 @@
 import type { AuthorizerClaims } from '@mds-core/mds-api-authorizer'
 import { AuthorizationError } from '@mds-core/mds-utils'
 import type express from 'express'
-import type { ApiRequest, ApiResponse, ApiResponseLocalsClaims } from '../@types'
+import type { ApiRequest, ApiResponse, ApiResponseLocalsClaims, HealthStatus } from '../@types'
 
-export const healthInfo = () => {
+export const healthInfo = (healthStatus: HealthStatus) => {
   const {
     versions: { node },
     env: {
@@ -31,6 +31,7 @@ export const healthInfo = () => {
       MAINTENANCE: maintenance
     }
   } = process
+
   return {
     name,
     version,
@@ -39,7 +40,9 @@ export const healthInfo = () => {
     status: maintenance ? `${maintenance} (MAINTENANCE)` : 'Running',
     process: process.pid,
     uptime: process.uptime(),
-    memory: process.memoryUsage()
+    memory: process.memoryUsage(),
+    healthy: Object.values(healthStatus.components).every(({ healthy }) => healthy),
+    ...healthStatus
   }
 }
 

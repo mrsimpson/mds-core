@@ -1,5 +1,14 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.41
+
+### Patch Changes
+
+- Updated dependencies [85b7280e]
+  - @mds-core/mds-api-server@0.4.14
+  - @mds-core/mds-transaction-service@0.6.32
+  - @mds-core/mds-api-helpers@0.2.32
+
 ## 0.2.40
 
 ### Patch Changes
