@@ -1,5 +1,11 @@
 # @mds-core/mds-audit-service
 
+## 0.6.10
+
+### Patch Changes
+
+- @mds-core/mds-rpc-common@0.3.23
+
 ## 0.6.9
 
 ### Patch Changes

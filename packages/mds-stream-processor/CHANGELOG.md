@@ -1,5 +1,19 @@
 # @mds-core/mds-stream-processor
 
+## 0.5.0
+
+### Minor Changes
+
+- 85b7280e: Take a new required `healthStatus` option when constructing a `KafkaSource`. This healthStatus will be _mutated_ based on the health of the Kafka Consumer, and can be passed along to an `mds-api-server::ApiServer` instance for health checks based on the consumer status.
+
+### Patch Changes
+
+- Updated dependencies [85b7280e]
+- Updated dependencies [85b7280e]
+- Updated dependencies [b6e9a2f6]
+  - @mds-core/mds-stream@0.4.0
+  - @mds-core/mds-api-server@0.4.14
+
 ## 0.4.21
 
 ### Patch Changes

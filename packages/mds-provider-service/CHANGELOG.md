@@ -1,5 +1,11 @@
 # @mds-core/mds-provider-service
 
+## 0.2.3
+
+### Patch Changes
+
+- @mds-core/mds-rpc-common@0.3.23
+
 ## 0.2.2
 
 ### Patch Changes
