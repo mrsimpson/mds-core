@@ -96,9 +96,8 @@ const registerLivelinessHandling = (consumer: Consumer, healthStatus: HealthStat
   /**
    * Check the consumers heartbeat every KAFKA_HEARTBEAT_TIMEOUT_MS
    */
-  setTimeout(async () => {
+  setInterval(async () => {
     await heartbeatCheck(consumer, healthStatus, lastHeartbeat)
-    setTimeout(heartbeatCheck, KAFKA_HEARTBEAT_TIMEOUT_MS)
   }, KAFKA_HEARTBEAT_TIMEOUT_MS)
 }
 
