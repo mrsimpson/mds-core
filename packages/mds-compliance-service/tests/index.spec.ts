@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import type { ServiceErrorDescriptor } from '@mds-core/mds-service-helpers'
 import stream from '@mds-core/mds-stream'
 import { days, now } from '@mds-core/mds-utils'
@@ -22,6 +23,7 @@ import { ComplianceServiceClient } from '../client'
 import { ComplianceRepository } from '../repository'
 import { ComplianceServiceManager } from '../service/manager'
 import { ComplianceSnapshotStreamKafka } from '../service/stream'
+import type { PROVIDER_FIXTURE } from './fixtures'
 import {
   COMPLIANCE_SNAPSHOT,
   COMPLIANCE_SNAPSHOTS,
@@ -33,6 +35,7 @@ import {
   PROVIDER_ID,
   PROVIDER_ID_1,
   PROVIDER_ID_2,
+  PROVIDER_NAME_MAP,
   TIME
 } from './fixtures'
 
@@ -179,6 +182,17 @@ describe('ComplianceSnapshots Service Tests', () => {
   })
 
   it('Accurately breaks compliance snapshots into violation periods for one provider and policy', async () => {
+    jest.spyOn(ProviderServiceClient, 'getProvider').mockImplementationOnce(async _ => {
+      return {
+        provider_id: PROVIDER_ID_2,
+        provider_name: 'Lime',
+        url: null,
+        mds_api_url: null,
+        gbfs_api_url: null,
+        color_code_hex: null,
+        provider_types: []
+      }
+    })
     const results: ComplianceAggregateDomainModel[] = await ComplianceServiceClient.getComplianceViolationPeriods({
       start_time: TIME,
       end_time: undefined,
@@ -207,6 +221,17 @@ describe('ComplianceSnapshots Service Tests', () => {
   })
 
   it('Accurately breaks compliance snapshots into violation periods for multiple providers and policies', async () => {
+    jest.spyOn(ProviderServiceClient, 'getProvider').mockImplementation(async provider_id => {
+      return {
+        provider_id,
+        provider_name: PROVIDER_NAME_MAP[provider_id as PROVIDER_FIXTURE],
+        url: null,
+        mds_api_url: null,
+        gbfs_api_url: null,
+        color_code_hex: null,
+        provider_types: []
+      }
+    })
     const resultsWithSpecifiedParams = await ComplianceServiceClient.getComplianceViolationPeriods({
       start_time: TIME,
       end_time: undefined,

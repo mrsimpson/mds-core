@@ -22,7 +22,7 @@ import { validateAuditTelemetryDomainCreateModel } from '@mds-core/mds-audit-ser
 import db from '@mds-core/mds-db'
 import type { TelemetryDomainModel } from '@mds-core/mds-ingest-service'
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
-import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import { ValidationError } from '@mds-core/mds-schema-validators'
 import { isError } from '@mds-core/mds-service-helpers'
 import type { AuditEvent, TelemetryData, Timestamp } from '@mds-core/mds-types'
@@ -207,7 +207,7 @@ function api(app: express.Express): express.Express {
           // Find provider device and event by vehicle id lookup
           const provider_device = await getVehicle(provider_id, provider_vehicle_id)
           const provider_device_id = provider_device ? provider_device.device_id : null
-          const provider_name = await providerName(provider_id)
+          const { provider_name } = await ProviderServiceClient.getProvider(provider_id)
 
           // Create the audit
           await writeAudit({

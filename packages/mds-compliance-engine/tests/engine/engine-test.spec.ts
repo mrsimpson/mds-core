@@ -20,7 +20,8 @@ import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import { IngestServiceManager } from '@mds-core/mds-ingest-service'
 import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
-import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry, TEST1_PROVIDER_ID } from '@mds-core/mds-test-data'
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
+import { LA_CITY_BOUNDARY, makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import type { VehicleEvent } from '@mds-core/mds-types'
 import { RuntimeError } from '@mds-core/mds-utils'
 import type { FeatureCollection } from 'geojson'
@@ -30,8 +31,10 @@ import { processPolicy } from '../../engine/mds-compliance-engine'
 import {
   ARBITRARY_EVENT_TYPES_POLICY,
   COUNT_POLICY_JSON,
+  ENGINE_TEST_PROVIDER_ID,
   EXPIRED_POLICY,
-  LOW_COUNT_POLICY
+  LOW_COUNT_POLICY,
+  PROVIDERS
 } from '../../test_data/fixtures'
 import { readJson } from './helpers'
 
@@ -55,10 +58,12 @@ describe('Tests General Compliance Engine Functionality', () => {
   beforeAll(async () => {
     policies = (await readJson('test_data/policies.json')) as Required<PolicyDomainModel>[]
     await IngestServer.start()
+    jest.spyOn(ProviderServiceClient, 'getProviders').mockImplementation(async () => PROVIDERS)
   })
 
   afterAll(async () => {
     await IngestServer.stop()
+    jest.clearAllMocks()
   })
 
   beforeEach(async () => {
@@ -68,7 +73,7 @@ describe('Tests General Compliance Engine Functionality', () => {
   it('Verifies not considering events older than 48 hours', async () => {
     const TWO_DAYS_IN_MS = 172800000
     const curTime = now()
-    const devices = makeDevices(40, curTime)
+    const devices = makeDevices(40, curTime, ENGINE_TEST_PROVIDER_ID)
     const events = makeEventsWithTelemetry(devices, curTime - TWO_DAYS_IN_MS, CITY_OF_LA, {
       event_types: ['trip_end'],
       vehicle_state: 'available',
@@ -94,7 +99,7 @@ describe('Tests General Compliance Engine Functionality', () => {
   })
 
   it('does not run inactive policies', async () => {
-    const devices = makeDevices(6, now())
+    const devices = makeDevices(6, now(), ENGINE_TEST_PROVIDER_ID)
     const start_time = now() - 10000000
     const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
       const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
@@ -115,9 +120,11 @@ describe('Tests General Compliance Engine Functionality', () => {
 describe('Verifies compliance engine processes by vehicle most recent event', () => {
   beforeAll(async () => {
     await IngestServer.start()
+    jest.spyOn(ProviderServiceClient, 'getProviders').mockImplementation(async () => PROVIDERS)
   })
   afterAll(async () => {
     await IngestServer.stop()
+    jest.clearAllMocks()
   })
   beforeEach(async () => {
     await db.reinitialize()
@@ -132,7 +139,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
   })
 
   it('should process count violation vehicles with the most recent event last', async () => {
-    const devices = makeDevices(6, now())
+    const devices = makeDevices(6, now(), ENGINE_TEST_PROVIDER_ID)
     const start_time = now() - 10000000
     const latest_device: DeviceDomainModel = devices[0]
     const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
@@ -148,7 +155,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
     const inputs = await getAllInputs()
     const complianceResults = await processPolicy(LOW_COUNT_POLICY, geographies, inputs)
     const { 0: result } = complianceResults.filter(
-      complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
+      complianceResult => complianceResult?.provider_id === ENGINE_TEST_PROVIDER_ID
     ) as ComplianceSnapshotDomainModel[]
     expect(result?.total_violations).toStrictEqual(1)
     const [device] =
@@ -159,7 +166,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
   })
 
   it('Verifies arbitrary event_types can be set for a state in a rule', async () => {
-    const devices = makeDevices(6, now())
+    const devices = makeDevices(6, now(), ENGINE_TEST_PROVIDER_ID)
     const start_time = now() - 10000000
     const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
       const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
@@ -174,13 +181,13 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
     const inputs = await getAllInputs()
     const complianceResults = await processPolicy(ARBITRARY_EVENT_TYPES_POLICY, geographies, inputs)
     const { 0: result } = complianceResults.filter(
-      complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
+      complianceResult => complianceResult?.provider_id === ENGINE_TEST_PROVIDER_ID
     ) as ComplianceSnapshotDomainModel[]
     expect(result?.total_violations).toStrictEqual(1)
   })
 
   it('Verifies no match when event types do not match policy', async () => {
-    const devices = makeDevices(6, now())
+    const devices = makeDevices(6, now(), ENGINE_TEST_PROVIDER_ID)
     const start_time = now() - 10000000
     const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
       const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
@@ -195,13 +202,13 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
     const inputs = await getAllInputs()
     const complianceResults = await processPolicy(ARBITRARY_EVENT_TYPES_POLICY, geographies, inputs)
     const { 0: result } = complianceResults.filter(
-      complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
+      complianceResult => complianceResult?.provider_id === ENGINE_TEST_PROVIDER_ID
     )
     expect(result?.total_violations).toStrictEqual(0)
   })
 
   it('Verifies state wildcard matching works', async () => {
-    const devices = makeDevices(11, now())
+    const devices = makeDevices(11, now(), ENGINE_TEST_PROVIDER_ID)
     const start_time = now() - 10000000
     const events = devices.reduce((events_acc: VehicleEvent[], device: DeviceDomainModel, current_index) => {
       const device_events = makeEventsWithTelemetry([device], start_time - current_index * 10, CITY_OF_LA, {
@@ -216,7 +223,7 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
     const inputs = await getAllInputs()
     const complianceResults = await processPolicy(COUNT_POLICY_JSON, geographies, inputs)
     const { 0: result } = complianceResults.filter(
-      complianceResult => complianceResult?.provider_id === TEST1_PROVIDER_ID
+      complianceResult => complianceResult?.provider_id === ENGINE_TEST_PROVIDER_ID
     ) as ComplianceSnapshotDomainModel[]
     expect(result?.total_violations).toStrictEqual(1)
   })
@@ -225,15 +232,17 @@ describe('Verifies compliance engine processes by vehicle most recent event', ()
 describe('Verifies errors are being properly thrown', () => {
   beforeAll(async () => {
     await IngestServer.start()
+    jest.spyOn(ProviderServiceClient, 'getProviders').mockImplementation(async () => PROVIDERS)
   })
   afterAll(async () => {
     await IngestServer.stop()
+    jest.clearAllMocks()
   })
 
   it('Verifies RuntimeErrors are being thrown with an invalid TIMEZONE env_var', async () => {
     const oldTimezone = process.env.TIMEZONE
     process.env.TIMEZONE = 'Pluto/Potato_Land'
-    const devices = makeDevices(1, now())
+    const devices = makeDevices(1, now(), ENGINE_TEST_PROVIDER_ID)
     const events = makeEventsWithTelemetry(devices, now(), CITY_OF_LA, {
       event_types: ['trip_end'],
       vehicle_state: 'available',

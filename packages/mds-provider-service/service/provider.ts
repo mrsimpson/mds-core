@@ -50,7 +50,9 @@ export const ProviderServiceProvider: ServiceProvider<ProviderService, ProviderS
 
   getProviders: async context => {
     try {
-      return ServiceResult(await ProviderRepository.getProviders())
+      const result = await ProviderRepository.getProviders()
+      if (result.length > 0) return ServiceResult(result)
+      else return ServiceResult(FALLBACK_PROVIDERS)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Getting Providers', error)
       logger.error('mds-provider-service::getProviders exception', { exception, error })

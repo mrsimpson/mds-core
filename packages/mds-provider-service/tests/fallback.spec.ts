@@ -35,6 +35,11 @@ describe('Provider Service Fallback Tests', () => {
     await expect(ProviderServiceClient.getProvider(uuid())).rejects.toMatchObject({ type: 'ServiceException' })
   })
 
+  it('Errors out if a provider_id is not in the DB and not in the fallback list', async () => {
+    const result = await ProviderServiceClient.getProviders()
+    expect(result).toMatchObject(FALLBACK_PROVIDERS)
+  })
+
   afterEach(() => {
     jest.clearAllMocks()
   })

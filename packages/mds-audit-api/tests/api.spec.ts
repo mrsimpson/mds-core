@@ -26,7 +26,7 @@ import { AttachmentServiceClient } from '@mds-core/mds-attachment-service'
 import db from '@mds-core/mds-db'
 import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
-import { JEST_PROVIDER_ID } from '@mds-core/mds-providers'
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import { ServiceError } from '@mds-core/mds-service-helpers'
 import { makeDevices, makeEventsWithTelemetry, makeTelemetryInArea, SCOPED_AUTH } from '@mds-core/mds-test-data'
 import type { Attachment, Audit, AuditAttachment, Telemetry, Timestamp, VehicleEvent } from '@mds-core/mds-types'
@@ -44,7 +44,8 @@ const APP_JSON = 'application/vnd.mds.audit+json; charset=utf-8; version=0.1'
 const audit_trip_id = uuid()
 const audit_trip_id_2 = uuid()
 const audit_device_id: string = uuid()
-const provider_id = JEST_PROVIDER_ID
+const provider_id = uuid()
+const JEST_PROVIDER_ID = uuid()
 const provider_device_id = uuid()
 const provider_vehicle_id = 'test-vehicle'
 
@@ -111,6 +112,17 @@ describe('Testing API', () => {
     }
 
     jest.spyOn(IngestServiceClient, 'getDevice').mockImplementation(async () => device)
+    jest.spyOn(ProviderServiceClient, 'getProvider').mockImplementation(async () => {
+      return {
+        provider_id,
+        provider_name: 'imaname',
+        url: null,
+        mds_api_url: null,
+        gbfs_api_url: null,
+        color_code_hex: null,
+        provider_types: []
+      }
+    })
 
     db.writeDevice(device).then(() => {
       db.writeEvent({

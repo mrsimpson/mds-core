@@ -16,7 +16,7 @@
 
 import { parseRequest, streamCsvToHttp } from '@mds-core/mds-api-helpers'
 import type { ApiRequestParams, ApiResponse } from '@mds-core/mds-api-server'
-import { getProviders } from '@mds-core/mds-providers'
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import type {
   PaginationLinks,
   TransactionDomainModel,
@@ -238,7 +238,7 @@ export const GetTransactionsAsCsvHandler = async (
       { label: 'Trip ID', value: 'receipt.receipt_details.trip_id' }
     ]
 
-    const providers = await getProviders()
+    const providers = await ProviderServiceClient.getProviders()
     const options = {
       provider_id,
       start_timestamp,

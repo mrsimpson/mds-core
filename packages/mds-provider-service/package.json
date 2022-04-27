@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@mds-core/mds-logger": "workspace:0.5.7",
+    "@mds-core/mds-provider-service": "workspace:0.2.3",
     "@mds-core/mds-repository": "workspace:0.2.4",
     "@mds-core/mds-rpc-common": "workspace:0.3.23",
     "@mds-core/mds-schema-validators": "workspace:0.5.13",

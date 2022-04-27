@@ -24,7 +24,7 @@
     "@mds-core/mds-api-helpers": "workspace:0.2.33",
     "@mds-core/mds-api-server": "workspace:0.4.14",
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-providers": "workspace:0.2.11",
+    "@mds-core/mds-provider-service": "workspace:0.2.3",
     "@mds-core/mds-schema-validators": "workspace:0.5.13",
     "@mds-core/mds-service-helpers": "workspace:0.6.10",
     "@mds-core/mds-transaction-service": "workspace:0.6.33",
