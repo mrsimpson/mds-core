@@ -1,5 +1,13 @@
 # @mds-core/mds-transaction-service
 
+## 0.6.33
+
+### Patch Changes
+
+- Updated dependencies [64afb64b]
+  - @mds-core/mds-stream@0.4.1
+  - @mds-core/mds-ingest-service@0.10.18
+
 ## 0.6.32
 
 ### Patch Changes

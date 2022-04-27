@@ -1,5 +1,11 @@
 # @mds-core/mds-stream
 
+## 0.4.1
+
+### Patch Changes
+
+- 64afb64b: BUGFIX: Use setInterval instead of setTimeout for health-check looping
+
 ## 0.4.0
 
 ### Minor Changes

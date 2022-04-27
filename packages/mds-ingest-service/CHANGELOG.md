@@ -1,5 +1,12 @@
 # @mds-core/mds-ingest-service
 
+## 0.10.18
+
+### Patch Changes
+
+- Updated dependencies [64afb64b]
+  - @mds-core/mds-stream@0.4.1
+
 ## 0.10.17
 
 ### Patch Changes
