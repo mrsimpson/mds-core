@@ -29,6 +29,7 @@ import {
   validateGetEventsWithDeviceAndTelemetryInfoOptions,
   validateGetH3BinsOptions,
   validateGetVehicleEventsFilterParams,
+  validateNoColumnsGetVehicleEventsFilterParams,
   validateTelemetryAnnotationDomainCreateModel
 } from './validators'
 
@@ -73,10 +74,23 @@ export const IngestServiceProvider: ServiceProvider<IngestService, IngestService
 
   getEventsUsingOptions: async (context, params) => {
     try {
-      return ServiceResult(await IngestRepository.getEventsUsingOptions(validateGetVehicleEventsFilterParams(params)))
+      return ServiceResult(
+        await IngestRepository.getEventsUsingOptions(validateNoColumnsGetVehicleEventsFilterParams(params))
+      )
     } catch (error) {
-      const exception = ServiceException('Error in getEvents', error)
-      IngestServiceLogger.error('getEvents exception', { exception, error })
+      const exception = ServiceException('Error in getEventsUsingOptions', error)
+      IngestServiceLogger.error('getEventsUsingOptions exception', { exception, error })
+      return exception
+    }
+  },
+  getPartialEventsUsingOptions: async (context, params) => {
+    try {
+      return ServiceResult(
+        await IngestRepository.getPartialEventsUsingOptions(validateGetVehicleEventsFilterParams(params))
+      )
+    } catch (error) {
+      const exception = ServiceException('Error in getPartialEventsUsingOptions', error)
+      IngestServiceLogger.error('getEventsUsingOptions exception', { exception, error })
       return exception
     }
   },
@@ -85,8 +99,18 @@ export const IngestServiceProvider: ServiceProvider<IngestService, IngestService
     try {
       return ServiceResult(await IngestRepository.getEventsUsingCursor(cursor))
     } catch (error) {
-      const exception = ServiceException('Error in getEvents', error)
-      IngestServiceLogger.error('getEvents exception', { exception, error })
+      const exception = ServiceException('Error in getEventsUsingCursor', error)
+      IngestServiceLogger.error('getEventsUsingCursor exception', { exception, error })
+      return exception
+    }
+  },
+
+  getPartialEventsUsingCursor: async (context, cursor) => {
+    try {
+      return ServiceResult(await IngestRepository.getPartialEventsUsingCursor(cursor))
+    } catch (error) {
+      const exception = ServiceException('Error in getPartialEventsUsingCursor', error)
+      IngestServiceLogger.error('getPartialEventsUsingCursor exception', { exception, error })
       return exception
     }
   },

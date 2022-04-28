@@ -233,7 +233,7 @@ const GEOGRAPHY_ID_C = uuid()
 const GEOGRAPHY_ID_D = uuid()
 
 const TEST_EVENT_ANNOTATION_A: EventAnnotationDomainCreateModel = {
-  events_row_id: 1,
+  events_row_id: 3,
   device_id: DEVICE_UUID_A,
   timestamp: testTimestamp,
   vehicle_id: 'test-id-1',
@@ -245,7 +245,7 @@ const TEST_EVENT_ANNOTATION_A: EventAnnotationDomainCreateModel = {
 }
 
 const TEST_EVENT_ANNOTATION_B: EventAnnotationDomainCreateModel = {
-  events_row_id: 2,
+  events_row_id: 4,
   device_id: DEVICE_UUID_B,
   timestamp: testTimestamp,
   vehicle_id: 'test-id-2',
@@ -498,9 +498,81 @@ describe('Ingest Service Tests', () => {
 
         expect(descEvents[0]?.timestamp).toBeGreaterThan(descEvents[descEvents.length - 1]?.timestamp ?? 0)
       })
+      describe('specify field columns', () => {
+        it('gets events with only specified fields', async () => {
+          const { events } = await IngestServiceClient.getPartialEventsUsingOptions({
+            time_range: { start: testTimestamp, end: testTimestamp + 2000 },
+            grouping_type: 'all_events',
+            limit: 1,
+            columns: { event: ['provider_id', 'device_id'], telemetry: { gps: ['lat', 'lng'] } }
+          })
+          expect(events[0]?.provider_id).toBeDefined()
+          expect(events[0]?.device_id).toBeDefined()
+          expect(events[0]?.telemetry.gps?.lat).toBeDefined()
+          expect(events[0]?.telemetry.gps?.lng).toBeDefined()
+
+          expect(events[0]?.telemetry.gps?.speed).not.toBeDefined()
+          expect(events[0]?.timestamp).not.toBeDefined()
+        })
+
+        it('rejects bad fields, missing fields', async () => {
+          await expect(
+            IngestServiceClient.getPartialEventsUsingOptions({
+              time_range: { start: testTimestamp, end: testTimestamp + 2000 },
+              grouping_type: 'all_events',
+              /* fake column names */
+              columns: { event: ['frank', 'n-stein'] as never, telemetry: { gps: ['lat', 'lng'] } }
+            })
+          ).rejects.toMatchObject({
+            type: 'ValidationError'
+          })
+        })
+
+        it('Joins on event annotation when annotation column is requested', async () => {
+          const { events } = await IngestServiceClient.getPartialEventsUsingOptions({
+            grouping_type: 'all_events',
+            columns: { annotation: ['geography_ids'], event: ['timestamp'], telemetry: { gps: ['lat'] } }
+          })
+          expect(events.length).toStrictEqual(2)
+
+          const { events: noJoinEvents } = await IngestServiceClient.getPartialEventsUsingOptions({
+            grouping_type: 'all_events',
+            columns: { event: ['timestamp'], telemetry: { gps: ['lat'] } }
+          })
+          expect(noJoinEvents.length).toStrictEqual(4)
+        })
+
+        it('Selects a set of events, given a list of (timestamp, device_id) pairs', async () => {
+          const { events: matchList } = await IngestServiceClient.getEventsUsingOptions({
+            grouping_type: 'all_events'
+          })
+          const [event1, event2] = matchList
+          if (!event1 || !event2) {
+            throw new Error('Not enough events to test')
+          }
+
+          const { events } = await IngestServiceClient.getPartialEventsUsingOptions({
+            grouping_type: 'all_events',
+            events: [
+              { timestamp: event1.timestamp, device_id: event1.device_id },
+              { timestamp: event2.timestamp, device_id: event2.device_id }
+            ],
+            columns: { event: ['timestamp', 'device_id'], telemetry: { gps: ['lat'] }, device: ['vehicle_type'] }
+          })
+          expect(events.length).toStrictEqual(2)
+
+          expect(events[0]?.timestamp).toStrictEqual(event1.timestamp)
+          expect(events[0]?.device_id).toStrictEqual(event1.device_id)
+          expect(events[0]?.device?.vehicle_type).toStrictEqual('car')
+
+          expect(events[1]?.timestamp).toStrictEqual(event2.timestamp)
+          expect(events[1]?.device_id).toStrictEqual(event2.device_id)
+          expect(events[1]?.device?.vehicle_type).toStrictEqual('car')
+        })
+      })
     })
 
-    describe('latest_per_vehicle', () => {
+    describe('latest_per_trip', () => {
       it('gets two events, one for each device, telemetry is loaded', async () => {
         const { events } = await IngestServiceClient.getEventsUsingOptions({
           time_range: { start: testTimestamp, end: testTimestamp + 2000 },
@@ -510,8 +582,8 @@ describe('Ingest Service Tests', () => {
 
         events.forEach(e => {
           expect(e.telemetry?.timestamp).toStrictEqual(TEST_TELEMETRY_B2.timestamp)
-          expect(e.telemetry?.gps.lat).toStrictEqual(TEST_TELEMETRY_B2.gps.lat)
-          expect(e.telemetry?.gps.lng).toStrictEqual(TEST_TELEMETRY_B2.gps.lng)
+          expect(e.telemetry?.gps?.lat).toStrictEqual(TEST_TELEMETRY_B2.gps.lat)
+          expect(e.telemetry?.gps?.lng).toStrictEqual(TEST_TELEMETRY_B2.gps.lng)
         })
       })
 
@@ -671,9 +743,10 @@ describe('Ingest Service Tests', () => {
       await IngestRepository.createEvents([TEST_EVENT_A1, TEST_EVENT_B1])
       await IngestRepository.createEvents([TEST_EVENT_A2, TEST_EVENT_B2])
       await IngestServiceClient.writeEventAnnotations([TEST_EVENT_ANNOTATION_A, TEST_EVENT_ANNOTATION_B])
-      const { events } = await IngestServiceClient.getEventsUsingOptions({
+      const { events } = await IngestServiceClient.getPartialEventsUsingOptions({
         time_range: { start: testTimestamp, end: testTimestamp + 2000 },
-        grouping_type: 'all_events'
+        grouping_type: 'all_events',
+        columns: { event: ['device_id'], telemetry: { gps: ['lat', 'lng'] }, annotation: ['geography_ids'] }
       })
       expect(events.filter(e => e.annotation).length).toEqual(2)
     })

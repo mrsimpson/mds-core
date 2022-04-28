@@ -16,15 +16,18 @@
 
 import type { IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import { ModelMapper } from '@mds-core/mds-repository'
-import type { Nullable, Timestamp } from '@mds-core/mds-types'
+import type { DeepPartial, Nullable, Timestamp } from '@mds-core/mds-types'
 import type {
+  DeviceDomainModel,
   EventAnnotationDomainModel,
   EventDomainCreateModel,
   EventDomainModel,
   MigratedEventDomainModel,
+  PartialEventDomainModel,
   TelemetryDomainModel
 } from '../../@types'
 import type { EventEntityModel } from '../entities/event-entity'
+import type { TelemetryEntityModel } from '../entities/telemetry-entity'
 import type { MigratedEntityModel } from '../mixins/migrated-entity'
 import { EventAnnotationEntityToDomain } from './event-annotation-mappers'
 import { TelemetryEntityToDomain } from './telemetry-mappers'
@@ -49,6 +52,18 @@ export const EventEntityToDomain = ModelMapper<EventEntityModel, EventDomainMode
     return { telemetry, annotation, ...domain }
   }
 )
+
+export type PartialEventEntityModel = Omit<DeepPartial<EventEntityModel>, 'telemetry'> & {
+  telemetry: Partial<TelemetryEntityModel>
+  device?: Partial<DeviceDomainModel>
+}
+
+export const PartialEventEntityToDomain = ModelMapper<PartialEventEntityModel, PartialEventDomainModel, {}>(entity => {
+  const { telemetry, annotation, device, migrated_from_source, migrated_from_version, migrated_from_id, ...domain } =
+    entity
+
+  return { telemetry, annotation, device, ...domain }
+})
 
 /**
  * Slightly weird mapper that is used only for migrated events
