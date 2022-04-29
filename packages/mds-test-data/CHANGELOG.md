@@ -1,5 +1,13 @@
 # @mds-core/mds-test-data
 
+## 0.4.37
+
+### Patch Changes
+
+- 69a85751: Deleting mds-providers package and migrating to mds-provider-service
+- Updated dependencies [f99b6dda]
+  - @mds-core/mds-ingest-service@0.11.0
+
 ## 0.4.36
 
 ### Patch Changes

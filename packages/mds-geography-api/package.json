@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-geography-api",
-  "version": "0.4.33",
+  "version": "0.4.34",
   "description": "MDS Geography API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -15,18 +15,18 @@
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-helpers": "workspace:0.2.33",
+    "@mds-core/mds-api-helpers": "workspace:0.3.0",
     "@mds-core/mds-api-server": "workspace:0.4.14",
-    "@mds-core/mds-geography-service": "workspace:0.10.30",
+    "@mds-core/mds-geography-service": "workspace:0.10.31",
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-schema-validators": "workspace:0.5.13",
+    "@mds-core/mds-schema-validators": "workspace:0.5.14",
     "@mds-core/mds-types": "workspace:0.9.2",
     "@mds-core/mds-utils": "workspace:0.5.2",
     "@types/express": "4.17.13",
     "express": "4.17.1"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "workspace:0.4.36"
+    "@mds-core/mds-test-data": "workspace:0.4.37"
   },
   "publishConfig": {
     "main": "dist/index.js"

@@ -1,5 +1,16 @@
 # @mds-core/mds-ingest-service
 
+## 0.11.0
+
+### Minor Changes
+
+- f99b6dda: getEventsUsingOptions now supports a sparse selection, to only load specific fields from the database
+
+### Patch Changes
+
+- Updated dependencies [69a85751]
+  - @mds-core/mds-schema-validators@0.5.14
+
 ## 0.10.18
 
 ### Patch Changes

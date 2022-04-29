@@ -1,5 +1,26 @@
 # @mds-core/mds-audit-api
 
+## 0.4.12
+
+### Patch Changes
+
+- 69a85751: Deleting mds-providers package and migrating to mds-provider-service
+- d6ea4fa6: Add type annotations to parsers
+- 536a2fcf: Fix bug where JSON.parse failures were being handled non-gracefully in Audit /vehicles endpoint
+- Updated dependencies [d6ea4fa6]
+- Updated dependencies [69a85751]
+- Updated dependencies [f99b6dda]
+- Updated dependencies [69a85751]
+- Updated dependencies [536a2fcf]
+  - @mds-core/mds-api-helpers@0.3.0
+  - @mds-core/mds-provider-service@0.2.4
+  - @mds-core/mds-schema-validators@0.5.14
+  - @mds-core/mds-ingest-service@0.11.0
+  - @mds-core/mds-agency-cache@0.4.27
+  - @mds-core/mds-attachment-service@0.5.34
+  - @mds-core/mds-audit-service@0.6.11
+  - @mds-core/mds-db@0.6.26
+
 ## 0.4.11
 
 ### Patch Changes

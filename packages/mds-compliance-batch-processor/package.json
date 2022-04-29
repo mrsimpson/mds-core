@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-batch-processor",
-  "version": "0.2.32",
+  "version": "0.2.33",
   "description": "MDS Compliance Batch Processor",
   "keywords": [
     "mds",
@@ -22,14 +22,14 @@
   },
   "dependencies": {
     "@mds-core/mds-api-server": "workspace:0.4.14",
-    "@mds-core/mds-compliance-engine": "workspace:0.8.32",
-    "@mds-core/mds-compliance-service": "workspace:0.10.39",
-    "@mds-core/mds-db": "workspace:0.6.25",
-    "@mds-core/mds-geography-service": "0.10.30",
-    "@mds-core/mds-ingest-service": "0.10.18",
+    "@mds-core/mds-compliance-engine": "workspace:0.8.33",
+    "@mds-core/mds-compliance-service": "workspace:0.10.40",
+    "@mds-core/mds-db": "workspace:0.6.26",
+    "@mds-core/mds-geography-service": "0.10.31",
+    "@mds-core/mds-ingest-service": "0.11.0",
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-policy-service": "workspace:0.12.7",
-    "@mds-core/mds-provider-service": "workspace:0.2.3",
+    "@mds-core/mds-policy-service": "workspace:0.12.8",
+    "@mds-core/mds-provider-service": "workspace:0.2.4",
     "@mds-core/mds-service-helpers": "workspace:0.6.10",
     "@mds-core/mds-types": "workspace:0.9.2",
     "@mds-core/mds-utils": "workspace:0.5.2",
@@ -38,7 +38,7 @@
     "yargs": "17.0.1"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "workspace:0.4.36"
+    "@mds-core/mds-test-data": "workspace:0.4.37"
   },
   "publishConfig": {
     "main": "dist/index.js"

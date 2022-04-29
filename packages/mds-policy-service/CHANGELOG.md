@@ -1,5 +1,13 @@
 # @mds-core/mds-policy-service
 
+## 0.12.8
+
+### Patch Changes
+
+- Updated dependencies [69a85751]
+  - @mds-core/mds-schema-validators@0.5.14
+  - @mds-core/mds-geography-service@0.10.31
+
 ## 0.12.7
 
 ### Patch Changes

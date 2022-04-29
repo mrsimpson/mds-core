@@ -1,5 +1,17 @@
 # @mds-core/mds-api-helpers
 
+## 0.3.0
+
+### Minor Changes
+
+- d6ea4fa6: [BUGFIX] Update SingleParser interface to work nicely with parsers like `JSON.parse()` again (the previous patch version broke this behavior)
+
+### Patch Changes
+
+- 536a2fcf: Add support for property keys in parseRequest parsers (to use in error handling loggers, for example)
+  - @mds-core/mds-agency-cache@0.4.27
+  - @mds-core/mds-db@0.6.26
+
 ## 0.2.33
 
 ### Patch Changes

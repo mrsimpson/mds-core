@@ -1,5 +1,11 @@
 # @mds-core/mds-schema-validators
 
+## 0.5.14
+
+### Patch Changes
+
+- 69a85751: Deleting mds-providers package and migrating to mds-provider-service
+
 ## 0.5.13
 
 ### Patch Changes
