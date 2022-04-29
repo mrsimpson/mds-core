@@ -45,7 +45,7 @@ export type TransactionApiGetTransactionsAsCsvResponse = ApiResponse<string>
 const getOrderOption = (req: TransactionApiGetTransactionsRequest) => {
   const { order_column: column } = parseRequest(req)
     .single({
-      parser: queryVal => {
+      parser: (queryVal: string) => {
         const isSortableColumn = (value: unknown): value is SORTABLE_COLUMN =>
           typeof value === 'string' && SORTABLE_COLUMN.includes(value as SORTABLE_COLUMN)
 
@@ -65,7 +65,7 @@ const getOrderOption = (req: TransactionApiGetTransactionsRequest) => {
 
   const { order_direction: direction = 'ASC' } = parseRequest(req)
     .single({
-      parser: queryVal => {
+      parser: (queryVal: string) => {
         const isDirection = (value: unknown): value is SORT_DIRECTION =>
           typeof queryVal === 'string' && SORT_DIRECTION.includes(value as SORT_DIRECTION)
 

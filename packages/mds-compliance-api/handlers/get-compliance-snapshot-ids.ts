@@ -40,7 +40,7 @@ export const GetComplianceSnapshotIDsHandler = async (
 ) => {
   try {
     const { compliance_ids_token } = parseRequest(req)
-      .single({ parser: s => s })
+      .single({ parser: (s: string) => s })
       .query('compliance_ids_token')
 
     if (!isDefined(compliance_ids_token)) {

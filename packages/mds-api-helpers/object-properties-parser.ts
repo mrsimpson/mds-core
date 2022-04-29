@@ -20,8 +20,10 @@ import { hasAtLeastOneEntry, isStringArray } from '@mds-core/mds-utils'
  * - Number
  * - String
  * - JSON.parse
+ * @param value String value to parse
+ * @param key Optionally, take a key (useful for error messages).
  */
-export type SingleParser<T> = (value: string, key: string) => T
+export type SingleParser<T> = ((value: string) => T) | ((value: string, key: string) => T)
 
 /** A multi-value (array) parser. Useful for complex transformations, e.g.:
  * - Input cleansing: (xs) => { xs.map(Number).filter(x => x > 0) }

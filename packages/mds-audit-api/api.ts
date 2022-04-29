@@ -511,7 +511,7 @@ function api(app: express.Express): express.Express {
               }, {})
 
             const { event_viewport_adjustment = seconds(30) } = parseRequest(req)
-              .single({ parser: x => seconds(Number(x)) })
+              .single({ parser: (x: string) => seconds(Number(x)) })
               .query('event_viewport_adjustment')
 
             const start_time = audit_start && audit_start - event_viewport_adjustment
