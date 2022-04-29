@@ -615,6 +615,15 @@ describe('Testing API', () => {
         })
     })
 
+    it('Verify getting vehicles with invalid bbox fails gracefully', async () => {
+      const result = await request
+        .get(pathPrefix(`/vehicles?bbox=[[-122.341,47.602],[-122.323,47.61>]]`)) // note the `>` character in the bbox JSON, this is invalid
+        .set('Authorization', SCOPED_AUTH(['audits:vehicles:read'], audit_subject_id))
+        .expect(400)
+
+      expect(result.header).toHaveProperty('content-type', APP_JSON)
+    })
+
     it('Verify get vehicle by vehicle_id and provider_id', done => {
       request
         .get(pathPrefix(`/vehicles/${devices_a[0]?.provider_id}/vin/${devices_a[0]?.vehicle_id}`))

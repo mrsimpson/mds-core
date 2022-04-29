@@ -21,12 +21,12 @@ import { hasAtLeastOneEntry, isStringArray } from '@mds-core/mds-utils'
  * - String
  * - JSON.parse
  */
-export type SingleParser<T> = (value: string) => T
+export type SingleParser<T> = (value: string, key: string) => T
 
 /** A multi-value (array) parser. Useful for complex transformations, e.g.:
  * - Input cleansing: (xs) => { xs.map(Number).filter(x => x > 0) }
  */
-export type ListParser<T> = (value: string[]) => T[]
+export type ListParser<T> = (value: string[], key: string) => T[]
 
 export type ParseObjectPropertiesOptionsSingle<T> = Partial<{
   parser: SingleParser<T>
@@ -60,14 +60,14 @@ export const parseObjectPropertiesSingle = <T = string>(
         .reduce((params, { key, value }) => {
           if (typeof value === 'string') {
             if (parser) {
-              return { ...params, [key]: parser(value) }
+              return { ...params, [key]: parser(value, key) }
             }
             return { ...params, [key]: value }
           }
           if (isStringArray(value) && hasAtLeastOneEntry(value)) {
             const [firstVal] = value
             if (parser) {
-              return { ...params, [key]: parser(firstVal) }
+              return { ...params, [key]: parser(firstVal, key) }
             }
             return { ...params, [key]: firstVal }
           }
@@ -95,13 +95,13 @@ export const parseObjectPropertiesList = <T = string>(
         .reduce((params, { key, value }) => {
           if (typeof value === 'string') {
             if (parser) {
-              return { ...params, [key]: parser([value]) }
+              return { ...params, [key]: parser([value], key) }
             }
             return { ...params, [key]: [value] }
           }
           if (isStringArray(value)) {
             if (parser) {
-              return { ...params, [key]: parser(value) }
+              return { ...params, [key]: parser(value, key) }
             }
             return { ...params, [key]: value }
           }

@@ -676,27 +676,42 @@ function api(app: express.Express): express.Express {
     pathPrefix('/vehicles'),
     checkAuditApiAccess(scopes => scopes.includes('audits:vehicles:read')),
     async (req: AuditApiGetVehicleRequest, res: GetAuditVehiclesResponse) => {
-      const { skip, take } = { skip: 0, take: 10000 }
-      const {
-        strict = true,
-        bbox,
-        provider_id
-      } = {
-        ...parseRequest(req).single({ parser: JSON.parse }).query('strict', 'bbox'),
-        ...parseRequest(req).single().query('provider_id')
-      }
-
-      const url = urls.format({
-        protocol: req.get('x-forwarded-proto') || req.protocol,
-        host: req.get('host'),
-        pathname: req.path
-      })
-
       try {
+        const { skip, take } = { skip: 0, take: 10000 }
+        const {
+          strict = true,
+          bbox,
+          provider_id
+        } = {
+          ...parseRequest(req)
+            .single({
+              parser: (val, key) => {
+                try {
+                  return JSON.parse(val)
+                } catch (error) {
+                  throw new ValidationError(`invalid query parameter ${key}`, { [key]: val })
+                }
+              }
+            })
+            .query('strict', 'bbox'),
+          ...parseRequest(req).single().query('provider_id')
+        }
+
+        const url = urls.format({
+          protocol: req.get('x-forwarded-proto') || req.protocol,
+          host: req.get('host'),
+          pathname: req.path
+        })
+
         const response = await getVehicles(skip, take, url, req.query, bbox, strict, provider_id)
         return res.status(200).send({ version: res.locals.version, ...response })
       } catch (error) {
-        AuditApiLogger.error('getVehicles fail', { error })
+        if (error instanceof ValidationError) {
+          // 400 Bad Request
+          return res.status(400).send({ error })
+        }
+
+        AuditApiLogger.error('getVehicles fail')
         return res.status(500).send({
           error: 'internal_server_error'
         })
