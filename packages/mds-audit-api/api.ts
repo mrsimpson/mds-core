@@ -22,7 +22,7 @@ import { validateAuditTelemetryDomainCreateModel } from '@mds-core/mds-audit-ser
 import db from '@mds-core/mds-db'
 import type { TelemetryDomainModel } from '@mds-core/mds-ingest-service'
 import { IngestServiceClient } from '@mds-core/mds-ingest-service'
-import { providerName } from '@mds-core/mds-providers' // map of uuids -> obj
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import { ValidationError } from '@mds-core/mds-schema-validators'
 import { isError } from '@mds-core/mds-service-helpers'
 import type { AuditEvent, TelemetryData, Timestamp } from '@mds-core/mds-types'
@@ -207,7 +207,7 @@ function api(app: express.Express): express.Express {
           // Find provider device and event by vehicle id lookup
           const provider_device = await getVehicle(provider_id, provider_vehicle_id)
           const provider_device_id = provider_device ? provider_device.device_id : null
-          const provider_name = await providerName(provider_id)
+          const { provider_name } = await ProviderServiceClient.getProvider(provider_id)
 
           // Create the audit
           await writeAudit({
@@ -511,7 +511,7 @@ function api(app: express.Express): express.Express {
               }, {})
 
             const { event_viewport_adjustment = seconds(30) } = parseRequest(req)
-              .single({ parser: x => seconds(Number(x)) })
+              .single({ parser: (x: string) => seconds(Number(x)) })
               .query('event_viewport_adjustment')
 
             const start_time = audit_start && audit_start - event_viewport_adjustment
@@ -676,27 +676,42 @@ function api(app: express.Express): express.Express {
     pathPrefix('/vehicles'),
     checkAuditApiAccess(scopes => scopes.includes('audits:vehicles:read')),
     async (req: AuditApiGetVehicleRequest, res: GetAuditVehiclesResponse) => {
-      const { skip, take } = { skip: 0, take: 10000 }
-      const {
-        strict = true,
-        bbox,
-        provider_id
-      } = {
-        ...parseRequest(req).single({ parser: JSON.parse }).query('strict', 'bbox'),
-        ...parseRequest(req).single().query('provider_id')
-      }
-
-      const url = urls.format({
-        protocol: req.get('x-forwarded-proto') || req.protocol,
-        host: req.get('host'),
-        pathname: req.path
-      })
-
       try {
+        const { skip, take } = { skip: 0, take: 10000 }
+        const {
+          strict = true,
+          bbox,
+          provider_id
+        } = {
+          ...parseRequest(req)
+            .single({
+              parser: (val, key) => {
+                try {
+                  return JSON.parse(val)
+                } catch (error) {
+                  throw new ValidationError(`invalid query parameter ${key}`, { [key]: val })
+                }
+              }
+            })
+            .query('strict', 'bbox'),
+          ...parseRequest(req).single().query('provider_id')
+        }
+
+        const url = urls.format({
+          protocol: req.get('x-forwarded-proto') || req.protocol,
+          host: req.get('host'),
+          pathname: req.path
+        })
+
         const response = await getVehicles(skip, take, url, req.query, bbox, strict, provider_id)
         return res.status(200).send({ version: res.locals.version, ...response })
       } catch (error) {
-        AuditApiLogger.error('getVehicles fail', { error })
+        if (error instanceof ValidationError) {
+          // 400 Bad Request
+          return res.status(400).send({ error })
+        }
+
+        AuditApiLogger.error('getVehicles fail')
         return res.status(500).send({
           error: 'internal_server_error'
         })

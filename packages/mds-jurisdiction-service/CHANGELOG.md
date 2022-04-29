@@ -1,5 +1,12 @@
 # @mds-core/mds-jurisdiction-service
 
+## 0.5.34
+
+### Patch Changes
+
+- Updated dependencies [69a85751]
+  - @mds-core/mds-schema-validators@0.5.14
+
 ## 0.5.33
 
 ### Patch Changes

@@ -25,6 +25,8 @@ import type {
   VEHICLE_STATE,
   VEHICLE_TYPE
 } from '@mds-core/mds-types'
+import type { Cursor } from 'typeorm-cursor-pagination'
+import type { EventEntity } from '../repository/entities/event-entity'
 import type {
   DeviceDomainModel,
   EventAnnotationDomainCreateModel,
@@ -32,14 +34,16 @@ import type {
   EventDomainCreateModel,
   EventDomainModel,
   EventWithDeviceAndTelemetryInfoDomainModel,
+  GpsData,
   GROUPING_TYPE,
   H3_RESOLUTIONS,
+  PartialEventDomainModel,
   TelemetryAnnotationDomainCreateModel,
   TelemetryAnnotationDomainModel,
   TelemetryDomainModel
 } from './models'
 
-type ResponseWithCursor<T extends {}> = T & {
+export type ResponseWithCursor<T extends {}> = T & {
   cursor: {
     prev: Nullable<string>
     next: Nullable<string>
@@ -65,6 +69,8 @@ export type TimeRange = {
   end: Timestamp
 }
 
+export type WithCursorOptions<P extends object> = P & Cursor
+
 export const GetVehicleEventsOrderColumn = <const>['timestamp', 'provider_id', 'vehicle_state']
 
 export type GetVehicleEventsOrderColumn = typeof GetVehicleEventsOrderColumn[number]
@@ -78,6 +84,71 @@ export type GetVehicleEventsOrderOption = {
   direction?: GetVehicleEventsOrderDirection
 }
 
+export const EventColumns = <const>[
+  'id',
+  'device_id',
+  'event_types',
+  'provider_id',
+  'timestamp',
+  'recorded',
+  'vehicle_state',
+  'telemetry_timestamp',
+  'trip_id',
+  'trip_state'
+]
+export type EventColumn = keyof Pick<EventEntity, typeof EventColumns[number]>
+
+export const TelemetryGpsColumns = <const>[
+  'lat',
+  'lng',
+  'speed',
+  'heading',
+  'accuracy',
+  'altitude',
+  'hdop',
+  'satellites'
+]
+export type TelemetryGpsColumn = keyof Pick<GpsData, typeof TelemetryGpsColumns[number]>
+
+export const TelemetryBaseColumns = <const>['device_id', 'provider_id', 'timestamp', 'charge', 'recorded', 'stop_id']
+
+export type TelemetryBaseColumn = keyof Pick<TelemetryDomainModel, typeof TelemetryBaseColumns[number]>
+
+export const DeviceColumns = <const>[
+  'device_id',
+  'provider_id',
+  'vehicle_id',
+  'vehicle_type',
+  'propulsion_types',
+  'year',
+  'mfgr',
+  'model',
+  'accessibility_options',
+  'modality'
+]
+export type DeviceColumn = keyof Pick<DeviceDomainModel, typeof DeviceColumns[number]>
+
+export const EventAnnotationColumns = <const>[
+  'device_id',
+  'timestamp',
+  'recorded',
+  'geography_ids',
+  'geography_types',
+  'vehicle_id',
+  'vehicle_type',
+  'latency_ms'
+]
+export type EventAnnotationColumn = keyof Pick<EventAnnotationDomainModel, typeof EventAnnotationColumns[number]>
+
+export type GetVehicleEventQueryColumns = {
+  event: EventColumn[]
+  telemetry: {
+    gps: TelemetryGpsColumn[]
+    base?: TelemetryBaseColumn[]
+  }
+  annotation?: EventAnnotationColumn[]
+  device?: DeviceColumn[]
+}
 export interface GetVehicleEventsFilterParams {
   vehicle_types?: VEHICLE_TYPE[]
   propulsion_types?: PROPULSION_TYPE[]
@@ -91,10 +162,21 @@ export interface GetVehicleEventsFilterParams {
   geography_ids?: UUID[]
   limit?: number
   order?: GetVehicleEventsOrderOption
+  events?: { device_id: UUID; timestamp: Timestamp }[]
+  columns?: GetVehicleEventQueryColumns
+}
+
+export type NoColumns<T> = Omit<T, 'columns'>
+export type WithColumns<T> = Omit<T, 'columns'> & {
+  columns: GetVehicleEventQueryColumns
 }
 
 export type GetVehicleEventsResponse = ResponseWithCursor<{
   events: EventDomainModel[]
+}>
+
+export type GetPartialVehicleEventsResponse = ResponseWithCursor<{
+  events: PartialEventDomainModel[]
 }>
 
 export interface ReadTripEventsQueryParams {
@@ -138,8 +220,10 @@ export interface IngestService {
   getDevicesUsingOptions: (options: GetDevicesOptions) => GetDevicesResponse
   getDevice: (options: GetDeviceOptions) => DeviceDomainModel | undefined
   getDevicesUsingCursor: (cursor: string) => GetDevicesResponse
-  getEventsUsingOptions: (params: GetVehicleEventsFilterParams) => GetVehicleEventsResponse
+  getEventsUsingOptions: (params: NoColumns<GetVehicleEventsFilterParams>) => GetVehicleEventsResponse
   getEventsUsingCursor: (cursor: string) => GetVehicleEventsResponse
+  getPartialEventsUsingOptions: (params: WithColumns<GetVehicleEventsFilterParams>) => GetPartialVehicleEventsResponse
+  getPartialEventsUsingCursor: (cursor: string) => GetPartialVehicleEventsResponse
   getDevices: (device_ids: UUID[]) => DeviceDomainModel[]
   getLatestTelemetryForDevices: (device_ids: UUID[]) => TelemetryDomainModel[]
   writeEvents: (event: EventDomainCreateModel[]) => EventDomainModel[]
@@ -172,6 +256,8 @@ export const IngestServiceDefinition: RpcServiceDefinition<IngestService> = {
   getDevicesUsingCursor: RpcRoute<IngestService['getDevicesUsingCursor']>(),
   getEventsUsingOptions: RpcRoute<IngestService['getEventsUsingOptions']>(),
   getEventsUsingCursor: RpcRoute<IngestService['getEventsUsingCursor']>(),
+  getPartialEventsUsingOptions: RpcRoute<IngestService['getPartialEventsUsingOptions']>(),
+  getPartialEventsUsingCursor: RpcRoute<IngestService['getPartialEventsUsingCursor']>(),
   getLatestTelemetryForDevices: RpcRoute<IngestService['getLatestTelemetryForDevices']>(),
   writeEvents: RpcRoute<IngestService['writeEvents']>(),
   writeEventAnnotations: RpcRoute<IngestService['writeEventAnnotations']>(),

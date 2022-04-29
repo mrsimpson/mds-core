@@ -1,5 +1,15 @@
 # @mds-core/mds-transaction-service
 
+## 0.6.34
+
+### Patch Changes
+
+- bffd1039: Auto-chunking of large postgres writes in transaction service
+- Updated dependencies [69a85751]
+- Updated dependencies [f99b6dda]
+  - @mds-core/mds-schema-validators@0.5.14
+  - @mds-core/mds-ingest-service@0.11.0
+
 ## 0.6.33
 
 ### Patch Changes

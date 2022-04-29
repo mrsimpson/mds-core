@@ -1,5 +1,17 @@
 # @mds-core/mds-compliance-service
 
+## 0.10.40
+
+### Patch Changes
+
+- 69a85751: Deleting mds-providers package and migrating to mds-provider-service
+- Updated dependencies [69a85751]
+- Updated dependencies [69a85751]
+  - @mds-core/mds-provider-service@0.2.4
+  - @mds-core/mds-schema-validators@0.5.14
+  - @mds-core/mds-policy-service@0.12.8
+  - @mds-core/mds-db@0.6.26
+
 ## 0.10.39
 
 ### Patch Changes

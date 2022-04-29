@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import type { InsertReturning } from '@mds-core/mds-repository'
 import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import type { UUID } from '@mds-core/mds-types'
-import { NotFoundError } from '@mds-core/mds-utils'
+import { NotFoundError, now } from '@mds-core/mds-utils'
+import { cleanEnv, num } from 'envalid'
 import type { FindOperator } from 'typeorm'
 import { Between, Brackets, In, LessThan, MoreThan } from 'typeorm'
 import type { Cursor } from 'typeorm-cursor-pagination'
@@ -42,6 +42,9 @@ import {
 } from './mappers'
 import migrations from './migrations'
 
+const env = cleanEnv(process.env, {
+  TRANSACTION_BULK_DB_WRITE_CHUNK_SIZE: num({ default: 5000 })
+})
 interface InsertTransactionOptions {
   beforeCommit: (pendingTransaction: TransactionDomainModel) => Promise<void>
 }
@@ -208,19 +211,31 @@ export const TransactionRepository = ReadWriteRepository.Create(
         const { beforeCommit = async () => undefined } = options
         try {
           const connection = await repository.connect('rw')
-          const result = await connection.transaction(async manager => {
-            const { raw: entities }: InsertReturning<TransactionEntity> = await manager
-              .getRepository(TransactionEntity)
-              .createQueryBuilder()
-              .insert()
-              .values(transactions.map(TransactionDomainToEntityCreate.mapper()))
-              .returning('*')
-              .execute()
-            const pendingTransactions = entities.map(TransactionEntityToDomain.map)
+          const chunks = repository.asChunksForInsert(
+            transactions.map(TransactionDomainToEntityCreate.mapper({ recorded: now() })),
+            env.TRANSACTION_BULK_DB_WRITE_CHUNK_SIZE
+          )
+
+          const results: TransactionDomainModel[] = await connection.transaction(async manager => {
+            const insertResults = await Promise.all(
+              chunks.map(chunk => {
+                return manager
+                  .getRepository(TransactionEntity)
+                  .createQueryBuilder()
+                  .insert()
+                  .values(chunk)
+                  .returning('*')
+                  .execute()
+              })
+            )
+            const pendingTransactions = insertResults
+              .reduce<Array<TransactionEntity>>((entities, { raw: chunk = [] }) => entities.concat(chunk), [])
+              .map(TransactionEntityToDomain.mapper())
             await beforeCommit(pendingTransactions)
             return pendingTransactions
           })
-          return result
+
+          return results
         } catch (error) {
           throw RepositoryError(error)
         }

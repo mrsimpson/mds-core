@@ -1,6 +1,7 @@
 import type { DomainModelCreate, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
 import type {
   ACCESSIBILITY_OPTION,
+  DeepPartial,
   MODALITY,
   Nullable,
   PROPULSION_TYPE,
@@ -12,6 +13,7 @@ import type {
   VEHICLE_STATE,
   VEHICLE_TYPE
 } from '@mds-core/mds-types'
+import type { EventEntityModel } from '../repository/entities/event-entity'
 export interface DeviceDomainModel extends RecordedColumn {
   device_id: UUID
   provider_id: UUID
@@ -42,6 +44,15 @@ export interface EventDomainModel extends RecordedColumn {
   telemetry: TelemetryDomainModel
   annotation: Nullable<EventAnnotationDomainModel>
   trip_id: Nullable<UUID>
+}
+
+export type PartialEventDomainModel = Omit<DeepPartial<EventDomainModel>, 'telemetry'> & {
+  telemetry: DeepPartial<TelemetryDomainModel>
+  device?: Partial<DeviceDomainModel>
+}
+
+export type PartialEventEntityModel = Omit<DeepPartial<EventEntityModel>, 'telemetry'> & {
+  telemetry: DeepPartial<TelemetryDomainModel>
 }
 
 export type EventDomainCreateModel = DomainModelCreate<

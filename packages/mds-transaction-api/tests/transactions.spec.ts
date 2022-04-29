@@ -15,6 +15,7 @@
  */
 
 import { ApiServer } from '@mds-core/mds-api-server'
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import type { TransactionDomainModel } from '@mds-core/mds-transaction-service'
 import { TransactionServiceClient, transactionsGenerator } from '@mds-core/mds-transaction-service'
 // import { SCOPED_AUTH } from '@mds-core/mds-test-data'
@@ -328,13 +329,25 @@ describe('Test Transactions API: Transactions', () => {
     })
 
     it('Can GET bulk transactions as csv', async () => {
-      const mockTransactionsA = [...transactionsGenerator(15)]
+      const provider_id = uuid()
+      jest.spyOn(ProviderServiceClient, 'getProviders').mockImplementationOnce(async () => [
+        {
+          provider_id,
+          provider_name: 'JUMP',
+          color_code_hex: '#000',
+          url: 'https://jump.com',
+          gbfs_api_url: null,
+          mds_api_url: 'https://api.uber.com/v0.2/emobility/mds',
+          provider_types: ['mds_micromobility']
+        }
+      ])
+      const mockTransactionsA = [...transactionsGenerator(15, { provider_id })]
       const mockTransactionsB = [
-        ...transactionsGenerator(15, { receipt_details: { custom_description: 'do not care' } })
+        ...transactionsGenerator(15, { receipt_details: { custom_description: 'do not care' }, provider_id })
       ]
 
       const basicOptions = {
-        provider_id: uuid(),
+        provider_id: provider_id,
         start_timestamp: Date.now(),
         end_timestamp: Date.now()
       }
@@ -417,10 +430,22 @@ describe('Test Transactions API: Transactions', () => {
     })
 
     it('Can GET bulk transactions as csv and pick columns', async () => {
-      const mockTransactions = [...transactionsGenerator(15)]
+      const provider_id = uuid()
+      jest.spyOn(ProviderServiceClient, 'getProviders').mockImplementationOnce(async () => [
+        {
+          provider_id,
+          provider_name: 'JUMP',
+          color_code_hex: '#000',
+          url: 'https://jump.com',
+          gbfs_api_url: null,
+          mds_api_url: 'https://api.uber.com/v0.2/emobility/mds',
+          provider_types: ['mds_micromobility']
+        }
+      ])
+      const mockTransactions = [...transactionsGenerator(15, { provider_id })]
 
       const basicOptions = {
-        provider_id: uuid(),
+        provider_id,
         start_timestamp: Date.now(),
         end_timestamp: Date.now()
       }
@@ -493,6 +518,18 @@ describe('Test Transactions API: Transactions', () => {
     })
 
     it('GETting a non-existent transaction fails', async () => {
+      jest.spyOn(ProviderServiceClient, 'getProvider').mockImplementationOnce(async () => {
+        return {
+          provider_id: uuid(),
+          provider_name: 'aproviderhasaname',
+          url: null,
+          mds_api_url: null,
+          gbfs_api_url: null,
+          color_code_hex: null,
+          provider_types: []
+        }
+      })
+
       jest.spyOn(TransactionServiceClient, 'getTransaction').mockImplementationOnce(async _ => {
         throw new NotFoundError()
       })

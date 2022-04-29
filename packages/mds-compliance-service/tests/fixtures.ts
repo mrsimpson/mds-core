@@ -106,6 +106,14 @@ export const POLICY_ID_2 = 'dfe3f757-c43a-4eb6-b85e-abc00f3e8387'
 export const PROVIDER_ID_1 = 'c20e08cf-8488-46a6-a66c-5d8fb827f7e0'
 export const PROVIDER_ID_2 = '63f13c48-34ff-49d2-aca7-cf6a5b6171c3'
 
+const PROVIDER_FIXTURES = [PROVIDER_ID_1, PROVIDER_ID_2] as const
+export type PROVIDER_FIXTURE = typeof PROVIDER_FIXTURES[number]
+
+export const PROVIDER_NAME_MAP: { [k in PROVIDER_FIXTURE]: string } = {
+  'c20e08cf-8488-46a6-a66c-5d8fb827f7e0': 'JUMP',
+  '63f13c48-34ff-49d2-aca7-cf6a5b6171c3': 'Lime'
+}
+
 export const COMPLIANCE_SNAPSHOT_ID_1 = '243e1209-61ad-4d7c-8464-db551f1f8c21'
 
 export const COMPLIANCE_SNAPSHOTS_PROVIDER_1_POLICY_1: ComplianceSnapshotDomainModel[] = (() => {

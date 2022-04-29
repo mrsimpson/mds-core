@@ -14,9 +14,20 @@ import type {
   EventDomainCreateModel,
   EventDomainModel,
   GetEventsWithDeviceAndTelemetryInfoOptions,
-  GetVehicleEventsFilterParams
+  GetVehicleEventsFilterParams,
+  NoColumns,
+  WithColumns
 } from '../@types'
-import { GetVehicleEventsOrderColumn, GetVehicleEventsOrderDirection, GROUPING_TYPES } from '../@types'
+import {
+  DeviceColumns,
+  EventAnnotationColumns,
+  EventColumns,
+  GetVehicleEventsOrderColumn,
+  GetVehicleEventsOrderDirection,
+  GROUPING_TYPES,
+  TelemetryBaseColumns,
+  TelemetryGpsColumns
+} from '../@types'
 import { TelemetryCreateSchema } from './telemetry_validators'
 
 export const { $schema: eventAnnotationDomainSchema } = SchemaValidator<EventAnnotationDomainModel>({
@@ -107,7 +118,7 @@ export const { validate: validateEventDomainModel, $schema: EventSchema } = Sche
   WithNonNullableKeys<EventDomainModel, 'telemetry'>
 >(eventDomainModelSchema(), { useDefaults: true })
 
-export const { validate: validateGetVehicleEventsFilterParams } = SchemaValidator<GetVehicleEventsFilterParams>({
+const noColumnsGetVehicleEventsFilterParamsSchema = <const>{
   type: 'object',
   properties: {
     vehicle_types: nullableArray([...new Set(VEHICLE_TYPES)]),
@@ -127,6 +138,15 @@ export const { validate: validateGetVehicleEventsFilterParams } = SchemaValidato
     vehicle_id: { type: 'string', nullable: true },
     device_ids: { type: 'array', items: uuidSchema, nullable: true },
     event_types: nullableArray([...new Set(VEHICLE_EVENTS)]),
+    events: {
+      type: 'array',
+      nullable: true,
+      items: {
+        type: 'object',
+        properties: { timestamp: timestampSchema, device_id: uuidSchema },
+        required: ['timestamp', 'device_id']
+      }
+    },
     limit: { type: 'integer', nullable: true },
     order: {
       type: 'object',
@@ -141,7 +161,43 @@ export const { validate: validateGetVehicleEventsFilterParams } = SchemaValidato
     geography_ids: { type: 'array', items: uuidSchema, nullable: true }
   },
   required: ['grouping_type']
-})
+}
+
+const filterColumns = <const>{
+  type: 'object',
+  nullable: true,
+  properties: {
+    event: nullableArray([...new Set(EventColumns)]),
+    telemetry: {
+      type: 'object',
+      properties: {
+        base: nullableArray([...new Set(TelemetryBaseColumns)]),
+        gps: nullableArray([...new Set(TelemetryGpsColumns)])
+      },
+      required: ['gps']
+    },
+    annotation: nullableArray([...new Set(EventAnnotationColumns)]),
+    device: nullableArray([...new Set(DeviceColumns)])
+  },
+  required: ['event', 'telemetry']
+}
+
+const withColumnsGetVehicleEventsFilterParamsSchema = () => {
+  const { properties, required, ...rest } = noColumnsGetVehicleEventsFilterParamsSchema
+  return <const>{
+    ...rest,
+    properties: { ...properties, columns: filterColumns },
+    required: [...required, 'columns']
+  }
+}
+
+export const { validate: validateGetVehicleEventsFilterParams } = SchemaValidator<
+  WithColumns<GetVehicleEventsFilterParams>
+>(withColumnsGetVehicleEventsFilterParamsSchema())
+
+export const { validate: validateNoColumnsGetVehicleEventsFilterParams } = SchemaValidator<
+  NoColumns<GetVehicleEventsFilterParams>
+>(noColumnsGetVehicleEventsFilterParamsSchema)
 
 export const { validate: validateEventAnnotationDomainCreateModel } = SchemaValidator<EventAnnotationDomainCreateModel>(
   {

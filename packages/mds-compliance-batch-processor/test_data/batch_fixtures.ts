@@ -20,7 +20,7 @@ import { GeographyServiceClient } from '@mds-core/mds-geography-service'
 import type { DeviceDomainModel } from '@mds-core/mds-ingest-service'
 import type { PolicyDomainModel } from '@mds-core/mds-policy-service'
 import { PolicyServiceClient } from '@mds-core/mds-policy-service'
-import { getProviders } from '@mds-core/mds-providers'
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import { makeDevices, makeEventsWithTelemetry } from '@mds-core/mds-test-data'
 import { LA_CITY_BOUNDARY } from '@mds-core/mds-test-data/test-areas/la-city-boundary'
 import { minutes, now } from '@mds-core/mds-utils'
@@ -50,7 +50,7 @@ async function main() {
   await GeographyServiceClient.writeGeographies([geographies[0]])
   await GeographyServiceClient.publishGeography({ geography_id: geographies[0].geography_id })
 
-  const providerIDs = Object.keys(await getProviders()).slice(0, 4)
+  const providerIDs = (await ProviderServiceClient.getProviders()).map(p => p.provider_id).slice(0, 4)
   const devices = providerIDs.reduce((acc: DeviceDomainModel[], providerID) => {
     acc = acc.concat(makeDevices(20000, now(), providerID))
     return acc

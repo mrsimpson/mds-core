@@ -32,6 +32,9 @@ export const IngestServiceManager = RpcServer<IngestService, IngestServiceReques
     getDevicesUsingCursor: (args, context) => IngestServiceProvider.getDevicesUsingCursor(context, ...args),
     getEventsUsingOptions: (args, context) => IngestServiceProvider.getEventsUsingOptions(context, ...args),
     getEventsUsingCursor: (args, context) => IngestServiceProvider.getEventsUsingCursor(context, ...args),
+    getPartialEventsUsingOptions: (args, context) =>
+      IngestServiceProvider.getPartialEventsUsingOptions(context, ...args),
+    getPartialEventsUsingCursor: (args, context) => IngestServiceProvider.getPartialEventsUsingCursor(context, ...args),
     getDevices: (args, context) => IngestServiceProvider.getDevices(context, ...args),
     getLatestTelemetryForDevices: (args, context) =>
       IngestServiceProvider.getLatestTelemetryForDevices(context, ...args),

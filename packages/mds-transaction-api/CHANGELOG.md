@@ -1,5 +1,22 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.43
+
+### Patch Changes
+
+- 69a85751: Deleting mds-providers package and migrating to mds-provider-service
+- 69a85751: Return static list of providers if DB is empty, and update transaction api to use mds-provider-service
+- d6ea4fa6: Add type annotations to parsers
+- Updated dependencies [bffd1039]
+- Updated dependencies [d6ea4fa6]
+- Updated dependencies [69a85751]
+- Updated dependencies [69a85751]
+- Updated dependencies [536a2fcf]
+  - @mds-core/mds-transaction-service@0.6.34
+  - @mds-core/mds-api-helpers@0.3.0
+  - @mds-core/mds-provider-service@0.2.4
+  - @mds-core/mds-schema-validators@0.5.14
+
 ## 0.2.42
 
 ### Patch Changes

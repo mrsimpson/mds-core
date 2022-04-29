@@ -17,7 +17,7 @@ export const GetViolationHandler = async (
 ) => {
   try {
     const { violation_id } = parseRequest(req)
-      .single({ parser: x => (isUUID(x) ? x : undefined) })
+      .single({ parser: (x: string) => (isUUID(x) ? x : undefined) })
       .params('violation_id')
 
     if (!violation_id) {

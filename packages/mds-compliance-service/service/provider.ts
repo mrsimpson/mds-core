@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { providerName } from '@mds-core/mds-providers'
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import type { ProcessController, ServiceProvider } from '@mds-core/mds-service-helpers'
 import { ServiceException, ServiceResult } from '@mds-core/mds-service-helpers'
 import { isDefined } from '@mds-core/mds-utils'
@@ -178,7 +178,7 @@ export const ComplianceServiceProvider: ServiceProvider<ComplianceService, Compl
           if (!provider_id || !policy_id) {
             throw new Error('Invalid key')
           }
-          const provider_name = await providerName(provider_id)
+          const { provider_name } = await ProviderServiceClient.getProvider(provider_id)
           return {
             provider_id,
             policy_id,

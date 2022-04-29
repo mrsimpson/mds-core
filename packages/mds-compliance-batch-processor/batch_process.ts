@@ -20,7 +20,7 @@ import { ComplianceServiceClient } from '@mds-core/mds-compliance-service'
 import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import { GeographyServiceClient } from '@mds-core/mds-geography-service'
 import { PolicyServiceClient } from '@mds-core/mds-policy-service'
-import { getProviders } from '@mds-core/mds-providers'
+import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import type { SerializedBuffers } from '@mds-core/mds-service-helpers'
 import { now } from '@mds-core/mds-utils'
 import { ComplianceBatchProcessorLogger } from './logger'
@@ -45,7 +45,7 @@ export async function computeSnapshot() {
   })
   const compliance_as_of = now() // The timestamp right after we fetch the inputs (latest state as of that time)
 
-  const provider_ids = Object.keys(await getProviders())
+  const provider_ids = (await ProviderServiceClient.getProviders()).map(p => p.provider_id)
 
   /**
    * This is intentionally an async (for) loop, as opposed to being concurrent (Promise.all()).

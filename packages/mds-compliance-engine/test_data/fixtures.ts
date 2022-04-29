@@ -1,8 +1,9 @@
 import type { GeographyDomainModel } from '@mds-core/mds-geography-service'
 import type { CountPolicy, SpeedPolicy, TimePolicy } from '@mds-core/mds-policy-service'
 import { RULE_TYPES } from '@mds-core/mds-policy-service'
+import type { ProviderDomainModel } from '@mds-core/mds-provider-service'
 import { LA_CITY_BOUNDARY, restrictedAreas, veniceSpecOps } from '@mds-core/mds-test-data'
-import { days, now } from '@mds-core/mds-utils'
+import { days, now, uuid } from '@mds-core/mds-utils'
 import type { Polygon } from 'geojson'
 
 export const CITY_OF_LA = '1f943d59-ccc9-4d91-b6e2-0c5e771cbc49'
@@ -515,3 +516,35 @@ export const OVERLAPPING_GEOS_TIME_POLICY: TimePolicy = {
     }
   ]
 }
+
+export const ENGINE_TEST_PROVIDER_ID = uuid()
+
+export const PROVIDERS: ProviderDomainModel[] = [
+  {
+    provider_id: ENGINE_TEST_PROVIDER_ID,
+    provider_name: 'JUMP',
+    color_code_hex: '#000',
+    url: 'https://jump.com',
+    gbfs_api_url: null,
+    mds_api_url: 'https://api.uber.com/v0.2/emobility/mds',
+    provider_types: ['mds_micromobility']
+  },
+  {
+    provider_id: uuid(),
+    provider_name: 'Lime',
+    color_code_hex: '#000',
+    url: 'https://li.me',
+    gbfs_api_url: null,
+    mds_api_url: 'https://data.lime.bike/api/partners/v1/mds',
+    provider_types: ['mds_micromobility']
+  },
+  {
+    provider_id: uuid(),
+    provider_name: 'Bird',
+    color_code_hex: '#000',
+    url: 'https://www.bird.co',
+    mds_api_url: 'https://mds.bird.co',
+    gbfs_api_url: 'https://mds.bird.co/gbfs',
+    provider_types: ['mds_micromobility']
+  }
+]

@@ -1,5 +1,20 @@
 # @mds-core/mds-compliance-api
 
+## 0.4.45
+
+### Patch Changes
+
+- d6ea4fa6: Add type annotations to parsers
+- Updated dependencies [d6ea4fa6]
+- Updated dependencies [69a85751]
+- Updated dependencies [536a2fcf]
+  - @mds-core/mds-api-helpers@0.3.0
+  - @mds-core/mds-compliance-service@0.10.40
+  - @mds-core/mds-schema-validators@0.5.14
+  - @mds-core/mds-test-data@0.4.37
+  - @mds-core/mds-policy-service@0.12.8
+  - @mds-core/mds-db@0.6.26
+
 ## 0.4.44
 
 ### Patch Changes

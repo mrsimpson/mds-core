@@ -23,13 +23,6 @@ import { TransactionServiceManager } from '../service/manager'
 import { TransactionStreamKafka } from '../service/stream'
 import { transactionsGenerator } from '../test-fixtures'
 
-describe('Transaction Repository Tests', () => {
-  beforeAll(TransactionRepository.initialize)
-  it('Run Migrations', TransactionRepository.runAllMigrations)
-  it('Revert Migrations', TransactionRepository.revertAllMigrations)
-  afterAll(TransactionRepository.shutdown)
-})
-
 const TransactionServer = TransactionServiceManager.controller()
 
 const mockStream = stream.mockStream(TransactionStreamKafka)

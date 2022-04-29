@@ -43,7 +43,7 @@ const getQueryParamsDates = (req: PolicyApiGetPoliciesRequest) => {
 const getSort = (req: PolicyApiGetPoliciesRequest) => {
   return parseRequest(req)
     .single({
-      parser: s => {
+      parser: (s: string) => {
         if (s && typeof s === 'string' && SortPolicyColumn.includes(s as SortPolicyColumn)) {
           return s as SortPolicyColumn
         }
@@ -56,7 +56,7 @@ const getSort = (req: PolicyApiGetPoliciesRequest) => {
 const getSortDirection = (req: PolicyApiGetPoliciesRequest) => {
   return parseRequest(req)
     .single({
-      parser: dir => {
+      parser: (dir: string) => {
         if (dir && typeof dir === 'string' && SortPolicyDirection.includes(dir as SortPolicyDirection)) {
           return dir as SortPolicyDirection
         }

@@ -43,7 +43,7 @@ export const GetViolationDetailsSnapshotHandler = async (
   try {
     const { compliance_as_of = now() } = parseRequest(req).single({ parser: Number }).query('compliance_as_of')
     const { compliance_snapshot_id, policy_id } = parseRequest(req)
-      .single({ parser: s => s })
+      .single({ parser: (s: string) => s })
       .query('compliance_snapshot_id', 'policy_id')
 
     /**
@@ -54,7 +54,7 @@ export const GetViolationDetailsSnapshotHandler = async (
       res.locals.scopes.includes('compliance:read:provider') && res.locals.claims && res.locals.claims.provider_id
         ? res.locals.claims
         : parseRequest(req)
-            .single({ parser: s => s })
+            .single({ parser: (s: string) => s })
             .query('provider_id')
 
     if (!isDefined(compliance_snapshot_id) && (!isDefined(policy_id) || !isDefined(provider_id))) {
