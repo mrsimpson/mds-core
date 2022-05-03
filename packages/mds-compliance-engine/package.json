@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-engine",
-  "version": "0.8.33",
+  "version": "0.8.34",
   "description": "MDS Compliance Tool",
   "keywords": [
     "mds",
@@ -21,14 +21,14 @@
     "watch": "nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-helpers": "workspace:0.3.0",
+    "@mds-core/mds-api-helpers": "workspace:0.3.1",
     "@mds-core/mds-api-server": "workspace:0.4.14",
-    "@mds-core/mds-compliance-service": "workspace:0.10.40",
-    "@mds-core/mds-db": "workspace:0.6.26",
-    "@mds-core/mds-geography-service": "workspace:0.10.31",
-    "@mds-core/mds-ingest-service": "0.11.0",
+    "@mds-core/mds-compliance-service": "workspace:0.10.41",
+    "@mds-core/mds-db": "workspace:0.6.27",
+    "@mds-core/mds-geography-service": "workspace:0.10.32",
+    "@mds-core/mds-ingest-service": "0.11.1",
     "@mds-core/mds-logger": "workspace:0.5.7",
-    "@mds-core/mds-policy-service": "workspace:0.12.8",
+    "@mds-core/mds-policy-service": "workspace:0.12.9",
     "@mds-core/mds-provider-service": "workspace:0.2.4",
     "@mds-core/mds-schema-validators": "workspace:0.5.14",
     "@mds-core/mds-service-helpers": "workspace:0.6.10",
@@ -44,8 +44,8 @@
     "yargs": "17.2.1"
   },
   "devDependencies": {
-    "@mds-core/mds-agency": "workspace:0.5.21",
-    "@mds-core/mds-test-data": "workspace:0.4.37"
+    "@mds-core/mds-agency": "workspace:0.5.22",
+    "@mds-core/mds-test-data": "workspace:0.4.38"
   },
   "publishConfig": {
     "main": "dist/index.js"

@@ -1,5 +1,11 @@
 # @container-images/mds-policy-service
 
+## 0.2.9
+
+### Patch Changes
+
+- @mds-core/mds-policy-service@0.12.9
+
 ## 0.2.8
 
 ### Patch Changes

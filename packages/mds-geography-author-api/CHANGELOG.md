@@ -1,5 +1,12 @@
 # @mds-core/mds-geography-author-api
 
+## 0.4.35
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.3.1
+- @mds-core/mds-geography-service@0.10.32
+
 ## 0.4.34
 
 ### Patch Changes
