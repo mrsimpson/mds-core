@@ -16,7 +16,7 @@
     "image:production": "pnpm run:concurrent image:production",
     "image:push": "bin/build-helper pushImages",
     "images": "pnpm run:concurrent image",
-    "preinstall": "npx check-node-version --package && npx only-allow pnpm && pnpm i -g pnpm",
+    "preinstall": "npx check-node-version --package && npx only-allow pnpm && pnpm i -g pnpm@6.32.11",
     "lint": "pnpm lint:audit && pnpm lint:prettier '**/package.json' && pnpm lint:markdown && pnpm lint:eslint '**/*.ts'",
     "lint:audit": "pnpm-ci audit --strict -i GHSA-fwr7-v2mv-hh25",
     "lint:eslint": "eslint --ignore-path .gitignore --ignore-path .eslintignore",
