@@ -45,9 +45,11 @@ export const IngestServiceClientFactory = (
       process.env.ENABLE_RPC === 'true'
         ? RpcRequest(options, IngestServiceRpcClient.getPartialEventsUsingOptions, args)
         : UnwrapServiceResult(IngestServiceProvider.getPartialEventsUsingOptions)(context, ...args), // Temporarily remove RPC hop per APPS-155
-    getEventsUsingCursor: (...args) => RpcRequest(options, IngestServiceRpcClient.getEventsUsingCursor, args),
     getPartialEventsUsingCursor: (...args) =>
-      RpcRequest(options, IngestServiceRpcClient.getPartialEventsUsingCursor, args),
+      process.env.ENABLE_RPC === 'true'
+        ? RpcRequest(options, IngestServiceRpcClient.getPartialEventsUsingCursor, args)
+        : UnwrapServiceResult(IngestServiceProvider.getPartialEventsUsingCursor)(context, ...args), // Temporarily remove RPC hop per APPS-155
+    getEventsUsingCursor: (...args) => RpcRequest(options, IngestServiceRpcClient.getEventsUsingCursor, args),
     getDevices: (...args) =>
       process.env.ENABLE_RPC === 'true'
         ? RpcRequest(options, IngestServiceRpcClient.getDevices, args)
