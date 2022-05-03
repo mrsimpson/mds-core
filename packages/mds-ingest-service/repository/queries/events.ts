@@ -13,7 +13,6 @@ import type {
   EventDomainModel,
   GetEventsWithDeviceAndTelemetryInfoOptions,
   GetEventsWithDeviceAndTelemetryInfoResponse,
-  GetVehicleEventQueryColumns,
   GetVehicleEventsFilterParams,
   GetVehicleEventsOrderOption,
   PartialEventDomainModel,
@@ -57,7 +56,7 @@ const getEventsOrPartialEvents = async <
   params: WithCursorOptions<GetVehicleEventsFilterParams>,
   mapper: ModelMapper<E, D>
 ): Promise<ResponseWithCursor<{ events: D[] }>> => {
-  const { limit = 100, beforeCursor, afterCursor, order, columns } = params
+  const { limit = 100, beforeCursor, afterCursor, order } = params
 
   try {
     const connection = await repository.connect('ro')
@@ -67,7 +66,7 @@ const getEventsOrPartialEvents = async <
     const {
       data,
       cursor: { beforeCursor: nextBeforeCursor, afterCursor: nextAfterCursor }
-    } = await paginateEventTelemetry<E>(query, limit, beforeCursor, afterCursor, columns, order)
+    } = await paginateEventTelemetry<E>(query, limit, beforeCursor, afterCursor, order)
 
     const events = data.map(mapper.mapper())
 
@@ -219,6 +218,37 @@ const buildQueryAndCursor = (connection: DataSource, params: WithCursorOptions<G
     query.andWhere('events.provider_id = ANY(:provider_ids)', { provider_ids })
   }
 
+  /**
+   * results are selected as JSON, so that we can skip the TypeORM entity builder.
+   */
+  if (columns) {
+    /* id must always be selected, for use with pagination cursor */
+    if (!columns.event.includes('id')) {
+      columns.event.push('id')
+    }
+    const row = columns.event.map(field => `'${field}', events.${field}`).join(', ')
+    query.select(`jsonb_build_object(${row}) as event`)
+
+    const telemetryColumns = columns.telemetry.base?.map(field => `'${field}', telemetry.${field}`)
+    const gpsColumns = columns.telemetry.gps.map(field => `'${field}', telemetry.${field}`)
+
+    const telemetryObject = telemetryColumns
+      ? `jsonb_build_object(${telemetryColumns.join(', ')}, 'gps', jsonb_build_object(${gpsColumns.join(', ')}))`
+      : `jsonb_build_object('gps', jsonb_build_object(${gpsColumns.join(', ')}))`
+    query.addSelect(`${telemetryObject} as telemetry`)
+
+    if (columns.annotation) {
+      const row = columns.annotation.map(field => `'${field}', event_annotations.${field}`).join(', ')
+      query.addSelect(`jsonb_build_object(${row}) as annotation`)
+    }
+    if (columns.device) {
+      const row = columns.device.map(field => `'${field}', devices.${field}`).join(', ')
+      query.addSelect(`jsonb_build_object(${row}) as device`)
+    }
+  } else {
+    query.select('row_to_json(events.*) as event, row_to_json(telemetry.*) as telemetry')
+  }
+
   const cursor = {
     time_range,
     geography_ids,
@@ -252,7 +282,6 @@ const paginateEventTelemetry = async <E extends EventEntityModel | PartialEventE
   limit: number,
   beforeCursor: string | null,
   afterCursor: string | null,
-  fields?: GetVehicleEventQueryColumns,
   order?: GetVehicleEventsOrderOption
 ): Promise<PagingResult<E>> => {
   const pager = buildPaginator({
@@ -272,34 +301,9 @@ const paginateEventTelemetry = async <E extends EventEntityModel | PartialEventE
   const pagedQuery: SelectQueryBuilder<{
     event: EventEntity
     telemetry: TelemetryEntity
+    device?: DeviceEntity
     annotation?: EventAnnotationEntity
   }> = pager['appendPagingQuery'](query)
-  /**
-   * results are selected as JSON, so that we can skip the TypeORM entity builder.
-   */
-  if (fields) {
-    const row = fields.event.map(field => `'${field}', events.${field}`).join(', ')
-    pagedQuery.select(`jsonb_build_object(${row}) as event`)
-
-    const telemetryColumns = fields.telemetry.base?.map(field => `'${field}', telemetry.${field}`)
-    const gpsColumns = fields.telemetry.gps.map(field => `'${field}', telemetry.${field}`)
-
-    const telemetryObject = telemetryColumns
-      ? `jsonb_build_object(${telemetryColumns.join(', ')}, 'gps', jsonb_build_object(${gpsColumns.join(', ')}))`
-      : `jsonb_build_object('gps', jsonb_build_object(${gpsColumns.join(', ')}))`
-    pagedQuery.addSelect(`${telemetryObject} as telemetry`)
-
-    if (fields.annotation) {
-      const row = fields.annotation.map(field => `'${field}', event_annotations.${field}`).join(', ')
-      pagedQuery.addSelect(`jsonb_build_object(${row}) as annotation`)
-    }
-    if (fields.device) {
-      const row = fields.device.map(field => `'${field}', devices.${field}`).join(', ')
-      pagedQuery.addSelect(`jsonb_build_object(${row}) as device`)
-    }
-  } else {
-    pagedQuery.select('row_to_json(events.*) as event, row_to_json(telemetry.*) as telemetry')
-  }
 
   const results: {
     event: EventEntity

@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.11.1
+
+### Patch Changes
+
+- 546e2b51: get-partial-events uses provider, fixes cursor bug
+
 ## 0.11.0
 
 ### Minor Changes

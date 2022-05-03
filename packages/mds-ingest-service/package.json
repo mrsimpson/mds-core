@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-ingest-service",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "Mobility Data Specification Ingest Service",
   "keywords": [
     "mds",
