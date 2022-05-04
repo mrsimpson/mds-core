@@ -16,11 +16,12 @@ export interface ProviderDomainModel {
 }
 
 export type ProviderDomainCreateModel = DomainModelCreate<ProviderDomainModel>
+export type GetProvidersOptions = Partial<{ provider_types: PROVIDER_TYPE[] }>
 
 export interface ProviderService {
   createProviders: (mdsProviders: ProviderDomainCreateModel[]) => ProviderDomainModel[]
   createProvider: (mdsProvider: ProviderDomainCreateModel) => ProviderDomainModel
-  getProviders: () => ProviderDomainModel[]
+  getProviders: (options?: GetProvidersOptions) => ProviderDomainModel[]
   getProvider: (provider_id: UUID) => ProviderDomainModel
   updateProvider: (mdsProvider: ProviderDomainModel) => ProviderDomainModel
   deleteProvider: (provider_id: UUID) => ProviderDomainModel['provider_id']
