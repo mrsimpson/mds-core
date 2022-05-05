@@ -1,5 +1,12 @@
 # @container-images/mds-geography-service
 
+## 0.2.11
+
+### Patch Changes
+
+- Updated dependencies [579ebc43]
+  - @mds-core/mds-webpack-config@0.1.15
+
 ## 0.2.10
 
 ### Patch Changes

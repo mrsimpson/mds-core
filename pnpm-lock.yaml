@@ -41,6 +41,7 @@ importers:
       lint-staged: 12.4.1
       markdownlint-cli2: 0.4.0
       mockdate: 3.0.5
+      node-loader: 2.0.0
       node-rsa: 1.1.1
       nodemon: 2.0.16
       nyc: 15.1.0
@@ -90,6 +91,7 @@ importers:
       lint-staged: 12.4.1
       markdownlint-cli2: 0.4.0
       mockdate: 3.0.5
+      node-loader: 2.0.0_webpack@5.72.0
       node-rsa: 1.1.1
       nodemon: 2.0.16
       nyc: 15.1.0
@@ -115,7 +117,7 @@ importers:
   container-images/mds-agency:
     specifiers:
       '@mds-core/mds-agency': workspace:0.5.23
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -131,7 +133,7 @@ importers:
   container-images/mds-attachment-service:
     specifiers:
       '@mds-core/mds-attachment-service': workspace:0.5.35
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -147,7 +149,7 @@ importers:
   container-images/mds-audit-api:
     specifiers:
       '@mds-core/mds-audit-api': workspace:0.4.14
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -163,7 +165,7 @@ importers:
   container-images/mds-audit-service:
     specifiers:
       '@mds-core/mds-audit-service': workspace:0.6.12
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -179,7 +181,7 @@ importers:
   container-images/mds-collector-api:
     specifiers:
       '@mds-core/mds-collector-api': workspace:0.1.83
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -195,7 +197,7 @@ importers:
   container-images/mds-collector-service:
     specifiers:
       '@mds-core/mds-collector-service': workspace:0.4.36
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -211,7 +213,7 @@ importers:
   container-images/mds-compliance-api:
     specifiers:
       '@mds-core/mds-compliance-api': workspace:0.4.47
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -227,7 +229,7 @@ importers:
   container-images/mds-compliance-service:
     specifiers:
       '@mds-core/mds-compliance-service': workspace:0.10.42
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -243,7 +245,7 @@ importers:
   container-images/mds-config-api:
     specifiers:
       '@mds-core/mds-config-api': workspace:0.4.14
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -259,7 +261,7 @@ importers:
   container-images/mds-config-service:
     specifiers:
       '@mds-core/mds-config-service': workspace:0.4.14
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -275,7 +277,7 @@ importers:
   container-images/mds-geography-api:
     specifiers:
       '@mds-core/mds-geography-api': workspace:0.4.36
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -291,7 +293,7 @@ importers:
   container-images/mds-geography-author-api:
     specifiers:
       '@mds-core/mds-geography-author-api': workspace:0.4.36
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -307,7 +309,7 @@ importers:
   container-images/mds-geography-service:
     specifiers:
       '@mds-core/mds-geography-service': workspace:0.10.33
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -323,7 +325,7 @@ importers:
   container-images/mds-ingest-service:
     specifiers:
       '@mds-core/mds-ingest-service': workspace:0.11.2
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -339,7 +341,7 @@ importers:
   container-images/mds-jurisdiction-api:
     specifiers:
       '@mds-core/mds-jurisdiction-api': workspace:0.1.82
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -355,7 +357,7 @@ importers:
   container-images/mds-jurisdiction-service:
     specifiers:
       '@mds-core/mds-jurisdiction-service': workspace:0.5.35
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -371,7 +373,7 @@ importers:
   container-images/mds-policy:
     specifiers:
       '@mds-core/mds-policy': workspace:0.8.10
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -387,7 +389,7 @@ importers:
   container-images/mds-policy-author-api:
     specifiers:
       '@mds-core/mds-policy-author-api': workspace:0.8.10
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -403,7 +405,7 @@ importers:
   container-images/mds-policy-service:
     specifiers:
       '@mds-core/mds-policy-service': workspace:0.12.10
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -419,7 +421,7 @@ importers:
   container-images/mds-provider-service:
     specifiers:
       '@mds-core/mds-provider-service': workspace:0.2.5
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -435,7 +437,7 @@ importers:
   container-images/mds-transaction-api:
     specifiers:
       '@mds-core/mds-transaction-api': workspace:0.2.45
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -451,7 +453,7 @@ importers:
   container-images/mds-transaction-service:
     specifiers:
       '@mds-core/mds-transaction-service': workspace:0.6.36
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -1620,7 +1622,7 @@ packages:
       convert-source-map: 1.8.0
       debug: 4.3.3
       gensync: 1.0.0-beta.2
-      json5: 2.2.0
+      json5: 2.2.1
       semver: 6.3.0
     transitivePeerDependencies:
       - supports-color
@@ -4117,6 +4119,10 @@ packages:
       is-windows: 1.0.2
     dev: true
 
+  /big.js/5.2.2:
+    resolution: {integrity: sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==}
+    dev: true
+
   /binary-extensions/2.2.0:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
@@ -5158,6 +5164,11 @@ packages:
 
   /emoji-regex/9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
+    dev: true
+
+  /emojis-list/3.0.0:
+    resolution: {integrity: sha512-/kyM18EfinwXZbno9FyUGeFh87KC8HRQBQGildHZbEuRyWFOmv1U10o9BBp8XVZDVNNuQKyIGIu5ZYAAXJ0V2Q==}
+    engines: {node: '>= 4'}
     dev: true
 
   /encodeurl/1.0.2:
@@ -7578,14 +7589,6 @@ packages:
       minimist: 1.2.6
     dev: true
 
-  /json5/2.2.0:
-    resolution: {integrity: sha512-f+8cldu7X/y7RAJurMEJmdoKXGB/X550w2Nr3tTbezL6RwEE/iMcm+tZnXeoZtKuOq6ft8+CqzEkrIgx1fPoQA==}
-    engines: {node: '>=6'}
-    hasBin: true
-    dependencies:
-      minimist: 1.2.6
-    dev: true
-
   /json5/2.2.1:
     resolution: {integrity: sha512-1hqLFMSrGHRHxav9q9gNjJ5EXznIxGVO09xQRrwplcS8qs28pZ8s8hupZAmqDwZUmVZ2Qb2jnyPOWcDH8m8dlA==}
     engines: {node: '>=6'}
@@ -7598,7 +7601,7 @@ packages:
   /jsonfile/4.0.0:
     resolution: {integrity: sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=}
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
     dev: true
 
   /jsonfile/6.1.0:
@@ -7606,7 +7609,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
     dev: true
 
   /jsonparse/1.3.1:
@@ -7800,6 +7803,15 @@ packages:
   /loader-runner/4.3.0:
     resolution: {integrity: sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg==}
     engines: {node: '>=6.11.5'}
+    dev: true
+
+  /loader-utils/2.0.2:
+    resolution: {integrity: sha512-TM57VeHptv569d/GKh6TAYdzKblwDNiumOdkFnejjD0XwTH87K90w3O7AiJRqdQoXygvi1VQTJTLGhJl7WqA7A==}
+    engines: {node: '>=8.9.0'}
+    dependencies:
+      big.js: 5.2.2
+      emojis-list: 3.0.0
+      json5: 2.2.1
     dev: true
 
   /locate-path/2.0.0:
@@ -8365,6 +8377,16 @@ packages:
       uuid: 3.4.0
     dev: false
 
+  /node-loader/2.0.0_webpack@5.72.0:
+    resolution: {integrity: sha512-I5VN34NO4/5UYJaUBtkrODPWxbobrE4hgDqPrjB25yPkonFhCmZ146vTH+Zg417E9Iwoh1l/MbRs1apc5J295Q==}
+    engines: {node: '>= 10.13.0'}
+    peerDependencies:
+      webpack: ^5.0.0
+    dependencies:
+      loader-utils: 2.0.2
+      webpack: 5.72.0_7706800f0169d70464725ec035378d39
+    dev: true
+
   /node-preload/0.2.1:
     resolution: {integrity: sha512-RM5oyBy45cLEoHqCeh+MNuFAxO0vTFBLskvQbOKnEE7YTTSN4tbN8QWDIPQ6L+WvKsB/qLEGpYe2ZZ9d4W9OIQ==}
     engines: {node: '>=8'}
@@ -8728,7 +8750,7 @@ packages:
     resolution: {integrity: sha512-whdkPIooSu/bASggZ96BWVvZTRMOFxnyUG5PnTSGKoJE2gd5mbVNmR2Nj20QFzxYYgAXpoqC+AiXzl+UMRh7zQ==}
     engines: {node: '>=8'}
     dependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
       hasha: 5.2.2
       lodash.flattendeep: 4.4.0
       release-zalgo: 1.0.0

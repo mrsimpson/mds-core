@@ -1,5 +1,11 @@
 # @mds-core/mds-webpack-config
 
+## 0.1.15
+
+### Patch Changes
+
+- 579ebc43: Use node-loader to handle .node files in deep dependencies
+
 ## 0.1.14
 
 ### Patch Changes
