@@ -1,5 +1,12 @@
 # @container-images/mds-config-service
 
+## 0.6.5
+
+### Patch Changes
+
+- Updated dependencies [579ebc43]
+  - @mds-core/mds-webpack-config@0.1.15
+
 ## 0.6.4
 
 ### Patch Changes

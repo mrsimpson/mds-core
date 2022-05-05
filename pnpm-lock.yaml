@@ -117,7 +117,7 @@ importers:
   container-images/mds-agency:
     specifiers:
       '@mds-core/mds-agency': workspace:0.5.23
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -133,7 +133,7 @@ importers:
   container-images/mds-attachment-service:
     specifiers:
       '@mds-core/mds-attachment-service': workspace:0.5.35
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -149,7 +149,7 @@ importers:
   container-images/mds-audit-api:
     specifiers:
       '@mds-core/mds-audit-api': workspace:0.4.14
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -165,7 +165,7 @@ importers:
   container-images/mds-audit-service:
     specifiers:
       '@mds-core/mds-audit-service': workspace:0.6.12
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -181,7 +181,7 @@ importers:
   container-images/mds-collector-api:
     specifiers:
       '@mds-core/mds-collector-api': workspace:0.1.83
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -197,7 +197,7 @@ importers:
   container-images/mds-collector-service:
     specifiers:
       '@mds-core/mds-collector-service': workspace:0.4.36
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -213,7 +213,7 @@ importers:
   container-images/mds-compliance-api:
     specifiers:
       '@mds-core/mds-compliance-api': workspace:0.4.47
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -229,7 +229,7 @@ importers:
   container-images/mds-compliance-service:
     specifiers:
       '@mds-core/mds-compliance-service': workspace:0.10.42
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -245,7 +245,7 @@ importers:
   container-images/mds-config-api:
     specifiers:
       '@mds-core/mds-config-api': workspace:0.4.14
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -261,7 +261,7 @@ importers:
   container-images/mds-config-service:
     specifiers:
       '@mds-core/mds-config-service': workspace:0.4.14
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -277,7 +277,7 @@ importers:
   container-images/mds-geography-api:
     specifiers:
       '@mds-core/mds-geography-api': workspace:0.4.36
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -293,7 +293,7 @@ importers:
   container-images/mds-geography-author-api:
     specifiers:
       '@mds-core/mds-geography-author-api': workspace:0.4.36
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -309,7 +309,7 @@ importers:
   container-images/mds-geography-service:
     specifiers:
       '@mds-core/mds-geography-service': workspace:0.10.33
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -325,7 +325,7 @@ importers:
   container-images/mds-ingest-service:
     specifiers:
       '@mds-core/mds-ingest-service': workspace:0.11.2
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -341,7 +341,7 @@ importers:
   container-images/mds-jurisdiction-api:
     specifiers:
       '@mds-core/mds-jurisdiction-api': workspace:0.1.82
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -357,7 +357,7 @@ importers:
   container-images/mds-jurisdiction-service:
     specifiers:
       '@mds-core/mds-jurisdiction-service': workspace:0.5.35
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -373,7 +373,7 @@ importers:
   container-images/mds-policy:
     specifiers:
       '@mds-core/mds-policy': workspace:0.8.10
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -389,7 +389,7 @@ importers:
   container-images/mds-policy-author-api:
     specifiers:
       '@mds-core/mds-policy-author-api': workspace:0.8.10
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -405,7 +405,7 @@ importers:
   container-images/mds-policy-service:
     specifiers:
       '@mds-core/mds-policy-service': workspace:0.12.10
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -421,7 +421,7 @@ importers:
   container-images/mds-provider-service:
     specifiers:
       '@mds-core/mds-provider-service': workspace:0.2.5
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -437,7 +437,7 @@ importers:
   container-images/mds-transaction-api:
     specifiers:
       '@mds-core/mds-transaction-api': workspace:0.2.45
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
@@ -453,7 +453,7 @@ importers:
   container-images/mds-transaction-service:
     specifiers:
       '@mds-core/mds-transaction-service': workspace:0.6.36
-      '@mds-core/mds-webpack-config': workspace:0.1.14
+      '@mds-core/mds-webpack-config': workspace:0.1.15
       dd-trace: 2.6.0
       express: 4.18.1
       pg: 8.7.3
