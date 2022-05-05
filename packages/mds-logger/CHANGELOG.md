@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.5.8
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+
 ## 0.5.7
 
 ### Patch Changes

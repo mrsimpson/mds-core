@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-api-helpers",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Mobility Data Specification helper functions",
   "keywords": [
     "mds",
@@ -19,11 +19,11 @@
     "test": "pnpm _test"
   },
   "dependencies": {
-    "@mds-core/mds-agency-cache": "workspace:0.4.27",
-    "@mds-core/mds-api-server": "workspace:0.4.14",
-    "@mds-core/mds-db": "workspace:0.6.27",
-    "@mds-core/mds-types": "workspace:0.9.2",
-    "@mds-core/mds-utils": "workspace:0.5.2",
+    "@mds-core/mds-agency-cache": "workspace:0.5.0",
+    "@mds-core/mds-api-server": "workspace:0.4.15",
+    "@mds-core/mds-db": "workspace:0.6.28",
+    "@mds-core/mds-types": "workspace:0.9.3",
+    "@mds-core/mds-utils": "workspace:0.5.3",
     "http-status-codes": "2.2.0",
     "json2csv": "5.0.7",
     "luxon": "2.3.2",

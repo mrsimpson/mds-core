@@ -1,5 +1,26 @@
 # @mds-core/mds-audit-api
 
+## 0.4.14
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+- Updated dependencies [a72ed106]
+  - @mds-core/mds-agency-cache@0.5.0
+  - @mds-core/mds-api-helpers@0.3.2
+  - @mds-core/mds-api-server@0.4.15
+  - @mds-core/mds-attachment-service@0.5.35
+  - @mds-core/mds-audit-service@0.6.12
+  - @mds-core/mds-db@0.6.28
+  - @mds-core/mds-ingest-service@0.11.2
+  - @mds-core/mds-logger@0.5.8
+  - @mds-core/mds-provider-service@0.2.5
+  - @mds-core/mds-schema-validators@0.5.15
+  - @mds-core/mds-service-helpers@0.6.11
+  - @mds-core/mds-utils@0.5.3
+  - @mds-core/mds-types@0.9.3
+
 ## 0.4.13
 
 ### Patch Changes

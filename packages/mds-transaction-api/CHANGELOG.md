@@ -1,5 +1,23 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.45
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- a72ed106: Updating mds-provider-service so that .getProviders can query by provider type
+- Updated dependencies [8a3e63d0]
+- Updated dependencies [a72ed106]
+  - @mds-core/mds-api-helpers@0.3.2
+  - @mds-core/mds-api-server@0.4.15
+  - @mds-core/mds-logger@0.5.8
+  - @mds-core/mds-provider-service@0.2.5
+  - @mds-core/mds-schema-validators@0.5.15
+  - @mds-core/mds-service-helpers@0.6.11
+  - @mds-core/mds-transaction-service@0.6.36
+  - @mds-core/mds-utils@0.5.3
+  - @mds-core/mds-types@0.9.3
+
 ## 0.2.44
 
 ### Patch Changes

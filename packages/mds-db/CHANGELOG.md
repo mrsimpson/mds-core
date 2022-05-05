@@ -1,5 +1,20 @@
 # @mds-core/mds-db
 
+## 0.6.28
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+  - @mds-core/mds-attachment-service@0.5.35
+  - @mds-core/mds-audit-service@0.6.12
+  - @mds-core/mds-geography-service@0.10.33
+  - @mds-core/mds-ingest-service@0.11.2
+  - @mds-core/mds-logger@0.5.8
+  - @mds-core/mds-policy-service@0.12.10
+  - @mds-core/mds-utils@0.5.3
+  - @mds-core/mds-types@0.9.3
+
 ## 0.6.27
 
 ### Patch Changes

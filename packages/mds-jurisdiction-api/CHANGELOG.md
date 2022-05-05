@@ -1,5 +1,18 @@
 # @mds-core/mds-jurisdiction-api
 
+## 0.1.82
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+  - @mds-core/mds-api-helpers@0.3.2
+  - @mds-core/mds-api-server@0.4.15
+  - @mds-core/mds-jurisdiction-service@0.5.35
+  - @mds-core/mds-logger@0.5.8
+  - @mds-core/mds-service-helpers@0.6.11
+  - @mds-core/mds-utils@0.5.3
+
 ## 0.1.81
 
 ### Patch Changes

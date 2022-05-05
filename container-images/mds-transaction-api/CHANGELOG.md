@@ -1,5 +1,15 @@
 # @container-images/mds-transaction-api
 
+## 0.2.10
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+- Updated dependencies [a72ed106]
+  - @mds-core/mds-transaction-api@0.2.45
+  - @mds-core/mds-webpack-config@0.1.14
+
 ## 0.2.9
 
 ### Patch Changes
