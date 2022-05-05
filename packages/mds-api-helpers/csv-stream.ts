@@ -51,7 +51,7 @@ export const streamCsvToHttp: <
   res: R,
   fields: Array<{ label: string; value: Col }>,
   pick_columns?: Array<Col>
-) => Promise<void> = async (getter, cursorGetter, rowsKey, res, fields, pick_columns) => {
+) => Promise<R> = async (getter, cursorGetter, rowsKey, res, fields, pick_columns) => {
   const parserConfig = {
     fields: pick_columns
       ? fields

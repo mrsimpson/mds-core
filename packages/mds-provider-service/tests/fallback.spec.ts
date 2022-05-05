@@ -27,7 +27,7 @@ describe('Provider Service Fallback Tests', () => {
         throw new Error()
       })
     )
-    const results = await ProviderServiceClient.getProviders()
+    const results = await ProviderServiceClient.getProviders({})
     expect(results.length).toEqual(FALLBACK_PROVIDERS.length)
   })
 
@@ -36,7 +36,7 @@ describe('Provider Service Fallback Tests', () => {
   })
 
   it('Errors out if a provider_id is not in the DB and not in the fallback list', async () => {
-    const result = await ProviderServiceClient.getProviders()
+    const result = await ProviderServiceClient.getProviders({})
     expect(result).toMatchObject(FALLBACK_PROVIDERS)
   })
 

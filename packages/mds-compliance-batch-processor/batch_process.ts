@@ -45,7 +45,7 @@ export async function computeSnapshot() {
   })
   const compliance_as_of = now() // The timestamp right after we fetch the inputs (latest state as of that time)
 
-  const provider_ids = (await ProviderServiceClient.getProviders()).map(p => p.provider_id)
+  const provider_ids = (await ProviderServiceClient.getProviders({})).map(p => p.provider_id)
 
   /**
    * This is intentionally an async (for) loop, as opposed to being concurrent (Promise.all()).

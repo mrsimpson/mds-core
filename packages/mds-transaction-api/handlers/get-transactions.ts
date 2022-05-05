@@ -238,7 +238,7 @@ export const GetTransactionsAsCsvHandler = async (
       { label: 'Trip ID', value: 'receipt.receipt_details.trip_id' }
     ]
 
-    const providers = await ProviderServiceClient.getProviders()
+    const providers = await ProviderServiceClient.getProviders({})
     const options = {
       provider_id,
       start_timestamp,

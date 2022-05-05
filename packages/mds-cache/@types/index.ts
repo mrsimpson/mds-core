@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+import type { RedisKey } from 'ioredis'
+export type { RedisKey } from 'ioredis'
+export type OrderedFields = { [key: string]: number }
+
 declare module 'ioredis' {
   interface Redis {
-    geoadd: (key: KeyType, longitude: number, latitude: number, member: KeyType) => Promise<string[]>
-    georadius: (key: KeyType, longitude: number, latitude: number, radius: number, unit: string) => Promise<string[]>
+    geoadd: (key: RedisKey, longitude: number, latitude: number, member: RedisKey) => Promise<string[]>
+    georadius: (key: RedisKey, longitude: number, latitude: number, radius: number, unit: string) => Promise<string[]>
   }
 }
-
-export type { KeyType } from 'ioredis'
-export type OrderedFields = { [key: string]: number }

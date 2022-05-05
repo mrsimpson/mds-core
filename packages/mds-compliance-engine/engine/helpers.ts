@@ -47,7 +47,7 @@ export function isPolicyUniversal(policy: PolicyDomainModel) {
 }
 
 export async function getAllInputs() {
-  const provider_ids = (await ProviderServiceClient.getProviders()).map(p => p.provider_id)
+  const provider_ids = (await ProviderServiceClient.getProviders({})).map(p => p.provider_id)
   const inputs = await Promise.all(provider_ids.map(provider_id => getProviderInputs(provider_id)))
   return inputs.reduce((acc: ProviderInputs, cur) => {
     acc[cur.provider_id] = cur
@@ -288,7 +288,7 @@ export function annotateVehicleMap<T extends Rule<Exclude<RULE_TYPE, 'rate'>>>(
 
 export async function getProviderIDs(provider_ids: UUID[] | undefined | null) {
   if (!isDefined(provider_ids) || !Array.isArray(provider_ids) || provider_ids.length < 1) {
-    return (await ProviderServiceClient.getProviders()).map(p => p.provider_id)
+    return (await ProviderServiceClient.getProviders({})).map(p => p.provider_id)
   }
   return provider_ids
 }

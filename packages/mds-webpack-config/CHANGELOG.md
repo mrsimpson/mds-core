@@ -1,5 +1,11 @@
 # @mds-core/mds-webpack-config
 
+## 0.1.14
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+
 ## 0.1.13
 
 ### Patch Changes

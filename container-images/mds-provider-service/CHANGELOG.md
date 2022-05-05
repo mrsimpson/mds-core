@@ -1,5 +1,15 @@
 # @container-images/mds-provider-service
 
+## 0.1.5
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+- Updated dependencies [a72ed106]
+  - @mds-core/mds-provider-service@0.2.5
+  - @mds-core/mds-webpack-config@0.1.14
+
 ## 0.1.4
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @container-images/mds-config-api
 
+## 0.6.4
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+  - @mds-core/mds-config-api@0.4.14
+  - @mds-core/mds-webpack-config@0.1.14
+
 ## 0.6.3
 
 ### Patch Changes

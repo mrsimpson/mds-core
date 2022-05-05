@@ -50,7 +50,7 @@ async function main() {
   await GeographyServiceClient.writeGeographies([geographies[0]])
   await GeographyServiceClient.publishGeography({ geography_id: geographies[0].geography_id })
 
-  const providerIDs = (await ProviderServiceClient.getProviders()).map(p => p.provider_id).slice(0, 4)
+  const providerIDs = (await ProviderServiceClient.getProviders({})).map(p => p.provider_id).slice(0, 4)
   const devices = providerIDs.reduce((acc: DeviceDomainModel[], providerID) => {
     acc = acc.concat(makeDevices(20000, now(), providerID))
     return acc

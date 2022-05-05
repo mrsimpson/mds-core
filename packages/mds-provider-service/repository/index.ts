@@ -2,7 +2,7 @@ import type { InsertReturning } from '@mds-core/mds-repository'
 import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import type { UUID } from '@mds-core/mds-types'
 import { NotFoundError } from '@mds-core/mds-utils'
-import type { ProviderDomainModel } from '../@types'
+import type { GetProvidersOptions, ProviderDomainModel } from '../@types'
 import type { ProviderEntityModel } from './entities/provider-entity'
 import { ProviderEntity } from './entities/provider-entity'
 import { ProviderDomainToEntityCreate, ProviderEntityToDomain } from './mappers'
@@ -53,11 +53,17 @@ export const ProviderRepository = ReadWriteRepository.Create(
       }
     }
 
-    const getProviders = async (): Promise<ProviderDomainModel[]> => {
+    const getProviders = async (options: GetProvidersOptions): Promise<ProviderDomainModel[]> => {
       try {
+        const { provider_types } = options ?? {}
         const connection = await repository.connect('ro')
-        const entities = await connection.getRepository(ProviderEntity).find()
-        return entities.map(ProviderEntityToDomain.mapper())
+        const query = connection.getRepository(ProviderEntity).createQueryBuilder()
+
+        if (provider_types) {
+          query.andWhere('provider_types::text[] && :provider_types', { provider_types })
+        }
+
+        return (await query.getMany()).map(ProviderEntityToDomain.mapper())
       } catch (error) {
         throw RepositoryError(error)
       }

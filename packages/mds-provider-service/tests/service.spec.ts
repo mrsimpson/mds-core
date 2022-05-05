@@ -58,8 +58,17 @@ describe('Provider Service Tests', () => {
   it('Get All Providers', async () => {
     await ProviderServiceClient.createProvider(generateProvider({ provider_id: TEST_PROVIDER_ID }))
     await ProviderServiceClient.createProvider(generateProvider({ provider_id: TEST_PROVIDER_2_ID }))
-    const providers = await ProviderServiceClient.getProviders()
+    const providers = await ProviderServiceClient.getProviders({})
     expect(providers.length).toEqual(2)
+  })
+
+  it('Gets Providers By Type', async () => {
+    await ProviderServiceClient.createProvider(generateProvider({ provider_id: TEST_PROVIDER_ID }))
+    await ProviderServiceClient.createProvider(
+      generateProvider({ provider_id: TEST_PROVIDER_2_ID, provider_types: ['gbfs_micromobility'] })
+    )
+    const providers = await ProviderServiceClient.getProviders({ provider_types: ['mds_micromobility'] })
+    expect(providers.length).toEqual(1)
   })
 
   it('Get One Provider', async () => {

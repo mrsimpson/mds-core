@@ -48,9 +48,9 @@ export const ProviderServiceProvider: ServiceProvider<ProviderService, ProviderS
     }
   },
 
-  getProviders: async context => {
+  getProviders: async (context, options) => {
     try {
-      const result = await ProviderRepository.getProviders()
+      const result = await ProviderRepository.getProviders(options ?? {})
       if (result.length > 0) return ServiceResult(result)
       else return ServiceResult(FALLBACK_PROVIDERS)
     } catch (error) /* istanbul ignore next */ {

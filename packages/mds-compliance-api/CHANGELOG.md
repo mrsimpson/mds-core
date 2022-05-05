@@ -1,5 +1,23 @@
 # @mds-core/mds-compliance-api
 
+## 0.4.47
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+  - @mds-core/mds-api-helpers@0.3.2
+  - @mds-core/mds-api-server@0.4.15
+  - @mds-core/mds-compliance-service@0.10.42
+  - @mds-core/mds-db@0.6.28
+  - @mds-core/mds-logger@0.5.8
+  - @mds-core/mds-policy-service@0.12.10
+  - @mds-core/mds-schema-validators@0.5.15
+  - @mds-core/mds-service-helpers@0.6.11
+  - @mds-core/mds-utils@0.5.3
+  - @mds-core/mds-test-data@0.4.39
+  - @mds-core/mds-types@0.9.3
+
 ## 0.4.46
 
 ### Patch Changes

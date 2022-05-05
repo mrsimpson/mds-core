@@ -1,5 +1,13 @@
 # @mds-core/mds-config-files
 
+## 0.1.7
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+  - @mds-core/mds-utils@0.5.3
+
 ## 0.1.6
 
 ### Patch Changes

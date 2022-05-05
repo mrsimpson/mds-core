@@ -1,5 +1,21 @@
 # @mds-core/mds-transaction-service
 
+## 0.6.36
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+  - @mds-core/mds-ingest-service@0.11.2
+  - @mds-core/mds-logger@0.5.8
+  - @mds-core/mds-repository@0.2.5
+  - @mds-core/mds-rpc-common@0.3.24
+  - @mds-core/mds-schema-validators@0.5.15
+  - @mds-core/mds-service-helpers@0.6.11
+  - @mds-core/mds-stream@0.4.2
+  - @mds-core/mds-utils@0.5.3
+  - @mds-core/mds-types@0.9.3
+
 ## 0.6.35
 
 ### Patch Changes

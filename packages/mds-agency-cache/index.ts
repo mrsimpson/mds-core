@@ -28,7 +28,7 @@ import {
   tail
 } from '@mds-core/mds-utils'
 import flatten, { unflatten } from 'flat'
-import type Redis from 'ioredis'
+import type { ChainableCommander } from 'ioredis'
 import { AgencyCacheLogger } from './logger'
 import type {
   CachedItem,
@@ -67,7 +67,7 @@ async function info() {
 
 // update the ordered list of (device_id, timestamp) tuples
 // so that we can trivially get a list of "updated since ___" device_ids
-function updateVehicleList(device_id: UUID, pipeline: Redis.Pipeline, timestamp?: Timestamp) {
+function updateVehicleList(device_id: UUID, pipeline: ChainableCommander, timestamp?: Timestamp) {
   const when = timestamp || now()
   pipeline.zadd(decorateKey('device-ids'), when.toString(), device_id)
 }
@@ -84,7 +84,7 @@ async function hread(suffix: string, device_id: UUID): Promise<CachedItem> {
 }
 
 /* Store latest known lat/lng for a given device in a redis geo-spatial analysis compatible manner. */
-function addGeospatialHash(device_id: UUID, coordinates: [number, number], pipeline: Redis.Pipeline) {
+function addGeospatialHash(device_id: UUID, coordinates: [number, number], pipeline: ChainableCommander) {
   const [lat, lng] = coordinates
   pipeline.geoadd(decorateKey('locations'), lng, lat, device_id)
 }
@@ -123,7 +123,13 @@ async function hreads(
       return pipeline.hgetall(key)
     }, await client.multi())
 
-  const replies = (await multi.exec()).map(([_, result]) => result)
+  const results = await multi.exec()
+
+  if (!results) {
+    return []
+  }
+
+  const replies = results.map(([_, result]) => result as CachedItem)
 
   return replies.map((flat, index) =>
     Object.keys(flat).length > 0 ? unflatten({ ...flat, [`${prefix}_id`]: ids[index % ids.length] }) : unflatten(null)
@@ -131,7 +137,7 @@ async function hreads(
 }
 
 // anything with a device_id, e.g. device, telemetry, etc.
-function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | VehicleEvent, pipeline: Redis.Pipeline) {
+function hwrite(suffix: string, item: CacheReadDeviceResult | Telemetry | VehicleEvent, pipeline: ChainableCommander) {
   if (typeof item.device_id !== 'string') {
     AgencyCacheLogger.error(`hwrite: invalid device_id ${item.device_id}`)
     throw new Error(`hwrite: invalid device_id ${item.device_id}`)
@@ -164,7 +170,7 @@ async function writeDevices(devices: Device[]) {
 }
 
 // put basics of device in the cache
-function writeDevice(device: Device, pipeline: Redis.Pipeline) {
+function writeDevice(device: Device, pipeline: ChainableCommander) {
   try {
     if (!device) {
       throw new Error('null device not legal to write')
@@ -187,7 +193,7 @@ async function wipeDevices(device_ids: UUID[]) {
   await pipeline.exec()
 }
 
-function wipeDevice(device_id: UUID, pipeline: Redis.Pipeline) {
+function wipeDevice(device_id: UUID, pipeline: ChainableCommander) {
   const keys = [
     decorateKey(`device:${device_id}:event`),
     decorateKey(`device:${device_id}:telemetry`),
@@ -209,7 +215,7 @@ async function writeEvents(events: VehicleEvent[]) {
   await pipeline.exec()
 }
 
-function writeEvent(event: VehicleEvent, pipeline: Redis.Pipeline, prevEvent?: VehicleEvent) {
+function writeEvent(event: VehicleEvent, pipeline: ChainableCommander, prevEvent?: VehicleEvent) {
   try {
     if (tail(event.event_types) === 'decommissioned') {
       wipeDevice(event.device_id, pipeline)
@@ -384,7 +390,7 @@ async function readTelemetry(device_ids: UUID[]): Promise<Telemetry[]> {
 function writeOneTelemetry(
   telemetry: Telemetry,
   options: { quiet: boolean } = { quiet: false },
-  pipeline: Redis.Pipeline,
+  pipeline: ChainableCommander,
   priorTelemetry?: Telemetry
 ) {
   const isNewerTelemetry = () => {

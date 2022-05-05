@@ -1,5 +1,14 @@
 # @mds-core/mds-api-authorizer
 
+## 0.1.68
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+  - @mds-core/mds-utils@0.5.3
+  - @mds-core/mds-types@0.9.3
+
 ## 0.1.67
 
 ### Patch Changes

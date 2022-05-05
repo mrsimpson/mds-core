@@ -1,5 +1,11 @@
 # @mds-core/mds-types
 
+## 0.9.3
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+
 ## 0.9.2
 
 ### Patch Changes

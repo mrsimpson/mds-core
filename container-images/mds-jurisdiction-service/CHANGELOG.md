@@ -1,5 +1,14 @@
 # @container-images/mds-jurisdiction-service
 
+## 0.2.8
+
+### Patch Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+- Updated dependencies [8a3e63d0]
+  - @mds-core/mds-jurisdiction-service@0.5.35
+  - @mds-core/mds-webpack-config@0.1.14
+
 ## 0.2.7
 
 ### Patch Changes

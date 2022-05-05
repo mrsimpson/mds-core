@@ -1,5 +1,18 @@
 # @mds-core/mds-cache
 
+## 0.1.0
+
+### Minor Changes
+
+- 8a3e63d0: Breaking interface changes due to ioredis version bump
+
+### Patch Changes
+
+- Updated dependencies [8a3e63d0]
+  - @mds-core/mds-logger@0.5.8
+  - @mds-core/mds-utils@0.5.3
+  - @mds-core/mds-types@0.9.3
+
 ## 0.0.37
 
 ### Patch Changes
