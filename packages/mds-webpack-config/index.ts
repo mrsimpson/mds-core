@@ -58,6 +58,10 @@ const MergeConfigurations =
               test: /\.ts$/,
               loader: 'ts-loader',
               options: { onlyCompileBundledFiles: true }
+            },
+            {
+              test: /\.node$/,
+              loader: 'node-loader'
             }
           ]
         },
