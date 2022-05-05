@@ -22,8 +22,8 @@
   "dependencies": {
     "@mds-core/mds-utils": "workspace:0.5.2",
     "@types/yamljs": "0.2.31",
-    "envalid": "7.2.1",
-    "json5": "2.2.0",
+    "envalid": "7.3.1",
+    "json5": "2.2.1",
     "yamljs": "0.3.0"
   }
 }

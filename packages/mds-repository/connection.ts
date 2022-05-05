@@ -114,7 +114,8 @@ export class ConnectionManager {
           logger: 'simple-console',
           synchronize: false,
           migrationsRun: false,
-          namingStrategy: new MdsNamingStrategy()
+          namingStrategy: new MdsNamingStrategy(),
+          replication: undefined
         })
       ])
     )

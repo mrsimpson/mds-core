@@ -74,7 +74,7 @@ const registerLivelinessHandling = (consumer: Consumer, healthStatus: HealthStat
 
   const { CRASH, STOP, DISCONNECT, HEARTBEAT } = consumer.events
 
-  consumer.on(CRASH, async ({ error, groupId, restart }) => {
+  consumer.on(CRASH, async ({ payload: { error, groupId, restart } }) => {
     StreamLogger.error('Kafka consumer crashed', { error, groupId, restart })
     await disconnectConsumer(consumer)
     healthStatus.components = {

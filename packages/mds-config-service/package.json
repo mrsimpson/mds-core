@@ -28,6 +28,6 @@
     "@mds-core/mds-rpc-common": "workspace:0.3.23",
     "@mds-core/mds-service-helpers": "workspace:0.6.10",
     "@mds-core/mds-utils": "workspace:0.5.2",
-    "json5": "2.2.0"
+    "json5": "2.2.1"
   }
 }

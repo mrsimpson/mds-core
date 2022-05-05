@@ -17,18 +17,18 @@
 import type { Nullable, Timestamp, TimestampInSeconds } from '@mds-core/mds-types'
 import { ClientDisconnectedError, ExceptionMessages, isDefined } from '@mds-core/mds-utils'
 import type Redis from 'ioredis'
-import type { KeyType, ValueType } from 'ioredis'
+import type { RedisKey, RedisValue } from 'ioredis'
 import type { OrderedFields } from '../@types'
 import { initClient } from './helpers/client'
 
 export type ExpireAtOptions = {
-  key: KeyType
+  key: RedisKey
   timeInSeconds?: TimestampInSeconds
   timeInMs?: Timestamp
 }
 
 export const RedisCache = () => {
-  let client: Nullable<Redis.Redis> = null
+  let client: Nullable<Redis> = null
 
   /**
    * If the client is defined, the closure is called, otherwise throws an error
@@ -36,7 +36,7 @@ export const RedisCache = () => {
    * @returns same as what the exec returns
    * @throws ClientDisconnectedError
    */
-  const safelyExec = async <T>(exec: (theClient: Redis.Redis) => T) => {
+  const safelyExec = async <T>(exec: (theClient: Redis) => T) => {
     if (isDefined(client)) {
       return exec(client)
     }
@@ -58,13 +58,13 @@ export const RedisCache = () => {
     },
     multi: async () => safelyExec(theClient => theClient.multi()),
 
-    get: async (key: KeyType) => safelyExec(theClient => theClient.get(key)),
+    get: async (key: RedisKey) => safelyExec(theClient => theClient.get(key)),
 
-    mget: async (keys: KeyType[]) => safelyExec(theClient => theClient.mget(keys)),
+    mget: async (keys: RedisKey[]) => safelyExec(theClient => theClient.mget(keys)),
 
-    set: async (key: KeyType, val: ValueType) => safelyExec(theClient => theClient.set(key, val)),
+    set: async (key: RedisKey, val: RedisValue) => safelyExec(theClient => theClient.set(key, val)),
 
-    mset: async (data: { [key: string]: ValueType } | string[]) => safelyExec(theClient => theClient.mset(data)),
+    mset: async (data: { [key: string]: RedisValue } | string[]) => safelyExec(theClient => theClient.mset(data)),
 
     /**
      * Expires a key at Unix time in seconds, or time in milliseconds.
@@ -82,59 +82,59 @@ export const RedisCache = () => {
 
     dbsize: async () => safelyExec(theClient => theClient.dbsize()),
 
-    del: async (...keys: KeyType[]) => safelyExec(theClient => theClient.del(keys)),
+    del: async (...keys: RedisKey[]) => safelyExec(theClient => theClient.del(keys)),
 
     flushdb: async () => safelyExec(theClient => theClient.flushdb()),
 
-    sadd: async (key: KeyType, val: ValueType) => safelyExec(theClient => theClient.sadd(key, val)),
+    sadd: async (key: RedisKey, val: RedisValue) => safelyExec(theClient => theClient.sadd(key, val)),
 
-    srem: async (key: KeyType, val: ValueType) => safelyExec(theClient => theClient.srem(key, val)),
+    srem: async (key: RedisKey, val: RedisValue) => safelyExec(theClient => theClient.srem(key, val)),
 
-    smembers: async (key: KeyType) => safelyExec(theClient => theClient.smembers(key)),
+    smembers: async (key: RedisKey) => safelyExec(theClient => theClient.smembers(key)),
 
-    lpush: async (key: KeyType, val: ValueType) => safelyExec(theClient => theClient.lpush(key, val)),
+    lpush: async (key: RedisKey, val: RedisValue) => safelyExec(theClient => theClient.lpush(key, val)),
 
-    rpush: async (key: KeyType, val: ValueType) => safelyExec(theClient => theClient.rpush(key, val)),
+    rpush: async (key: RedisKey, val: RedisValue) => safelyExec(theClient => theClient.rpush(key, val)),
 
-    lrange: async (key: KeyType, min: number, max: number) => safelyExec(theClient => theClient.lrange(key, min, max)),
+    lrange: async (key: RedisKey, min: number, max: number) => safelyExec(theClient => theClient.lrange(key, min, max)),
 
     hset: async (
-      key: KeyType,
-      ...data: [{ [key: string]: ValueType }] | [KeyType, ValueType][] | [KeyType, ValueType]
+      key: RedisKey,
+      ...data: [{ [key: string]: RedisValue }] | [RedisKey, RedisValue][] | [RedisKey, RedisValue]
     ) => {
       /* We need to do tons of type coercion in here due to poor typing in DefinitelyTyped... I am so sorry. */
-      const isTupleArr = (d: unknown[]): d is [KeyType, ValueType][] => Array.isArray(d[0])
+      const isTupleArr = (d: unknown[]): d is [RedisKey, RedisValue][] => Array.isArray(d[0])
 
-      const isSingleTuple = (d: unknown[]): d is [KeyType, ValueType] => typeof d[0] === 'string'
+      const isSingleTuple = (d: unknown[]): d is [RedisKey, RedisValue] => typeof d[0] === 'string'
 
       return safelyExec(theClient => {
         if (isTupleArr(data)) {
-          const args = [key, ...data.flat()] as [key: KeyType, field: string, value: ValueType]
+          const args = [key, ...data.flat()] as [key: RedisKey, field: string, value: RedisValue]
           return theClient.hset(...args)
         }
 
         if (isSingleTuple(data)) {
-          const args = [key, ...data] as [key: KeyType, field: string, value: ValueType]
+          const args = [key, ...data] as [key: RedisKey, field: string, value: RedisValue]
           return theClient.hset(...args)
         }
 
         const [first] = data
-        const args = [key, first] as unknown as [key: KeyType, field: string, value: ValueType]
+        const args = [key, first] as unknown as [key: RedisKey, field: string, value: RedisValue]
         return theClient.hset(...args)
       })
     },
-    hmset: async (key: KeyType, data: { [key: string]: ValueType }) =>
+    hmset: async (key: RedisKey, data: { [key: string]: RedisValue }) =>
       safelyExec(theClient => theClient.hmset(key, data)),
 
-    hdel: async (key: KeyType, ...fields: KeyType[]) => safelyExec(theClient => theClient.hdel(key, fields)),
+    hdel: async (key: RedisKey, ...fields: RedisKey[]) => safelyExec(theClient => theClient.hdel(key, ...fields)),
 
-    hgetall: async (key: KeyType) => safelyExec(theClient => theClient.hgetall(key)),
+    hgetall: async (key: RedisKey) => safelyExec(theClient => theClient.hgetall(key)),
 
     info: async () => safelyExec(theClient => theClient.info()),
 
     keys: async (pattern: string) => safelyExec(theClient => theClient.keys(pattern)),
 
-    zadd: async (key: KeyType, fields: OrderedFields | (string | number)[]) =>
+    zadd: async (key: RedisKey, fields: OrderedFields | (string | number)[]) =>
       safelyExec(theClient => {
         const entries: (string | number)[] = !Array.isArray(fields)
           ? Object.entries(fields).reduce((acc: (number | string)[], [field, value]) => [...acc, value, field], [])
@@ -142,22 +142,22 @@ export const RedisCache = () => {
         return theClient.zadd(key, ...entries)
       }),
 
-    zrem: async (key: KeyType, val: ValueType) => safelyExec(theClient => theClient.zrem(key, val)),
+    zrem: async (key: RedisKey, val: RedisValue) => safelyExec(theClient => theClient.zrem(key, val)),
 
-    zrangebyscore: async (key: KeyType, min: string | number, max: string | number) =>
+    zrangebyscore: async (key: RedisKey, min: string | number, max: string | number) =>
       safelyExec(theClient => theClient.zrangebyscore(key, min, max)),
 
-    zremrangebyscore: async (key: KeyType, min: string | number, max: string | number) =>
+    zremrangebyscore: async (key: RedisKey, min: string | number, max: string | number) =>
       safelyExec(theClient => theClient.zremrangebyscore(key, min, max)),
 
-    geoadd: async (key: KeyType, longitude: number, latitude: number, member: KeyType) =>
+    geoadd: async (key: RedisKey, longitude: number, latitude: number, member: RedisKey) =>
       safelyExec(theClient => theClient.geoadd(key, longitude, latitude, member)),
 
-    georadius: async (key: KeyType, longitude: number, latitude: number, radius: number, unit: string) =>
+    georadius: async (key: RedisKey, longitude: number, latitude: number, radius: number, unit: string) =>
       safelyExec(theClient => theClient.georadius(key, longitude, latitude, radius, unit)),
 
     /* TODO: Improve multi call response structure */
-    multihgetall: async (key: KeyType) => safelyExec(theClient => theClient.multi().hgetall(key).exec())
+    multihgetall: async (key: RedisKey) => safelyExec(theClient => theClient.multi().hgetall(key).exec())
   }
 }
 

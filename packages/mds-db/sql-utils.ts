@@ -105,11 +105,11 @@ export function cols_sql(cols: Readonly<string[]>) {
 }
 
 // These are the types representing data that can be stored in db
-type DBValueType = null | string | number | boolean | string[]
+type DBRedisValue = null | string | number | boolean | string[]
 
 // take a list of column names and extract the values into a list for SQL insertion
 // undefined is coerced to null and objects are treated as JSON and stringified
-export function vals_list(cols: Readonly<string[]>, obj: { [s: string]: DBValueType | undefined | object }) {
+export function vals_list(cols: Readonly<string[]>, obj: { [s: string]: DBRedisValue | undefined | object }) {
   return cols
     .filter(col => col !== schema.COLUMN.id)
     .map(col => {
@@ -130,7 +130,7 @@ export function vals_list(cols: Readonly<string[]>, obj: { [s: string]: DBValueT
 }
 
 // convert an object to sql string representation
-export function to_sql(value: DBValueType | undefined | object) {
+export function to_sql(value: DBRedisValue | undefined | object) {
   // bools
   if (value === true || value === false) {
     return `${value}`

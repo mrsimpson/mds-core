@@ -20,11 +20,11 @@
   },
   "dependencies": {
     "@types/debug": "4.1.7",
-    "@types/pino": "6.3.11",
-    "debug": "4.3.2",
+    "@types/pino": "7.0.5",
+    "debug": "4.3.4",
     "express-http-context": "1.2.4",
-    "pino": "6.13.3",
-    "pino-pretty": "7.0.1"
+    "pino": "7.11.0",
+    "pino-pretty": "7.6.1"
   },
   "publishConfig": {
     "main": "dist/index.js"

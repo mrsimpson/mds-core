@@ -15,5 +15,7 @@
  */
 
 import tracer from 'dd-trace'
-tracer.init({ enabled: !!process.env.DD_ENV }) // initialized in a different file to avoid hoisting.
+if (!!process.env.DD_ENV) {
+  tracer.init() // initialized in a different file to avoid hoisting.
+}
 export default tracer
