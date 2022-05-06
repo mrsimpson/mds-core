@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
 import { ApiServer } from '@mds-core/mds-api-server'
 import type { GeographyWithMetadataDomainModel } from '@mds-core/mds-geography-service'
 import { GeographyRepository, GeographyServiceClient, GeographyServiceManager } from '@mds-core/mds-geography-service'
@@ -46,19 +44,20 @@ const GEOGRAPHIES_PUBLISH_SCOPE = SCOPED_AUTH(['geographies:publish'])
 const GeographyServer = GeographyServiceManager.controller()
 
 describe('Tests app', () => {
+  beforeAll(async () => {
+    await GeographyServer.start()
+    await GeographyRepository.truncateAllTables()
+  })
+
+  afterAll(async () => {
+    await GeographyServer.stop()
+    await GeographyRepository.truncateAllTables()
+    await GeographyRepository.shutdown()
+  })
+
   describe('Geography endpoint tests', () => {
     afterEach(() => {
       jest.restoreAllMocks()
-    })
-
-    beforeAll(async () => {
-      await GeographyRepository.truncateAllTables()
-      await GeographyServer.start()
-    })
-
-    afterAll(async () => {
-      await GeographyServer.stop()
-      await GeographyRepository.truncateAllTables()
     })
 
     // Geography endpoints
@@ -214,7 +213,6 @@ describe('Tests app', () => {
 
     beforeAll(async () => {
       await GeographyRepository.truncateAllTables()
-      await GeographyServer.start()
       await GeographyServiceClient.writeGeographies([
         { name: 'Geography 1', geography_id: GEOGRAPHY_UUID, geography_json: LA_CITY_BOUNDARY },
         { name: 'Geography 2', geography_id: GEOGRAPHY2_UUID, geography_json: restrictedAreas }
@@ -222,20 +220,15 @@ describe('Tests app', () => {
       await GeographyServiceClient.publishGeography({ geography_id: GEOGRAPHY2_UUID })
     })
 
-    afterAll(async () => {
-      await GeographyServer.stop()
-      await GeographyRepository.truncateAllTables()
-    })
-
     it('cannot GET geography metadata (no auth)', async () => {
-      request
+      await request
         .get(pathPrefix(`/geographies/${GEOGRAPHY_UUID}/meta`))
         .set('Authorization', EMPTY_SCOPE)
         .expect(403)
     })
 
     it('cannot GET geography metadata (wrong auth)', async () => {
-      request
+      await request
         .get(pathPrefix(`/geographies/${GEOGRAPHY_UUID}/meta`))
         .set('Authorization', EVENTS_READ_SCOPE)
         .expect(403)
@@ -392,14 +385,14 @@ describe('Tests app', () => {
     })
 
     it('verifies GETing a published geography metadata throws a permission error if the scope is wrong', async () => {
-      request
+      await request
         .get(pathPrefix(`/geographies/${GEOGRAPHY_UUID}/meta`))
         .set('Authorization', GEOGRAPHIES_READ_PUBLISHED_SCOPE)
         .expect(403)
     })
 
     it('verifies GETing a published geography metadata if the scope is geographies:read:unpublished', async () => {
-      request
+      await request
         .get(pathPrefix(`/geographies/${GEOGRAPHY_UUID}/meta`))
         .set('Authorization', GEOGRAPHIES_READ_UNPUBLISHED_SCOPE)
         .expect(200)
@@ -451,7 +444,7 @@ describe('Tests app', () => {
     })
 
     it('fails to hit non-existent endpoint with a 404', async () => {
-      request.get(pathPrefix(`/foobar`)).set('Authorization', GEOGRAPHIES_WRITE_SCOPE).expect(404)
+      await request.get(pathPrefix(`/foobar`)).set('Authorization', GEOGRAPHIES_WRITE_SCOPE).expect(404)
     })
   })
 })
