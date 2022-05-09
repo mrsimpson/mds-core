@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-provider-service",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Provider Service",
   "keywords": [
     "mds",
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@mds-core/mds-logger": "workspace:0.5.8",
-    "@mds-core/mds-provider-service": "workspace:0.2.5",
+    "@mds-core/mds-provider-service": "workspace:0.2.6",
     "@mds-core/mds-repository": "workspace:0.2.5",
     "@mds-core/mds-rpc-common": "workspace:0.3.24",
     "@mds-core/mds-schema-validators": "workspace:0.5.15",

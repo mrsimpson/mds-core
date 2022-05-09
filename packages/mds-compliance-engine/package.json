@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-engine",
-  "version": "0.8.36",
+  "version": "0.8.37",
   "description": "MDS Compliance Tool",
   "keywords": [
     "mds",
@@ -23,13 +23,13 @@
   "dependencies": {
     "@mds-core/mds-api-helpers": "workspace:0.3.3",
     "@mds-core/mds-api-server": "workspace:0.4.15",
-    "@mds-core/mds-compliance-service": "workspace:0.10.43",
+    "@mds-core/mds-compliance-service": "workspace:0.10.44",
     "@mds-core/mds-db": "workspace:0.6.29",
     "@mds-core/mds-geography-service": "workspace:0.10.34",
     "@mds-core/mds-ingest-service": "0.11.3",
     "@mds-core/mds-logger": "workspace:0.5.8",
     "@mds-core/mds-policy-service": "workspace:0.12.11",
-    "@mds-core/mds-provider-service": "workspace:0.2.5",
+    "@mds-core/mds-provider-service": "workspace:0.2.6",
     "@mds-core/mds-schema-validators": "workspace:0.5.15",
     "@mds-core/mds-service-helpers": "workspace:0.6.11",
     "@mds-core/mds-stream": "workspace:0.4.2",

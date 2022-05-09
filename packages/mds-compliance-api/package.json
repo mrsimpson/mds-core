@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-api",
-  "version": "0.4.48",
+  "version": "0.4.49",
   "description": "MDS Compliance API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -23,7 +23,7 @@
   "dependencies": {
     "@mds-core/mds-api-helpers": "workspace:0.3.3",
     "@mds-core/mds-api-server": "workspace:0.4.15",
-    "@mds-core/mds-compliance-service": "workspace:0.10.43",
+    "@mds-core/mds-compliance-service": "workspace:0.10.44",
     "@mds-core/mds-db": "workspace:0.6.29",
     "@mds-core/mds-logger": "workspace:0.5.8",
     "@mds-core/mds-policy-service": "workspace:0.12.11",
