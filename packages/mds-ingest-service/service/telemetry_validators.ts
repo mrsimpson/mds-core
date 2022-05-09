@@ -23,7 +23,7 @@ import {
   uuidSchema
 } from '@mds-core/mds-schema-validators'
 import type {
-  GetH3BinOptions,
+  GetAnonymizedTelemetryOptions,
   TelemetryAnnotationDomainCreateModel,
   TelemetryAnnotationDomainModel,
   TelemetryDomainCreateModel,
@@ -120,7 +120,7 @@ export const { validate: validateTelemetryAnnotationDomainCreateModel, $schema: 
 export const { validate: validateTelemetryAnnotationDomainModel, $schema: TelemetryAnnotationSchema } =
   SchemaValidator<TelemetryAnnotationDomainModel>(telemetryAnnotationDomainModelSchema(), { useDefaults: true })
 
-export const getH3BinsOptionsSchema: Schema<GetH3BinOptions> = <const>{
+export const getAnonymizeTelemetryOptionsSchema: Schema<GetAnonymizedTelemetryOptions> = <const>{
   type: 'object',
   properties: {
     k: { type: 'integer', minimum: 2, default: K_HOURLY },
@@ -131,5 +131,5 @@ export const getH3BinsOptionsSchema: Schema<GetH3BinOptions> = <const>{
   required: ['k', 'h3_resolution', 'start', 'end']
 }
 
-export const { validate: validateGetH3BinsOptions, $schema: GetH3BinsOptionsSchema } =
-  SchemaValidator<GetH3BinOptions>(getH3BinsOptionsSchema)
+export const { validate: validateAnonymizeTelemetryOptions, $schema: GetAnonymizeTelemetryOptionsSchema } =
+  SchemaValidator<GetAnonymizedTelemetryOptions>(getAnonymizeTelemetryOptionsSchema)

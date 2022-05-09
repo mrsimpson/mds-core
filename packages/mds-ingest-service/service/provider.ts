@@ -18,16 +18,16 @@ import { validateUUIDs } from '@mds-core/mds-schema-validators'
 import type { ProcessController, ServiceProvider } from '@mds-core/mds-service-helpers'
 import { ServiceException, ServiceResult } from '@mds-core/mds-service-helpers'
 import { NotFoundError, now } from '@mds-core/mds-utils'
-import type { GetH3BinOptions, IngestService, IngestServiceRequestContext } from '../@types'
+import type { GetAnonymizedTelemetryOptions, IngestService, IngestServiceRequestContext } from '../@types'
 import { IngestServiceLogger } from '../logger'
 import { IngestRepository } from '../repository'
 import {
+  validateAnonymizeTelemetryOptions,
   validateEventAnnotationDomainCreateModel,
   validateEventDomainCreateModel,
   validateGetDeviceOptions,
   validateGetDevicesOptions,
   validateGetEventsWithDeviceAndTelemetryInfoOptions,
-  validateGetH3BinsOptions,
   validateGetVehicleEventsFilterParams,
   validateNoColumnsGetVehicleEventsFilterParams,
   validateTelemetryAnnotationDomainCreateModel
@@ -180,13 +180,17 @@ export const IngestServiceProvider: ServiceProvider<IngestService, IngestService
     }
   },
 
-  getH3Bins: async (context, params: GetH3BinOptions) => {
+  getAnonymizedTelemetry: async (context, params: GetAnonymizedTelemetryOptions) => {
     try {
       const { start, end = now(), h3_resolution, k } = params
-      return ServiceResult(await IngestRepository.getH3Bins(validateGetH3BinsOptions({ start, end, h3_resolution, k })))
+      return ServiceResult(
+        await IngestRepository.getAnonymizedTelemetry(
+          validateAnonymizeTelemetryOptions({ start, end, h3_resolution, k })
+        )
+      )
     } catch (error) {
-      const exception = ServiceException('Error in getH3Bins', error)
-      IngestServiceLogger.error('getH3Bins exception', { exception, error })
+      const exception = ServiceException('Error in getAnonymizedTelemetry', error)
+      IngestServiceLogger.error('getAnonymizedTelemetry exception', { exception, error })
       return exception
     }
   },

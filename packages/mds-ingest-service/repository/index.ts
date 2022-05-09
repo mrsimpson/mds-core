@@ -27,12 +27,12 @@ import type {
   EventAnnotationDomainModel,
   EventDomainCreateModel,
   EventDomainModel,
+  GetAnonymizedTelemetryOptions,
   GetDeviceOptions,
   GetDevicesOptions,
   GetDevicesResponse,
   GetEventsWithDeviceAndTelemetryInfoOptions,
   GetEventsWithDeviceAndTelemetryInfoResponse,
-  GetH3BinOptions,
   GetPartialVehicleEventsResponse,
   GetVehicleEventsFilterParams,
   H3Bin,
@@ -187,7 +187,7 @@ export const IngestRepository = ReadWriteRepository.Create(
         }
       },
 
-      getH3Bins: async (params: GetH3BinOptions) => {
+      getAnonymizedTelemetry: async (params: GetAnonymizedTelemetryOptions) => {
         try {
           const { start, end, h3_resolution, k } = params
 

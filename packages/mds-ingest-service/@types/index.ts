@@ -206,7 +206,7 @@ export type GetEventsWithDeviceAndTelemetryInfoResponse = ResponseWithCursor<{
   events: EventWithDeviceAndTelemetryInfoDomainModel[]
 }>
 
-export type GetH3BinOptions = {
+export type GetAnonymizedTelemetryOptions = {
   k: number
   h3_resolution: H3_RESOLUTIONS
 } & TimeRange
@@ -231,7 +231,7 @@ export interface IngestService {
   writeTelemetryAnnotations: (
     telemetryAnnotations: TelemetryAnnotationDomainCreateModel[]
   ) => TelemetryAnnotationDomainModel[]
-  getH3Bins: (params: GetH3BinOptions) => H3Bin[]
+  getAnonymizedTelemetry: (params: GetAnonymizedTelemetryOptions) => H3Bin[]
   /**
    * Gets all trip-related events grouped by trip_id, with an optional time_range.
    * When a time_range is supplied, all trip_ids within that time_range will be considered,
@@ -262,7 +262,7 @@ export const IngestServiceDefinition: RpcServiceDefinition<IngestService> = {
   writeEvents: RpcRoute<IngestService['writeEvents']>(),
   writeEventAnnotations: RpcRoute<IngestService['writeEventAnnotations']>(),
   writeTelemetryAnnotations: RpcRoute<IngestService['writeTelemetryAnnotations']>(),
-  getH3Bins: RpcRoute<IngestService['getH3Bins']>(),
+  getAnonymizedTelemetry: RpcRoute<IngestService['getAnonymizedTelemetry']>(),
   getTripEvents: RpcRoute<IngestService['getTripEvents']>(),
   getEventsWithDeviceAndTelemetryInfoUsingOptions:
     RpcRoute<IngestService['getEventsWithDeviceAndTelemetryInfoUsingOptions']>(),
