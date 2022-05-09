@@ -1,5 +1,14 @@
 # @mds-core/mds-db
 
+## 0.6.29
+
+### Patch Changes
+
+- Updated dependencies [20831fe1]
+  - @mds-core/mds-ingest-service@0.11.3
+  - @mds-core/mds-geography-service@0.10.34
+  - @mds-core/mds-policy-service@0.12.11
+
 ## 0.6.28
 
 ### Patch Changes

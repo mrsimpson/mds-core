@@ -1,5 +1,11 @@
 # @container-images/mds-transaction-service
 
+## 0.2.12
+
+### Patch Changes
+
+- @mds-core/mds-transaction-service@0.6.37
+
 ## 0.2.11
 
 ### Patch Changes

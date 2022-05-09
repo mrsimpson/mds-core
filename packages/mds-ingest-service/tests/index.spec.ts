@@ -985,7 +985,7 @@ describe('Ingest Service Tests', () => {
     })
   })
 
-  describe('Tests getH3Bins service method', () => {
+  describe('Tests getAnonymizedTelemetry service method', () => {
     /**
      * Clear DB after each test runs, and after the file is finished. No side-effects for you.
      */
@@ -1009,7 +1009,7 @@ describe('Ingest Service Tests', () => {
         TEST_TELEMETRY_ANNOTATION_A6
       ])
 
-      const k2minResult = await IngestRepository.getH3Bins({
+      const k2minResult = await IngestRepository.getAnonymizedTelemetry({
         k: 2,
         start: testTimestamp,
         end: now() + 10000,
@@ -1033,7 +1033,7 @@ describe('Ingest Service Tests', () => {
 
       expect(k2minResult.length).toEqual(2)
 
-      const k1minResult = await IngestRepository.getH3Bins({
+      const k1minResult = await IngestRepository.getAnonymizedTelemetry({
         k: 1,
         start: testTimestamp,
         end: now() + 10000,
