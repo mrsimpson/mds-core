@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-transaction-api",
-  "version": "0.2.46",
+  "version": "0.2.47",
   "description": "MDS Transaction API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -24,7 +24,7 @@
     "@mds-core/mds-api-helpers": "workspace:0.3.3",
     "@mds-core/mds-api-server": "workspace:0.4.15",
     "@mds-core/mds-logger": "workspace:0.5.8",
-    "@mds-core/mds-provider-service": "workspace:0.2.5",
+    "@mds-core/mds-provider-service": "workspace:0.2.6",
     "@mds-core/mds-schema-validators": "workspace:0.5.15",
     "@mds-core/mds-service-helpers": "workspace:0.6.11",
     "@mds-core/mds-transaction-service": "workspace:0.6.37",

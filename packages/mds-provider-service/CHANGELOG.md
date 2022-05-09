@@ -1,5 +1,13 @@
 # @mds-core/mds-provider-service
 
+## 0.2.6
+
+### Patch Changes
+
+- ced8fd6e: Update possible provider types to bring it in line with mds-gql, add querying by provider id
+- Updated dependencies [ced8fd6e]
+  - @mds-core/mds-provider-service@0.2.6
+
 ## 0.2.5
 
 ### Patch Changes

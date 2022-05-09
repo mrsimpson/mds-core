@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-service",
-  "version": "0.10.43",
+  "version": "0.10.44",
   "description": "Compliance Service",
   "keywords": [
     "mds",
@@ -27,7 +27,7 @@
     "@mds-core/mds-db": "workspace:0.6.29",
     "@mds-core/mds-logger": "workspace:0.5.8",
     "@mds-core/mds-policy-service": "workspace:0.12.11",
-    "@mds-core/mds-provider-service": "workspace:0.2.5",
+    "@mds-core/mds-provider-service": "workspace:0.2.6",
     "@mds-core/mds-repository": "workspace:0.2.5",
     "@mds-core/mds-rpc-common": "workspace:0.3.24",
     "@mds-core/mds-schema-validators": "workspace:0.5.15",
