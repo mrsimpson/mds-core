@@ -1,5 +1,11 @@
 # @mds-core/mds-policy-service
 
+## 0.12.11
+
+### Patch Changes
+
+- @mds-core/mds-geography-service@0.10.34
+
 ## 0.12.10
 
 ### Patch Changes

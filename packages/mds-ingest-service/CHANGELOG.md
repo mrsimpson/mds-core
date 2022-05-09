@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.11.3
+
+### Patch Changes
+
+- 20831fe1: Rename getH3Bins
+
 ## 0.11.2
 
 ### Patch Changes
