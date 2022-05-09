@@ -55,12 +55,16 @@ export const ProviderRepository = ReadWriteRepository.Create(
 
     const getProviders = async (options: GetProvidersOptions): Promise<ProviderDomainModel[]> => {
       try {
-        const { provider_types } = options ?? {}
+        const { provider_types, provider_ids } = options ?? {}
         const connection = await repository.connect('ro')
         const query = connection.getRepository(ProviderEntity).createQueryBuilder()
 
         if (provider_types) {
           query.andWhere('provider_types::text[] && :provider_types', { provider_types })
+        }
+
+        if (provider_ids && provider_ids.length > 0) {
+          query.andWhere('provider_id = ANY(:provider_ids)', { provider_ids })
         }
 
         return (await query.getMany()).map(ProviderEntityToDomain.mapper())

@@ -3,7 +3,7 @@ import type { RpcEmptyRequestContext, RpcServiceDefinition } from '@mds-core/mds
 import { RpcRoute } from '@mds-core/mds-rpc-common'
 import type { Nullable, UUID } from '@mds-core/mds-types'
 
-export const PROVIDER_TYPES = ['mds_micromobility', 'gbfs_micromobility'] as const
+export const PROVIDER_TYPES = ['cds', 'mds_taxi', 'mds_tnc', 'mds_micromobility', 'gbfs_micromobility'] as const
 export type PROVIDER_TYPE = typeof PROVIDER_TYPES[number]
 export interface ProviderDomainModel {
   provider_id: UUID
@@ -16,7 +16,7 @@ export interface ProviderDomainModel {
 }
 
 export type ProviderDomainCreateModel = DomainModelCreate<ProviderDomainModel>
-export type GetProvidersOptions = Partial<{ provider_types: PROVIDER_TYPE[] }>
+export type GetProvidersOptions = Partial<{ provider_types: PROVIDER_TYPE[]; provider_ids: UUID[] }>
 
 export interface ProviderService {
   createProviders: (mdsProviders: ProviderDomainCreateModel[]) => ProviderDomainModel[]
