@@ -19,9 +19,9 @@ export const ProviderServiceManager = RpcServer<ProviderService, ProviderService
     deleteProvider: (args, context) => ProviderServiceProvider.deleteProvider(context, ...args)
   },
   {
-    port: process.env.MDS_PROVIDER_SERVICE_RPC_PORT,
+    port: process.env.PROVIDER_SERVICE_RPC_PORT,
     repl: {
-      port: process.env.MDS_PROVIDER_SERVICE_REPL_PORT,
+      port: process.env.PROVIDER_SERVICE_REPL_PORT,
       context: { client: ProviderServiceClient }
     }
   }

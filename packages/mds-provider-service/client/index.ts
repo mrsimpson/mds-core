@@ -11,8 +11,8 @@ export const ProviderServiceClientFactory = (
 ): ServiceClient<ProviderService> => {
   const ProviderServiceRpcClient = RpcClient(ProviderServiceDefinition, {
     context,
-    host: process.env.MDS_PROVIDER_SERVICE_RPC_HOST,
-    port: process.env.MDS_PROVIDER_SERVICE_RPC_PORT
+    host: process.env.PROVIDER_SERVICE_RPC_HOST,
+    port: process.env.PROVIDER_SERVICE_RPC_PORT
   })
 
   return {
