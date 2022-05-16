@@ -62,7 +62,7 @@ describe('Transaction Service Tests', () => {
 
         it('Create one good Compliance Violation transaction', async () => {
           const [transactionToPersist] = transactionsGenerator(1, {
-            receipt_details: { violation_id: uuid(), trip_id: null, policy_id: uuid() }
+            receipt_details: { type: 'compliance_violation', violation_id: uuid(), trip_id: null, policy_id: uuid() }
           })
 
           if (!transactionToPersist) {
@@ -334,7 +334,7 @@ describe('Transaction Service Tests', () => {
           const transactionsToPersist = [
             ...transactionsGenerator(5, {
               provider_id,
-              receipt_details: { violation_id, trip_id: null, policy_id: uuid() }
+              receipt_details: { type: 'compliance_violation', violation_id, trip_id: null, policy_id: uuid() }
             })
           ] // Arbitrarily generate 5 events
           await TransactionServiceClient.createTransactions(transactionsToPersist)
@@ -362,7 +362,7 @@ describe('Transaction Service Tests', () => {
           await TransactionServiceClient.createTransactions([
             ...transactionsGenerator(5, {
               provider_id,
-              receipt_details: { custom_description: `color: 'Red'` },
+              receipt_details: { type: 'custom', custom_description: `color: 'Red'` },
               amount: 125
             })
           ])
