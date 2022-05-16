@@ -23,7 +23,8 @@ import type {
   GeographyDomainModel,
   GeographyMetadataDomainCreateModel,
   GetGeographiesOptions,
-  GetPublishedGeographiesOptions
+  GetPublishedGeographiesOptions,
+  WriteGeographiesOptions
 } from '../@types'
 import { GeographyServiceLogger } from '../logger'
 
@@ -119,6 +120,15 @@ export const { validate: validateGetGeographiesOptions, isValid: isValidGetGeogr
       includeMetadata: { type: 'boolean', nullable: true, default: false },
       includeGeographyJSON: { type: 'boolean', nullable: true, default: true },
       includeHidden: { type: 'boolean', nullable: true, default: true }
+    }
+  })
+
+export const { validate: validateWriteGeographiesOptions, isValid: isValidWriteGeographiesOptions } =
+  SchemaValidator<WriteGeographiesOptions>({
+    $id: 'WriteGeographyOptions',
+    type: 'object',
+    properties: {
+      publishOnCreate: { type: 'boolean', nullable: true, default: false }
     }
   })
 
