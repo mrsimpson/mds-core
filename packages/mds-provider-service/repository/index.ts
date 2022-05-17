@@ -8,9 +8,14 @@ import { ProviderEntity } from './entities/provider-entity'
 import { ProviderDomainToEntityCreate, ProviderEntityToDomain } from './mappers'
 import migrations from './migrations'
 
+const ProviderSeeders = [{ entity: ProviderEntity, mapper: ProviderDomainToEntityCreate }].map(seeder => ({
+  ...seeder,
+  upsert: true
+}))
+
 export const ProviderRepository = ReadWriteRepository.Create(
   'Providers',
-  { entities: [ProviderEntity], migrations },
+  { entities: [ProviderEntity], migrations, seeders: ProviderSeeders },
   repository => {
     const getProvider = async (provider_id: UUID): Promise<ProviderDomainModel> => {
       try {

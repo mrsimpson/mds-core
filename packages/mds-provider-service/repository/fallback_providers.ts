@@ -281,7 +281,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: UNITED_CHECKER_CAB_PROVIDER_ID,
@@ -290,7 +290,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: UNITED_INDEPENDENTS_TAXI_DRIVERS_PROVIDER_ID,
@@ -299,7 +299,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: BEVERLY_HILLS_CAB_CO_PROVIDER_ID,
@@ -308,7 +308,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: INDEPENDENT_TAXI_OWNERS_PROVIDER_ID,
@@ -317,7 +317,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: DIVVY_PROVIDER_ID,
@@ -326,7 +326,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
     url: null,
     mds_api_url: null,
     gbfs_api_url: 'https://gbfs.divvybikes.com',
-    provider_types: ['mds_micromobility']
+    provider_types: ['gbfs_micromobility']
   },
   {
     provider_id: TEST1_PROVIDER_ID,
