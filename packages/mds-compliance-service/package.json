@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-compliance-service",
-  "version": "0.10.45",
+  "version": "0.10.46",
   "description": "Compliance Service",
   "keywords": [
     "mds",
@@ -24,11 +24,11 @@
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-db": "workspace:0.6.30",
+    "@mds-core/mds-db": "workspace:0.6.31",
     "@mds-core/mds-logger": "workspace:0.5.8",
-    "@mds-core/mds-policy-service": "workspace:0.12.12",
-    "@mds-core/mds-provider-service": "workspace:0.3.0",
-    "@mds-core/mds-repository": "workspace:0.2.5",
+    "@mds-core/mds-policy-service": "workspace:0.12.13",
+    "@mds-core/mds-provider-service": "workspace:0.3.1",
+    "@mds-core/mds-repository": "workspace:0.2.6",
     "@mds-core/mds-rpc-common": "workspace:0.3.24",
     "@mds-core/mds-schema-validators": "workspace:0.5.15",
     "@mds-core/mds-service-helpers": "workspace:0.6.11",

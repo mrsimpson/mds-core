@@ -1,5 +1,14 @@
 # @mds-core/mds-geography-service
 
+## 0.10.36
+
+### Patch Changes
+
+- bf5c00a4: Support a combined list of seeded/unseeded entities
+- Updated dependencies [bf5c00a4]
+  - @mds-core/mds-repository@0.2.6
+  - @mds-core/mds-test-data@0.4.42
+
 ## 0.10.35
 
 ### Patch Changes
