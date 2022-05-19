@@ -31,9 +31,8 @@ import { JurisdictionDomainToEntityCreate, JurisdictionEntityToDomain } from './
 export const JurisdictionRepository = ReadWriteRepository.Create(
   'jurisdictions',
   {
-    entities: [JurisdictionEntity],
-    migrations,
-    seeders: [{ entity: JurisdictionEntity, mapper: JurisdictionDomainToEntityCreate }]
+    entities: [{ entity: JurisdictionEntity, seeder: { mapper: JurisdictionDomainToEntityCreate } }],
+    migrations
   },
   repository => {
     return {

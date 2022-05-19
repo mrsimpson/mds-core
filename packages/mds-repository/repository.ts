@@ -28,20 +28,38 @@ import { MapModels } from './mapper'
 import { RepositoryMigrations } from './migrations'
 export type { DataSource } from 'typeorm'
 
-type Entity = Function
-type Migration = Function
+type EntityConstructor = Function
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-interface EntitySeeder<From = any, To = any> {
-  entity: Entity
-  mapper: ModelMapper<From, To>
-  reader?: MountedConfigFileReader
-  upsert?: boolean
+interface UnseededEntity {
+  entity: EntityConstructor
 }
 
-export type ReadOnlyRepositoryOptions = { entities: Array<Entity> }
-export type ReadWriteRepositoryOptions = ReadOnlyRepositoryOptions & { migrations: Array<Migration> } & {
-  seeders?: Array<EntitySeeder>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface SeededEntity<From = any, To = any> extends UnseededEntity {
+  seeder: {
+    mapper: ModelMapper<From, To>
+    reader?: MountedConfigFileReader
+    upsert?: boolean
+  }
+}
+
+type Entity = EntityConstructor | UnseededEntity | SeededEntity
+
+export const isSeededEntity = (entity: Entity): entity is SeededEntity =>
+  typeof entity !== 'function' && 'seeder' in entity
+
+export const getEntityConstructor = (entity: Entity): EntityConstructor =>
+  typeof entity === 'function' ? entity : entity.entity
+
+export interface ReadOnlyRepositoryOptions {
+  entities: Array<Exclude<Entity, SeededEntity>>
+}
+
+type Migration = Function
+
+export interface ReadWriteRepositoryOptions {
+  entities: Array<Entity>
+  migrations: Array<Migration>
 }
 
 const runAllMigrationsUsingConnection = async (connection: DataSource): Promise<void> => {
@@ -92,7 +110,7 @@ const truncateAllTablesUsingConnection = async (
 ): Promise<void> => {
   // Get the table names of every @Entity
   const tableNames = entities
-    .map(entity => connection.getMetadata(entity))
+    .map(entity => connection.getMetadata(getEntityConstructor(entity)))
     .filter(metadata => !metadata.expression) // An expression indicates an @Entity is a @ViewEntity which cannot be truncated
     .map(metadata => metadata.tableName)
 
@@ -132,7 +150,7 @@ const onConflictDoUpdate = <T>(insert: InsertQueryBuilder<T>, { metadata }: Repo
   return insert
 }
 
-const DataSeeder = (connection: DataSource, path?: string) => {
+const EntitySeeder = (connection: DataSource, path?: string) => {
   try {
     const mount = ConfigFileReader.mount(path)
     logger.info(`R/W repository using data files mounted at ${mount.path}`)
@@ -140,10 +158,8 @@ const DataSeeder = (connection: DataSource, path?: string) => {
     return {
       using: async <From, To>({
         entity,
-        mapper,
-        reader = mount,
-        upsert = false
-      }: EntitySeeder<From, To>): Promise<void> => {
+        seeder: { mapper, reader = mount, upsert = false }
+      }: SeededEntity<From, To>): Promise<void> => {
         const repository = connection.getRepository(entity)
 
         const {
@@ -223,7 +239,7 @@ export const ReadOnlyRepository = {
     { entities }: ReadOnlyRepositoryOptions,
     methods: (repository: ReadOnlyRepositoryProtectedMethods) => T
   ): ReadOnlyRepositoryPublicMethods<T> => {
-    const manager = new ConnectionManager(name, { entities })
+    const manager = new ConnectionManager(name, { entities: entities.map(getEntityConstructor) })
 
     const connect = (mode: 'ro') => manager.connect(mode)
 
@@ -259,7 +275,7 @@ export type ReadWriteRepositoryPublicMethods<T extends {}> = T &
 export const ReadWriteRepository = {
   Create: <T extends {}>(
     name: string,
-    { entities, migrations, seeders = [] }: ReadWriteRepositoryOptions,
+    { entities, migrations }: ReadWriteRepositoryOptions,
     methods: (repository: ReadWriteRepositoryProtectedMethods) => T
   ): ReadWriteRepositoryPublicMethods<T> => {
     const migrationsTableName = `${name}-migrations`
@@ -268,7 +284,7 @@ export const ReadWriteRepository = {
     const { connect, disconnect, ormconfig } = new ConnectionManager(name, {
       migrationsTableName,
       metadataTableName,
-      entities,
+      entities: entities.map(getEntityConstructor),
       migrations: migrations.length === 0 ? [] : RepositoryMigrations(migrationsTableName).concat(migrations)
     })
 
@@ -295,12 +311,14 @@ export const ReadWriteRepository = {
       }
 
       // Enabled seeding by default
-      const { PG_SEED } = cleanEnv(process.env, { PG_SEED: bool({ default: seeders.length > 0 }) })
+      const { PG_SEED } = cleanEnv(process.env, {
+        PG_SEED: bool({ default: entities.some(isSeededEntity) })
+      })
 
       if (PG_SEED) {
-        const seed = DataSeeder(connection)
+        const seed = EntitySeeder(connection)
         if (seed) {
-          for (const seeder of seeders) {
+          for (const seeder of entities.filter(isSeededEntity)) {
             await seed.using(seeder)
           }
         }
