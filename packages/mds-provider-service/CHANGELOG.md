@@ -1,5 +1,14 @@
 # @mds-core/mds-provider-service
 
+## 0.3.1
+
+### Patch Changes
+
+- bf5c00a4: Support a combined list of seeded/unseeded entities
+- Updated dependencies [bf5c00a4]
+  - @mds-core/mds-provider-service@0.3.1
+  - @mds-core/mds-repository@0.2.6
+
 ## 0.3.0
 
 ### Minor Changes

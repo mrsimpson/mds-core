@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.2.6
+
+### Patch Changes
+
+- bf5c00a4: Support a combined list of seeded/unseeded entities
+
 ## 0.2.5
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @mds-core/mds-audit-service
 
+## 0.6.13
+
+### Patch Changes
+
+- Updated dependencies [bf5c00a4]
+  - @mds-core/mds-repository@0.2.6
+
 ## 0.6.12
 
 ### Patch Changes
