@@ -1,5 +1,12 @@
 # @mds-core/mds-geography-service
 
+## 0.10.35
+
+### Patch Changes
+
+- 797fd762: Enable publishing in case of a successful write if a client so desires
+  - @mds-core/mds-test-data@0.4.41
+
 ## 0.10.34
 
 ### Patch Changes

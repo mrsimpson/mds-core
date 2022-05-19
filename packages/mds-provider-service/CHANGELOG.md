@@ -1,5 +1,20 @@
 # @mds-core/mds-provider-service
 
+## 0.3.0
+
+### Minor Changes
+
+- 6d396b88: Add Provider Seeding from Config, update fallback provider_types for some providers.
+- 223ee44e: Align mds-provider-service env vars with standard naming conventions (remove MDS prefix)
+
+### Patch Changes
+
+- 18612d2f: Fix color codes for fallback provider list
+- Updated dependencies [18612d2f]
+- Updated dependencies [6d396b88]
+- Updated dependencies [223ee44e]
+  - @mds-core/mds-provider-service@0.3.0
+
 ## 0.2.6
 
 ### Patch Changes

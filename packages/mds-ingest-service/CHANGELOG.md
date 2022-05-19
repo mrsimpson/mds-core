@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.11.4
+
+### Patch Changes
+
+- 9865e103: Downgrade TypeORM Cursor Paginator to v0.6.1 to resolve performance regression in v0.8.1
+
 ## 0.11.3
 
 ### Patch Changes
