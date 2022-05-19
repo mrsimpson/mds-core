@@ -35,7 +35,7 @@
     "envalid": "7.3.1",
     "pg": "8.7.3",
     "typeorm": "0.3.6",
-    "typeorm-cursor-pagination": "0.8.1"
+    "typeorm-cursor-pagination": "0.6.1"
   },
   "publishConfig": {
     "main": "dist/index.js"

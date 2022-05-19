@@ -55,9 +55,31 @@ export async function computeSnapshot() {
     const providerInputs = {
       [provider_id]: await getProviderInputs(provider_id, compliance_as_of)
     }
-    const snapshots = (
-      await Promise.all(policies.map(policy => processPolicy(policy, geographies, providerInputs, compliance_as_of)))
-    ).flat()
+
+    const snapshots = []
+    for (const policy of policies) {
+      /* If possible, force garbage collection between each policy.
+       * In old releases, it was possible to run into situations where the GC was not invoked often enough, and the memory usage was too high.
+       */
+      if (global.gc) {
+        const convertBytesToMB = (bytes: number) => Math.round(bytes / 1024 / 1024)
+        const memoryUsagePreGc = Object.fromEntries(
+          Object.entries(process.memoryUsage()).map(([key, value]) => [key, `${convertBytesToMB(value)} MB`])
+        )
+        ComplianceBatchProcessorLogger.debug(`Memory usage pre garbage collection: ${JSON.stringify(memoryUsagePreGc)}`)
+        ComplianceBatchProcessorLogger.debug('Garbage collecting...')
+        global.gc()
+        const memoryUsagePostGc = Object.fromEntries(
+          Object.entries(process.memoryUsage()).map(([key, value]) => [key, `${convertBytesToMB(value)} MB`])
+        )
+        ComplianceBatchProcessorLogger.debug(
+          `Memory usage post garbage collection: ${JSON.stringify(memoryUsagePostGc)}`
+        )
+      }
+
+      const policySnapshots = await processPolicy(policy, geographies, providerInputs, compliance_as_of)
+      snapshots.push(...policySnapshots)
+    }
 
     await batchComplianceSnapshots(snapshots)
   }
