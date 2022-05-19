@@ -46,11 +46,13 @@ export const SUPPORT1_PROVIDER_ID = '09828cf3-9b85-449b-bc8f-d3aaef5c3448'
 export const SUPPORT2_PROVIDER_ID = 'fa5f6ce0-c038-4027-9c2c-a693f1ed7533'
 export const SUPPORT3_PROVIDER_ID = '9944b4cd-58a3-4969-a6d4-c131ff0b2111'
 
+const FALLBACK_COLOR_HEX = '#0f0'
+
 export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: JUMP_PROVIDER_ID,
     provider_name: 'JUMP',
-    color_code_hex: '#000',
+    color_code_hex: '#121212',
     url: 'https://jump.com',
     gbfs_api_url: null,
     mds_api_url: 'https://api.uber.com/v0.2/emobility/mds',
@@ -59,7 +61,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: LIME_PROVIDER_ID,
     provider_name: 'Lime',
-    color_code_hex: '#000',
+    color_code_hex: '#24d000',
     url: 'https://li.me',
     gbfs_api_url: null,
     mds_api_url: 'https://data.lime.bike/api/partners/v1/mds',
@@ -68,7 +70,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: BIRD_PROVIDER_ID,
     provider_name: 'Bird',
-    color_code_hex: '#000',
+    color_code_hex: '#333333',
     url: 'https://www.bird.co',
     mds_api_url: 'https://mds.bird.co',
     gbfs_api_url: 'https://mds.bird.co/gbfs',
@@ -77,7 +79,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: CIRC_PROVIDER_ID,
     provider_name: 'Circ',
-    color_code_hex: '#000',
+    color_code_hex: '#fa6e4b',
     url: 'https://www.circ.com',
     gbfs_api_url: null,
     mds_api_url: 'https://mds.bird.co',
@@ -86,7 +88,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: RAZOR_PROVIDER_ID,
     provider_name: 'Razor',
-    color_code_hex: '#000',
+    color_code_hex: '#ee2d15',
     url: 'https: //www.razor.com/share',
     gbfs_api_url: null,
     mds_api_url: 'https: //razor-200806.appspot.com/api/v2/mds',
@@ -95,7 +97,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: LYFT_PROVIDER_ID,
     provider_name: 'Lyft',
-    color_code_hex: '#000',
+    color_code_hex: '#ff00bf',
     url: 'https://www.lyft.com',
     gbfs_api_url: null,
     mds_api_url: 'https: //api.lyft.com/v1/last-mile/mds',
@@ -104,7 +106,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: SKIP_PROVIDER_ID,
     provider_name: 'Skip',
-    color_code_hex: '#000',
+    color_code_hex: '#f7c80a',
     url: 'https://www.skipscooters.com',
     gbfs_api_url: null,
     mds_api_url: 'https://api.skipscooters.com/mds',
@@ -113,7 +115,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: HOPR_PROVIDER_ID,
     provider_name: 'HOPR',
-    color_code_hex: '#000',
+    color_code_hex: '#42deea',
     url: 'https://gohopr.com',
     gbfs_api_url: null,
     mds_api_url: 'https://gbfs.hopr.city/api/mds',
@@ -122,7 +124,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: WHEELS_PROVIDER_ID,
     provider_name: 'Wheels',
-    color_code_hex: '#000',
+    color_code_hex: '#900a48',
     url: 'https://wheels.co',
     gbfs_api_url: null,
     mds_api_url: 'https://mds.getwheelsapp.com',
@@ -131,7 +133,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: SPIN_PROVIDER_ID,
     provider_name: 'Spin',
-    color_code_hex: '#000',
+    color_code_hex: '#ff5436',
     url: 'https://www.spin.app',
     gbfs_api_url: null,
     mds_api_url: 'https://api.spin.pm/api/v1/mds',
@@ -140,7 +142,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: WIND_PROVIDER_ID,
     provider_name: 'WIND',
-    color_code_hex: '#000',
+    color_code_hex: '#fffa00',
     url: 'https://www.wind.co',
     gbfs_api_url: null,
     mds_api_url: 'https://partners.wind.co/v1/mds',
@@ -149,7 +151,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: TIER_PROVIDER_ID,
     provider_name: 'Tier',
-    color_code_hex: '#000',
+    color_code_hex: '#69d2aa',
     url: 'https://www.tier.app',
     gbfs_api_url: null,
     mds_api_url: 'https://partner.tier-services.io/mds',
@@ -158,7 +160,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: CLOUD_PROVIDER_ID,
     provider_name: 'Cloud',
-    color_code_hex: '#000',
+    color_code_hex: '#4c7cf3',
     url: 'https://www.cloud.tt',
     mds_api_url: 'https://mds.cloud.tt',
     gbfs_api_url: 'https://mds.cloud.tt/gbfs',
@@ -167,7 +169,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: BLUE_LA_PROVIDER_ID,
     provider_name: 'BlueLA',
-    color_code_hex: '#000',
+    color_code_hex: '#0D929D',
     url: 'https://www.bluela.com',
     mds_api_url: 'https://api.bluela.com/mds/v0',
     gbfs_api_url: 'https://api.bluela.com/gbfs/v1/meta',
@@ -176,7 +178,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: BOLT_PROVIDER_ID,
     provider_name: 'Bolt',
-    color_code_hex: '#000',
+    color_code_hex: '#ffe600',
     url: 'https://www.micromobility.com/',
     gbfs_api_url: null,
     mds_api_url: 'https://bolt.miami/bolt2/api/mds',
@@ -185,7 +187,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: CLEVR_PROVIDER_ID,
     provider_name: 'CLEVR',
-    color_code_hex: '#000',
+    color_code_hex: '#1470af',
     url: 'https://clevrmobility.com',
     mds_api_url: 'https://portal.clevrmobility.com/api/la/',
     gbfs_api_url: 'https://portal.clevrmobility.com/api/gbfs/en/discovery/',
@@ -194,7 +196,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: SHERPA_LA_PROVIDER_ID,
     provider_name: 'SherpaLA',
-    color_code_hex: '#000',
+    color_code_hex: '#00FF00',
     url: null,
     mds_api_url: 'https://mds.bird.co',
     gbfs_api_url: 'https://mds.bird.co/gbfs/platform-partner/sherpa-la',
@@ -203,7 +205,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: OJO_ELECTRIC_PROVIDER_ID,
     provider_name: 'OjO Electric',
-    color_code_hex: '#000',
+    color_code_hex: '#ac0e26',
     url: 'https://www.ojoelectric.com',
     mds_api_url: 'https://api.ojoelectric.com/api/mds',
     gbfs_api_url: 'https://api.ojoelectric.com/api/mds/gbfs.json',
@@ -212,7 +214,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: SUPERPEDESTRIAN_PROVIDER_ID,
     provider_name: 'Superpedestrian',
-    color_code_hex: '#000',
+    color_code_hex: '#E5FF00',
     url: 'https://www.superpedestrian.com',
     gbfs_api_url: null,
     mds_api_url: 'https://wrangler-mds-production.herokuapp.com/mds',
@@ -221,7 +223,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: BOAZ_BIKES_PROVIDER_ID,
     provider_name: 'Boaz Bikes',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: 'https://www.boazbikes.com/',
     mds_api_url: 'https://mds.movatic.co/',
     gbfs_api_url: 'https://gbsf.movatic.co/en/1.1/576347857979998215',
@@ -230,7 +232,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: HELBIZ_PROVIDER_ID,
     provider_name: 'Helbiz',
-    color_code_hex: '#000',
+    color_code_hex: '#1483ba',
     url: 'https://helbiz.com/',
     mds_api_url: null,
     gbfs_api_url: null,
@@ -239,7 +241,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: TUKTUK_PROVIDER_ID,
     provider_name: 'TukTuk',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: 'https://tuktukscooters.com/',
     mds_api_url: null,
     gbfs_api_url: null,
@@ -248,7 +250,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: VEO_RIDE_PROVIDER_ID,
     provider_name: 'VeoRide INC.',
-    color_code_hex: '#000',
+    color_code_hex: '#36dec8',
     url: 'https://www.veoride.com/',
     mds_api_url: null,
     gbfs_api_url: null,
@@ -257,7 +259,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: LADOT_PROVIDER_ID,
     provider_name: 'LADOT',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: 'https://ladot.io',
     mds_api_url: null,
     gbfs_api_url: null,
@@ -266,7 +268,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: BLUE_SYSTEMS_PROVIDER_ID,
     provider_name: 'Blue Systems',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: 'https://www.bluesystems.ai',
     mds_api_url: null,
     gbfs_api_url: null,
@@ -275,61 +277,61 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: LA_YELLOW_CAB_PROVIDER_ID,
     provider_name: 'LA Yellow Cab',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: UNITED_CHECKER_CAB_PROVIDER_ID,
     provider_name: 'United Checker Cab',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: UNITED_INDEPENDENTS_TAXI_DRIVERS_PROVIDER_ID,
     provider_name: 'United Independents Taxi Drivers',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: BEVERLY_HILLS_CAB_CO_PROVIDER_ID,
     provider_name: 'Beverly Hills Cab Co.',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: INDEPENDENT_TAXI_OWNERS_PROVIDER_ID,
     provider_name: 'Independent Taxi Owners',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
-    provider_types: ['mds_micromobility']
+    provider_types: ['mds_taxi']
   },
   {
     provider_id: DIVVY_PROVIDER_ID,
     provider_name: 'Divvy',
-    color_code_hex: '#000',
+    color_code_hex: '#f6bf0a',
     url: null,
     mds_api_url: null,
     gbfs_api_url: 'https://gbfs.divvybikes.com',
-    provider_types: ['mds_micromobility']
+    provider_types: ['gbfs_micromobility']
   },
   {
     provider_id: TEST1_PROVIDER_ID,
     provider_name: 'Test 1',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
@@ -338,7 +340,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: TEST2_PROVIDER_ID,
     provider_name: 'Test 2',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
@@ -347,7 +349,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: JEST_PROVIDER_ID,
     provider_name: 'Jest Test Provider',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
@@ -356,7 +358,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: SUPPORT1_PROVIDER_ID,
     provider_name: 'Support 1',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
@@ -365,7 +367,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: SUPPORT2_PROVIDER_ID,
     provider_name: 'Support 2',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,
@@ -374,7 +376,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: SUPPORT3_PROVIDER_ID,
     provider_name: 'Support 3',
-    color_code_hex: '#000',
+    color_code_hex: FALLBACK_COLOR_HEX,
     url: null,
     mds_api_url: null,
     gbfs_api_url: null,

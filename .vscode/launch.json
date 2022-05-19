@@ -1,7 +1,4 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
@@ -21,12 +18,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-agency",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -44,12 +40,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-attachment-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -66,12 +61,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-audit-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -89,12 +83,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-audit-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -111,12 +104,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-collector-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -134,12 +126,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-collector-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -156,12 +147,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-compliance",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -179,12 +169,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -202,12 +191,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -224,12 +212,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -247,12 +234,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-author-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -270,12 +256,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -292,12 +277,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-ingest-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -314,12 +298,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-jurisdiction-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -337,12 +320,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-jurisdiction-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -359,12 +341,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -382,12 +363,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy-author-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -405,12 +385,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -427,12 +406,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-transaction-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -450,12 +428,11 @@
         "-r",
         "tsconfig-paths/register",
         "-r",
-        "dotenv/config"
+        "dotenv-flow/config"
       ],
       "args": ["server/index.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-transaction-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -475,7 +452,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-agency",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -496,7 +472,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-api-authorizer",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -516,7 +491,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-api-server",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -536,7 +510,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-attachment-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -556,7 +529,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-audit-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -577,7 +549,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-audit-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -597,7 +568,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-collector-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -618,7 +588,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-collector-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -638,7 +607,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-compliance-engine",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -658,7 +626,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-compliance-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -678,7 +645,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -699,7 +665,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-files",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -719,7 +684,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-config-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -739,7 +703,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-db",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -759,7 +722,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -780,7 +742,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-author-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -800,7 +761,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-geography-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -820,7 +780,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-ingest-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -840,7 +799,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-jurisdiction-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -861,7 +819,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-jurisdiction-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -881,7 +838,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-logger",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -901,7 +857,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -921,7 +876,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy-author-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -941,7 +895,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-policy-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -962,7 +915,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-repository",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -982,7 +934,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-rpc-common",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -1003,7 +954,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-service-helpers",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -1023,7 +973,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-schema-validators",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -1043,7 +992,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-stream",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -1063,7 +1011,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-stream-processor",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -1083,7 +1030,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-transaction-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -1103,7 +1049,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-transaction-service",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -1123,7 +1068,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-types",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",
@@ -1143,7 +1087,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-utils",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}"
@@ -1162,7 +1105,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-schema-validators",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}"
@@ -1181,7 +1123,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}/packages/mds-compliance-api",
       "env": {
         "DOTENV_FLOW_PATH": "${workspaceFolder}",

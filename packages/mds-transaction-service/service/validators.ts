@@ -59,6 +59,7 @@ const usableEventSchema = {
 const tripReceiptSchema: JSONSchemaType<TripReceiptDetailsDomainModel> = {
   type: 'object',
   properties: {
+    type: { type: 'string', const: 'trip' },
     trip_id: uuidSchema,
     start_timestamp: timestampSchema,
     end_timestamp: timestampSchema,
@@ -70,7 +71,7 @@ const tripReceiptSchema: JSONSchemaType<TripReceiptDetailsDomainModel> = {
     distance: { type: 'number', format: 'float', nullable: true, default: null },
     trip_events: { type: 'array', items: usableEventSchema }
   },
-  required: ['start_timestamp', 'end_timestamp', 'trip_events', 'trip_id']
+  required: ['type', 'start_timestamp', 'end_timestamp', 'trip_events', 'trip_id']
 }
 
 /**
@@ -79,6 +80,7 @@ const tripReceiptSchema: JSONSchemaType<TripReceiptDetailsDomainModel> = {
 const curbUseSchema: JSONSchemaType<CurbUseDetailsDomainModel> = {
   type: 'object',
   properties: {
+    type: { type: 'string', const: 'curb_use' },
     trip_id: uuidSchema,
     start_timestamp: timestampSchema,
     end_timestamp: timestampSchema,
@@ -87,7 +89,16 @@ const curbUseSchema: JSONSchemaType<CurbUseDetailsDomainModel> = {
     duration: { type: 'integer' }, // duration of the trip in seconds
     trip_events: { type: 'array', items: usableEventSchema } // Events which occurred in the trip
   },
-  required: ['duration', 'end_timestamp', 'geography_id', 'start_timestamp', 'trip_events', 'trip_id', 'vehicle_type']
+  required: [
+    'type',
+    'duration',
+    'end_timestamp',
+    'geography_id',
+    'start_timestamp',
+    'trip_events',
+    'trip_id',
+    'vehicle_type'
+  ]
 }
 
 export const { validate: validateTransactionSearchParams } = SchemaValidator<TransactionSearchParams>(
@@ -123,19 +134,21 @@ const complianceViolationDetailsSchema: JSONSchemaType<ComplianceViolationDetail
   type: 'object',
   description: 'Receipt details which provide a pointer to an MDS Compliance Violation.',
   properties: {
+    type: { type: 'string', const: 'compliance_violation' },
     violation_id: uuidSchema,
     trip_id: { ...uuidSchema, nullable: true, default: null },
     policy_id: uuidSchema
   },
-  required: ['violation_id']
+  required: ['type', 'violation_id']
 }
 
 const customReceiptDetailsSchema: JSONSchemaType<CustomReceiptDetailsDomainModel> = {
   type: 'object',
   properties: {
+    type: { type: 'string', const: 'custom' },
     custom_description: { type: 'string' }
   },
-  required: ['custom_description']
+  required: ['type', 'custom_description']
 }
 
 const receiptDomainSchema = <const>{
@@ -150,7 +163,9 @@ const receiptDomainSchema = <const>{
       example: 'https://mds.coruscant.com/compliance/snapshot/c78280ff-4e58-4e30-afa9-d72673037799'
     },
     receipt_details: {
-      anyOf: [tripReceiptSchema, complianceViolationDetailsSchema, curbUseSchema, customReceiptDetailsSchema]
+      // discriminator: {propertyName: "type"},
+      required: ['type'],
+      oneOf: [tripReceiptSchema, complianceViolationDetailsSchema, curbUseSchema, customReceiptDetailsSchema]
     }
   },
   required: ['origin_url', 'receipt_details', 'receipt_id', 'timestamp']
@@ -158,7 +173,7 @@ const receiptDomainSchema = <const>{
 
 const {
   $schema: { $schema, ...receiptSchema }
-} = SchemaValidator<ReceiptDomainModel>(receiptDomainSchema, { keywords: ['example'] })
+} = SchemaValidator<ReceiptDomainModel>(receiptDomainSchema, { keywords: ['example'], discriminator: true })
 
 export const { validate: validateTransactionDomainModel, $schema: TransactionSchema } =
   SchemaValidator<TransactionDomainModel>(

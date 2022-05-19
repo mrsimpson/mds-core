@@ -1,5 +1,13 @@
 # @mds-core/mds-policy-service
 
+## 0.12.12
+
+### Patch Changes
+
+- 9865e103: Downgrade TypeORM Cursor Paginator to v0.6.1 to resolve performance regression in v0.8.1
+- Updated dependencies [797fd762]
+  - @mds-core/mds-geography-service@0.10.35
+
 ## 0.12.11
 
 ### Patch Changes

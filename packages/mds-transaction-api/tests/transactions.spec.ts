@@ -343,7 +343,10 @@ describe('Test Transactions API: Transactions', () => {
       ])
       const mockTransactionsA = [...transactionsGenerator(15, { provider_id })]
       const mockTransactionsB = [
-        ...transactionsGenerator(15, { receipt_details: { custom_description: 'do not care' }, provider_id })
+        ...transactionsGenerator(15, {
+          receipt_details: { type: 'custom', custom_description: 'do not care' },
+          provider_id
+        })
       ]
 
       const basicOptions = {

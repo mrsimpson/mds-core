@@ -78,10 +78,17 @@
                         "example": "https://mds.coruscant.com/compliance/snapshot/c78280ff-4e58-4e30-afa9-d72673037799"
                       },
                       "receipt_details": {
-                        "anyOf": [
+                        "required": [
+                          "type"
+                        ],
+                        "oneOf": [
                           {
                             "type": "object",
                             "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "trip"
+                              },
                               "trip_id": {
                                 "type": "string",
                                 "format": "uuid"
@@ -441,6 +448,7 @@
                               }
                             },
                             "required": [
+                              "type",
                               "start_timestamp",
                               "end_timestamp",
                               "trip_events",
@@ -451,6 +459,10 @@
                             "type": "object",
                             "description": "Receipt details which provide a pointer to an MDS Compliance Violation.",
                             "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "compliance_violation"
+                              },
                               "violation_id": {
                                 "type": "string",
                                 "format": "uuid"
@@ -467,12 +479,17 @@
                               }
                             },
                             "required": [
+                              "type",
                               "violation_id"
                             ]
                           },
                           {
                             "type": "object",
                             "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "curb_use"
+                              },
                               "trip_id": {
                                 "type": "string",
                                 "format": "uuid"
@@ -821,6 +838,7 @@
                               }
                             },
                             "required": [
+                              "type",
                               "duration",
                               "end_timestamp",
                               "geography_id",
@@ -833,11 +851,16 @@
                           {
                             "type": "object",
                             "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "custom"
+                              },
                               "custom_description": {
                                 "type": "string"
                               }
                             },
                             "required": [
+                              "type",
                               "custom_description"
                             ]
                           }

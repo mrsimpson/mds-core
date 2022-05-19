@@ -45,6 +45,10 @@ export type GetGeographiesOptions = Partial<{
   includeHidden: boolean
 }>
 
+export type WriteGeographiesOptions = Partial<{
+  publishOnCreate: boolean
+}>
+
 export interface PublishGeographyParams {
   publish_date?: Timestamp
   geography_id: UUID
@@ -67,7 +71,10 @@ export interface GeographyService {
   getGeographies: (options?: GetGeographiesOptions) => GeographyWithMetadataDomainModel[]
   getUnpublishedGeographies: (options?: GetGeographiesOptions) => GeographyWithMetadataDomainModel[]
   getPublishedGeographies: (options?: GetPublishedGeographiesOptions) => GeographyWithMetadataDomainModel[]
-  writeGeographies: (geographies: GeographyDomainCreateModel[]) => GeographyDomainModel[]
+  writeGeographies: (
+    geographies: GeographyDomainCreateModel[],
+    options?: WriteGeographiesOptions
+  ) => GeographyDomainModel[]
   writeGeographiesMetadata: (metadata: GeographyMetadataDomainCreateModel[]) => GeographyMetadataDomainModel[]
   deleteGeographyAndMetadata: (geography_id: UUID) => UUID
   editGeography: (geography: GeographyDomainCreateModel) => GeographyDomainModel

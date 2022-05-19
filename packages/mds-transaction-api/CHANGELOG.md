@@ -1,5 +1,20 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.48
+
+### Patch Changes
+
+- 662d43b5: Add type discriminator property to ReceiptDomainModel
+- 9865e103: Downgrade TypeORM Cursor Paginator to v0.6.1 to resolve performance regression in v0.8.1
+- Updated dependencies [18612d2f]
+- Updated dependencies [6d396b88]
+- Updated dependencies [662d43b5]
+- Updated dependencies [223ee44e]
+- Updated dependencies [9865e103]
+  - @mds-core/mds-provider-service@0.3.0
+  - @mds-core/mds-transaction-service@0.7.0
+  - @mds-core/mds-api-helpers@0.3.4
+
 ## 0.2.47
 
 ### Patch Changes

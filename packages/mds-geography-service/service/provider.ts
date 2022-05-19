@@ -25,7 +25,8 @@ import {
   validateGeographyMetadataDomainCreateModel,
   validateGetGeographiesOptions,
   validateGetPublishedGeographiesOptions,
-  validateUuids
+  validateUuids,
+  validateWriteGeographiesOptions
 } from './validators'
 
 export const GeographyServiceProvider: ServiceProvider<GeographyService, GeographyServiceRequestContext> &
@@ -84,9 +85,16 @@ export const GeographyServiceProvider: ServiceProvider<GeographyService, Geograp
     }
   },
 
-  writeGeographies: async (context, models) => {
+  writeGeographies: async (context, models, options) => {
     try {
       const geographies = await GeographyRepository.writeGeographies(models.map(validateGeographyDomainCreateModel))
+      const { publishOnCreate } = validateWriteGeographiesOptions(options ?? {})
+      if (publishOnCreate) {
+        const publishedGeographies = await Promise.all(
+          geographies.map(geography => GeographyRepository.publishGeography({ geography_id: geography.geography_id }))
+        )
+        return ServiceResult(publishedGeographies)
+      }
       return ServiceResult(geographies)
     } catch (error) /* istanbul ignore next */ {
       const exception = ServiceException('Error Writing Geographies', error)

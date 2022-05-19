@@ -28,6 +28,7 @@ export interface PaginationLinks {
 
 // one example -- many others are possible
 export interface TripReceiptDetailsDomainModel {
+  type: 'trip'
   trip_id: UUID
   /**
    * Should be populated with the timestamp of the starting event
@@ -79,6 +80,7 @@ export interface TripReceiptDetailsDomainModel {
 }
 
 export interface CurbUseDetailsDomainModel {
+  type: 'curb_use'
   trip_id: UUID
   start_timestamp: Timestamp
   end_timestamp: Timestamp
@@ -89,12 +91,14 @@ export interface CurbUseDetailsDomainModel {
 }
 
 export interface ComplianceViolationDetailsDomainModel {
+  type: 'compliance_violation'
   violation_id: UUID
   trip_id: Nullable<UUID>
   policy_id: UUID
 }
 
 export interface CustomReceiptDetailsDomainModel {
+  type: 'custom'
   custom_description: string
 }
 

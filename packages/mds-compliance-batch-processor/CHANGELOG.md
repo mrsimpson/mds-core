@@ -1,5 +1,24 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.2.38
+
+### Patch Changes
+
+- 9865e103: Downgrade TypeORM Cursor Paginator to v0.6.1 to resolve performance regression in v0.8.1
+- 9865e103: Force-invoke the garbage collector when processing policies in the batch processor.
+- Updated dependencies [18612d2f]
+- Updated dependencies [6d396b88]
+- Updated dependencies [223ee44e]
+- Updated dependencies [9865e103]
+- Updated dependencies [797fd762]
+  - @mds-core/mds-provider-service@0.3.0
+  - @mds-core/mds-ingest-service@0.11.4
+  - @mds-core/mds-policy-service@0.12.12
+  - @mds-core/mds-geography-service@0.10.35
+  - @mds-core/mds-compliance-engine@0.8.38
+  - @mds-core/mds-compliance-service@0.10.45
+  - @mds-core/mds-db@0.6.30
+
 ## 0.2.37
 
 ### Patch Changes

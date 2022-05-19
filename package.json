@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "version": "0.2.89",
+  "version": "0.2.90",
   "private": true,
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -91,7 +91,8 @@
       "node-jose@1.1.4>node-forge": "1.3.0",
       "prebuild-install@7.0.1>minimist": "1.2.6",
       "strip-ansi@4.0.0>ansi-regex": "3.0.1",
-      "tsconfig-paths@3.13.0>minimist": "1.2.6"
+      "tsconfig-paths@3.13.0>minimist": "1.2.6",
+      "typeorm-cursor-pagination": "0.6.1"
     }
   }
 }
