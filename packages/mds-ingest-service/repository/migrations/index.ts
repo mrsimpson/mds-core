@@ -42,6 +42,7 @@ import { CopyIngestMigrationMetadata1645465504597 } from './1645465504597-CopyIn
 import { DropMigrationIndices1646177244396 } from './1646177244396-DropMigrationIndices'
 import { AddTelemetryAnnotationEntity1646881807158 } from './1646881807158-AddTelemetryAnnotationEntity'
 import { AddTelemetryAnnotationIndicies1649954300329 } from './1649954300329-AddTelemetryAnnotationIndicies'
+import { AddAccessibilityOptionsColumnToEventAnnotations1652752567678 } from './1652752567678-AddAccessibilityOptionsColumnToEventAnnotations'
 
 export default [
   CreateDevicesTable1603212409274,
@@ -71,5 +72,6 @@ export default [
   CopyIngestMigrationMetadata1645465504597,
   DropMigrationIndices1646177244396,
   AddTelemetryAnnotationEntity1646881807158,
-  AddTelemetryAnnotationIndicies1649954300329
+  AddTelemetryAnnotationIndicies1649954300329,
+  AddAccessibilityOptionsColumnToEventAnnotations1652752567678
 ]

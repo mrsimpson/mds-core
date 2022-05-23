@@ -108,6 +108,7 @@ export interface DeviceLabel {
   vehicle_id: string
   vehicle_type: VEHICLE_TYPE
   propulsion_types: PROPULSION_TYPE[]
+  accessibility_options: ACCESSIBILITY_OPTION[]
 }
 
 export interface GeographyLabel {

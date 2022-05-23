@@ -239,6 +239,7 @@ const TEST_EVENT_ANNOTATION_A: EventAnnotationDomainCreateModel = {
   vehicle_id: 'test-id-1',
   vehicle_type: 'scooter',
   propulsion_types: ['electric'],
+  accessibility_options: [],
   geography_ids: [GEOGRAPHY_ID_A, GEOGRAPHY_ID_B],
   geography_types: ['jurisdiction', null],
   latency_ms: 100
@@ -251,6 +252,7 @@ const TEST_EVENT_ANNOTATION_B: EventAnnotationDomainCreateModel = {
   vehicle_id: 'test-id-2',
   vehicle_type: 'scooter',
   propulsion_types: ['electric'],
+  accessibility_options: [],
   geography_ids: [GEOGRAPHY_ID_C, GEOGRAPHY_ID_D],
   geography_types: [null, 'spot'],
   latency_ms: 150
