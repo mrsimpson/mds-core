@@ -15,7 +15,7 @@
  */
 
 import { BigintTransformer, IdentityColumn, RecordedColumn } from '@mds-core/mds-repository'
-import type { PROPULSION_TYPE } from '@mds-core/mds-types'
+import type { ACCESSIBILITY_OPTION, PROPULSION_TYPE } from '@mds-core/mds-types'
 import { Timestamp, UUID, VEHICLE_TYPE } from '@mds-core/mds-types'
 import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm'
 import { EventEntity, EventEntityModel } from './event-entity'
@@ -39,6 +39,9 @@ export class EventAnnotationEntity extends IdentityColumn(RecordedColumn(class {
   @Index()
   @Column('varchar', { array: true, length: 31 })
   propulsion_types: PROPULSION_TYPE[]
+
+  @Column('varchar', { array: true, length: 255 })
+  accessibility_options: ACCESSIBILITY_OPTION[]
 
   @Index()
   @Column('uuid', { array: true })

@@ -7,7 +7,14 @@ import {
   uuidSchema
 } from '@mds-core/mds-schema-validators'
 import type { WithNonNullableKeys } from '@mds-core/mds-types'
-import { PROPULSION_TYPES, TRIP_STATES, VEHICLE_EVENTS, VEHICLE_STATES, VEHICLE_TYPES } from '@mds-core/mds-types'
+import {
+  ACCESSIBILITY_OPTIONS,
+  PROPULSION_TYPES,
+  TRIP_STATES,
+  VEHICLE_EVENTS,
+  VEHICLE_STATES,
+  VEHICLE_TYPES
+} from '@mds-core/mds-types'
 import type {
   EventAnnotationDomainCreateModel,
   EventAnnotationDomainModel,
@@ -38,6 +45,7 @@ export const { $schema: eventAnnotationDomainSchema } = SchemaValidator<EventAnn
     vehicle_id: { type: 'string' },
     vehicle_type: { type: 'string', enum: VEHICLE_TYPES },
     propulsion_types: { type: 'array', items: { type: 'string', enum: PROPULSION_TYPES } },
+    accessibility_options: { type: 'array', items: { type: 'string', enum: ACCESSIBILITY_OPTIONS } },
     geography_ids: { type: 'array', items: uuidSchema },
     geography_types: { type: 'array', items: nullableString },
     latency_ms: { type: 'integer' },
@@ -49,6 +57,7 @@ export const { $schema: eventAnnotationDomainSchema } = SchemaValidator<EventAnn
     'vehicle_id',
     'vehicle_type',
     'propulsion_types',
+    'accessibility_options',
     'geography_ids',
     'geography_types',
     'latency_ms'
@@ -208,6 +217,7 @@ export const { validate: validateEventAnnotationDomainCreateModel } = SchemaVali
       vehicle_id: { type: 'string' },
       vehicle_type: { type: 'string', enum: VEHICLE_TYPES },
       propulsion_types: { type: 'array', items: { type: 'string', enum: PROPULSION_TYPES } },
+      accessibility_options: { type: 'array', items: { type: 'string', enum: ACCESSIBILITY_OPTIONS } },
       geography_ids: { type: 'array', items: uuidSchema },
       geography_types: { type: 'array', items: nullableString },
       latency_ms: { type: 'integer' },
@@ -219,6 +229,7 @@ export const { validate: validateEventAnnotationDomainCreateModel } = SchemaVali
       'vehicle_id',
       'vehicle_type',
       'propulsion_types',
+      'accessibility_options',
       'geography_ids',
       'geography_types',
       'latency_ms',

@@ -1,5 +1,12 @@
 # @mds-core/mds-transaction-service
 
+## 0.7.2
+
+### Patch Changes
+
+- Updated dependencies [a4d221d0]
+  - @mds-core/mds-ingest-service@0.12.0
+
 ## 0.7.1
 
 ### Patch Changes

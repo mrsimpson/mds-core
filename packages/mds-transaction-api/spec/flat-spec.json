@@ -217,6 +217,15 @@
                                             ]
                                           }
                                         },
+                                        "accessibility_options": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string",
+                                            "enum": [
+                                              "wheelchair_accessible"
+                                            ]
+                                          }
+                                        },
                                         "geography_ids": {
                                           "type": "array",
                                           "items": {
@@ -247,6 +256,7 @@
                                         "vehicle_id",
                                         "vehicle_type",
                                         "propulsion_types",
+                                        "accessibility_options",
                                         "geography_ids",
                                         "geography_types",
                                         "latency_ms"
@@ -607,6 +617,15 @@
                                             ]
                                           }
                                         },
+                                        "accessibility_options": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string",
+                                            "enum": [
+                                              "wheelchair_accessible"
+                                            ]
+                                          }
+                                        },
                                         "geography_ids": {
                                           "type": "array",
                                           "items": {
@@ -637,6 +656,7 @@
                                         "vehicle_id",
                                         "vehicle_type",
                                         "propulsion_types",
+                                        "accessibility_options",
                                         "geography_ids",
                                         "geography_types",
                                         "latency_ms"

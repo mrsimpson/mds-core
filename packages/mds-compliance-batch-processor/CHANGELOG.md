@@ -1,5 +1,17 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.2.40
+
+### Patch Changes
+
+- Updated dependencies [a4d221d0]
+  - @mds-core/mds-ingest-service@0.12.0
+  - @mds-core/mds-compliance-engine@0.8.40
+  - @mds-core/mds-db@0.6.32
+  - @mds-core/mds-compliance-service@0.10.47
+  - @mds-core/mds-geography-service@0.10.37
+  - @mds-core/mds-policy-service@0.12.14
+
 ## 0.2.39
 
 ### Patch Changes

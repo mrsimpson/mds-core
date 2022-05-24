@@ -1,5 +1,12 @@
 # @mds-core/mds-compliance-service
 
+## 0.10.47
+
+### Patch Changes
+
+- @mds-core/mds-db@0.6.32
+- @mds-core/mds-policy-service@0.12.14
+
 ## 0.10.46
 
 ### Patch Changes
