@@ -1,5 +1,11 @@
 # @mds-core/mds-ingest-service
 
+## 0.12.0
+
+### Minor Changes
+
+- a4d221d0: Add accessibility_options column to event annotations
+
 ## 0.11.5
 
 ### Patch Changes
