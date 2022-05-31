@@ -10,13 +10,13 @@ BASE_DIR=$(dirname $0)/..
 if [[ -n "$REGISTRY" ]]; then  # if non-empty
   REGISTRY="$(echo $REGISTRY | sed 's#/$##')/"  # ensure '/' suffix
 fi
+if [[ ! -d "$BASE_DIR/dist" ]]; then mkdir $BASE_DIR/dist; fi
 
 buildImage() {
-  local image=$1
-  local tag=$(echo $image | cut -f2 -d":")
-  if [[ ! -d "$BASE_DIR/dist" ]]; then mkdir $BASE_DIR/dist; fi
+  local repo=$(echo $1 | cut -f1 -d":")
+  local tag=$(echo $1 | cut -f2 -d":")
   if [[ "$tag" != "latest" ]]; then
-    image=${image}$(getBranchSuffix)$(getCommitHash)
+    image="${repo}:$(getBranchSuffix)-$(getCommitHash)"
   fi
 
   local system_arch=$(uname -m)
@@ -73,25 +73,24 @@ pushImages() {
 }
 
 getBranchSuffix() {
-  git rev-parse --abbrev-ref HEAD | sed -E -e 's/[^-a-zA-Z0-9]/-/g' -e 's/^/-/'
+  git rev-parse --abbrev-ref HEAD | sed -E -e 's/[^-a-zA-Z0-9]/-/g'
 }
 
 getCommitHash() {
-  git rev-parse --short HEAD | sed -E -e 's/[^-a-zA-Z0-9]/-/g' -e 's/^/-/'
+  git rev-parse --short HEAD | sed -E -e 's/[^-a-zA-Z0-9]/-/g'
 }
 
 images() {
-  for d in $BASE_DIR/container-images/*/package.json; do
+  for d in $BASE_DIR/container-images/*/Dockerfile; do
     basename $(dirname $d)
   done
 }
 
 templateValues() {
-  suffix="$(getBranchSuffix)$(getCommitHash)"
+  suffix="$(getBranchSuffix)-$(getCommitHash)"
   for image in $(images); do
-    version=$(jq -r '.version' < $BASE_DIR/container-images/$image/package.json)
-    varname="$(echo $image | sed -e 's/^lacuna-//' -e 's/^mds-//' -e 's/-/_/g' | tr a-z A-Z)_VERSION"
-    export $varname=${version}${suffix}
+    varname="$(echo $image | sed 's/-/_/g' | tr a-z A-Z)_VERSION"
+    export $varname=$suffix
   done
   mkdir -p dist
   envsubst < $BASE_DIR/values.yaml.tpl > $BASE_DIR/dist/values-mds.yaml

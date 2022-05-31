@@ -17,7 +17,7 @@
     "bundle:production": "webpack --mode=production --env npm_package_name=${npm_package_name} --env npm_package_version=${npm_package_version}",
     "image": "pnpm image:production",
     "image:development": "pnpm bundle:development && ../../bin/build-helper buildImage mds-transaction-service:latest",
-    "image:production": "pnpm bundle:production && ../../bin/build-helper buildImage mds-transaction-service:${npm_package_version}"
+    "image:production": "pnpm bundle:production && ../../bin/build-helper buildImage mds-transaction-service:production"
   },
   "dependencies": {
     "@mds-core/mds-transaction-service": "workspace:0.7.2",
