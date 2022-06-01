@@ -1,5 +1,13 @@
 # @container-images/mds-transaction-service
 
+## 0.2.16
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-transaction-service@0.7.3
+
 ## 0.2.15
 
 ### Patch Changes

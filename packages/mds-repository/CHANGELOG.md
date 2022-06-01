@@ -1,5 +1,11 @@
 # @mds-core/mds-repository
 
+## 0.2.7
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+
 ## 0.2.6
 
 ### Patch Changes

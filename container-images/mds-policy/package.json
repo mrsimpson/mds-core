@@ -1,6 +1,6 @@
 {
   "name": "@container-images/mds-policy",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "private": true,
   "description": "Docker Image for MDS Policy API",
   "keywords": [
@@ -20,7 +20,7 @@
     "image:production": "pnpm bundle:production && ../../bin/build-helper buildImage mds-policy:production"
   },
   "dependencies": {
-    "@mds-core/mds-policy": "workspace:0.8.14",
+    "@mds-core/mds-policy": "workspace:0.8.15",
     "@mds-core/mds-webpack-config": "workspace:0.1.15",
     "dd-trace": "2.6.0",
     "express": "4.18.1",

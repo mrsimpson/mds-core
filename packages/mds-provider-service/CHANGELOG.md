@@ -1,5 +1,16 @@
 # @mds-core/mds-provider-service
 
+## 0.3.2
+
+### Patch Changes
+
+- 64c97828: Update fallback provider colors
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [64c97828]
+- Updated dependencies [2927d784]
+  - @mds-core/mds-provider-service@0.3.2
+  - @mds-core/mds-repository@0.2.7
+
 ## 0.3.1
 
 ### Patch Changes

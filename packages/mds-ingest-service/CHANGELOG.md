@@ -1,5 +1,15 @@
 # @mds-core/mds-ingest-service
 
+## 0.12.1
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+- Updated dependencies [2927d784]
+  - @mds-core/mds-repository@0.2.7
+  - @mds-core/mds-stream@0.4.3
+
 ## 0.12.0
 
 ### Minor Changes

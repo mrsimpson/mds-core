@@ -1,5 +1,15 @@
 # @mds-core/mds-agency
 
+## 0.5.28
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-api-helpers@0.3.7
+  - @mds-core/mds-db@0.6.33
+  - @mds-core/mds-ingest-service@0.12.1
+
 ## 0.5.27
 
 ### Patch Changes

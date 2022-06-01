@@ -1,5 +1,16 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.51
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [64c97828]
+- Updated dependencies [2927d784]
+  - @mds-core/mds-provider-service@0.3.2
+  - @mds-core/mds-api-helpers@0.3.7
+  - @mds-core/mds-transaction-service@0.7.3
+
 ## 0.2.50
 
 ### Patch Changes

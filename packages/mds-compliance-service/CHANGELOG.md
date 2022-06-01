@@ -1,5 +1,19 @@
 # @mds-core/mds-compliance-service
 
+## 0.10.48
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [64c97828]
+- Updated dependencies [2927d784]
+- Updated dependencies [2927d784]
+  - @mds-core/mds-provider-service@0.3.2
+  - @mds-core/mds-db@0.6.33
+  - @mds-core/mds-policy-service@0.12.15
+  - @mds-core/mds-repository@0.2.7
+  - @mds-core/mds-stream@0.4.3
+
 ## 0.10.47
 
 ### Patch Changes
