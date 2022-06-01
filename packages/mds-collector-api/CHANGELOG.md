@@ -1,5 +1,14 @@
 # @mds-core/mds-collector-api
 
+## 0.1.88
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-api-helpers@0.3.7
+  - @mds-core/mds-collector-service@0.4.38
+
 ## 0.1.87
 
 ### Patch Changes

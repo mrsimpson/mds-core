@@ -1,5 +1,11 @@
 # @mds-core/mds-stream
 
+## 0.4.3
+
+### Patch Changes
+
+- 2927d784: Preregister kafka stream consumer health check
+
 ## 0.4.2
 
 ### Patch Changes

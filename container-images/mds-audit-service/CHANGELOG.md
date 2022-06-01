@@ -1,5 +1,13 @@
 # @container-images/mds-audit-service
 
+## 0.2.11
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-audit-service@0.6.14
+
 ## 0.2.10
 
 ### Patch Changes

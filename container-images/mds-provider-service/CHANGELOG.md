@@ -1,5 +1,14 @@
 # @container-images/mds-provider-service
 
+## 0.1.10
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [64c97828]
+- Updated dependencies [2927d784]
+  - @mds-core/mds-provider-service@0.3.2
+
 ## 0.1.9
 
 ### Patch Changes

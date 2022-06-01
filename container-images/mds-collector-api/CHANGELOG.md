@@ -1,5 +1,13 @@
 # @container-images/mds-collector-api
 
+## 0.2.16
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-collector-api@0.1.88
+
 ## 0.2.15
 
 ### Patch Changes

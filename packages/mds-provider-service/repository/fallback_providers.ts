@@ -46,7 +46,7 @@ export const SUPPORT1_PROVIDER_ID = '09828cf3-9b85-449b-bc8f-d3aaef5c3448'
 export const SUPPORT2_PROVIDER_ID = 'fa5f6ce0-c038-4027-9c2c-a693f1ed7533'
 export const SUPPORT3_PROVIDER_ID = '9944b4cd-58a3-4969-a6d4-c131ff0b2111'
 
-const FALLBACK_COLOR_HEX = '#0f0'
+const FALLBACK_COLOR_HEX = '#2e5266'
 
 export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
@@ -61,7 +61,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: LIME_PROVIDER_ID,
     provider_name: 'Lime',
-    color_code_hex: '#24d000',
+    color_code_hex: '#6bca57',
     url: 'https://li.me',
     gbfs_api_url: null,
     mds_api_url: 'https://data.lime.bike/api/partners/v1/mds',
@@ -97,7 +97,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: LYFT_PROVIDER_ID,
     provider_name: 'Lyft',
-    color_code_hex: '#ff00bf',
+    color_code_hex: '#ff8bbe',
     url: 'https://www.lyft.com',
     gbfs_api_url: null,
     mds_api_url: 'https: //api.lyft.com/v1/last-mile/mds',
@@ -196,7 +196,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: SHERPA_LA_PROVIDER_ID,
     provider_name: 'SherpaLA',
-    color_code_hex: '#00FF00',
+    color_code_hex: '#81e1ff',
     url: null,
     mds_api_url: 'https://mds.bird.co',
     gbfs_api_url: 'https://mds.bird.co/gbfs/platform-partner/sherpa-la',
@@ -214,7 +214,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: SUPERPEDESTRIAN_PROVIDER_ID,
     provider_name: 'Superpedestrian',
-    color_code_hex: '#E5FF00',
+    color_code_hex: '#e9fd39',
     url: 'https://www.superpedestrian.com',
     gbfs_api_url: null,
     mds_api_url: 'https://wrangler-mds-production.herokuapp.com/mds',
@@ -223,7 +223,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: BOAZ_BIKES_PROVIDER_ID,
     provider_name: 'Boaz Bikes',
-    color_code_hex: FALLBACK_COLOR_HEX,
+    color_code_hex: '#d6d6d6',
     url: 'https://www.boazbikes.com/',
     mds_api_url: 'https://mds.movatic.co/',
     gbfs_api_url: 'https://gbsf.movatic.co/en/1.1/576347857979998215',
@@ -241,7 +241,7 @@ export const FALLBACK_PROVIDERS: ProviderDomainModel[] = [
   {
     provider_id: TUKTUK_PROVIDER_ID,
     provider_name: 'TukTuk',
-    color_code_hex: FALLBACK_COLOR_HEX,
+    color_code_hex: '#f6a122',
     url: 'https://tuktukscooters.com/',
     mds_api_url: null,
     gbfs_api_url: null,

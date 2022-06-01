@@ -1,5 +1,20 @@
 # @mds-core/mds-compliance-batch-processor
 
+## 0.2.41
+
+### Patch Changes
+
+- 2927d784: Preregister kafka stream consumer health check
+- Updated dependencies [64c97828]
+- Updated dependencies [2927d784]
+  - @mds-core/mds-provider-service@0.3.2
+  - @mds-core/mds-compliance-engine@0.8.41
+  - @mds-core/mds-compliance-service@0.10.48
+  - @mds-core/mds-db@0.6.33
+  - @mds-core/mds-geography-service@0.10.38
+  - @mds-core/mds-ingest-service@0.12.1
+  - @mds-core/mds-policy-service@0.12.15
+
 ## 0.2.40
 
 ### Patch Changes

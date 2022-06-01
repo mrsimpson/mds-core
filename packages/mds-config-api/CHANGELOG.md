@@ -1,5 +1,11 @@
 # @mds-core/mds-config-api
 
+## 0.4.15
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+
 ## 0.4.14
 
 ### Patch Changes

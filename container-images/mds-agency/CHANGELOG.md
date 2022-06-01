@@ -1,5 +1,13 @@
 # @container-images/mds-agency
 
+## 0.3.16
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-agency@0.5.28
+
 ## 0.3.15
 
 ### Patch Changes

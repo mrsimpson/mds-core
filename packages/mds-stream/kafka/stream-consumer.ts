@@ -108,6 +108,11 @@ const createStreamConsumer = async (
   { clientId = 'client', groupId = 'group', fromBeginning = false }: Partial<KafkaStreamConsumerOptions> = {}
 ) => {
   try {
+    const preConnectComponentId = 'kafka-consumer-pre-connection'
+    healthStatus.components = {
+      ...healthStatus.components,
+      [preConnectComponentId]: { last_updated: now(), healthy: false, message: 'Kafka Consumer not started yet' }
+    }
     const brokers = getKafkaBrokers()
 
     if (!brokers) {
@@ -121,6 +126,7 @@ const createStreamConsumer = async (
     await Promise.all(asArray(topics).map(topic => consumer.subscribe({ topic, fromBeginning })))
 
     registerLivelinessHandling(consumer, healthStatus)
+    delete healthStatus.components[preConnectComponentId]
 
     await consumer.run({ eachMessage })
     return consumer

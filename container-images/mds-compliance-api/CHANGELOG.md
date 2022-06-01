@@ -1,5 +1,13 @@
 # @container-images/mds-compliance-api
 
+## 0.3.17
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-compliance-api@0.4.53
+
 ## 0.3.16
 
 ### Patch Changes

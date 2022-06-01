@@ -1,5 +1,17 @@
 # @mds-core/mds-db
 
+## 0.6.33
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-attachment-service@0.5.37
+  - @mds-core/mds-audit-service@0.6.14
+  - @mds-core/mds-geography-service@0.10.38
+  - @mds-core/mds-ingest-service@0.12.1
+  - @mds-core/mds-policy-service@0.12.15
+
 ## 0.6.32
 
 ### Patch Changes

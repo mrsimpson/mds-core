@@ -1,5 +1,13 @@
 # @mds-core/mds-test-data
 
+## 0.4.44
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-ingest-service@0.12.1
+
 ## 0.4.43
 
 ### Patch Changes

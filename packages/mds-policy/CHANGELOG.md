@@ -1,5 +1,15 @@
 # @mds-core/mds-policy
 
+## 0.8.15
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-api-helpers@0.3.7
+  - @mds-core/mds-db@0.6.33
+  - @mds-core/mds-policy-service@0.12.15
+
 ## 0.8.14
 
 ### Patch Changes

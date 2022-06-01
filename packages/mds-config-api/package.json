@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-config-api",
-  "version": "0.4.14",
+  "version": "0.4.15",
   "description": "Mobility Data Specification configuration API",
   "keywords": [
     "mds",
@@ -33,7 +33,7 @@
     "query-string": "7.1.1"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "0.4.43",
+    "@mds-core/mds-test-data": "0.4.44",
     "http-status-codes": "2.2.0"
   }
 }

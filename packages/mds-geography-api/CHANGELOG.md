@@ -1,5 +1,14 @@
 # @mds-core/mds-geography-api
 
+## 0.4.41
+
+### Patch Changes
+
+- 2927d784: Bump version because of change in mds-stream
+- Updated dependencies [2927d784]
+  - @mds-core/mds-api-helpers@0.3.7
+  - @mds-core/mds-geography-service@0.10.38
+
 ## 0.4.40
 
 ### Patch Changes
