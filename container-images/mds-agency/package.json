@@ -1,6 +1,6 @@
 {
   "name": "@container-images/mds-agency",
-  "version": "0.3.16",
+  "version": "0.3.17",
   "private": true,
   "description": "Docker Image for MDS Agency API",
   "keywords": [
@@ -20,7 +20,7 @@
     "image:production": "pnpm bundle:production && ../../bin/build-helper buildImage mds-agency:production"
   },
   "dependencies": {
-    "@mds-core/mds-agency": "workspace:0.5.28",
+    "@mds-core/mds-agency": "workspace:0.5.29",
     "@mds-core/mds-webpack-config": "workspace:0.1.15",
     "dd-trace": "2.6.0",
     "express": "4.18.1",

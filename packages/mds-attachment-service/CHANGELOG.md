@@ -1,5 +1,11 @@
 # @mds-core/mds-attachment-service
 
+## 0.5.38
+
+### Patch Changes
+
+- 8dd1aef4: Updating sharp package to avoid npm advisory
+
 ## 0.5.37
 
 ### Patch Changes
