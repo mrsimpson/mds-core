@@ -1,5 +1,13 @@
 # @mds-core/mds-compliance-api
 
+## 0.4.54
+
+### Patch Changes
+
+- @mds-core/mds-db@0.6.34
+- @mds-core/mds-api-helpers@0.3.8
+- @mds-core/mds-compliance-service@0.10.49
+
 ## 0.4.53
 
 ### Patch Changes

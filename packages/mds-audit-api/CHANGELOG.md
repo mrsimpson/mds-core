@@ -1,5 +1,15 @@
 # @mds-core/mds-audit-api
 
+## 0.4.21
+
+### Patch Changes
+
+- 8dd1aef4: Updating sharp package to avoid npm advisory
+- Updated dependencies [8dd1aef4]
+  - @mds-core/mds-attachment-service@0.5.38
+  - @mds-core/mds-db@0.6.34
+  - @mds-core/mds-api-helpers@0.3.8
+
 ## 0.4.20
 
 ### Patch Changes

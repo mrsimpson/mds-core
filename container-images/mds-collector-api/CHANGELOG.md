@@ -1,5 +1,11 @@
 # @container-images/mds-collector-api
 
+## 0.2.17
+
+### Patch Changes
+
+- @mds-core/mds-collector-api@0.1.89
+
 ## 0.2.16
 
 ### Patch Changes

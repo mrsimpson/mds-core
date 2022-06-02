@@ -1,5 +1,11 @@
 # @mds-core/mds-collector-api
 
+## 0.1.89
+
+### Patch Changes
+
+- @mds-core/mds-api-helpers@0.3.8
+
 ## 0.1.88
 
 ### Patch Changes
