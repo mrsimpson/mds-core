@@ -41,8 +41,8 @@ export const telemetryDomainCreateModelSchema: Schema<TelemetryDomainCreateModel
     gps: {
       type: 'object',
       properties: {
-        lat: { type: 'number', format: 'float' },
-        lng: { type: 'number', format: 'float' },
+        lat: { type: 'number', format: 'float', minimum: -90, maximum: 90 },
+        lng: { type: 'number', format: 'float', minimum: -180, maximum: 180 },
         // ⬇⬇⬇ NULLABLE/OPTIONAL PROPERTIES ⬇⬇⬇
         altitude: nullableFloat,
         heading: { ...nullableFloat, minimum: 0, exclusiveMaximum: 360 },
