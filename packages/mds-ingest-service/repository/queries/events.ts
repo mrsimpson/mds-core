@@ -114,6 +114,8 @@ const buildQueryAndCursor = (connection: DataSource, params: WithCursorOptions<G
     device_ids,
     propulsion_types,
     provider_ids,
+    modalities,
+    accessibility_options,
     limit = 100,
     order,
     columns,
@@ -124,7 +126,9 @@ const buildQueryAndCursor = (connection: DataSource, params: WithCursorOptions<G
     (columns?.device?.length ?? 0) > 0 ||
     isDefined(propulsion_types) ||
     isDefined(vehicle_types) ||
-    isDefined(vehicle_id)
+    isDefined(vehicle_id) ||
+    isDefined(modalities) ||
+    isDefined(accessibility_options)
 
   const joinAnnotations = (columns?.annotation?.length ?? 0) > 0 || isDefined(geography_ids)
   const query = connection
@@ -148,6 +152,14 @@ const buildQueryAndCursor = (connection: DataSource, params: WithCursorOptions<G
 
     if (vehicle_id) {
       query.andWhere('lower(devices.vehicle_id) = :vehicle_id', { vehicle_id: vehicle_id.toLowerCase() })
+    }
+
+    if (modalities) {
+      query.andWhere('devices.modality = ANY(:modalities)', { modalities })
+    }
+
+    if (accessibility_options) {
+      query.andWhere('devices.accessibility_options && :accessibility_options', { accessibility_options })
     }
   }
 

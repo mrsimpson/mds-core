@@ -417,6 +417,45 @@ describe('Ingest Service Tests', () => {
         expect(events.length).toEqual(2)
       })
 
+      it('gets events, filters on modalities', async () => {
+        const { events: tncEvents } = await IngestServiceClient.getEventsUsingOptions({
+          time_range: { start: testTimestamp, end: testTimestamp + 2000 },
+          grouping_type: 'all_events',
+          modalities: ['tnc']
+        })
+        expect(tncEvents.length).toEqual(4)
+
+        const { events: micromobilityEvents } = await IngestServiceClient.getEventsUsingOptions({
+          time_range: { start: testTimestamp, end: testTimestamp + 2000 },
+          grouping_type: 'all_events',
+          modalities: ['micromobility']
+        })
+        expect(micromobilityEvents.length).toEqual(0)
+
+        const { events: combinedEvents } = await IngestServiceClient.getEventsUsingOptions({
+          time_range: { start: testTimestamp, end: testTimestamp + 2000 },
+          grouping_type: 'all_events',
+          modalities: ['tnc', 'micromobility']
+        })
+        expect(combinedEvents.length).toEqual(4)
+      })
+
+      it('gets events, filters on accessibility_options', async () => {
+        const { events: wheelchairEvents } = await IngestServiceClient.getEventsUsingOptions({
+          time_range: { start: testTimestamp, end: testTimestamp + 2000 },
+          grouping_type: 'all_events',
+          accessibility_options: ['wheelchair_accessible']
+        })
+        expect(wheelchairEvents.length).toEqual(4)
+
+        const { events: nonWheelchairEvents } = await IngestServiceClient.getEventsUsingOptions({
+          time_range: { start: testTimestamp, end: testTimestamp + 2000 },
+          grouping_type: 'all_events',
+          accessibility_options: []
+        })
+        expect(nonWheelchairEvents.length).toEqual(0)
+      })
+
       it('gets events in order provided (vehicle_state)', async () => {
         const { events } = await IngestServiceClient.getEventsUsingOptions({
           time_range: { start: testTimestamp, end: testTimestamp + 2000 },

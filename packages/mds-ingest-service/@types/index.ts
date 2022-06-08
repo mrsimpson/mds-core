@@ -17,6 +17,8 @@
 import type { RpcEmptyRequestContext, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { RpcRoute } from '@mds-core/mds-rpc-common'
 import type {
+  ACCESSIBILITY_OPTION,
+  MODALITY,
   Nullable,
   PROPULSION_TYPE,
   Timestamp,
@@ -164,6 +166,8 @@ export interface GetVehicleEventsFilterParams {
   order?: GetVehicleEventsOrderOption
   events?: { device_id: UUID; timestamp: Timestamp }[]
   columns?: GetVehicleEventQueryColumns
+  modalities?: MODALITY[]
+  accessibility_options?: ACCESSIBILITY_OPTION[]
 }
 
 export type NoColumns<T> = Omit<T, 'columns'>

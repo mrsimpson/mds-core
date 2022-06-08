@@ -9,6 +9,7 @@ import {
 import type { WithNonNullableKeys } from '@mds-core/mds-types'
 import {
   ACCESSIBILITY_OPTIONS,
+  MODALITIES,
   PROPULSION_TYPES,
   TRIP_STATES,
   VEHICLE_EVENTS,
@@ -146,6 +147,8 @@ const noColumnsGetVehicleEventsFilterParamsSchema = <const>{
     grouping_type: { type: 'string', enum: [...GROUPING_TYPES] },
     vehicle_id: { type: 'string', nullable: true },
     device_ids: { type: 'array', items: uuidSchema, nullable: true },
+    modalities: nullableArray([...new Set(MODALITIES)]),
+    accessibility_options: nullableArray([...new Set(ACCESSIBILITY_OPTIONS)]),
     event_types: nullableArray([...new Set(VEHICLE_EVENTS)]),
     events: {
       type: 'array',
