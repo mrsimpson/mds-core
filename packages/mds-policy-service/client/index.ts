@@ -43,7 +43,8 @@ export const PolicyServiceClientFactory = (
     readPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.readPolicy, args),
     readSinglePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.readSinglePolicyMetadata, args),
     updatePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.updatePolicyMetadata, args),
-    writePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.writePolicyMetadata, args)
+    writePolicyMetadata: (...args) => RpcRequest(options, PolicyServiceRpcClient.writePolicyMetadata, args),
+    writePolicyIntentToPolicy: (...args) => RpcRequest(options, PolicyServiceRpcClient.writePolicyIntentToPolicy, args)
   }
 }
 

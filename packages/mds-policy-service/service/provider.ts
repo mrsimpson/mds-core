@@ -21,6 +21,7 @@ import { BadParamsError, DependencyMissingError } from '@mds-core/mds-utils'
 import type { PolicyService, PolicyServiceRequestContext } from '../@types'
 import { PolicyServiceLogger } from '../logger'
 import { PolicyRepository } from '../repository'
+import { translateIntentToPolicy } from './helpers'
 import { PolicyStreamKafka } from './stream'
 import { validatePolicyDomainModel, validatePolicyMetadataDomainModel, validatePresentationOptions } from './validators'
 
@@ -99,5 +100,15 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyService
       }
 
       return publishedPolicy
+    }),
+  writePolicyIntentToPolicy: (context, intent_draft) =>
+    serviceErrorWrapper('writePolicyIntentToPolicy', async () => {
+      const { policy_id } = await PolicyRepository.writePolicy(translateIntentToPolicy(intent_draft)
+)
+      await PolicyRepository.writePolicyMetadata({
+        policy_id,
+        policy_metadata: { intent_type: intent_draft.intent_type }
+      })
+      return PolicyRepository.publishPolicy(policy_id)
     })
 }

@@ -7,12 +7,18 @@ import {
 import stream from '@mds-core/mds-stream'
 import type { UUID } from '@mds-core/mds-types'
 import { clone, days, now, START_ONE_MONTH_AGO, START_ONE_MONTH_FROM_NOW, uuid, yesterday } from '@mds-core/mds-utils'
-import type { PolicyMetadataDomainModel } from '../@types'
+import type { NoParkingIntentDraft, PolicyMetadataDomainModel } from '../@types'
 import { PolicyServiceClient } from '../client'
 import { PolicyRepository } from '../repository'
 import { PolicyServiceManager } from '../service/manager'
 import { PolicyStreamKafka } from '../service/stream'
-import { POLICY2_JSON, POLICY3_JSON, POLICY_WITH_DUPE_RULE } from '../test_data/policies'
+import {
+  POLICY2_JSON,
+  POLICY3_JSON,
+  POLICY_WITH_DUPE_RULE,
+  TEST_GEOGRAPHY_UUID1,
+  TEST_PROVIDER_ID1
+} from '../test_data/policies'
 import { createPolicyAndGeographyFactory, PolicyFactory, RulesFactory } from './helpers'
 
 const GeographyServer = GeographyServiceManager.controller()
@@ -57,6 +63,52 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       await expect(PolicyServiceClient.publishPolicy(badPolicy.policy_id, now())).rejects.toMatchObject({
         type: 'DependencyMissingError'
       })
+    })
+
+    it('can translate, create, and publish a draft of a policy intent', async () => {
+      const start_date = now() + 50000
+      const end_date = now() + 500000
+      const draft: NoParkingIntentDraft = {
+        intent_type: 'no_parking',
+        rule_fields: {
+          geographies: [TEST_GEOGRAPHY_UUID1],
+          days: ['mon'],
+          start_time: '09:00:00',
+          end_time: '10:00:00'
+        },
+        policy_fields: {
+          name: 'aname',
+          description: 'aname',
+          provider_ids: [TEST_PROVIDER_ID1],
+          start_date,
+          end_date
+        }
+      }
+
+      const policy = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+      const { policy_id } = policy
+      expect(policy).toMatchObject({
+        name: 'aname',
+        description: 'aname',
+        provider_ids: [TEST_PROVIDER_ID1],
+        start_date,
+        end_date,
+        rules: [
+          {
+            rule_type: 'count',
+            maximum: 0,
+            geographies: [TEST_GEOGRAPHY_UUID1],
+            days: ['mon'],
+            start_time: '09:00:00',
+            end_time: '10:00:00'
+          }
+        ]
+      })
+      const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
+      expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('no_parking')
+
+      const publishedPolicy = await PolicyServiceClient.readPolicy(policy_id, { withStatus: true })
+      expect(publishedPolicy.status).toBe('pending')
     })
 
     it('can CRUD a SimplePolicy', async () => {

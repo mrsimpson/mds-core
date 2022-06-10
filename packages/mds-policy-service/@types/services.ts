@@ -17,6 +17,7 @@
 import type { RpcEmptyRequestContext, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { RpcRoute } from '@mds-core/mds-rpc-common'
 import type { Nullable, TimeRange, Timestamp, UUID } from '@mds-core/mds-types'
+import type { IntentDraft, INTENT_TYPE } from './intents'
 import type { PolicyDomainCreateModel, PolicyDomainModel, PolicyMetadataDomainModel, POLICY_STATUS } from './models'
 
 export type FILTER_POLICY_STATUS = Exclude<POLICY_STATUS, 'unknown'>
@@ -70,6 +71,7 @@ export interface PolicyService {
   readSinglePolicyMetadata: <M>(policy_id: UUID) => PolicyMetadataDomainModel<M>
   updatePolicyMetadata: (policy_metadata: PolicyMetadataDomainModel) => PolicyMetadataDomainModel
   writePolicyMetadata: (policy_metadata: PolicyMetadataDomainModel) => PolicyMetadataDomainModel
+  writePolicyIntentToPolicy: <I extends INTENT_TYPE>(intent_draft: IntentDraft<I>) => PolicyDomainModel
 }
 
 export const PolicyServiceDefinition: RpcServiceDefinition<PolicyService> = {
@@ -84,7 +86,8 @@ export const PolicyServiceDefinition: RpcServiceDefinition<PolicyService> = {
   readPolicy: RpcRoute<PolicyService['readPolicy']>(),
   readSinglePolicyMetadata: RpcRoute<PolicyService['readSinglePolicyMetadata']>(),
   updatePolicyMetadata: RpcRoute<PolicyService['updatePolicyMetadata']>(),
-  writePolicyMetadata: RpcRoute<PolicyService['writePolicyMetadata']>()
+  writePolicyMetadata: RpcRoute<PolicyService['writePolicyMetadata']>(),
+  writePolicyIntentToPolicy: RpcRoute<PolicyService['writePolicyIntentToPolicy']>()
 }
 
 export type PolicyServiceRequestContext = RpcEmptyRequestContext
