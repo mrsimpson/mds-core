@@ -6,10 +6,20 @@ import {
 } from '@mds-core/mds-geography-service'
 import stream from '@mds-core/mds-stream'
 import type { UUID } from '@mds-core/mds-types'
-import { clone, days, now, START_ONE_MONTH_AGO, START_ONE_MONTH_FROM_NOW, uuid, yesterday } from '@mds-core/mds-utils'
+import {
+  clone,
+  days,
+  hours,
+  now,
+  START_ONE_MONTH_AGO,
+  START_ONE_MONTH_FROM_NOW,
+  uuid,
+  yesterday
+} from '@mds-core/mds-utils'
 import type { NoParkingIntentDraft, PolicyMetadataDomainModel } from '../@types'
 import { PolicyServiceClient } from '../client'
 import { PolicyRepository } from '../repository'
+import { TWENTY_MINUTES } from '../service/helpers'
 import { PolicyServiceManager } from '../service/manager'
 import { PolicyStreamKafka } from '../service/stream'
 import {
@@ -66,8 +76,10 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
     })
 
     it('can translate, create, and publish a draft of a policy intent', async () => {
-      const start_date = now() + 50000
-      const end_date = now() + 500000
+      // Pushing start_date to an hour in the future to ensure we don't have to worry
+      // about start_date > publish_date by 20 minutes
+      const start_date = now() + hours(1)
+      const end_date = now() + hours(10)
       const draft: NoParkingIntentDraft = {
         intent_type: 'no_parking',
         rule_fields: {
@@ -109,6 +121,28 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
       const publishedPolicy = await PolicyServiceClient.readPolicy(policy_id, { withStatus: true })
       expect(publishedPolicy.status).toBe('pending')
+    })
+
+    it('adjusts the start_date to fit the spec', async () => {
+      const draft: NoParkingIntentDraft = {
+        intent_type: 'no_parking',
+        rule_fields: {
+          geographies: [TEST_GEOGRAPHY_UUID1],
+          days: ['mon'],
+          start_time: '09:00:00',
+          end_time: '10:00:00'
+        },
+        policy_fields: {
+          name: 'aname',
+          description: 'aname',
+          provider_ids: [TEST_PROVIDER_ID1],
+          start_date: now(),
+          end_date: null
+        }
+      }
+
+      const { start_date, published_date } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+      expect(start_date - (published_date as number)).toBeGreaterThanOrEqual(TWENTY_MINUTES)
     })
 
     it('can CRUD a SimplePolicy', async () => {
