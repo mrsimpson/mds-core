@@ -1,4 +1,6 @@
 deployments:
+  mds-activity-service:
+    version: ${MDS_ACTIVITY_SERVICE_VERSION}
   mds-agency:
     version: ${MDS_AGENCY_VERSION}
   mds-attachment-service:
