@@ -11,7 +11,7 @@ export const { validate: validateProviderDomainModel, isValid: isValidProviderDo
       url: nullableString,
       mds_api_url: nullableString,
       gbfs_api_url: nullableString,
-      color_code_hex: { type: 'string' },
+      color_code_hex: nullableString,
       provider_types: { type: 'array', items: { type: 'string', enum: PROVIDER_TYPES } }
     },
     required: ['provider_id', 'provider_name', 'color_code_hex']
