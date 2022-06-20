@@ -1,5 +1,11 @@
 # @mds-core/mds-api-authorizer
 
+## 0.1.69
+
+### Patch Changes
+
+- @mds-core/mds-utils@0.5.4
+
 ## 0.1.68
 
 ### Patch Changes

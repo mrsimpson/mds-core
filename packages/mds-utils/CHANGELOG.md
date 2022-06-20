@@ -1,5 +1,12 @@
 # @mds-core/mds-utils
 
+## 0.5.4
+
+### Patch Changes
+
+- Updated dependencies [19b45968]
+  - @mds-core/mds-logger@0.5.9
+
 ## 0.5.3
 
 ### Patch Changes
