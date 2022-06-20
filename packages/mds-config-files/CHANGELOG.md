@@ -1,5 +1,11 @@
 # @mds-core/mds-config-files
 
+## 0.1.8
+
+### Patch Changes
+
+- @mds-core/mds-utils@0.5.4
+
 ## 0.1.7
 
 ### Patch Changes

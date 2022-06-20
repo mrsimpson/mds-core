@@ -1,5 +1,11 @@
 # @mds-core/mds-logger
 
+## 0.5.9
+
+### Patch Changes
+
+- 19b45968: Pino-based logger was not printing out all error messages when running test suites because the suite would finish before the asynchronous logging did.
+
 ## 0.5.8
 
 ### Patch Changes

@@ -346,11 +346,15 @@
                                           "properties": {
                                             "lat": {
                                               "type": "number",
-                                              "format": "float"
+                                              "format": "float",
+                                              "minimum": -90,
+                                              "maximum": 90
                                             },
                                             "lng": {
                                               "type": "number",
-                                              "format": "float"
+                                              "format": "float",
+                                              "minimum": -180,
+                                              "maximum": 180
                                             },
                                             "altitude": {
                                               "type": "number",
@@ -746,11 +750,15 @@
                                           "properties": {
                                             "lat": {
                                               "type": "number",
-                                              "format": "float"
+                                              "format": "float",
+                                              "minimum": -90,
+                                              "maximum": 90
                                             },
                                             "lng": {
                                               "type": "number",
-                                              "format": "float"
+                                              "format": "float",
+                                              "minimum": -180,
+                                              "maximum": 180
                                             },
                                             "altitude": {
                                               "type": "number",

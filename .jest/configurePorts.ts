@@ -7,6 +7,8 @@ import findPort from 'find-port-free-sync'
 Object.assign(
   process.env,
   ...[
+    'ACTIVITY_SERVICE_REPL_PORT',
+    'ACTIVITY_SERVICE_RPC_PORT',
     'AGENCY_API_HTTP_PORT',
     'ATTACHMENT_SERVICE_REPL_PORT',
     'ATTACHMENT_SERVICE_RPC_PORT',

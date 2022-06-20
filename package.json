@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "version": "0.2.94",
+  "version": "0.2.95",
   "private": true,
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -18,7 +18,7 @@
     "images": "pnpm run:concurrent image",
     "preinstall": "npx check-node-version --package && npx only-allow pnpm && pnpm i -g pnpm@6.32.11",
     "lint": "pnpm lint:audit && pnpm lint:prettier '**/package.json' && pnpm lint:markdown && pnpm lint:eslint '**/*.ts'",
-    "lint:audit": "pnpm-ci audit --strict -i GHSA-fwr7-v2mv-hh25 GHSA-wm7h-9275-46v2",
+    "lint:audit": "pnpm-ci audit --strict -i GHSA-wm7h-9275-46v2 GHSA-g954-5hwp-pp24",
     "lint:eslint": "eslint --ignore-path .gitignore --ignore-path .eslintignore",
     "lint:markdown": "markdownlint-cli2 '**/*.md' '!**/CHANGELOG.md' '!**/node_modules/**'",
     "lint:prettier": "prettier --check",

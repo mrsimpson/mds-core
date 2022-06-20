@@ -1,5 +1,11 @@
 # @container-images/mds-config-service
 
+## 0.6.6
+
+### Patch Changes
+
+- @mds-core/mds-config-service@0.4.15
+
 ## 0.6.5
 
 ### Patch Changes

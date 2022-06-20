@@ -38,7 +38,8 @@ export const PolicyServiceManager = RpcServer<PolicyService, PolicyServiceReques
     readPolicy: (args, context) => PolicyServiceProvider.readPolicy(context, ...args),
     readSinglePolicyMetadata: (args, context) => PolicyServiceProvider.readSinglePolicyMetadata(context, ...args),
     updatePolicyMetadata: (args, context) => PolicyServiceProvider.updatePolicyMetadata(context, ...args),
-    writePolicyMetadata: (args, context) => PolicyServiceProvider.writePolicyMetadata(context, ...args)
+    writePolicyMetadata: (args, context) => PolicyServiceProvider.writePolicyMetadata(context, ...args),
+    writePolicyIntentToPolicy: (args, context) => PolicyServiceProvider.writePolicyIntentToPolicy(context, ...args)
   },
   {
     port: process.env.POLICY_SERVICE_RPC_PORT,

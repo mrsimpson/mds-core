@@ -1,5 +1,12 @@
 # @container-images/mds-provider-service
 
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies [07474e2f]
+  - @mds-core/mds-provider-service@0.3.3
+
 ## 0.1.10
 
 ### Patch Changes

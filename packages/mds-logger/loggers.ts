@@ -15,7 +15,7 @@ export const logger = (() =>
       messageKey: 'message',
       level: process.env.DEBUG ? 'debug' : false || 'info'
     },
-    pino.destination({ sync: false })
+    pino.destination({ sync: process.env.NODE_ENV === 'test' })
   ))()
 
 /**
