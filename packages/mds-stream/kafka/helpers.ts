@@ -21,7 +21,11 @@ export const getKafkaBrokers = () => {
     env: { KAFKA_HOST }
   } = process
 
-  if (KAFKA_HOST) return [KAFKA_HOST]
+  if (KAFKA_HOST) {
+    const brokers = KAFKA_HOST.split(',').map(s => s.trim())
+
+    return brokers
+  }
 
   StreamLogger.warn('KAFKA_HOST is undefined, skipping initialization.')
   return null
