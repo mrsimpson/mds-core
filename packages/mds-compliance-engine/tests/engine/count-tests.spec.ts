@@ -28,6 +28,7 @@ import {
 import type { Telemetry, UUID, VehicleEvent } from '@mds-core/mds-types'
 import { now, rangeRandomInt, uuid } from '@mds-core/mds-utils'
 import type { Feature, FeatureCollection } from 'geojson'
+import { Settings } from 'luxon'
 import MockDate from 'mockdate'
 import type { ComplianceEngineResult, VehicleEventWithTelemetry } from '../../@types'
 import { isCountRuleMatch, processCountPolicy } from '../../engine/count_processors'
@@ -548,5 +549,40 @@ describe('Tests Compliance Engine Count Functionality:', () => {
       return vehicle.rules_matched.includes(rule_1_id)
     }).length
     expect(rule_1_matched).toStrictEqual(4)
+  })
+
+  describe('Verifies time-of-day based count minimum rules behave properly', () => {
+    afterAll(() => {
+      Settings.now = () => new Date().valueOf() // make sure to reset luxon
+    })
+
+    it('Verifies that if a count minimum rule is inactive, it does not trigger violations', () => {
+      Settings.now = () => new Date('2021-09-15T05:00:00.000Z').valueOf()
+      const policy: CountPolicy = {
+        ...COUNT_POLICY_JSON,
+        rules: [
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          { ...COUNT_POLICY_JSON.rules[0]!, start_time: '09:00:00', end_time: '21:00:00', maximum: null, minimum: 100 }
+        ]
+      }
+      const devices: DeviceDomainModel[] = makeDevices(7, now())
+      const events = makeEventsWithTelemetry(devices, now() - 100000, CITY_OF_LA, {
+        event_types: ['trip_end'],
+        vehicle_state: 'available',
+        speed: rangeRandomInt(10)
+      })
+      const telemetry: Telemetry[] = []
+      devices.forEach(device => {
+        telemetry.push(makeTelemetryInArea(device, now(), CITY_OF_LA, 10))
+      })
+      const deviceMap = generateDeviceMap(devices)
+      const resultNew = processCountPolicy(
+        policy,
+        events as (VehicleEvent & { telemetry: Telemetry })[],
+        [LA_GEOGRAPHY],
+        deviceMap
+      ) as ComplianceEngineResult
+      expect(resultNew.total_violations).toStrictEqual(0)
+    })
   })
 })

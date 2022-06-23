@@ -31,17 +31,15 @@ export function isTimeRuleMatch(
   // We throw out events that have no telemetry.
   event: VehicleEvent & { telemetry: Telemetry }
 ) {
-  if (isRuleActive(rule)) {
-    for (const geography of rule.geographies) {
-      if (
-        isInStatesOrEvents(rule, device, event) &&
-        isInVehicleTypes(rule, device) &&
-        (!rule.maximum || (now() - event.timestamp) / RULE_UNIT_MAP[rule.rule_units] >= rule.maximum)
-      ) {
-        const poly = getPolygon(geographies, geography)
-        if (poly && pointInShape(event.telemetry.gps, poly)) {
-          return true
-        }
+  for (const geography of rule.geographies) {
+    if (
+      isInStatesOrEvents(rule, device, event) &&
+      isInVehicleTypes(rule, device) &&
+      (!rule.maximum || (now() - event.timestamp) / RULE_UNIT_MAP[rule.rule_units] >= rule.maximum)
+    ) {
+      const poly = getPolygon(geographies, geography)
+      if (poly && pointInShape(event.telemetry.gps, poly)) {
+        return true
       }
     }
   }
@@ -60,25 +58,27 @@ export function processTimePolicy(
   // Necessary because we destructively modify the devices list to keep track of which devices we've seen.
   const devicesToCheck = clone(devices)
   policy.rules.forEach(rule => {
-    events.forEach(event => {
-      if (devicesToCheck[event.device_id]) {
-        const device = devicesToCheck[event.device_id]
+    if (isRuleActive(rule)) {
+      events.forEach(event => {
+        if (devicesToCheck[event.device_id]) {
+          const device = devicesToCheck[event.device_id]
 
-        if (!device) {
-          logger.warn(`Device ${event.device_id} not found in devices list.`)
-          return
-        }
-
-        if (isTimeRuleMatch(rule as TimeRule, geographies, device, event)) {
-          matchedVehicles[device.device_id] = {
-            device,
-            rule_applied: rule.rule_id,
-            rules_matched: [rule.rule_id]
+          if (!device) {
+            logger.warn(`Device ${event.device_id} not found in devices list.`)
+            return
           }
-          delete devicesToCheck[device.device_id]
+
+          if (isTimeRuleMatch(rule as TimeRule, geographies, device, event)) {
+            matchedVehicles[device.device_id] = {
+              device,
+              rule_applied: rule.rule_id,
+              rules_matched: [rule.rule_id]
+            }
+            delete devicesToCheck[device.device_id]
+          }
         }
-      }
-    })
+      })
+    }
   })
   const matchedVehiclesArr = annotateVehicleMap(policy, events, geographies, matchedVehicles, isTimeRuleMatch)
   return {
