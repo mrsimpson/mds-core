@@ -123,6 +123,14 @@ describe('ComplianceSnapshots Service Tests', () => {
     }
   })
 
+  it('Gets ComplianceSnapshots by TimeInterval with empty provider_ids list', async () => {
+    await expect(
+      ComplianceServiceClient.getComplianceSnapshotsByTimeInterval({
+        start_time: now() - days(2),
+        provider_ids: []
+      })
+    ).resolves
+  })
   it('Gets ComplianceSnapshots By TimeInterval (start_time, provider_ids options)', async () => {
     const complianceSnapshots = await ComplianceServiceClient.getComplianceSnapshotsByTimeInterval({
       start_time: now() - days(2),

@@ -132,11 +132,11 @@ export const ComplianceRepository = ReadWriteRepository.Create(
             .createQueryBuilder()
             .where('compliance_as_of >= :start_time', { start_time })
             .andWhere('compliance_as_of <= :end_time', { end_time })
-          if (isDefined(provider_ids)) {
-            query.andWhere('provider_id IN (:...provider_ids)', { provider_ids })
+          if (isDefined(provider_ids) && provider_ids.length > 0) {
+            query.andWhere('provider_id = ANY (:provider_ids)', { provider_ids })
           }
-          if (isDefined(policy_ids)) {
-            query.andWhere('policy_id IN (:...policy_ids)', { policy_ids })
+          if (isDefined(policy_ids) && policy_ids.length > 0) {
+            query.andWhere('policy_id = ANY (:policy_ids)', { policy_ids })
           }
 
           query.orderBy('compliance_as_of')
