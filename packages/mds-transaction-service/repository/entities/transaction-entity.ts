@@ -21,6 +21,7 @@ import { Column, Entity, Index } from 'typeorm'
 import { FEE_TYPE } from '../../@types'
 
 @Entity('transactions')
+@Index(['provider_id', 'timestamp'])
 export class TransactionEntity extends IdentityColumn(RecordedColumn(class {})) {
   @Column('uuid', { primary: true })
   transaction_id: UUID

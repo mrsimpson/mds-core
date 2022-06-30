@@ -36,6 +36,7 @@ export const TransactionServiceClientFactory = (
     createTransactions: (...args) => RpcRequest(options, TransactionServiceRpcClient.createTransactions, args),
     getTransaction: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransaction, args),
     getTransactions: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransactions, args),
+    getTransactionSummary: (...args) => RpcRequest(options, TransactionServiceRpcClient.getTransactionSummary, args),
     addTransactionOperation: (...args) =>
       RpcRequest(options, TransactionServiceRpcClient.addTransactionOperation, args),
     getTransactionOperations: (...args) =>

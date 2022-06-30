@@ -178,7 +178,7 @@ export const SORT_DIRECTION = <const>['ASC', 'DESC']
 export type SORT_DIRECTION = typeof SORT_DIRECTION[number]
 
 export interface TransactionSearchParams {
-  provider_id?: UUID
+  provider_ids?: UUID[]
   start_timestamp?: Timestamp
   end_timestamp?: Timestamp
   search_text?: string
@@ -205,6 +205,8 @@ export interface TransactionStatusDomainModel {
 }
 export type TransactionStatusDomainCreateModel = DomainModelCreate<TransactionStatusDomainModel>
 
+export type TransactionSummary = Record<UUID, { amount: number; count: number }>
+
 export interface TransactionService {
   /**  TODO if auth token has a provider_id, it must match */
   createTransaction: (transaction: TransactionDomainCreateModel) => TransactionDomainModel
@@ -217,6 +219,8 @@ export interface TransactionService {
   /** TODO if auth token has a provider_id, it must match */
   /**  read back single */
   getTransaction: (transaction_id: TransactionDomainModel['transaction_id']) => TransactionDomainModel
+
+  getTransactionSummary: (params: TransactionSearchParams) => TransactionSummary
 
   /** create an 'operation', e.g. for dispute-handling, etc. */
   /**  TODO if auth token has a provider_id, it must match */
@@ -247,6 +251,7 @@ export const TransactionServiceDefinition: RpcServiceDefinition<TransactionServi
 
   getTransactions: RpcRoute<TransactionService['getTransactions']>(),
   getTransaction: RpcRoute<TransactionService['getTransaction']>(),
+  getTransactionSummary: RpcRoute<TransactionService['getTransactionSummary']>(),
 
   addTransactionOperation: RpcRoute<TransactionService['addTransactionOperation']>(),
   getTransactionOperations: RpcRoute<TransactionService['getTransactionOperations']>(),

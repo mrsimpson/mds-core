@@ -18,15 +18,15 @@ import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import type { UUID } from '@mds-core/mds-types'
 import { NotFoundError, now } from '@mds-core/mds-utils'
 import { cleanEnv, num } from 'envalid'
-import type { FindOperator } from 'typeorm'
-import { Between, Brackets, In, LessThan, MoreThan } from 'typeorm'
+import { In } from 'typeorm'
 import type { Cursor } from 'typeorm-cursor-pagination'
 import { buildPaginator } from 'typeorm-cursor-pagination'
 import type {
   TransactionDomainModel,
   TransactionOperationDomainModel,
   TransactionSearchParams,
-  TransactionStatusDomainModel
+  TransactionStatusDomainModel,
+  TransactionSummary
 } from '../@types'
 import { validateTransactionSearchParams } from '../service/validators'
 import { TransactionOperationEntity } from './entities/operation-entity'
@@ -41,6 +41,7 @@ import {
   TransactionStatusEntityToDomain
 } from './mappers'
 import migrations from './migrations'
+import { resolveConditions, resolveTimeBounds } from './query-helpers'
 
 const env = cleanEnv(process.env, {
   TRANSACTION_BULK_DB_WRITE_CHUNK_SIZE: num({ default: 5000 })
@@ -82,7 +83,7 @@ export const TransactionRepository = ReadWriteRepository.Create(
         search: TransactionSearchParams
       ): Promise<{ transactions: TransactionDomainModel[]; cursor: Cursor }> => {
         const {
-          provider_id,
+          provider_ids,
           start_timestamp,
           end_timestamp,
           search_text,
@@ -94,51 +95,6 @@ export const TransactionRepository = ReadWriteRepository.Create(
           limit,
           order
         } = validateTransactionSearchParams(search)
-
-        const resolveTimeBounds = (): { timestamp?: FindOperator<number> } => {
-          if (start_timestamp && end_timestamp) {
-            return { timestamp: Between(start_timestamp, end_timestamp) }
-          }
-          if (start_timestamp) {
-            return { timestamp: MoreThan(start_timestamp) }
-          }
-          if (end_timestamp) {
-            return { timestamp: LessThan(end_timestamp) }
-          }
-          return {}
-        }
-
-        const jsonSearch = (alias: string) => {
-          /**
-           * 'simple' means no word-stemming, all words are indexed and searchable.
-           * ['string','numeric','boolean'] means all values of the JSONB column are being searched as text
-           */
-          return search_text
-            ? new Brackets(qb =>
-                qb.where(
-                  `jsonb_to_tsvector('simple',${alias}.receipt,'["string","numeric","boolean"]') @@ to_tsquery(:search_text)`,
-                  {
-                    search_text: search_text + ':*'
-                  }
-                )
-              )
-            : []
-        }
-
-        const resolveProviderId = (): { provider_id?: UUID } => (provider_id ? { provider_id } : {})
-
-        const resolveConditions = (alias: string) => {
-          const clauses = [
-            start_amount ? new Brackets(qb => qb.where(`amount > :start_amount`, { start_amount })) : [],
-            end_amount ? new Brackets(qb => qb.where(`amount < :end_amount`, { end_amount })) : [],
-            fee_type ? new Brackets(qb => qb.where({ fee_type })) : [],
-            jsonSearch(alias)
-          ]
-
-          return clauses.flat().reduce((acc, clause) => {
-            return new Brackets(qb => qb.andWhere(acc).andWhere(clause))
-          }, new Brackets(qb => qb.where('1=1')))
-        }
 
         try {
           const connection = await repository.connect('ro')
@@ -152,8 +108,12 @@ export const TransactionRepository = ReadWriteRepository.Create(
           const queryBuilder = connection
             .getRepository(TransactionEntity)
             .createQueryBuilder(alias)
-            .where({ ...resolveProviderId(), ...resolveTimeBounds() })
-            .andWhere(resolveConditions(alias))
+            .where({ ...resolveTimeBounds({ start_timestamp, end_timestamp }) })
+            .andWhere(resolveConditions(alias, { start_amount, end_amount, fee_type, search_text }))
+
+          if (provider_ids && provider_ids.length > 0) {
+            queryBuilder.andWhere(`${alias}.provider_id = ANY(:provider_ids)`, { provider_ids })
+          }
 
           const { data, cursor } = await buildPaginator({
             alias,
@@ -167,6 +127,48 @@ export const TransactionRepository = ReadWriteRepository.Create(
             paginationKeys: [order?.column ?? 'id']
           }).paginate(queryBuilder)
           return { transactions: data.map(TransactionEntityToDomain.mapper()), cursor }
+        } catch (error) {
+          throw RepositoryError(error)
+        }
+      },
+
+      getTransactionSummary: async (search: TransactionSearchParams): Promise<TransactionSummary> => {
+        const { provider_ids, start_timestamp, end_timestamp, search_text, start_amount, end_amount, fee_type } =
+          validateTransactionSearchParams(search)
+
+        try {
+          const connection = await repository.connect('ro')
+
+          /**
+           * Need to generate a shared alias due to the different aliasing methods in TypeORM & TypeORM Cursor Paginator
+           * depending on debug vs production environments.
+           */
+          const alias = 'transactionentity'
+
+          const queryBuilder = connection
+            .getRepository(TransactionEntity)
+            .createQueryBuilder(alias)
+            .select('provider_id, SUM(amount) as amount, COUNT(*) as count')
+            .where({ ...resolveTimeBounds({ start_timestamp, end_timestamp }) })
+            .andWhere(resolveConditions(alias, { start_amount, end_amount, fee_type, search_text }))
+
+          if (provider_ids && provider_ids.length > 0) {
+            queryBuilder.andWhere(`${alias}.provider_id = ANY(:provider_ids)`, { provider_ids })
+          }
+
+          queryBuilder.groupBy('provider_id')
+
+          const queryResult: { provider_id: UUID; amount: number; count: number }[] = await queryBuilder.getRawMany() // FIXME: @neil
+
+          // Turn list into a dictionary for lookup
+          const queryMap = Object.fromEntries(queryResult.map(({ provider_id, ...rest }) => [provider_id, rest]))
+
+          // Set any providers that didn't come back in the DB query to 0/0
+          const result = Object.fromEntries<TransactionSummary['provider_id']>(
+            provider_ids?.map(provider_id => [provider_id, queryMap[provider_id] ?? { amount: 0, count: 0 }]) ?? []
+          )
+
+          return result
         } catch (error) {
           throw RepositoryError(error)
         }

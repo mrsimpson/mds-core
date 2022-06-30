@@ -23,6 +23,7 @@ import type {
   TransactionSearchParams
 } from '@mds-core/mds-transaction-service'
 import { SORTABLE_COLUMN, SORT_DIRECTION, TransactionServiceClient } from '@mds-core/mds-transaction-service'
+import type { UUID } from '@mds-core/mds-types'
 import { hasOwnProperty, ValidationError } from '@mds-core/mds-utils'
 import type express from 'express'
 import type { Cursor } from 'typeorm-cursor-pagination'
@@ -95,7 +96,7 @@ const getOrderOption = (req: TransactionApiGetTransactionsRequest) => {
  */
 const constructUrls = (
   req: TransactionApiGetTransactionsRequest,
-  { order, ...basicOptions }: TransactionSearchParams
+  { order, ...basicOptions }: Omit<TransactionSearchParams, 'provider_ids'> & { provider_id?: UUID }
 ) => {
   const url = new URL(`${req.get('x-forwarded-proto') || req.protocol}://${req.get('host')}${req.path}`)
 
@@ -144,7 +145,7 @@ export const GetTransactionsHandler = async (
     } = parseRequest(req).single({ parser: Number }).query('start_timestamp', 'end_timestamp', 'limit')
 
     const { transactions, cursor } = await TransactionServiceClient.getTransactions({
-      provider_id,
+      provider_ids: provider_id ? [provider_id] : undefined,
       before,
       after,
       start_timestamp,

@@ -91,6 +91,16 @@ export const TransactionServiceProvider: ServiceProvider<TransactionService, Tra
       return exception
     }
   },
+  getTransactionSummary: async (context, search) => {
+    try {
+      const transactionSummary = await TransactionRepository.getTransactionSummary(search)
+      return ServiceResult(transactionSummary)
+    } catch (error) /* istanbul ignore next */ {
+      const exception = ServiceException('Error Getting Transaction Summary', error)
+      TransactionServiceLogger.error('getTransactionSummary error', { exception, error })
+      return exception
+    }
+  },
   addTransactionOperation: async (context, transactionOperation) => {
     try {
       const operation = await TransactionRepository.addTransactionOperation(
