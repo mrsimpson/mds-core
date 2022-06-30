@@ -106,7 +106,7 @@ export const { validate: validateTransactionSearchParams } = SchemaValidator<Tra
     $id: 'TransactionSearchParams',
     type: 'object',
     properties: {
-      provider_id: { ...uuidSchema, nullable: true, default: null },
+      provider_ids: { type: 'array', items: uuidSchema, nullable: true, default: null },
       start_timestamp: nullableTimestamp,
       end_timestamp: nullableTimestamp,
       search_text: nullableString,
@@ -163,6 +163,7 @@ const receiptDomainSchema = <const>{
       example: 'https://mds.coruscant.com/compliance/snapshot/c78280ff-4e58-4e30-afa9-d72673037799'
     },
     receipt_details: {
+      type: 'object',
       // discriminator: {propertyName: "type"},
       required: ['type'],
       oneOf: [tripReceiptSchema, complianceViolationDetailsSchema, curbUseSchema, customReceiptDetailsSchema]

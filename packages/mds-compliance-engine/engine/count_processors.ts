@@ -33,13 +33,11 @@ export function isCountRuleMatch(
   device: DeviceDomainModel,
   event: VehicleEventWithTelemetry
 ) {
-  if (isRuleActive(rule)) {
-    for (const geography of rule.geographies) {
-      if (isInStatesOrEvents(rule, device, event) && isInVehicleTypes(rule, device)) {
-        const poly = getPolygon(geographies, geography)
-        if (poly && pointInShape(event.telemetry.gps, poly)) {
-          return true
-        }
+  for (const geography of rule.geographies) {
+    if (isInStatesOrEvents(rule, device, event) && isInVehicleTypes(rule, device)) {
+      const poly = getPolygon(geographies, geography)
+      if (poly && pointInShape(event.telemetry.gps, poly)) {
+        return true
       }
     }
   }
@@ -68,39 +66,41 @@ export function processCountPolicy(
   const overflowedVehicles: { [d: string]: { device: DeviceDomainModel; rules_matched: UUID[] } } = {}
   let countMinimumViolations = 0
   policy.rules.forEach(rule => {
-    const maximum = isDefined(rule.maximum) ? rule.maximum : Number.POSITIVE_INFINITY
-    const { rule_id } = rule
-    let num_matches = 0
-    events.forEach(event => {
-      if (devicesToCheck[event.device_id]) {
-        const device = devicesToCheck[event.device_id]
-        if (!device) {
-          logger.warn(`Device ${event.device_id} not found in devices list.`)
-          return
-        }
-        if (isCountRuleMatch(rule as CountRule, geographies, device, event)) {
-          if (num_matches < maximum) {
-            matchedVehicles[device.device_id] = { device, rule_applied: rule_id, rules_matched: [rule_id] }
-            delete devicesToCheck[device.device_id]
-            delete overflowedVehicles[device.device_id]
-          } else if (overflowedVehicles[device.device_id]) {
-            // eslint-reason We literally check in the line above that this device entry exists in the overflowedVehicles map
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            overflowedVehicles[device.device_id]!.rules_matched.push(rule_id)
-          } else {
-            overflowedVehicles[device.device_id] = {
-              device,
-              rules_matched: [rule.rule_id]
-            }
+    if (isRuleActive(rule)) {
+      const maximum = isDefined(rule.maximum) ? rule.maximum : Number.POSITIVE_INFINITY
+      const { rule_id } = rule
+      let num_matches = 0
+      events.forEach(event => {
+        if (devicesToCheck[event.device_id]) {
+          const device = devicesToCheck[event.device_id]
+          if (!device) {
+            logger.warn(`Device ${event.device_id} not found in devices list.`)
+            return
           }
-          // Increment whenever there's a match.
-          num_matches += 1
+          if (isCountRuleMatch(rule as CountRule, geographies, device, event)) {
+            if (num_matches < maximum) {
+              matchedVehicles[device.device_id] = { device, rule_applied: rule_id, rules_matched: [rule_id] }
+              delete devicesToCheck[device.device_id]
+              delete overflowedVehicles[device.device_id]
+            } else if (overflowedVehicles[device.device_id]) {
+              // eslint-reason We literally check in the line above that this device entry exists in the overflowedVehicles map
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              overflowedVehicles[device.device_id]!.rules_matched.push(rule_id)
+            } else {
+              overflowedVehicles[device.device_id] = {
+                device,
+                rules_matched: [rule.rule_id]
+              }
+            }
+            // Increment whenever there's a match.
+            num_matches += 1
+          }
         }
+      })
+      const rule_minimum = rule.minimum ?? Number.NEGATIVE_INFINITY
+      if (num_matches < rule_minimum) {
+        countMinimumViolations += rule_minimum - num_matches
       }
-    })
-    const rule_minimum = rule.minimum ?? Number.NEGATIVE_INFINITY
-    if (num_matches < rule_minimum) {
-      countMinimumViolations += rule_minimum - num_matches
     }
   })
 

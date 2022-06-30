@@ -1,5 +1,13 @@
 # @mds-core/mds-collector-service
 
+## 0.4.40
+
+### Patch Changes
+
+- Updated dependencies [ae11d0c0]
+- Updated dependencies [73d219e3]
+  - @mds-core/mds-stream@0.4.5
+
 ## 0.4.39
 
 ### Patch Changes

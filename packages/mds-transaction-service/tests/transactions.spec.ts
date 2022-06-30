@@ -203,18 +203,18 @@ describe('Transaction Service Tests', () => {
           await TransactionServiceClient.createTransactions(transactionsToPersist)
 
           const { transactions: firstPage, cursor: firstCursor } = await TransactionServiceClient.getTransactions({
-            provider_id
+            provider_ids: [provider_id]
           })
           expect(firstPage.length).toEqual(10) // default page size
 
           const { transactions: secondPage, cursor: secondCursor } = await TransactionServiceClient.getTransactions({
-            provider_id,
+            provider_ids: [provider_id],
             after: firstCursor.afterCursor ?? undefined
           })
           expect(secondPage.length).toEqual(10) // default page size
 
           const { transactions: lastPage } = await TransactionServiceClient.getTransactions({
-            provider_id,
+            provider_ids: [provider_id],
             after: secondCursor.afterCursor ?? undefined
           })
           expect(lastPage.length).toEqual(1) // default page size
@@ -405,10 +405,30 @@ describe('Transaction Service Tests', () => {
         })
         it('Get All Transactions with bogus provider search', async () => {
           const { transactions } = await TransactionServiceClient.getTransactions({
-            provider_id: uuid()
+            provider_ids: [uuid()]
           })
           expect(transactions.length).toEqual(0)
         })
+      })
+    })
+
+    describe('Transaction Summary Tests', () => {
+      it('Tests reading transaction summaries', async () => {
+        const provider_id = uuid()
+
+        // Arbitrarily generate 5 events
+        await TransactionServiceClient.createTransactions([
+          ...transactionsGenerator(5, {
+            provider_id,
+            receipt_details: { type: 'custom', custom_description: `color: 'Red'` },
+            amount: 125
+          })
+        ])
+
+        const result = await TransactionServiceClient.getTransactionSummary({ provider_ids: [provider_id] })
+
+        expect(result).toHaveProperty(provider_id)
+        expect(result[provider_id]).toStrictEqual({ amount: 125 * 5, count: 5 })
       })
     })
   })

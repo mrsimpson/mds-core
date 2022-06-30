@@ -1,5 +1,18 @@
 # @mds-core/mds-transaction-service
 
+## 0.8.0
+
+### Minor Changes
+
+- 6121fdcd: [PLAT-537] Add getTransactionSummary function, switch provider_id to a list of provider_ids for getTransactions
+
+### Patch Changes
+
+- Updated dependencies [ae11d0c0]
+- Updated dependencies [73d219e3]
+  - @mds-core/mds-stream@0.4.5
+  - @mds-core/mds-ingest-service@0.13.1
+
 ## 0.7.4
 
 ### Patch Changes

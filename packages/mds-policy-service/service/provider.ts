@@ -103,8 +103,7 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyService
     }),
   writePolicyIntentToPolicy: (context, intent_draft) =>
     serviceErrorWrapper('writePolicyIntentToPolicy', async () => {
-      const { policy_id } = await PolicyRepository.writePolicy(translateIntentToPolicy(intent_draft)
-)
+      const { policy_id } = await PolicyRepository.writePolicy(translateIntentToPolicy(intent_draft))
       await PolicyRepository.writePolicyMetadata({
         policy_id,
         policy_metadata: { intent_type: intent_draft.intent_type }

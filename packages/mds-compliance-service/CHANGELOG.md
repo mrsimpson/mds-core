@@ -1,5 +1,16 @@
 # @mds-core/mds-compliance-service
 
+## 0.10.51
+
+### Patch Changes
+
+- 268feae1: Fix bug when fetching compliance snapshots by time interval where an invalid SQL statement could be created with `IN ()` when provider_ids or policy_ids was a defined, but empty list.
+- Updated dependencies [ae11d0c0]
+- Updated dependencies [73d219e3]
+  - @mds-core/mds-stream@0.4.5
+  - @mds-core/mds-policy-service@0.12.17
+  - @mds-core/mds-db@0.6.36
+
 ## 0.10.50
 
 ### Patch Changes

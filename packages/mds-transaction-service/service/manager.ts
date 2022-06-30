@@ -31,6 +31,7 @@ export const TransactionServiceManager = RpcServer<TransactionService, Transacti
     createTransactions: (args, context) => TransactionServiceProvider.createTransactions(context, ...args),
     getTransaction: (args, context) => TransactionServiceProvider.getTransaction(context, ...args),
     getTransactions: (args, context) => TransactionServiceProvider.getTransactions(context, ...args),
+    getTransactionSummary: (args, context) => TransactionServiceProvider.getTransactionSummary(context, ...args),
     addTransactionOperation: (args, context) => TransactionServiceProvider.addTransactionOperation(context, ...args),
     getTransactionOperations: (args, context) => TransactionServiceProvider.getTransactionOperations(context, ...args),
     setTransactionStatus: (args, context) => TransactionServiceProvider.setTransactionStatus(context, ...args),

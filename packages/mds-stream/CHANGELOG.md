@@ -1,5 +1,12 @@
 # @mds-core/mds-stream
 
+## 0.4.5
+
+### Patch Changes
+
+- ae11d0c0: Bump KafkaJS dependency
+- 73d219e3: Allow KAFKA_HOST to be a list of comma-separated brokers.
+
 ## 0.4.4
 
 ### Patch Changes

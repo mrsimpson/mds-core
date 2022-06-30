@@ -154,7 +154,9 @@ describe('Test Transactions API: Transactions', () => {
 
       expect(getTransactionsMock).toBeCalledWith({
         ...basicOptions,
-        order: undefined
+        provider_ids: [basicOptions.provider_id],
+        order: undefined,
+        provider_id: undefined
       })
 
       expect(result.status).toStrictEqual(200)
@@ -186,7 +188,9 @@ describe('Test Transactions API: Transactions', () => {
 
       expect(getTransactionsMock).toBeCalledWith({
         ...basicOptions,
-        order: undefined
+        provider_ids: [basicOptions.provider_id],
+        order: undefined,
+        provider_id: undefined
       })
 
       expect(result.status).toStrictEqual(200)
@@ -252,7 +256,9 @@ describe('Test Transactions API: Transactions', () => {
         order: {
           column: 'timestamp',
           direction: 'DESC'
-        }
+        },
+        provider_ids: [basicOptions.provider_id],
+        provider_id: undefined
       })
 
       const {
@@ -290,7 +296,7 @@ describe('Test Transactions API: Transactions', () => {
 
       expect(getTransactionsMock).toBeCalledWith({
         ...basicOptions,
-        provider_id: provider_id_scoped, // ensure provider query param is overridden when passed to service
+        provider_ids: [provider_id_scoped], // ensure provider query param is overridden when passed to service
         order: undefined
       })
       expect(result.status).toBe(200)
@@ -322,8 +328,9 @@ describe('Test Transactions API: Transactions', () => {
 
       expect(getTransactionsMock).toBeCalledWith({
         ...basicOptions,
-        provider_id: provider_id_scoped, // ensure provider query param is overridden when passed to service
-        order: undefined
+        provider_ids: [provider_id_scoped], // ensure provider query param is overridden when passed to service
+        order: undefined,
+        provider_id: undefined
       })
       expect(result.status).toBe(200)
     })
