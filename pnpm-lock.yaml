@@ -1426,7 +1426,7 @@ importers:
       '@mds-core/mds-utils': workspace:0.5.4
       envalid: 7.3.1
       flat: 5.0.2
-      kafkajs: 1.16.0
+      kafkajs: 2.1.0
       nats: 2.6.1
     dependencies:
       '@mds-core/mds-api-server': link:../mds-api-server
@@ -1435,7 +1435,7 @@ importers:
       '@mds-core/mds-utils': link:../mds-utils
       envalid: 7.3.1
       flat: 5.0.2
-      kafkajs: 1.16.0
+      kafkajs: 2.1.0
       nats: 2.6.1
 
   packages/mds-stream-processor:
@@ -7728,9 +7728,9 @@ packages:
       safe-buffer: 5.2.1
     dev: false
 
-  /kafkajs/1.16.0:
-    resolution: {integrity: sha512-+Rcfu2hyQ/jv5skqRY8xA7Ra+mmRkDAzCaLDYbkGtgsNKpzxPWiLbk8ub0dgr4EbWrN1Zb4BCXHUkD6+zYfdWg==}
-    engines: {node: '>=10.13.0'}
+  /kafkajs/2.1.0:
+    resolution: {integrity: sha512-6IYiOdGWvFPbSbVB+AV3feT+A7vzw5sXm7Ze4QTfP7FRNdY8pGcpiNPvD2lfgYFD8Dm9KbMgBgTt2mf8KaIkzw==}
+    engines: {node: '>=14.0.0'}
     dev: false
 
   /keyv/4.3.2:
