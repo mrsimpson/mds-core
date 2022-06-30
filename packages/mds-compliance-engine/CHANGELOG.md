@@ -1,5 +1,21 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.44
+
+### Patch Changes
+
+- 41d3f26c: Fix count minimum rules that aren't active from triggering violations
+- Updated dependencies [268feae1]
+- Updated dependencies [ae11d0c0]
+- Updated dependencies [73d219e3]
+  - @mds-core/mds-compliance-service@0.10.51
+  - @mds-core/mds-stream@0.4.5
+  - @mds-core/mds-ingest-service@0.13.1
+  - @mds-core/mds-policy-service@0.12.17
+  - @mds-core/mds-db@0.6.36
+  - @mds-core/mds-api-helpers@0.3.10
+  - @mds-core/mds-geography-service@0.10.40
+
 ## 0.8.43
 
 ### Patch Changes
