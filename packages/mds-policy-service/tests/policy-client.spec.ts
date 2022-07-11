@@ -16,7 +16,7 @@ import {
   uuid,
   yesterday
 } from '@mds-core/mds-utils'
-import type { NoParkingIntentDraft, PolicyMetadataDomainModel } from '../@types'
+import type { NoParkingIntentDraft, PermittedVehicleCountIntentDraft, PolicyMetadataDomainModel } from '../@types'
 import { PolicyServiceClient } from '../client'
 import { PolicyRepository } from '../repository'
 import { TWENTY_MINUTES } from '../service/helpers'
@@ -143,6 +143,31 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
       const { start_date, published_date } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
       expect(start_date - (published_date as number)).toBeGreaterThanOrEqual(TWENTY_MINUTES)
+    })
+
+    it('handles publishing a PermittedVehicleCount policy intent', async () => {
+      const draft: PermittedVehicleCountIntentDraft = {
+        intent_type: 'permitted_vehicle_count',
+        rule_fields: {
+          geographies: [TEST_GEOGRAPHY_UUID1],
+          days: ['mon'],
+          start_time: '09:00:00',
+          end_time: '10:00:00',
+          maximum: 10,
+          minimum: 5
+        },
+        policy_fields: {
+          name: 'aname',
+          description: 'aname',
+          provider_ids: [TEST_PROVIDER_ID1],
+          start_date: now(),
+          end_date: null
+        }
+      }
+
+      const { rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+      expect(rules[0]?.maximum).toEqual(10)
+      expect(rules[0]?.minimum).toEqual(5)
     })
 
     it('can CRUD a SimplePolicy', async () => {
