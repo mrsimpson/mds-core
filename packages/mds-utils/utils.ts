@@ -582,6 +582,11 @@ const asArrayOfAtLeastOne = <T>(value: SingleOrArray<T>): [T, ...T[]] => {
   return [value]
 }
 
+/**
+ * Typeguard for checking if a value is a one-dimensional array.
+ */
+const isOneDimensionalArray = <T>(value: T[] | T[][]): value is T[] => Array.isArray(value) && !Array.isArray(value[0])
+
 const pluralize = (count: number, singular: string, plural: string) => (count === 1 ? singular : plural)
 
 /**
@@ -618,6 +623,25 @@ const zip = <T, U, R>(arr1: T[], arr2: U[], mapper: (x: T, y: U) => R) => {
 
 const hasAtLeastOneEntry = <T>(input: T[]): input is [T, ...T[]] => input.length >= 1
 
+const asChunks = <TItem>(items: TItem[], size = 1000) => {
+  const chunks =
+    items.length > size
+      ? items.reduce<Array<Array<TItem>>>((reduced, t, index) => {
+          const chunk = Math.floor(index / size)
+          if (!reduced[chunk]) {
+            reduced.push([])
+          }
+          ;(reduced[chunk] as Array<TItem>).push(t)
+          return reduced
+        }, [])
+      : [items]
+
+  if (chunks.length > 1) {
+    UtilsLogger.info(`Splitting ${items.length} items into ${chunks.length} chunks for processing`)
+  }
+  return chunks
+}
+
 export {
   RULE_UNIT_MAP,
   START_NOW,
@@ -630,6 +654,7 @@ export {
   addDistanceBearing,
   areThereCommonElements,
   asArray,
+  asChunks,
   capitalizeFirst,
   clone,
   csv,
@@ -647,6 +672,7 @@ export {
   isPct,
   isStringArray,
   isSubset,
+  isOneDimensionalArray,
   isTimestamp,
   isUUID,
   makePointInShape,

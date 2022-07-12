@@ -18,6 +18,7 @@
     "process": "pnpm watch",
     "start": "pnpm watch",
     "test": "pnpm _test",
+    "test_process": "pnpm ts-node tests/test-processor.ts",
     "ts-node": "node --experimental-repl-await -r ts-node/register -r ../../dotenv-flow.js",
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
