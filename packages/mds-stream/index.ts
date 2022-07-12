@@ -20,6 +20,7 @@ import { NatsStreamConsumer } from './nats/stream-consumer'
 import { NatsStreamProducer } from './nats/stream-producer'
 import { mockStream } from './test-utils'
 
+export { KafkaJSError } from 'kafkajs'
 export type { KafkaStreamConsumerOptions, KafkaStreamProducerOptions } from './kafka'
 export type { NatsProcessorFn } from './nats/codecs'
 export type { StreamConsumer, StreamProducer } from './stream-interface'

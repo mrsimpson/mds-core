@@ -1,5 +1,19 @@
 # @mds-core/mds-transaction-service
 
+## 0.8.1
+
+### Patch Changes
+
+- Updated dependencies [e3aad79e]
+- Updated dependencies [e3aad79e]
+  - @mds-core/mds-repository@0.3.0
+  - @mds-core/mds-utils@0.6.0
+  - @mds-core/mds-ingest-service@0.13.2
+  - @mds-core/mds-rpc-common@0.3.26
+  - @mds-core/mds-schema-validators@0.5.17
+  - @mds-core/mds-service-helpers@0.6.13
+  - @mds-core/mds-stream@0.4.6
+
 ## 0.8.0
 
 ### Minor Changes

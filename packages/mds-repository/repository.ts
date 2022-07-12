@@ -16,7 +16,7 @@
 
 import type { MountedConfigFileReader } from '@mds-core/mds-config-files'
 import { ConfigFileReader } from '@mds-core/mds-config-files'
-import { pluralize, tail, testEnvSafeguard } from '@mds-core/mds-utils'
+import { asChunks, pluralize, tail, testEnvSafeguard } from '@mds-core/mds-utils'
 import { bool, cleanEnv } from 'envalid'
 import type { EntityMetadata, InsertQueryBuilder, Repository } from 'typeorm'
 import { DataSource } from 'typeorm'
@@ -118,24 +118,7 @@ const truncateAllTablesUsingConnection = async (
   await connection.query(`TRUNCATE ${tableNames} RESTART IDENTITY CASCADE`)
 }
 
-const asChunksForInsert = <TEntity>(entities: TEntity[], size = 4_000) => {
-  const chunks =
-    entities.length > size
-      ? entities.reduce<Array<Array<TEntity>>>((reduced, t, index) => {
-          const chunk = Math.floor(index / size)
-          if (!reduced[chunk]) {
-            reduced.push([])
-          }
-          ;(reduced[chunk] as Array<TEntity>).push(t) // this cast is safe because we initialize the index if it doesn't exist yet
-          return reduced
-        }, [])
-      : [entities]
-
-  if (chunks.length > 1) {
-    logger.info(`Splitting ${entities.length} records into ${chunks.length} chunks for insert`)
-  }
-  return chunks
-}
+const asChunksForInsert = <TEntity>(entities: TEntity[], size = 4_000) => asChunks(entities, size)
 
 const onConflictDoUpdate = <T>(insert: InsertQueryBuilder<T>, { metadata }: Repository<T>) => {
   const getColumnNames = (predicate: (column: EntityMetadata['columns'][number]) => boolean) =>

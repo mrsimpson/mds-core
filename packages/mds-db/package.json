@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-db",
-  "version": "0.6.36",
+  "version": "0.6.37",
   "description": "Mobility Data Specification database interface",
   "keywords": [
     "mds",
@@ -18,20 +18,20 @@
     "test": "pnpm _test"
   },
   "dependencies": {
-    "@mds-core/mds-attachment-service": "workspace:0.5.39",
-    "@mds-core/mds-audit-service": "workspace:0.6.15",
-    "@mds-core/mds-geography-service": "workspace:0.10.40",
-    "@mds-core/mds-ingest-service": "workspace:0.13.1",
+    "@mds-core/mds-attachment-service": "workspace:0.5.40",
+    "@mds-core/mds-audit-service": "workspace:0.6.16",
+    "@mds-core/mds-geography-service": "workspace:0.10.41",
+    "@mds-core/mds-ingest-service": "workspace:0.13.2",
     "@mds-core/mds-logger": "workspace:0.5.9",
-    "@mds-core/mds-policy-service": "workspace:0.12.17",
+    "@mds-core/mds-policy-service": "workspace:0.13.0",
     "@mds-core/mds-types": "workspace:0.9.3",
-    "@mds-core/mds-utils": "workspace:0.5.4",
+    "@mds-core/mds-utils": "workspace:0.6.0",
     "@types/pg": "8.6.5",
     "await-lock": "2.2.2",
     "pg": "8.7.3"
   },
   "devDependencies": {
-    "@mds-core/mds-test-data": "workspace:0.4.46"
+    "@mds-core/mds-test-data": "workspace:0.4.47"
   },
   "publishConfig": {
     "main": "dist/index.js"

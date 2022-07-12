@@ -1,5 +1,25 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.45
+
+### Patch Changes
+
+- Updated dependencies [e3aad79e]
+- Updated dependencies [0eb78767]
+- Updated dependencies [e3aad79e]
+  - @mds-core/mds-utils@0.6.0
+  - @mds-core/mds-policy-service@0.13.0
+  - @mds-core/mds-compliance-service@0.10.52
+  - @mds-core/mds-geography-service@0.10.41
+  - @mds-core/mds-ingest-service@0.13.2
+  - @mds-core/mds-provider-service@0.3.4
+  - @mds-core/mds-api-helpers@0.3.11
+  - @mds-core/mds-api-server@0.4.17
+  - @mds-core/mds-db@0.6.37
+  - @mds-core/mds-schema-validators@0.5.17
+  - @mds-core/mds-service-helpers@0.6.13
+  - @mds-core/mds-stream@0.4.6
+
 ## 0.8.44
 
 ### Patch Changes

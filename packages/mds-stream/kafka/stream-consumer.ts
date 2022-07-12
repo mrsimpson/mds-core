@@ -18,7 +18,7 @@ import type { HealthStatus } from '@mds-core/mds-api-server'
 import type { Nullable, SingleOrArray, Timestamp } from '@mds-core/mds-types'
 import { asArray, isDefined, now, seconds } from '@mds-core/mds-utils'
 import { cleanEnv, num } from 'envalid'
-import type { Consumer, EachMessagePayload } from 'kafkajs'
+import type { Consumer, EachBatchPayload, EachMessagePayload } from 'kafkajs'
 import { Kafka } from 'kafkajs'
 import { StreamLogger } from '../logger'
 import type { StreamConsumer } from '../stream-interface'
@@ -101,10 +101,13 @@ const registerLivelinessHandling = (consumer: Consumer, healthStatus: HealthStat
   }, KAFKA_HEARTBEAT_TIMEOUT_MS)
 }
 
+/* KafjaJS will use the `eachMessage` callback to process each message. The `eachBatch` callback will 
+process a batch of messages if `eachMessage` is not provided. */
 const createStreamConsumer = async (
   topics: SingleOrArray<string>,
-  eachMessage: (payload: EachMessagePayload) => Promise<void>,
   healthStatus: HealthStatus,
+  eachMessage?: (payload: EachMessagePayload) => Promise<void>,
+  eachBatch?: (payload: EachBatchPayload) => Promise<void>,
   { clientId = 'client', groupId = 'group', fromBeginning = false }: Partial<KafkaStreamConsumerOptions> = {}
 ) => {
   try {
@@ -128,7 +131,7 @@ const createStreamConsumer = async (
     registerLivelinessHandling(consumer, healthStatus)
     delete healthStatus.components[preConnectComponentId]
 
-    await consumer.run({ eachMessage })
+    await consumer.run({ eachMessage, eachBatch })
     return consumer
   } catch (err) {
     StreamLogger.error('createStreamConsumer error', { err })
@@ -144,8 +147,9 @@ const disconnectConsumer = async (consumer: Nullable<Consumer>) => {
 
 export const KafkaStreamConsumer = (
   topics: SingleOrArray<string>,
-  eachMessage: (payload: EachMessagePayload) => Promise<void>,
   healthStatus: HealthStatus,
+  eachMessage?: (payload: EachMessagePayload) => Promise<void>,
+  eachBatch?: (payload: EachBatchPayload) => Promise<void>,
   options?: Partial<KafkaStreamConsumerOptions>
 ): StreamConsumer => {
   let consumer: Nullable<Consumer> = null
@@ -153,7 +157,7 @@ export const KafkaStreamConsumer = (
   return {
     initialize: async () => {
       if (!consumer) {
-        consumer = await createStreamConsumer(topics, eachMessage, healthStatus, options)
+        consumer = await createStreamConsumer(topics, healthStatus, eachMessage, eachBatch, options)
       }
     },
     shutdown: async () => {
