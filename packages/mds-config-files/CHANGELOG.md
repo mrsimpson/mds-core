@@ -1,5 +1,13 @@
 # @mds-core/mds-config-files
 
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [e3aad79e]
+- Updated dependencies [e3aad79e]
+  - @mds-core/mds-utils@0.6.0
+
 ## 0.1.8
 
 ### Patch Changes

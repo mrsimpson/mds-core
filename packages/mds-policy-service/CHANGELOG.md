@@ -1,5 +1,23 @@
 # @mds-core/mds-policy-service
 
+## 0.13.0
+
+### Minor Changes
+
+- 0eb78767: 'Adding PermittedVehicleCount intent PA-64'
+
+### Patch Changes
+
+- Updated dependencies [e3aad79e]
+- Updated dependencies [e3aad79e]
+  - @mds-core/mds-repository@0.3.0
+  - @mds-core/mds-utils@0.6.0
+  - @mds-core/mds-geography-service@0.10.41
+  - @mds-core/mds-rpc-common@0.3.26
+  - @mds-core/mds-schema-validators@0.5.17
+  - @mds-core/mds-service-helpers@0.6.13
+  - @mds-core/mds-stream@0.4.6
+
 ## 0.12.17
 
 ### Patch Changes

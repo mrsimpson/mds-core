@@ -1,5 +1,18 @@
 # @mds-core/mds-repository
 
+## 0.3.0
+
+### Minor Changes
+
+- e3aad79e: asChunks is part of mds-utils now
+
+### Patch Changes
+
+- Updated dependencies [e3aad79e]
+- Updated dependencies [e3aad79e]
+  - @mds-core/mds-utils@0.6.0
+  - @mds-core/mds-config-files@0.1.9
+
 ## 0.2.8
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # @mds-core/mds-geography-author-api
 
+## 0.4.45
+
+### Patch Changes
+
+- Updated dependencies [e3aad79e]
+- Updated dependencies [e3aad79e]
+  - @mds-core/mds-utils@0.6.0
+  - @mds-core/mds-geography-service@0.10.41
+  - @mds-core/mds-api-helpers@0.3.11
+  - @mds-core/mds-api-server@0.4.17
+  - @mds-core/mds-schema-validators@0.5.17
+  - @mds-core/mds-service-helpers@0.6.13
+
 ## 0.4.44
 
 ### Patch Changes

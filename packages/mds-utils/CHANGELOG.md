@@ -1,5 +1,12 @@
 # @mds-core/mds-utils
 
+## 0.6.0
+
+### Minor Changes
+
+- e3aad79e: asChunks is part of mds-utils now
+- e3aad79e: adds KafkaBatchSource to process batches of messages from Kafka at once, faster
+
 ## 0.5.4
 
 ### Patch Changes

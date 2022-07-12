@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-agency-cache",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Mobility Data Specification cache interface",
   "keywords": [
     "mds",
@@ -19,11 +19,11 @@
     "test": "pnpm _test"
   },
   "dependencies": {
-    "@mds-core/mds-cache": "workspace:0.1.1",
+    "@mds-core/mds-cache": "workspace:0.1.2",
     "@mds-core/mds-logger": "workspace:0.5.9",
-    "@mds-core/mds-schema-validators": "workspace:0.5.16",
+    "@mds-core/mds-schema-validators": "workspace:0.5.17",
     "@mds-core/mds-types": "workspace:0.9.3",
-    "@mds-core/mds-utils": "workspace:0.5.4",
+    "@mds-core/mds-utils": "workspace:0.6.0",
     "@types/flat": "5.0.2",
     "@types/ioredis": "4.28.10",
     "flat": "5.0.2",

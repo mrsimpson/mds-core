@@ -1,5 +1,20 @@
 # @mds-core/mds-stream-processor
 
+## 0.6.0
+
+### Minor Changes
+
+- e3aad79e: adds KafkaBatchSource to process batches of messages from Kafka at once, faster
+
+### Patch Changes
+
+- Updated dependencies [e3aad79e]
+- Updated dependencies [e3aad79e]
+  - @mds-core/mds-utils@0.6.0
+  - @mds-core/mds-api-server@0.4.17
+  - @mds-core/mds-service-helpers@0.6.13
+  - @mds-core/mds-stream@0.4.6
+
 ## 0.5.5
 
 ### Patch Changes

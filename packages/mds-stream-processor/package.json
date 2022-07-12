@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-stream-processor",
-  "version": "0.5.5",
+  "version": "0.6.0",
   "description": "MDS Stream Processor",
   "keywords": [
     "mds"
@@ -23,12 +23,12 @@
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-server": "0.4.16",
+    "@mds-core/mds-api-server": "0.4.17",
     "@mds-core/mds-logger": "workspace:0.5.9",
-    "@mds-core/mds-service-helpers": "workspace:0.6.12",
-    "@mds-core/mds-stream": "workspace:0.4.5",
+    "@mds-core/mds-service-helpers": "workspace:0.6.13",
+    "@mds-core/mds-stream": "workspace:0.4.6",
     "@mds-core/mds-types": "workspace:0.9.3",
-    "@mds-core/mds-utils": "workspace:0.5.4",
+    "@mds-core/mds-utils": "workspace:0.6.0",
     "@types/event-stream": "4.0.0",
     "event-stream": "4.0.1"
   },
