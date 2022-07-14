@@ -16,13 +16,14 @@
 
 import { parseRequest, streamCsvToHttp } from '@mds-core/mds-api-helpers'
 import type { ApiRequestParams, ApiResponse } from '@mds-core/mds-api-server'
+import type { ProviderDomainModel } from '@mds-core/mds-provider-service'
 import { ProviderServiceClient } from '@mds-core/mds-provider-service'
 import type {
   PaginationLinks,
   TransactionDomainModel,
   TransactionSearchParams
 } from '@mds-core/mds-transaction-service'
-import { SORTABLE_COLUMN, SORT_DIRECTION, TransactionServiceClient } from '@mds-core/mds-transaction-service'
+import { FEE_TYPE, SORTABLE_COLUMN, SORT_DIRECTION, TransactionServiceClient } from '@mds-core/mds-transaction-service'
 import type { UUID } from '@mds-core/mds-types'
 import { hasOwnProperty, ValidationError } from '@mds-core/mds-utils'
 import type express from 'express'
@@ -42,6 +43,9 @@ export type TransactionApiGetTransactionsResponse = TransactionApiResponse<{
 }>
 
 export type TransactionApiGetTransactionsAsCsvResponse = ApiResponse<string>
+
+const isFeeType = (value: unknown): value is FEE_TYPE =>
+  typeof value === 'string' && FEE_TYPE.includes(value as FEE_TYPE)
 
 const getOrderOption = (req: TransactionApiGetTransactionsRequest) => {
   const { order_column: column } = parseRequest(req)
@@ -134,6 +138,12 @@ export const GetTransactionsHandler = async (
       after
     } = parseRequest(req).single({ parser: String }).query('provider_id', 'before', 'after')
 
+    const { fee_type } = parseRequest(req)
+      .single({
+        parser: (x: string) => (isFeeType(x) ? x : undefined)
+      })
+      .query('fee_type')
+
     // eslint-reason checkAccess middleware has previously verified that local.claims.provider_id is a UUID
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const provider_id = scopes.includes('transactions:read') ? queried_provider_id : res.locals.claims!.provider_id!
@@ -151,7 +161,8 @@ export const GetTransactionsHandler = async (
       start_timestamp,
       end_timestamp,
       order,
-      limit
+      limit,
+      fee_type
     })
 
     const { version } = res.locals
@@ -191,6 +202,12 @@ export const GetTransactionsAsCsvHandler = async (
 ) => {
   try {
     const { provider_id } = parseRequest(req).single({ parser: String }).query('provider_id')
+    const { fee_type } = parseRequest(req)
+      .single({
+        parser: (x: string) => (isFeeType(x) ? x : undefined)
+      })
+      .query('fee_type')
+
     const order = getOrderOption(req)
     const {
       start_timestamp,
@@ -240,12 +257,20 @@ export const GetTransactionsAsCsvHandler = async (
     ]
 
     const providers = await ProviderServiceClient.getProviders({})
+
+    const providerMap = providers.reduce<Record<UUID, ProviderDomainModel>>((acc, provider) => {
+      acc[provider.provider_id] = provider
+
+      return acc
+    }, {})
+
     const options = {
-      provider_id,
+      provider_ids: provider_id ? [provider_id] : undefined,
       start_timestamp,
       end_timestamp,
       order,
-      limit
+      limit,
+      fee_type
     }
 
     const mapper = ({ transactions, cursor }: { transactions: TransactionDomainModel[]; cursor: Cursor }) => ({
@@ -253,8 +278,8 @@ export const GetTransactionsAsCsvHandler = async (
         ...transaction,
         amount: transaction.amount / 100, // conversion from pennies to dollars or equivalent
         currency_iso: process.env.TRANSACTION_CURRENCY || 'USD', // TODO add support for multiple currencies in mds-transaction-service
-        provider_name: hasOwnProperty(providers, transaction.provider_id)
-          ? providers[transaction.provider_id]
+        provider_name: hasOwnProperty(providerMap, transaction.provider_id)
+          ? providerMap[transaction.provider_id]
           : 'unknown'
       })),
       cursor: { prev: cursor.beforeCursor, next: cursor.afterCursor }
