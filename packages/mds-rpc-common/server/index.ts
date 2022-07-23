@@ -112,6 +112,18 @@ export const RpcServiceManager = (options: Partial<RpcServiceManagerOptions> = {
       let server: Nullable<http.Server> = null
       let repl: Nullable<net.Server> = null
 
+      // Check for route conflicts if managing multiple services
+      if (services.length > 1) {
+        RpcCommonLogger.info(`Checking for RPC Server route conflicts (managing ${services.length} services)`)
+        const routes = new Set<string>()
+        services.forEach(service => {
+          for (const route in service.routes) {
+            if (routes.has(route)) throw new Error(`Multiple definitions detected for route /${route}`)
+            routes.add(route)
+          }
+        })
+      }
+
       return ProcessManager({
         start: async () => {
           if (!server) {
