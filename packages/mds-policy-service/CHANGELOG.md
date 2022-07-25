@@ -1,5 +1,11 @@
 # @mds-core/mds-policy-service
 
+## 0.13.2
+
+### Patch Changes
+
+- e43d6969: Enable propulsion_types and vehicle_types to be configurable in policy intents by users
+
 ## 0.13.1
 
 ### Patch Changes
