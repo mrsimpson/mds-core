@@ -1,5 +1,11 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.27
+
+### Patch Changes
+
+- a810503a: Detect RPC Server route conflicts when managing multiple services
+
 ## 0.3.26
 
 ### Patch Changes

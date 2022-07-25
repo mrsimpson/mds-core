@@ -1,5 +1,12 @@
 # @mds-core/mds-audit-service
 
+## 0.6.17
+
+### Patch Changes
+
+- Updated dependencies [a810503a]
+  - @mds-core/mds-rpc-common@0.3.27
+
 ## 0.6.16
 
 ### Patch Changes

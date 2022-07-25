@@ -390,7 +390,9 @@ describe('Test Transactions API: Transactions', () => {
         })
 
       expect(getTransactionsMock).toHaveBeenNthCalledWith(1, {
-        ...basicOptions,
+        start_timestamp: basicOptions.start_timestamp,
+        end_timestamp: basicOptions.end_timestamp,
+        provider_ids: [basicOptions.provider_id],
         limit: 10,
         order: {
           column: 'timestamp',
@@ -398,7 +400,9 @@ describe('Test Transactions API: Transactions', () => {
         }
       })
       expect(getTransactionsMock).toHaveBeenNthCalledWith(2, {
-        ...basicOptions,
+        start_timestamp: basicOptions.start_timestamp,
+        end_timestamp: basicOptions.end_timestamp,
+        provider_ids: [basicOptions.provider_id],
         limit: 10,
         after: 'arbitraryAfterCursor',
         order: {
@@ -457,7 +461,8 @@ describe('Test Transactions API: Transactions', () => {
       const basicOptions = {
         provider_id,
         start_timestamp: Date.now(),
-        end_timestamp: Date.now()
+        end_timestamp: Date.now(),
+        fee_type: 'base_fee'
       }
       const fullOptions = {
         pick_columns: ['provider_id', 'amount', 'fee_type'],
@@ -488,7 +493,10 @@ describe('Test Transactions API: Transactions', () => {
         })
 
       expect(getTransactionsMock).toHaveBeenNthCalledWith(1, {
-        ...basicOptions,
+        start_timestamp: basicOptions.start_timestamp,
+        end_timestamp: basicOptions.end_timestamp,
+        provider_ids: [basicOptions.provider_id],
+        fee_type: basicOptions.fee_type,
         limit: 10,
         order: {
           column: 'timestamp',

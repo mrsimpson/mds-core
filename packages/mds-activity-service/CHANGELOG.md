@@ -1,5 +1,12 @@
 # @mds-core/mds-activity-service
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [a810503a]
+  - @mds-core/mds-rpc-common@0.3.27
+
 ## 0.1.2
 
 ### Patch Changes

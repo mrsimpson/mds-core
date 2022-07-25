@@ -1,5 +1,12 @@
 # @mds-core/mds-jurisdiction-service
 
+## 0.5.40
+
+### Patch Changes
+
+- Updated dependencies [a810503a]
+  - @mds-core/mds-rpc-common@0.3.27
+
 ## 0.5.39
 
 ### Patch Changes

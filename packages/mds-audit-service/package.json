@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-audit-service",
-  "version": "0.6.16",
+  "version": "0.6.17",
   "description": "Mobility Data Specification Audit Service",
   "keywords": [
     "mds"
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@mds-core/mds-repository": "workspace:0.3.0",
-    "@mds-core/mds-rpc-common": "workspace:0.3.26",
+    "@mds-core/mds-rpc-common": "workspace:0.3.27",
     "@mds-core/mds-schema-validators": "workspace:0.5.17",
     "@mds-core/mds-service-helpers": "workspace:0.6.13",
     "@mds-core/mds-types": "workspace:0.9.3",

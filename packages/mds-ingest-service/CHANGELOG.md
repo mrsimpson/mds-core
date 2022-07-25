@@ -1,5 +1,13 @@
 # @mds-core/mds-ingest-service
 
+## 0.13.3
+
+### Patch Changes
+
+- 87c26cde: Fix getEvents queries not paginating correctly when filtered by modalities or accessibility_options
+- Updated dependencies [a810503a]
+  - @mds-core/mds-rpc-common@0.3.27
+
 ## 0.13.2
 
 ### Patch Changes

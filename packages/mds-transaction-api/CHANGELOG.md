@@ -1,5 +1,14 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.56
+
+### Patch Changes
+
+- 43786b58: [PLAT-540] Properly handle provider_id filters in GET Transactions CSV, add support for fee_type filtering.
+  - @mds-core/mds-provider-service@0.3.5
+  - @mds-core/mds-transaction-service@0.8.2
+  - @mds-core/mds-api-helpers@0.3.12
+
 ## 0.2.55
 
 ### Patch Changes

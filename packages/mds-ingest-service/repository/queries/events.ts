@@ -272,6 +272,8 @@ const buildQueryAndCursor = (connection: DataSource, params: WithCursorOptions<G
     device_ids,
     propulsion_types,
     provider_ids,
+    modalities,
+    accessibility_options,
     limit,
     order,
     columns
