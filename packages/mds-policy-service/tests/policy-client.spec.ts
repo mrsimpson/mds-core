@@ -5,7 +5,7 @@ import {
   writePublishedGeography
 } from '@mds-core/mds-geography-service'
 import stream from '@mds-core/mds-stream'
-import type { UUID } from '@mds-core/mds-types'
+import type { DAY_OF_WEEK, UUID } from '@mds-core/mds-types'
 import {
   clone,
   days,
@@ -16,7 +16,12 @@ import {
   uuid,
   yesterday
 } from '@mds-core/mds-utils'
-import type { NoParkingIntentDraft, PermittedVehicleCountIntentDraft, PolicyMetadataDomainModel } from '../@types'
+import type {
+  NoParkingIntentDraft,
+  PermittedVehicleCountIntentDraft,
+  PolicyMetadataDomainModel,
+  TIME_FORMAT
+} from '../@types'
 import { PolicyServiceClient } from '../client'
 import { PolicyRepository } from '../repository'
 import { TWENTY_MINUTES } from '../service/helpers'
@@ -86,7 +91,9 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
           geographies: [TEST_GEOGRAPHY_UUID1],
           days: ['mon'],
           start_time: '09:00:00',
-          end_time: '10:00:00'
+          end_time: '10:00:00',
+          vehicle_types: ['scooter'],
+          propulsion_types: ['combustion']
         },
         policy_fields: {
           name: 'aname',
@@ -112,7 +119,9 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
             geographies: [TEST_GEOGRAPHY_UUID1],
             days: ['mon'],
             start_time: '09:00:00',
-            end_time: '10:00:00'
+            end_time: '10:00:00',
+            vehicle_types: ['scooter'],
+            propulsion_types: ['combustion']
           }
         ]
       })
@@ -121,6 +130,74 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
       const publishedPolicy = await PolicyServiceClient.readPolicy(policy_id, { withStatus: true })
       expect(publishedPolicy.status).toBe('pending')
+    })
+
+    describe('Exercise propulsion_types and vehicle_types', () => {
+      const start_date = now() + hours(1)
+      const end_date = now() + hours(10)
+      const POLICY_FIELDS = {
+        name: 'aname',
+        description: 'aname',
+        provider_ids: [TEST_PROVIDER_ID1],
+        start_date,
+        end_date
+      }
+
+      const RULE_FIELDS: { geographies: UUID[]; days: DAY_OF_WEEK[]; start_time: TIME_FORMAT; end_time: TIME_FORMAT } =
+        {
+          geographies: [TEST_GEOGRAPHY_UUID1],
+          days: ['mon'],
+          start_time: '09:00:00',
+          end_time: '10:00:00'
+        }
+
+      it('sets propulsion_fields and vehicle_types to null if the user so desires', async () => {
+        const draft: NoParkingIntentDraft = {
+          intent_type: 'no_parking',
+          rule_fields: {
+            ...RULE_FIELDS,
+            vehicle_types: null,
+            propulsion_types: null
+          },
+          policy_fields: POLICY_FIELDS
+        }
+
+        const policy = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+        expect(policy.rules[0]?.vehicle_types).toEqual(null)
+        expect(policy.rules[0]?.propulsion_types).toEqual(null)
+      })
+
+      it('sets propulsion_fields and vehicle_types to [] if the properties are undefined', async () => {
+        const draft: NoParkingIntentDraft = {
+          intent_type: 'no_parking',
+          rule_fields: {
+            ...RULE_FIELDS,
+            vehicle_types: undefined,
+            propulsion_types: undefined
+          },
+          policy_fields: POLICY_FIELDS
+        }
+
+        const policy = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+        expect(policy.rules[0]?.vehicle_types).toEqual([])
+        expect(policy.rules[0]?.propulsion_types).toEqual([])
+      })
+
+      it('sets propulsion_fields and vehicle_types to [] if the user so desires', async () => {
+        const draft: NoParkingIntentDraft = {
+          intent_type: 'no_parking',
+          rule_fields: {
+            ...RULE_FIELDS,
+            vehicle_types: [],
+            propulsion_types: []
+          },
+          policy_fields: POLICY_FIELDS
+        }
+
+        const policy = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+        expect(policy.rules[0]?.vehicle_types).toEqual([])
+        expect(policy.rules[0]?.propulsion_types).toEqual([])
+      })
     })
 
     it('adjusts the start_date to fit the spec', async () => {
