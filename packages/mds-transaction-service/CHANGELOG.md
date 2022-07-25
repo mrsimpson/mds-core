@@ -1,5 +1,14 @@
 # @mds-core/mds-transaction-service
 
+## 0.8.2
+
+### Patch Changes
+
+- Updated dependencies [a810503a]
+- Updated dependencies [87c26cde]
+  - @mds-core/mds-rpc-common@0.3.27
+  - @mds-core/mds-ingest-service@0.13.3
+
 ## 0.8.1
 
 ### Patch Changes

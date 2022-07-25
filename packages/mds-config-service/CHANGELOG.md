@@ -1,5 +1,12 @@
 # @mds-core/mds-config-service
 
+## 0.4.17
+
+### Patch Changes
+
+- Updated dependencies [a810503a]
+  - @mds-core/mds-rpc-common@0.3.27
+
 ## 0.4.16
 
 ### Patch Changes

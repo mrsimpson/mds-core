@@ -1,5 +1,13 @@
 # @mds-core/mds-provider-service
 
+## 0.3.5
+
+### Patch Changes
+
+- Updated dependencies [a810503a]
+  - @mds-core/mds-rpc-common@0.3.27
+  - @mds-core/mds-provider-service@0.3.5
+
 ## 0.3.4
 
 ### Patch Changes

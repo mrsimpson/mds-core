@@ -1,5 +1,12 @@
 # @mds-core/mds-jurisdiction-api
 
+## 0.1.92
+
+### Patch Changes
+
+- @mds-core/mds-jurisdiction-service@0.5.40
+- @mds-core/mds-api-helpers@0.3.12
+
 ## 0.1.91
 
 ### Patch Changes
