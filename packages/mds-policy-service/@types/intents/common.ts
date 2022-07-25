@@ -49,7 +49,7 @@ export const COMMON_INTENT_RULE_DEFAULTS: Omit<
   rule_type: 'count',
   rule_units: 'devices',
   value_url: null,
-  vehicle_types: ['scooter', 'moped'],
+  vehicle_types: [],
   propulsion_types: [],
   transaction_types: null,
   service_types: null

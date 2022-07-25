@@ -37,7 +37,7 @@ export type BaseIntentRuleUserFields = NoParkingIntentRuleUserFields | Permitted
 
 export type NoParkingIntentRuleUserFields = Pick<
   BaseRule<PartialMicroMobilityStatesMap>,
-  'geographies' | 'days' | 'start_time' | 'end_time'
+  'geographies' | 'days' | 'start_time' | 'end_time' | 'vehicle_types' | 'propulsion_types'
 >
 export type NoParkingIntentPolicyUserFields = BaseIntentPolicyUserFields
 export type PermittedVehicleCountIntentPolicyUserFields = BaseIntentPolicyUserFields
@@ -50,7 +50,7 @@ export type NoParkingIntentDraft = IntentDraft<
 
 export type PermittedVehicleCountIntentRuleUserFields = Pick<
   BaseRule<PartialMicroMobilityStatesMap>,
-  'minimum' | 'maximum' | 'geographies' | 'days' | 'start_time' | 'end_time'
+  'minimum' | 'maximum' | 'geographies' | 'days' | 'start_time' | 'end_time' | 'vehicle_types' | 'propulsion_types'
 >
 
 export type PermittedVehicleCountIntentDraft = IntentDraft<
