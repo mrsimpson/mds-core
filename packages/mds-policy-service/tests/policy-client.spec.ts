@@ -18,6 +18,7 @@ import {
 } from '@mds-core/mds-utils'
 import type {
   NoParkingIntentDraft,
+  ParkingTimeLimitIntentDraft,
   PermittedVehicleCountIntentDraft,
   PolicyMetadataDomainModel,
   TIME_FORMAT
@@ -80,7 +81,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       })
     })
 
-    it('can translate, create, and publish a draft of a policy intent', async () => {
+    it('can translate, create, and publish a draft of a NoParking policy intent', async () => {
       // Pushing start_date to an hour in the future to ensure we don't have to worry
       // about start_date > publish_date by 20 minutes
       const start_date = now() + hours(1)
@@ -130,6 +131,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
       const publishedPolicy = await PolicyServiceClient.readPolicy(policy_id, { withStatus: true })
       expect(publishedPolicy.status).toBe('pending')
+      expect(publishedPolicy?.rules[0]?.states).toMatchObject({})
     })
 
     describe('Exercise propulsion_types and vehicle_types', () => {
@@ -182,22 +184,6 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
         expect(policy.rules[0]?.vehicle_types).toEqual([])
         expect(policy.rules[0]?.propulsion_types).toEqual([])
       })
-
-      it('sets propulsion_fields and vehicle_types to [] if the user so desires', async () => {
-        const draft: NoParkingIntentDraft = {
-          intent_type: 'no_parking',
-          rule_fields: {
-            ...RULE_FIELDS,
-            vehicle_types: [],
-            propulsion_types: []
-          },
-          policy_fields: POLICY_FIELDS
-        }
-
-        const policy = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
-        expect(policy.rules[0]?.vehicle_types).toEqual([])
-        expect(policy.rules[0]?.propulsion_types).toEqual([])
-      })
     })
 
     it('adjusts the start_date to fit the spec', async () => {
@@ -242,10 +228,82 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
         }
       }
 
-      const { rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+      const { policy_id, rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
       expect(rules[0]?.maximum).toEqual(10)
       expect(rules[0]?.minimum).toEqual(5)
+      expect(rules[0]?.states).toMatchObject({})
+
+      const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
+      expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('permitted_vehicle_count')
     })
+
+    it('handles publishing a ParkingTimeLimit policy intent', async () => {
+      const draft: ParkingTimeLimitIntentDraft = {
+        intent_type: 'parking_time_limit',
+        rule_fields: {
+          geographies: [TEST_GEOGRAPHY_UUID1],
+          days: ['mon'],
+          start_time: '09:00:00',
+          end_time: '10:00:00',
+          maximum: 10
+        },
+        policy_fields: {
+          name: 'aname',
+          description: 'aname',
+          provider_ids: [TEST_PROVIDER_ID1],
+          start_date: now(),
+          end_date: null
+        }
+      }
+
+      const { policy_id, rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+      expect(rules[0]?.maximum).toEqual(10)
+      expect(rules[0]?.minimum).toEqual(0)
+      expect(rules[0]?.rule_units).toEqual('minutes')
+      expect(rules[0]?.states).toMatchObject({ available: [], non_operational: [], reserved: [] })
+
+      const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
+      expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('parking_time_limit')
+    })
+
+    // TODO: Put back in later
+    // it('handles publishing a RequiredParking policy intent', async () => {
+    //   const draft: RequiredParkingIntentDraft = {
+    //     intent_type: 'required_parking',
+    //     rule_fields: [
+    //       {
+    //         geographies: [TEST_GEOGRAPHY_UUID1],
+    //         days: ['mon'],
+    //         start_time: '09:00:00',
+    //         end_time: '10:00:00',
+    //         maximum: 10
+    //       },
+    //       {
+    //         geographies: [TEST_GEOGRAPHY_UUID1],
+    //         days: ['mon'],
+    //         start_time: '09:00:00',
+    //         end_time: '10:00:00',
+    //         maximum: 0
+    //       }
+    //     ],
+    //     policy_fields: {
+    //       name: 'aname',
+    //       description: 'aname',
+    //       provider_ids: [TEST_PROVIDER_ID1],
+    //       start_date: now(),
+    //       end_date: null
+    //     }
+    //   }
+
+    //   const { policy_id, rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+    //   expect(rules[0]?.maximum).toEqual(10)
+    //   expect(rules[0]?.minimum).toEqual(0)
+    //   expect(rules[0]?.rule_units).toEqual('minutes')
+    //   expect(rules[0]?.states).toMatchObject({ available: [], non_operational: [], reserved: [] })
+
+    //   const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
+    //   expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('required_parking')
+    // })
 
     it('can CRUD a SimplePolicy', async () => {
       const simplePolicy = PolicyFactory()
