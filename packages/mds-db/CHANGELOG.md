@@ -1,5 +1,12 @@
 # @mds-core/mds-db
 
+## 0.6.40
+
+### Patch Changes
+
+- Updated dependencies [e711219f]
+  - @mds-core/mds-policy-service@0.13.3
+
 ## 0.6.39
 
 ### Patch Changes

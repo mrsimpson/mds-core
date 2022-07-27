@@ -1,5 +1,11 @@
 # @mds-core/mds-policy-service
 
+## 0.13.3
+
+### Patch Changes
+
+- e711219f: Adding two new policy intents, required parking and parking time limit
+
 ## 0.13.2
 
 ### Patch Changes

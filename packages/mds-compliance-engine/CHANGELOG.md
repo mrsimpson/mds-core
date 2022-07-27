@@ -1,5 +1,15 @@
 # @mds-core/mds-compliance-engine
 
+## 0.8.48
+
+### Patch Changes
+
+- Updated dependencies [e711219f]
+  - @mds-core/mds-policy-service@0.13.3
+  - @mds-core/mds-compliance-service@0.10.55
+  - @mds-core/mds-db@0.6.40
+  - @mds-core/mds-api-helpers@0.3.14
+
 ## 0.8.47
 
 ### Patch Changes

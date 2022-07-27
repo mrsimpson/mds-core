@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-transaction-api",
-  "version": "0.2.57",
+  "version": "0.2.58",
   "description": "MDS Transaction API",
   "license": "Apache-2.0",
   "author": "City of Los Angeles",
@@ -21,7 +21,7 @@
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-api-helpers": "workspace:0.3.13",
+    "@mds-core/mds-api-helpers": "workspace:0.3.14",
     "@mds-core/mds-api-server": "workspace:0.4.17",
     "@mds-core/mds-logger": "workspace:0.5.9",
     "@mds-core/mds-provider-service": "workspace:0.3.5",
