@@ -25,7 +25,7 @@ import type {
 } from '@mds-core/mds-transaction-service'
 import { FEE_TYPE, SORTABLE_COLUMN, SORT_DIRECTION, TransactionServiceClient } from '@mds-core/mds-transaction-service'
 import type { UUID } from '@mds-core/mds-types'
-import { hasOwnProperty, ValidationError } from '@mds-core/mds-utils'
+import { ValidationError } from '@mds-core/mds-utils'
 import type express from 'express'
 import type { Cursor } from 'typeorm-cursor-pagination'
 import type { TransactionApiRequest, TransactionApiResponse } from '../@types'
@@ -278,9 +278,7 @@ export const GetTransactionsAsCsvHandler = async (
         ...transaction,
         amount: transaction.amount / 100, // conversion from pennies to dollars or equivalent
         currency_iso: process.env.TRANSACTION_CURRENCY || 'USD', // TODO add support for multiple currencies in mds-transaction-service
-        provider_name: hasOwnProperty(providerMap, transaction.provider_id)
-          ? providerMap[transaction.provider_id]
-          : 'unknown'
+        provider_name: providerMap[transaction.provider_id]?.provider_name ?? 'unknown'
       })),
       cursor: { prev: cursor.beforeCursor, next: cursor.afterCursor }
     })
