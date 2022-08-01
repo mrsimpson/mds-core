@@ -1,5 +1,13 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.59
+
+### Patch Changes
+
+- e66e6091: Properly include provider name in CSV
+- Updated dependencies [7258c132]
+  - @mds-core/mds-transaction-service@0.9.0
+
 ## 0.2.58
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-transaction-service",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "description": "MDS Transaction Service",
   "keywords": [
     "mds",
