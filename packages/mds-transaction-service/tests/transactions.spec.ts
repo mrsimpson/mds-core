@@ -416,19 +416,25 @@ describe('Transaction Service Tests', () => {
       it('Tests reading transaction summaries', async () => {
         const provider_id = uuid()
 
-        // Arbitrarily generate 5 events
         await TransactionServiceClient.createTransactions([
+          // Generate 5 transactions which have a non-zero amount
           ...transactionsGenerator(5, {
             provider_id,
             receipt_details: { type: 'custom', custom_description: `color: 'Red'` },
             amount: 125
+          }),
+          // Generate 10 transactions which have a zero amount
+          ...transactionsGenerator(10, {
+            provider_id,
+            receipt_details: { type: 'custom', custom_description: `color: 'Red'` },
+            amount: 0
           })
         ])
 
         const result = await TransactionServiceClient.getTransactionSummary({ provider_ids: [provider_id] })
 
         expect(result).toHaveProperty(provider_id)
-        expect(result[provider_id]).toStrictEqual({ amount: 125 * 5, count: 5 })
+        expect(result[provider_id]).toStrictEqual({ amount: 125 * 5, non_zero_amount_count: 5, zero_amount_count: 10 })
       })
     })
   })

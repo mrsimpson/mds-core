@@ -1,5 +1,11 @@
 # @mds-core/mds-transaction-service
 
+## 0.9.0
+
+### Minor Changes
+
+- 7258c132: [PLAT-545] Split TransactionSummary.count into TransactionSummary.non_zero_amount_count and TransactionSummary.zero_amount_count
+
 ## 0.8.2
 
 ### Patch Changes

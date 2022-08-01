@@ -205,7 +205,14 @@ export interface TransactionStatusDomainModel {
 }
 export type TransactionStatusDomainCreateModel = DomainModelCreate<TransactionStatusDomainModel>
 
-export type TransactionSummary = Record<UUID, { amount: number; count: number }>
+export type TransactionSummary = Record<
+  UUID,
+  {
+    amount: number
+    /* The number of non-zero-amount transactions */ non_zero_amount_count: number
+    /* The number of zero-amount transactions (non-billable, or free)*/ zero_amount_count: number
+  }
+>
 
 export interface TransactionService {
   /**  TODO if auth token has a provider_id, it must match */

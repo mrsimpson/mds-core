@@ -148,7 +148,9 @@ export const TransactionRepository = ReadWriteRepository.Create(
           const queryBuilder = connection
             .getRepository(TransactionEntity)
             .createQueryBuilder(alias)
-            .select('provider_id, SUM(amount) as amount, COUNT(*) as count')
+            .select(
+              'provider_id, SUM(amount) as amount, SUM(CASE WHEN amount != 0 THEN 1 ELSE 0 END) AS non_zero_amount_count, SUM(CASE WHEN amount = 0 THEN 1 ELSE 0 END) as zero_amount_count'
+            )
             .where({ ...resolveTimeBounds({ start_timestamp, end_timestamp }) })
             .andWhere(resolveConditions(alias, { start_amount, end_amount, fee_type, search_text }))
 
@@ -158,14 +160,22 @@ export const TransactionRepository = ReadWriteRepository.Create(
 
           queryBuilder.groupBy('provider_id')
 
-          const queryResult: { provider_id: UUID; amount: number; count: number }[] = await queryBuilder.getRawMany() // FIXME: @neil
+          const queryResult: {
+            provider_id: UUID
+            amount: number
+            non_zero_amount_count: number
+            zero_amount_count: number
+          }[] = await queryBuilder.getRawMany()
 
           // Turn list into a dictionary for lookup
           const queryMap = Object.fromEntries(queryResult.map(({ provider_id, ...rest }) => [provider_id, rest]))
 
           // Set any providers that didn't come back in the DB query to 0/0
           const result = Object.fromEntries<TransactionSummary['provider_id']>(
-            provider_ids?.map(provider_id => [provider_id, queryMap[provider_id] ?? { amount: 0, count: 0 }]) ?? []
+            provider_ids?.map(provider_id => [
+              provider_id,
+              queryMap[provider_id] ?? { amount: 0, non_zero_amount_count: 0, zero_amount_count: 0 }
+            ]) ?? []
           )
 
           return result
