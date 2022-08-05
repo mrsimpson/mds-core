@@ -37,18 +37,21 @@ import {
 } from '../test_data/policies'
 import { createPolicyAndGeographyFactory, PolicyFactory, RulesFactory } from './helpers'
 
+const mockStream = stream.mockStream(PolicyStreamKafka)
 const GeographyServer = GeographyServiceManager.controller()
 const PolicyServer = PolicyServiceManager.controller()
 
 describe('spot check unit test policy functions with SimplePolicy', () => {
   describe('Policy Client Tests', () => {
     beforeAll(async () => {
+      process.env.KAFKA_HOST = 'localhost:7375'
       await GeographyServer.start()
       await PolicyServer.start()
       await PolicyRepository.initialize()
     })
 
     beforeEach(async () => {
+      mockStream.write.mockReset()
       await PolicyRepository.truncateAllTables()
     })
 
@@ -57,6 +60,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       await PolicyRepository.shutdown()
       await GeographyServer.stop()
       await PolicyServer.stop()
+      delete process.env.KAFKA_HOST
     })
 
     it('cannot publish a policy w/ missing geography', async () => {
@@ -81,7 +85,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       })
     })
 
-    it('can translate, create, and publish a draft of a NoParking policy intent', async () => {
+    it('can translate, create, and publish a draft of a NoParking policy intent and publish to Kafka', async () => {
       // Pushing start_date to an hour in the future to ensure we don't have to worry
       // about start_date > publish_date by 20 minutes
       const start_date = now() + hours(1)
@@ -132,6 +136,13 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       const publishedPolicy = await PolicyServiceClient.readPolicy(policy_id, { withStatus: true })
       expect(publishedPolicy.status).toBe('pending')
       expect(publishedPolicy?.rules[0]?.states).toMatchObject({})
+
+      const { status, ...policyWithoutStatus } = publishedPolicy
+      const [[kafkaPolicy]] = mockStream.write.mock.calls
+      expect(kafkaPolicy).toMatchObject(policyWithoutStatus)
+      // Calling this out specially because the published_date has to be passed to Kafka explicitly
+      // in the service provider layer
+      expect(kafkaPolicy?.published_date).toEqual(publishedPolicy.published_date)
     })
 
     describe('Exercise propulsion_types and vehicle_types', () => {
@@ -645,20 +656,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
     })
 
     describe('Tests Kafka publishing', () => {
-      const mockStream = stream.mockStream(PolicyStreamKafka)
-
-      beforeAll(() => {
-        process.env.KAFKA_HOST = 'localhost:7375'
-      })
-
-      afterAll(() => {
-        delete process.env.KAFKA_HOST
-      })
-      beforeEach(() => {
-        mockStream.write.mockReset()
-      })
-
-      it('Verifies that publishing a policy results in a kafka stream write', async () => {
+      it('Verifies that publishing a policy results in a kafka stream write and includes the publish_date', async () => {
         const policy = PolicyFactory()
 
         await createPolicyAndGeographyFactory(PolicyServiceClient, GeographyServiceClient, policy, {
@@ -666,8 +664,11 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
         })
 
         await PolicyServiceClient.publishPolicy(policy.policy_id, policy.start_date)
+        const publishedPolicy = await PolicyServiceClient.readPolicy(policy.policy_id)
 
         expect(mockStream.write).toHaveBeenCalledTimes(1)
+        const kafkaPolicy = mockStream.write.mock.calls[0][0]
+        expect(kafkaPolicy).toMatchObject({ published_date: publishedPolicy.published_date, ...policy })
       })
 
       it('Verifies that a failed kafka publish results in a failed publish', async () => {
