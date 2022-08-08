@@ -38,7 +38,7 @@ export const ActivityMapper = {
   EntityModel: {
     to: {
       DomainModel: ModelMapper<ActivityEntityModel, ActivityDomainModel>((entity, options) => {
-        const { id, recorded, ...domain } = entity
+        const { id, ...domain } = entity
         return domain
       })
     }
