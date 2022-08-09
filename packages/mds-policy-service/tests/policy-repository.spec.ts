@@ -167,6 +167,15 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       expect(rule.name).toStrictEqual(SIMPLE_POLICY_JSON.rules[0]?.name)
     })
 
+    it('can read policies by rule modality', async () => {
+      await PolicyRepository.writePolicy(SIMPLE_POLICY_JSON)
+      const { policies: micromobilityPolicies } = await PolicyRepository.readPolicies({ modalities: ['micromobility'] })
+      expect(micromobilityPolicies.length).toEqual(1)
+
+      const { policies: taxiPolicies } = await PolicyRepository.readPolicies({ modalities: ['taxi'] })
+      expect(taxiPolicies.length).toEqual(0)
+    })
+
     it('ensures rules are unique when writing new policy', async () => {
       await PolicyRepository.writePolicy(POLICY3_JSON)
       await expect(PolicyRepository.writePolicy(POLICY_WITH_DUPE_RULE)).rejects.toThrowError(ConflictError)
