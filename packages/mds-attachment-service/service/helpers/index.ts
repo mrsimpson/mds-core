@@ -35,6 +35,13 @@ const memoryStorage = multer.memoryStorage()
 
 export const multipartFormUpload = multer({ storage: memoryStorage }).single('file')
 
+const getBaseUrl = () => {
+  if (s3Bucket === 'us-east-1') {
+    return `https://${s3Bucket}.s3.amazonaws.com/${s3BucketSubdir}/`
+  }
+  return `https://${s3Bucket}.s3-${s3Region}.amazonaws.com/${s3BucketSubdir}/`
+}
+
 export function attachmentSummary(attachment: Attachment): AttachmentSummary {
   const thumbnailUrl = attachment.thumbnail_filename ? attachment.base_url + attachment.thumbnail_filename : ''
   return {
@@ -97,7 +104,7 @@ export async function writeAttachmentS3(file: Omit<Express.Multer.File, 'stream'
   return {
     attachment_filename: attachmentFilename,
     attachment_id: attachmentId,
-    base_url: `https://${s3Bucket}.s3-${s3Region}.amazonaws.com/${s3BucketSubdir}/`,
+    base_url: getBaseUrl(),
     mimetype: file.mimetype,
     thumbnail_filename: thumbnailFilename,
     thumbnail_mimetype: file.mimetype
