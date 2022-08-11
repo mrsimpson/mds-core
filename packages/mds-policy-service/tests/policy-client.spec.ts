@@ -19,6 +19,7 @@ import {
 import type {
   NoParkingIntentDraft,
   ParkingTimeLimitIntentDraft,
+  PermittedParkingIntentDraft,
   PermittedVehicleCountIntentDraft,
   PolicyMetadataDomainModel,
   TIME_FORMAT
@@ -37,18 +38,21 @@ import {
 } from '../test_data/policies'
 import { createPolicyAndGeographyFactory, PolicyFactory, RulesFactory } from './helpers'
 
+const mockStream = stream.mockStream(PolicyStreamKafka)
 const GeographyServer = GeographyServiceManager.controller()
 const PolicyServer = PolicyServiceManager.controller()
 
 describe('spot check unit test policy functions with SimplePolicy', () => {
   describe('Policy Client Tests', () => {
     beforeAll(async () => {
+      process.env.KAFKA_HOST = 'localhost:7375'
       await GeographyServer.start()
       await PolicyServer.start()
       await PolicyRepository.initialize()
     })
 
     beforeEach(async () => {
+      mockStream.write.mockReset()
       await PolicyRepository.truncateAllTables()
     })
 
@@ -57,6 +61,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       await PolicyRepository.shutdown()
       await GeographyServer.stop()
       await PolicyServer.stop()
+      delete process.env.KAFKA_HOST
     })
 
     it('cannot publish a policy w/ missing geography', async () => {
@@ -81,7 +86,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       })
     })
 
-    it('can translate, create, and publish a draft of a NoParking policy intent', async () => {
+    it('can translate, create, and publish a draft of a NoParking policy intent and publish to Kafka', async () => {
       // Pushing start_date to an hour in the future to ensure we don't have to worry
       // about start_date > publish_date by 20 minutes
       const start_date = now() + hours(1)
@@ -132,6 +137,13 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       const publishedPolicy = await PolicyServiceClient.readPolicy(policy_id, { withStatus: true })
       expect(publishedPolicy.status).toBe('pending')
       expect(publishedPolicy?.rules[0]?.states).toMatchObject({})
+
+      const { status, ...policyWithoutStatus } = publishedPolicy
+      const [[kafkaPolicy]] = mockStream.write.mock.calls
+      expect(kafkaPolicy).toMatchObject(policyWithoutStatus)
+      // Calling this out specially because the published_date has to be passed to Kafka explicitly
+      // in the service provider layer
+      expect(kafkaPolicy?.published_date).toEqual(publishedPolicy.published_date)
     })
 
     describe('Exercise propulsion_types and vehicle_types', () => {
@@ -266,44 +278,43 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('parking_time_limit')
     })
 
-    // TODO: Put back in later
-    // it('handles publishing a RequiredParking policy intent', async () => {
-    //   const draft: RequiredParkingIntentDraft = {
-    //     intent_type: 'required_parking',
-    //     rule_fields: [
-    //       {
-    //         geographies: [TEST_GEOGRAPHY_UUID1],
-    //         days: ['mon'],
-    //         start_time: '09:00:00',
-    //         end_time: '10:00:00',
-    //         maximum: 10
-    //       },
-    //       {
-    //         geographies: [TEST_GEOGRAPHY_UUID1],
-    //         days: ['mon'],
-    //         start_time: '09:00:00',
-    //         end_time: '10:00:00',
-    //         maximum: 0
-    //       }
-    //     ],
-    //     policy_fields: {
-    //       name: 'aname',
-    //       description: 'aname',
-    //       provider_ids: [TEST_PROVIDER_ID1],
-    //       start_date: now(),
-    //       end_date: null
-    //     }
-    //   }
+    it('handles publishing a PermittedParking policy intent', async () => {
+      const draft: PermittedParkingIntentDraft = {
+        intent_type: 'permitted_parking',
+        rule_fields: [
+          {
+            geographies: [TEST_GEOGRAPHY_UUID1],
+            days: ['mon'],
+            start_time: '09:00:00',
+            end_time: '10:00:00',
+            maximum: 10
+          },
+          {
+            geographies: [TEST_GEOGRAPHY_UUID1],
+            days: ['mon'],
+            start_time: '09:00:00',
+            end_time: '10:00:00',
+            maximum: 0
+          }
+        ],
+        policy_fields: {
+          name: 'aname',
+          description: 'aname',
+          provider_ids: [TEST_PROVIDER_ID1],
+          start_date: now(),
+          end_date: null
+        }
+      }
 
-    //   const { policy_id, rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
-    //   expect(rules[0]?.maximum).toEqual(10)
-    //   expect(rules[0]?.minimum).toEqual(0)
-    //   expect(rules[0]?.rule_units).toEqual('minutes')
-    //   expect(rules[0]?.states).toMatchObject({ available: [], non_operational: [], reserved: [] })
+      const { policy_id, rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+      expect(rules[0]?.maximum).toEqual(10)
+      expect(rules[0]?.minimum).toEqual(0)
+      expect(rules[0]?.rule_units).toEqual('minutes')
+      expect(rules[0]?.states).toMatchObject({ available: [], non_operational: [], reserved: [] })
 
-    //   const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
-    //   expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('required_parking')
-    // })
+      const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
+      expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('permitted_parking')
+    })
 
     it('can CRUD a SimplePolicy', async () => {
       const simplePolicy = PolicyFactory()
@@ -514,6 +525,18 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       expect(policies[0]?.rules.map(rule => rule.rule_id).includes(rule_id)).toBeTruthy()
     })
 
+    it('can read Policies by rule modality', async () => {
+      const simplePolicy = PolicyFactory()
+      await PolicyServiceClient.writePolicy(simplePolicy)
+      const { policies: micromobilityPolicies } = await PolicyServiceClient.readPolicies({
+        modalities: ['micromobility']
+      })
+      expect(micromobilityPolicies.length).toEqual(1)
+
+      const { policies: taxiPolicies } = await PolicyServiceClient.readPolicies({ modalities: ['taxi'] })
+      expect(taxiPolicies.length).toEqual(0)
+    })
+
     it('ensures rules are unique when writing new policy', async () => {
       await PolicyServiceClient.writePolicy(POLICY3_JSON)
       await expect(PolicyServiceClient.writePolicy(POLICY_WITH_DUPE_RULE)).rejects.toMatchObject({
@@ -645,20 +668,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
     })
 
     describe('Tests Kafka publishing', () => {
-      const mockStream = stream.mockStream(PolicyStreamKafka)
-
-      beforeAll(() => {
-        process.env.KAFKA_HOST = 'localhost:7375'
-      })
-
-      afterAll(() => {
-        delete process.env.KAFKA_HOST
-      })
-      beforeEach(() => {
-        mockStream.write.mockReset()
-      })
-
-      it('Verifies that publishing a policy results in a kafka stream write', async () => {
+      it('Verifies that publishing a policy results in a kafka stream write and includes the publish_date', async () => {
         const policy = PolicyFactory()
 
         await createPolicyAndGeographyFactory(PolicyServiceClient, GeographyServiceClient, policy, {
@@ -666,8 +676,11 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
         })
 
         await PolicyServiceClient.publishPolicy(policy.policy_id, policy.start_date)
+        const publishedPolicy = await PolicyServiceClient.readPolicy(policy.policy_id)
 
         expect(mockStream.write).toHaveBeenCalledTimes(1)
+        const kafkaPolicy = mockStream.write.mock.calls[0][0]
+        expect(kafkaPolicy).toMatchObject({ published_date: publishedPolicy.published_date, ...policy })
       })
 
       it('Verifies that a failed kafka publish results in a failed publish', async () => {

@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-attachment-service",
-  "version": "0.5.41",
+  "version": "0.5.42",
   "description": "Mobility Data Specification Attachment Service",
   "keywords": [
     "mds"

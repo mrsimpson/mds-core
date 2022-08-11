@@ -440,6 +440,26 @@
       }
     },
     {
+      "name": "Tests: mds-activity-service",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
+        "--runInBand",
+        "--coverage",
+        "false"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}/packages/mds-activity-service",
+      "env": {
+        "DOTENV_FLOW_PATH": "${workspaceFolder}",
+        "npm_package_name": "@mds-core/mds-activity-service",
+        "PATH_PREFIX": "/activity"
+      }
+    },
+    {
       "name": "Tests: mds-agency",
       "type": "node",
       "request": "launch",

@@ -3,7 +3,7 @@ import type { BaseRule, MicroMobilityStatesToEvents, PolicyDomainModel } from '.
 
 export type PartialMicroMobilityStatesMap = Partial<MicroMobilityStatesToEvents>
 
-export const INTENT_TYPES = <const>['no_parking', 'permitted_vehicle_count', 'parking_time_limit']
+export const INTENT_TYPES = <const>['no_parking', 'permitted_vehicle_count', 'parking_time_limit', 'permitted_parking']
 export type INTENT_TYPE = typeof INTENT_TYPES[number]
 
 export const BASE_POLICY_DEFAULTS: Pick<

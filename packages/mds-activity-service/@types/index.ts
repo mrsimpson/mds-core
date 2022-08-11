@@ -17,16 +17,17 @@
 import type { DomainModelCreate } from '@mds-core/mds-repository'
 import type { RpcAuthorizedRequestContext, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { RpcRoute } from '@mds-core/mds-rpc-common'
-import type { Nullable } from '@mds-core/mds-types'
+import type { Nullable, Timestamp } from '@mds-core/mds-types'
 
 export interface ActivityDomainModel {
   category: string
   type: string
   description: string
   details: Nullable<{}>
+  recorded: Timestamp
 }
 
-export type ActivityDomainCreateModel = DomainModelCreate<ActivityDomainModel>
+export type ActivityDomainCreateModel = DomainModelCreate<Omit<ActivityDomainModel, 'recorded'>>
 
 export type GetActivityOptions = Partial<{
   limit: number

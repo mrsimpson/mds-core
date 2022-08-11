@@ -1,5 +1,16 @@
 # @mds-core/mds-db
 
+## 0.6.41
+
+### Patch Changes
+
+- Updated dependencies [79df478d]
+- Updated dependencies [68fd0f77]
+- Updated dependencies [6b18d335]
+- Updated dependencies [bf8c7aa5]
+  - @mds-core/mds-policy-service@0.14.0
+  - @mds-core/mds-attachment-service@0.5.42
+
 ## 0.6.40
 
 ### Patch Changes

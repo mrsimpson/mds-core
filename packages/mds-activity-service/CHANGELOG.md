@@ -1,5 +1,11 @@
 # @mds-core/mds-activity-service
 
+## 0.1.4
+
+### Patch Changes
+
+- b79cce32: Add recorded timestamp to getActivity results
+
 ## 0.1.3
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @mds-core/mds-policy-service
 
+## 0.14.0
+
+### Minor Changes
+
+- bf8c7aa5: Add `modalities` filter option to readPolicies
+
+### Patch Changes
+
+- 79df478d: Adding PermittedParking policy intent
+- 68fd0f77: Push policy to kafka when intents are published
+
 ## 0.13.3
 
 ### Patch Changes

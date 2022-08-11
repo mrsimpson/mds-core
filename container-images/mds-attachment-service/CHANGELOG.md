@@ -1,5 +1,12 @@
 # @container-images/mds-attachment-service
 
+## 0.2.16
+
+### Patch Changes
+
+- Updated dependencies [6b18d335]
+  - @mds-core/mds-attachment-service@0.5.42
+
 ## 0.2.15
 
 ### Patch Changes

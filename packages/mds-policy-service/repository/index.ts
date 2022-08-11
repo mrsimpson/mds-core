@@ -55,6 +55,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
       geography_ids,
       statuses = [],
       active_on,
+      modalities,
       limit,
       beforeCursor,
       afterCursor,
@@ -143,6 +144,19 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
 
       if (active_on) {
         query.andWhere('(:stop >= start_date AND (end_date IS NULL OR end_date >= :start))', active_on)
+      }
+
+      if (modalities) {
+        query.andWhere(
+          "EXISTS(SELECT FROM json_array_elements(policy_json->'rules') elem WHERE elem->>'modality' = ANY(:modalities))",
+          { modalities }
+        )
+        if (modalities.includes('micromobility')) {
+          // Policies without rules or with any rule whose modality == null are micromobility by default
+          query.orWhere(
+            "(EXISTS(SELECT FROM json_array_elements(policy_json->'rules') elem WHERE elem->>'modality' IS NULL)) OR (policy_json->'rules' IS NULL) OR (JSON_ARRAY_LENGTH(policy_json->'rules') = 0)"
+          )
+        }
       }
 
       if (start_date) {

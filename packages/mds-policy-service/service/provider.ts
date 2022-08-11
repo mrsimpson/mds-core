@@ -17,7 +17,7 @@
 import { GeographyServiceClient } from '@mds-core/mds-geography-service'
 import type { ProcessController, ServiceProvider } from '@mds-core/mds-service-helpers'
 import { ServiceException, ServiceResult } from '@mds-core/mds-service-helpers'
-import { BadParamsError, DependencyMissingError } from '@mds-core/mds-utils'
+import { BadParamsError, DependencyMissingError, now } from '@mds-core/mds-utils'
 import type { PolicyService, PolicyServiceRequestContext } from '../@types'
 import { PolicyServiceLogger } from '../logger'
 import { PolicyRepository } from '../repository'
@@ -103,11 +103,14 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyService
     }),
   writePolicyIntentToPolicy: (context, intent_draft) =>
     serviceErrorWrapper('writePolicyIntentToPolicy', async () => {
+      // TODO insert ajv validation here
       const { policy_id } = await PolicyRepository.writePolicy(translateIntentToPolicy(intent_draft))
       await PolicyRepository.writePolicyMetadata({
         policy_id,
         policy_metadata: { intent_type: intent_draft.intent_type }
       })
-      return PolicyRepository.publishPolicy(policy_id)
+      return PolicyRepository.publishPolicy(policy_id, now(), {
+        beforeCommit: process.env.KAFKA_HOST ? async policy => PolicyStreamKafka.write(policy) : undefined
+      })
     })
 }

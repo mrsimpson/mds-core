@@ -1,5 +1,11 @@
 # @mds-core/mds-api-helpers
 
+## 0.3.15
+
+### Patch Changes
+
+- @mds-core/mds-db@0.6.41
+
 ## 0.3.14
 
 ### Patch Changes

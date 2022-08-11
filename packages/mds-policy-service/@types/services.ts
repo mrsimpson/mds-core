@@ -16,7 +16,7 @@
 
 import type { RpcEmptyRequestContext, RpcServiceDefinition } from '@mds-core/mds-rpc-common'
 import { RpcRoute } from '@mds-core/mds-rpc-common'
-import type { Nullable, TimeRange, Timestamp, UUID } from '@mds-core/mds-types'
+import type { MODALITY, Nullable, TimeRange, Timestamp, UUID } from '@mds-core/mds-types'
 import type { IntentDraft, INTENT_TYPE } from './intents'
 import type { PolicyDomainCreateModel, PolicyDomainModel, PolicyMetadataDomainModel, POLICY_STATUS } from './models'
 
@@ -43,6 +43,7 @@ export interface ReadPolicyQueryParams {
   statuses?: FILTER_POLICY_STATUS[]
   geography_ids?: Nullable<UUID[]>
   active_on?: TimeRange
+  modalities?: Nullable<MODALITY[]>
   limit?: number
   sort?: SortPolicyColumn
   direction?: SortPolicyDirection
