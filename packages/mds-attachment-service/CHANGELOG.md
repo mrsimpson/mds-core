@@ -1,5 +1,11 @@
 # @mds-core/mds-attachment-service
 
+## 0.5.42
+
+### Patch Changes
+
+- 6b18d335: Handle attachments in us-east-1 for MDC
+
 ## 0.5.41
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @container-images/mds-activity-service
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [b79cce32]
+  - @mds-core/mds-activity-service@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes
