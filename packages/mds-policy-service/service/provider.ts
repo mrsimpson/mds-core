@@ -103,6 +103,7 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyService
     }),
   writePolicyIntentToPolicy: (context, intent_draft) =>
     serviceErrorWrapper('writePolicyIntentToPolicy', async () => {
+      // TODO insert ajv validation here
       const { policy_id } = await PolicyRepository.writePolicy(translateIntentToPolicy(intent_draft))
       await PolicyRepository.writePolicyMetadata({
         policy_id,

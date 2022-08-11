@@ -34,12 +34,12 @@ export const PARKING_TIME_LIMIT_INTENT_RULE_CONSTANTS: IntentRuleDefaults = {
   states: { available: [], non_operational: [], reserved: [] }
 }
 
-export const REQUIRED_PARKING_INTENT_RULE_CONSTANTS: IntentRuleDefaults = {
+export const PERMITTED_PARKING_INTENT_RULE_CONSTANTS: IntentRuleDefaults = {
   ...COMMON_INTENT_RULE_DEFAULTS,
   modality: 'micromobility',
   maximum: 0,
   minimum: 0,
-  name: 'Required Parking',
+  name: 'Permitted Parking',
   rule_units: 'minutes',
   states: { available: [], non_operational: [], reserved: [] }
 }
@@ -47,7 +47,8 @@ export const REQUIRED_PARKING_INTENT_RULE_CONSTANTS: IntentRuleDefaults = {
 export const INTENT_RULE_CONSTANTS: { [K in INTENT_TYPE]: IntentRuleDefaults } = {
   no_parking: NO_PARKING_INTENT_RULE_CONSTANTS,
   permitted_vehicle_count: PERMITTED_VEHICLE_COUNT_INTENT_RULE_CONSTANTS,
-  parking_time_limit: PARKING_TIME_LIMIT_INTENT_RULE_CONSTANTS
+  parking_time_limit: PARKING_TIME_LIMIT_INTENT_RULE_CONSTANTS,
+  permitted_parking: PERMITTED_PARKING_INTENT_RULE_CONSTANTS
 }
 
 export type IntentDraft<I extends INTENT_TYPE> = {
@@ -59,13 +60,16 @@ export type IntentDraft<I extends INTENT_TYPE> = {
     ? PermittedVehicleCountIntentRuleUserFields
     : I extends 'parking_time_limit'
     ? ParkingTimeLimitIntentRuleUserFields
+    : I extends 'permitted_parking'
+    ? PermittedParkingIntentRuleUserFields
     : never
 }
 
-export type BaseIntentRuleUserFields =
+export type IntentRuleUserFields =
   | NoParkingIntentRuleUserFields
   | PermittedVehicleCountIntentRuleUserFields
   | ParkingTimeLimitIntentRuleUserFields
+  | PermittedParkingIntentRuleUserFields
 
 export type NoParkingIntentPolicyUserFields = BaseIntentPolicyUserFields
 
@@ -94,16 +98,14 @@ export type ParkingTimeLimitIntentRuleUserFields = Pick<
 
 export type ParkingTimeLimitIntentDraft = IntentDraft<'parking_time_limit'>
 
-export type RequiredParkingIntentPolicyUserFields = BaseIntentPolicyUserFields
+export type PermittedParkingIntentPolicyUserFields = BaseIntentPolicyUserFields
 
-export type RequiredParkingIntentRuleUserFieldsBase = Pick<
+export type PermittedParkingIntentRuleUserFieldsBase = Pick<
   BaseRule<PartialMicroMobilityStatesMap>,
   'maximum' | 'geographies' | 'days' | 'start_time' | 'end_time' | 'vehicle_types' | 'propulsion_types'
 >
 
-export type RequiredParkingIntentRuleUserFields = [
-  RequiredParkingIntentRuleUserFieldsBase,
-  RequiredParkingIntentRuleUserFieldsBase & { maximum: 0 }
-]
+export type PermittedParkingIntentRuleUserFields = Array<PermittedParkingIntentRuleUserFieldsBase>
+export type PermittedParkingIntentDraft = IntentDraft<'permitted_parking'>
 
 export * from './common'
