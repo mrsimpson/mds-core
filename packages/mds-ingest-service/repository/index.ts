@@ -27,7 +27,6 @@ import type {
   EventAnnotationDomainModel,
   EventDomainCreateModel,
   EventDomainModel,
-  GetAnonymizedTelemetryOptions,
   GetDeviceOptions,
   GetDevicesOptions,
   GetDevicesResponse,
@@ -35,11 +34,9 @@ import type {
   GetEventsWithDeviceAndTelemetryInfoResponse,
   GetPartialVehicleEventsResponse,
   GetVehicleEventsFilterParams,
-  H3Bin,
   NoColumns,
   ReadDeviceEventsQueryParams,
   ReadTripEventsQueryParams,
-  TelemetryAnnotationDomainCreateModel,
   TelemetryDomainCreateModel,
   TelemetryDomainModel,
   WithColumns,
@@ -49,7 +46,6 @@ import entities from './entities'
 import { DeviceEntity } from './entities/device-entity'
 import { EventAnnotationEntity } from './entities/event-annotation-entity'
 import { EventEntity } from './entities/event-entity'
-import { TelemetryAnnotationEntity } from './entities/telemetry-annotation-entity'
 import { TelemetryEntity } from './entities/telemetry-entity'
 import {
   DeviceDomainToEntityCreate,
@@ -61,10 +57,6 @@ import {
   TelemetryDomainToEntityCreate,
   TelemetryEntityToDomain
 } from './mappers'
-import {
-  TelemetryAnnotationDomainToEntityCreate,
-  TelemetryAnnotationEntityToDomain
-} from './mappers/telemetry-annotation-mappers'
 import migrations from './migrations'
 import { getEvents, getEventsWithDeviceAndTelemetryInfo, getPartialEvents } from './queries/events'
 import { buildCursor, parseCursor } from './queries/helpers'
@@ -165,46 +157,6 @@ export const IngestRepository = ReadWriteRepository.Create(
         try {
           const entities = await createTelemetriesEntityReturning(telemetries)
           return entities.map(TelemetryEntityToDomain.mapper())
-        } catch (error) {
-          throw RepositoryError(error)
-        }
-      },
-
-      createTelemetryAnnotations: async (telemetryAnnotations: TelemetryAnnotationDomainCreateModel[]) => {
-        try {
-          const connection = await repository.connect('rw')
-          const { raw: entities }: InsertReturning<TelemetryAnnotationEntity> = await connection
-            .getRepository(TelemetryAnnotationEntity)
-            .createQueryBuilder()
-            .insert()
-            .values(telemetryAnnotations.map(TelemetryAnnotationDomainToEntityCreate.mapper()))
-            .returning('*')
-            .execute()
-
-          return entities.map(TelemetryAnnotationEntityToDomain.mapper())
-        } catch (error) {
-          throw RepositoryError(error)
-        }
-      },
-
-      getAnonymizedTelemetry: async (params: GetAnonymizedTelemetryOptions) => {
-        try {
-          const { start, end, h3_resolution, k } = params
-
-          const connection = await repository.connect('ro')
-          const entities = await connection
-            .createQueryBuilder()
-            .select(['provider_id'])
-            .addSelect(h3_resolution, 'h3_identifier')
-            .addSelect(`COUNT(${h3_resolution})`, 'count')
-            .from('telemetry_annotations', 'annotation')
-            .where('timestamp >= :start', { start })
-            .andWhere('timestamp <= :end', { end })
-            .groupBy(`provider_id, ${h3_resolution}`)
-            .having(`COUNT(${h3_resolution}) >= :k`, { k })
-            .execute()
-
-          return entities as H3Bin[]
         } catch (error) {
           throw RepositoryError(error)
         }

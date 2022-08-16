@@ -17,7 +17,6 @@
 import { DeviceEntity } from './device-entity'
 import { EventAnnotationEntity } from './event-annotation-entity'
 import { EventEntity } from './event-entity'
-import { TelemetryAnnotationEntity } from './telemetry-annotation-entity'
 import { TelemetryEntity } from './telemetry-entity'
 
-export default [DeviceEntity, TelemetryEntity, EventEntity, EventAnnotationEntity, TelemetryAnnotationEntity]
+export default [DeviceEntity, TelemetryEntity, EventEntity, EventAnnotationEntity]

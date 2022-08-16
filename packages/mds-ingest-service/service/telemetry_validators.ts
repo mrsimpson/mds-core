@@ -22,14 +22,7 @@ import {
   timestampSchema,
   uuidSchema
 } from '@mds-core/mds-schema-validators'
-import type {
-  GetAnonymizedTelemetryOptions,
-  TelemetryAnnotationDomainCreateModel,
-  TelemetryAnnotationDomainModel,
-  TelemetryDomainCreateModel,
-  TelemetryDomainModel
-} from '../@types'
-import { H3_RESOLUTIONS, K_HOURLY } from '../@types'
+import type { TelemetryDomainCreateModel, TelemetryDomainModel } from '../@types'
 
 export const telemetryDomainCreateModelSchema: Schema<TelemetryDomainCreateModel> = <const>{
   $id: 'Telemetry',
@@ -60,41 +53,6 @@ export const telemetryDomainCreateModelSchema: Schema<TelemetryDomainCreateModel
   required: ['device_id', 'provider_id', 'timestamp', 'gps']
 }
 
-export const telemetryAnnotationDomainCreateModelSchema: Schema<TelemetryAnnotationDomainCreateModel> = <const>{
-  $id: 'TelemetryAnnotation',
-  type: 'object',
-  properties: {
-    device_id: uuidSchema,
-    provider_id: uuidSchema,
-    timestamp: timestampSchema,
-    h3_08: { type: 'string' },
-    h3_09: { type: 'string' },
-    h3_10: { type: 'string' },
-    h3_11: { type: 'string' },
-    h3_12: { type: 'string' },
-    h3_13: { type: 'string' },
-    telemetry_row_id: { type: 'integer' },
-    geography_ids: { type: 'array', items: uuidSchema }
-  },
-  required: [
-    'device_id',
-    'provider_id',
-    'timestamp',
-    'h3_08',
-    'h3_09',
-    'h3_10',
-    'h3_11',
-    'h3_12',
-    'h3_13',
-    'telemetry_row_id',
-    'geography_ids'
-  ]
-}
-
-export const telemetryAnnotationDomainModelSchema = (): Schema<TelemetryAnnotationDomainModel> => {
-  return telemetryAnnotationDomainCreateModelSchema as Schema<TelemetryAnnotationDomainModel>
-}
-
 export const telemetryDomainModelSchema = (): Schema<TelemetryDomainModel> => {
   const { required, $id, type, properties } = telemetryDomainCreateModelSchema
   const domainSchema = {
@@ -111,25 +69,3 @@ export const { validate: validateTelemetryDomainModel, $schema: TelemetrySchema 
 
 export const { validate: validateTelemetryDomainCreateModel, $schema: TelemetryCreateSchema } =
   SchemaValidator<TelemetryDomainCreateModel>(telemetryDomainCreateModelSchema, { useDefaults: true })
-
-export const { validate: validateTelemetryAnnotationDomainCreateModel, $schema: TelemetryAnnotationCreateSchema } =
-  SchemaValidator<TelemetryAnnotationDomainCreateModel>(telemetryAnnotationDomainCreateModelSchema, {
-    useDefaults: true
-  })
-
-export const { validate: validateTelemetryAnnotationDomainModel, $schema: TelemetryAnnotationSchema } =
-  SchemaValidator<TelemetryAnnotationDomainModel>(telemetryAnnotationDomainModelSchema(), { useDefaults: true })
-
-export const getAnonymizeTelemetryOptionsSchema: Schema<GetAnonymizedTelemetryOptions> = <const>{
-  type: 'object',
-  properties: {
-    k: { type: 'integer', minimum: 2, default: K_HOURLY },
-    h3_resolution: { type: 'string', enum: H3_RESOLUTIONS },
-    start: timestampSchema,
-    end: timestampSchema
-  },
-  required: ['k', 'h3_resolution', 'start', 'end']
-}
-
-export const { validate: validateAnonymizeTelemetryOptions, $schema: GetAnonymizeTelemetryOptionsSchema } =
-  SchemaValidator<GetAnonymizedTelemetryOptions>(getAnonymizeTelemetryOptionsSchema)
