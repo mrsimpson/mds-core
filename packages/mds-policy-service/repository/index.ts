@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { InsertReturning } from '@mds-core/mds-repository'
+import type { DataSource, InsertReturning } from '@mds-core/mds-repository'
 import { ReadWriteRepository, RepositoryError } from '@mds-core/mds-repository'
 import type { Timestamp, UUID } from '@mds-core/mds-types'
 import { ConflictError, hasAtLeastOneEntry, NotFoundError, now } from '@mds-core/mds-utils'
@@ -44,7 +44,8 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
   const readPolicies = async (
     params: ReadPolicyQueryParams = {},
     presentationOptions: PresentationOptions = {},
-    timestamp: Timestamp = now()
+    timestamp: Timestamp = now(),
+    connectionParam?: DataSource
   ) => {
     const {
       policy_ids,
@@ -103,7 +104,7 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
     const ALIAS = 'pe'
 
     try {
-      const connection = await repository.connect('ro')
+      const connection = connectionParam ?? (await repository.connect('ro'))
       const query = connection.getRepository(PolicyEntity).createQueryBuilder(ALIAS)
 
       const pager = (() => {
@@ -249,9 +250,9 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
     }
   }
 
-  const isPolicyPublished = async (policy_id: UUID) => {
+  const isPolicyPublished = async (policy_id: UUID, connectionParam?: DataSource) => {
     try {
-      const connection = await repository.connect('ro')
+      const connection = connectionParam ?? (await repository.connect('ro'))
       const entity = await connection.getRepository(PolicyEntity).findOneOrFail({ where: { policy_id } })
       if (!entity) {
         return false
@@ -416,13 +417,19 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
       try {
         const { beforeCommit = async () => undefined } = options
 
-        if (await isPolicyPublished(policy_id)) {
+        const connection = await repository.connect('rw')
+        if (await isPolicyPublished(policy_id, connection)) {
           throw new ConflictError('Cannot re-publish existing policy')
         }
 
         const {
           policies: [policy]
-        } = await readPolicies({ policy_ids: [policy_id], get_unpublished: true, get_published: null })
+        } = await readPolicies(
+          { policy_ids: [policy_id], get_unpublished: true, get_published: null },
+          undefined,
+          undefined,
+          connection
+        )
 
         if (!policy) {
           throw new NotFoundError('cannot publish nonexistent policy')
@@ -432,30 +439,25 @@ export const PolicyRepository = ReadWriteRepository.Create('policies', { entitie
           throw new ConflictError('Policies cannot be published after their start_date')
         }
 
-        try {
-          const connection = await repository.connect('rw')
-          const publishedPolicy = await connection.transaction(async manager => {
-            const {
-              raw: [updated]
-            } = await manager
-              .getRepository(PolicyEntity)
-              .createQueryBuilder()
-              .update()
-              .set({ published_date })
-              .where('policy_id = :policy_id', { policy_id })
-              .andWhere('published_date IS NULL')
-              .returning('*')
-              .execute()
-            const mappedPolicy = PolicyEntityToDomain.map(updated)
-            await beforeCommit(mappedPolicy)
+        const publishedPolicy = await connection.transaction(async manager => {
+          const {
+            raw: [updated]
+          } = await manager
+            .getRepository(PolicyEntity)
+            .createQueryBuilder()
+            .update()
+            .set({ published_date })
+            .where('policy_id = :policy_id', { policy_id })
+            .andWhere('published_date IS NULL')
+            .returning('*')
+            .execute()
+          const mappedPolicy = PolicyEntityToDomain.map(updated)
+          await beforeCommit(mappedPolicy)
 
-            return mappedPolicy
-          })
+          return mappedPolicy
+        })
 
-          return publishedPolicy
-        } catch (error) {
-          throw RepositoryError(error)
-        }
+        return publishedPolicy
       } catch (error) {
         throw RepositoryError(error)
       }
