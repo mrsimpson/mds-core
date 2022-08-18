@@ -1,5 +1,15 @@
 # @mds-core/mds-rpc-common
 
+## 0.3.28
+
+### Patch Changes
+
+- Updated dependencies [157cc524]
+  - @mds-core/mds-api-server@0.4.18
+  - @mds-core/mds-utils@0.6.1
+  - @mds-core/mds-api-authorizer@0.1.71
+  - @mds-core/mds-service-helpers@0.6.14
+
 ## 0.3.27
 
 ### Patch Changes

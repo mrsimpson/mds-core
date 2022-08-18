@@ -1,5 +1,15 @@
 # @mds-core/mds-api-server
 
+## 0.4.18
+
+### Patch Changes
+
+- 157cc524: Add a new AuthenticationError class
+- Updated dependencies [157cc524]
+  - @mds-core/mds-utils@0.6.1
+  - @mds-core/mds-api-authorizer@0.1.71
+  - @mds-core/mds-service-helpers@0.6.14
+
 ## 0.4.17
 
 ### Patch Changes

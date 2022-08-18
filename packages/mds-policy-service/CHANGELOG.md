@@ -1,5 +1,19 @@
 # @mds-core/mds-policy-service
 
+## 0.14.1
+
+### Patch Changes
+
+- d98196b3: Updating .isPolicyPublished and .readPolicies to take an optional connection parameter and using it in the .publishPolicy code path to avoid a race condition where the DB reader has not received all policies yet, thus causing the publish function to believe the policy that needs publishing does not exist yet'
+- Updated dependencies [157cc524]
+  - @mds-core/mds-utils@0.6.1
+  - @mds-core/mds-rpc-common@0.3.28
+  - @mds-core/mds-stream@0.4.7
+  - @mds-core/mds-geography-service@0.10.43
+  - @mds-core/mds-repository@0.3.1
+  - @mds-core/mds-schema-validators@0.5.18
+  - @mds-core/mds-service-helpers@0.6.14
+
 ## 0.14.0
 
 ### Minor Changes

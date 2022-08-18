@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-config-service",
-  "version": "0.4.17",
+  "version": "0.4.18",
   "description": "Mobility Data Specification configuration service",
   "keywords": [
     "mds",
@@ -23,11 +23,11 @@
     "watch": "pnpm build && nodemon --watch '../../packages' --ext 'ts' --ignore '*.d.ts' --exec pnpm ts-node --"
   },
   "dependencies": {
-    "@mds-core/mds-config-files": "workspace:0.1.9",
+    "@mds-core/mds-config-files": "workspace:0.1.10",
     "@mds-core/mds-logger": "workspace:0.5.9",
-    "@mds-core/mds-rpc-common": "workspace:0.3.27",
-    "@mds-core/mds-service-helpers": "workspace:0.6.13",
-    "@mds-core/mds-utils": "workspace:0.6.0",
+    "@mds-core/mds-rpc-common": "workspace:0.3.28",
+    "@mds-core/mds-service-helpers": "workspace:0.6.14",
+    "@mds-core/mds-utils": "workspace:0.6.1",
     "json5": "2.2.1"
   }
 }

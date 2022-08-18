@@ -1,5 +1,11 @@
 # @mds-core/mds-utils
 
+## 0.6.1
+
+### Patch Changes
+
+- 157cc524: Add a new AuthenticationError class
+
 ## 0.6.0
 
 ### Minor Changes
