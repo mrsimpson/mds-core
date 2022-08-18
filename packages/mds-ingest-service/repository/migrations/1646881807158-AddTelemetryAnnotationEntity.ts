@@ -27,17 +27,17 @@ export class AddTelemetryAnnotationEntity1646881807158 implements MigrationInter
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP INDEX "public"."idx_h3_13_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_h3_12_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_h3_11_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_h3_10_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_h3_09_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_h3_08_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_timestamp_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_provider_id_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_id_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_recorded_telemetry_annotation"`)
-    await queryRunner.query(`DROP INDEX "public"."idx_telemetry_row_id_telemetry_annotation"`)
-    await queryRunner.query(`DROP TABLE "telemetry_annotations"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_h3_13_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_h3_12_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_h3_11_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_h3_10_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_h3_09_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_h3_08_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_timestamp_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_provider_id_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_id_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_recorded_telemetry_annotation"`)
+    await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_telemetry_row_id_telemetry_annotation"`)
+    await queryRunner.query(`DROP TABLE IF EXISTS "telemetry_annotations"`)
   }
 }

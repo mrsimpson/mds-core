@@ -43,6 +43,7 @@ import { DropMigrationIndices1646177244396 } from './1646177244396-DropMigration
 import { AddTelemetryAnnotationEntity1646881807158 } from './1646881807158-AddTelemetryAnnotationEntity'
 import { AddTelemetryAnnotationIndicies1649954300329 } from './1649954300329-AddTelemetryAnnotationIndicies'
 import { AddAccessibilityOptionsColumnToEventAnnotations1652752567678 } from './1652752567678-AddAccessibilityOptionsColumnToEventAnnotations'
+import { DropTelemetryAnnotations1660590738992 } from './1660590738992-DropTelemetryAnnotations'
 
 export default [
   CreateDevicesTable1603212409274,
@@ -73,5 +74,6 @@ export default [
   DropMigrationIndices1646177244396,
   AddTelemetryAnnotationEntity1646881807158,
   AddTelemetryAnnotationIndicies1649954300329,
-  AddAccessibilityOptionsColumnToEventAnnotations1652752567678
+  AddAccessibilityOptionsColumnToEventAnnotations1652752567678,
+  DropTelemetryAnnotations1660590738992
 ]
