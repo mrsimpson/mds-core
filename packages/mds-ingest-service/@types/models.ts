@@ -79,28 +79,6 @@ export type TelemetryDomainCreateModel = DomainModelCreate<Omit<TelemetryDomainM
 export const GROUPING_TYPES = ['latest_per_vehicle', 'latest_per_trip', 'all_events'] as const
 export type GROUPING_TYPE = typeof GROUPING_TYPES[number]
 
-export interface TelemetryAnnotationDomainModel {
-  device_id: UUID
-  provider_id: UUID
-  timestamp: Timestamp
-  h3_08: string
-  h3_09: string
-  h3_10: string
-  h3_11: string
-  h3_12: string
-  h3_13: string
-  telemetry_row_id: number
-  geography_ids: UUID[]
-}
-
-export const H3_RESOLUTIONS = <const>['h3_08', 'h3_09', 'h3_10', 'h3_11', 'h3_12', 'h3_13']
-export type H3_RESOLUTIONS = typeof H3_RESOLUTIONS[number]
-
-export const K_HOURLY = 2
-export const K_DAILY = 2
-export const K_MONTHLY = 1
-
-export type TelemetryAnnotationDomainCreateModel = TelemetryAnnotationDomainModel
 /**
  * Labels which can be used to annotate events.
  */

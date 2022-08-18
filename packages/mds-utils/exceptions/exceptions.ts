@@ -61,6 +61,13 @@ export class ConflictError extends MdsError {
 }
 
 /* istanbul ignore next */
+export class AuthenticationError extends MdsError {
+  public constructor(error?: Error | string, public info?: unknown) {
+    super('AuthenticationError', reason(error), info)
+  }
+}
+
+/* istanbul ignore next */
 export class AuthorizationError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('AuthorizationError', reason(error), info)
@@ -74,6 +81,7 @@ export class RuntimeError extends MdsError {
   }
 }
 
+/* istanbul ignore next */
 export class IndexError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('IndexError', reason(error), info)
@@ -94,36 +102,42 @@ export class BadParamsError extends MdsError {
   }
 }
 
+/* istanbul ignore next */
 export class AlreadyPublishedError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('AlreadyPublishedError', reason(error), info)
   }
 }
 
+/* istanbul ignore next */
 export class UnsupportedTypeError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('UnsupportedTypeError', reason(error), info)
   }
 }
 
+/* istanbul ignore next */
 export class ParseError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('ParseError', reason(error), info)
   }
 }
 
+/* istanbul ignore next */
 export class DependencyMissingError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('DependencyMissingError', reason(error), info)
   }
 }
 
+/* istanbul ignore next */
 export class InsufficientPermissionsError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('InsufficientPermissionsError', reason(error), info)
   }
 }
 
+/* istanbul ignore next */
 export class ClientDisconnectedError extends MdsError {
   public constructor(error?: Error | string, public info?: unknown) {
     super('ClientDisconnectedError', reason(error), info)

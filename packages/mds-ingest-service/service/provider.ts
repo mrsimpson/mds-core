@@ -17,20 +17,18 @@
 import { validateUUIDs } from '@mds-core/mds-schema-validators'
 import type { ProcessController, ServiceProvider } from '@mds-core/mds-service-helpers'
 import { ServiceException, ServiceResult } from '@mds-core/mds-service-helpers'
-import { NotFoundError, now } from '@mds-core/mds-utils'
-import type { GetAnonymizedTelemetryOptions, IngestService, IngestServiceRequestContext } from '../@types'
+import { NotFoundError } from '@mds-core/mds-utils'
+import type { IngestService, IngestServiceRequestContext } from '../@types'
 import { IngestServiceLogger } from '../logger'
 import { IngestRepository } from '../repository'
 import {
-  validateAnonymizeTelemetryOptions,
   validateEventAnnotationDomainCreateModel,
   validateEventDomainCreateModel,
   validateGetDeviceOptions,
   validateGetDevicesOptions,
   validateGetEventsWithDeviceAndTelemetryInfoOptions,
   validateGetVehicleEventsFilterParams,
-  validateNoColumnsGetVehicleEventsFilterParams,
-  validateTelemetryAnnotationDomainCreateModel
+  validateNoColumnsGetVehicleEventsFilterParams
 } from './validators'
 
 export const IngestServiceProvider: ServiceProvider<IngestService, IngestServiceRequestContext> & ProcessController = {
@@ -162,35 +160,6 @@ export const IngestServiceProvider: ServiceProvider<IngestService, IngestService
     } catch (error) {
       const exception = ServiceException('Error in writeEventAnnotations', error)
       IngestServiceLogger.error('writeEventAnnotations exception', { exception, error })
-      return exception
-    }
-  },
-
-  writeTelemetryAnnotations: async (context, telemetryAnnotations) => {
-    try {
-      return ServiceResult(
-        await IngestRepository.createTelemetryAnnotations(
-          telemetryAnnotations.map(validateTelemetryAnnotationDomainCreateModel)
-        )
-      )
-    } catch (error) {
-      const exception = ServiceException('Error in writeTelemetryAnnotation', error)
-      IngestServiceLogger.error('writeTelemetryAnnotation exception', { exception, error })
-      return exception
-    }
-  },
-
-  getAnonymizedTelemetry: async (context, params: GetAnonymizedTelemetryOptions) => {
-    try {
-      const { start, end = now(), h3_resolution, k } = params
-      return ServiceResult(
-        await IngestRepository.getAnonymizedTelemetry(
-          validateAnonymizeTelemetryOptions({ start, end, h3_resolution, k })
-        )
-      )
-    } catch (error) {
-      const exception = ServiceException('Error in getAnonymizedTelemetry', error)
-      IngestServiceLogger.error('getAnonymizedTelemetry exception', { exception, error })
       return exception
     }
   },

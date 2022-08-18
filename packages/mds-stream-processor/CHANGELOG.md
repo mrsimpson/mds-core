@@ -1,5 +1,15 @@
 # @mds-core/mds-stream-processor
 
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [157cc524]
+  - @mds-core/mds-api-server@0.4.18
+  - @mds-core/mds-utils@0.6.1
+  - @mds-core/mds-stream@0.4.7
+  - @mds-core/mds-service-helpers@0.6.14
+
 ## 0.6.0
 
 ### Minor Changes

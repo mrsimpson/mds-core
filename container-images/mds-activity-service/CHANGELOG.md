@@ -1,5 +1,11 @@
 # @container-images/mds-activity-service
 
+## 0.1.5
+
+### Patch Changes
+
+- @mds-core/mds-activity-service@0.1.5
+
 ## 0.1.4
 
 ### Patch Changes

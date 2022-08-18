@@ -38,10 +38,7 @@ import type {
   EventWithDeviceAndTelemetryInfoDomainModel,
   GpsData,
   GROUPING_TYPE,
-  H3_RESOLUTIONS,
   PartialEventDomainModel,
-  TelemetryAnnotationDomainCreateModel,
-  TelemetryAnnotationDomainModel,
   TelemetryDomainModel
 } from './models'
 
@@ -210,16 +207,6 @@ export type GetEventsWithDeviceAndTelemetryInfoResponse = ResponseWithCursor<{
   events: EventWithDeviceAndTelemetryInfoDomainModel[]
 }>
 
-export type GetAnonymizedTelemetryOptions = {
-  k: number
-  h3_resolution: H3_RESOLUTIONS
-} & TimeRange
-
-export interface H3Bin {
-  count: number
-  h3_identifier: string
-  provider_id: UUID
-}
 export interface IngestService {
   getDevicesUsingOptions: (options: GetDevicesOptions) => GetDevicesResponse
   getDevice: (options: GetDeviceOptions) => DeviceDomainModel | undefined
@@ -232,10 +219,6 @@ export interface IngestService {
   getLatestTelemetryForDevices: (device_ids: UUID[]) => TelemetryDomainModel[]
   writeEvents: (event: EventDomainCreateModel[]) => EventDomainModel[]
   writeEventAnnotations: (params: EventAnnotationDomainCreateModel[]) => EventAnnotationDomainModel[]
-  writeTelemetryAnnotations: (
-    telemetryAnnotations: TelemetryAnnotationDomainCreateModel[]
-  ) => TelemetryAnnotationDomainModel[]
-  getAnonymizedTelemetry: (params: GetAnonymizedTelemetryOptions) => H3Bin[]
   /**
    * Gets all trip-related events grouped by trip_id, with an optional time_range.
    * When a time_range is supplied, all trip_ids within that time_range will be considered,
@@ -265,8 +248,6 @@ export const IngestServiceDefinition: RpcServiceDefinition<IngestService> = {
   getLatestTelemetryForDevices: RpcRoute<IngestService['getLatestTelemetryForDevices']>(),
   writeEvents: RpcRoute<IngestService['writeEvents']>(),
   writeEventAnnotations: RpcRoute<IngestService['writeEventAnnotations']>(),
-  writeTelemetryAnnotations: RpcRoute<IngestService['writeTelemetryAnnotations']>(),
-  getAnonymizedTelemetry: RpcRoute<IngestService['getAnonymizedTelemetry']>(),
   getTripEvents: RpcRoute<IngestService['getTripEvents']>(),
   getEventsWithDeviceAndTelemetryInfoUsingOptions:
     RpcRoute<IngestService['getEventsWithDeviceAndTelemetryInfoUsingOptions']>(),

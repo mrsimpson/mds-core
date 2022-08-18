@@ -87,14 +87,19 @@ images() {
 }
 
 templateValues() {
-  suffix="$(getBranchSuffix)-$(getCommitHash)"
+  gitBranch="$(getBranchSuffix)"
+  gitBranchRaw="$(git rev-parse --abbrev-ref HEAD)"
+  gitHash="$(getCommitHash)"
+  tag="$gitBranch-$gitHash"
   for image in $(images); do
     varname="$(echo $image | sed 's/-/_/g' | tr a-z A-Z)_VERSION"
-    export $varname=$suffix
+    export $varname=$tag  # for envsubst below
   done
   mkdir -p dist
   envsubst < $BASE_DIR/values.yaml.tpl > $BASE_DIR/dist/values-mds.yaml
   echo "Wrote dist/values-mds.yaml"
+  echo BRANCH=$gitBranchRaw > "dist/$gitBranch.properties"
+  echo "Wrote dist/$gitBranch.properties"
 }
 
 produceDockerPackageJson() {

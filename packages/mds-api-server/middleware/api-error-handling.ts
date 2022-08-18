@@ -1,6 +1,7 @@
 import { ErrorCheckFunction, isServiceError } from '@mds-core/mds-service-helpers'
 import {
   AlreadyPublishedError,
+  AuthenticationError,
   AuthorizationError,
   BadParamsError,
   ConflictError,
@@ -20,6 +21,7 @@ const isBadParamsError = ErrorCheckFunction(BadParamsError)
 const isNotFoundError = ErrorCheckFunction(NotFoundError)
 const isConflictError = ErrorCheckFunction(ConflictError)
 const isAuthorizationError = ErrorCheckFunction(AuthorizationError)
+const isAuthenticationError = ErrorCheckFunction(AuthenticationError)
 const isDependencyMissingError = ErrorCheckFunction(DependencyMissingError)
 const isInsufficientPermissionsError = ErrorCheckFunction(InsufficientPermissionsError)
 
@@ -47,6 +49,7 @@ export const ApiErrorHandlingMiddleware = (
   if (isInsufficientPermissionsError(error)) return res.status(StatusCodes.FORBIDDEN).send({ error })
   if (isNotFoundError(error)) return res.status(StatusCodes.NOT_FOUND).send({ error })
   if (isConflictError(error)) return res.status(StatusCodes.CONFLICT).send({ error })
+  if (isAuthenticationError(error)) return res.status(StatusCodes.UNAUTHORIZED).send({ error })
   if (isAuthorizationError(error)) return res.status(StatusCodes.FORBIDDEN).send({ error })
   if (isDependencyMissingError(error)) return res.status(StatusCodes.FAILED_DEPENDENCY).send({ error })
   if (isServiceError(error, 'ServiceUnavailable')) return res.status(StatusCodes.SERVICE_UNAVAILABLE).send({ error })

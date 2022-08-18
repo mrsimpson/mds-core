@@ -1,5 +1,12 @@
 # @mds-core/mds-schema-validators
 
+## 0.5.18
+
+### Patch Changes
+
+- Updated dependencies [157cc524]
+  - @mds-core/mds-utils@0.6.1
+
 ## 0.5.17
 
 ### Patch Changes

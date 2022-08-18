@@ -36,7 +36,7 @@ const memoryStorage = multer.memoryStorage()
 export const multipartFormUpload = multer({ storage: memoryStorage }).single('file')
 
 const getBaseUrl = () => {
-  if (s3Bucket === 'us-east-1') {
+  if (s3Region === 'us-east-1') {
     return `https://${s3Bucket}.s3.amazonaws.com/${s3BucketSubdir}/`
   }
   return `https://${s3Bucket}.s3-${s3Region}.amazonaws.com/${s3BucketSubdir}/`
