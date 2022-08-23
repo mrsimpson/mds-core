@@ -1297,6 +1297,7 @@ importers:
       '@mds-core/mds-test-data': workspace:0.4.49
       '@mds-core/mds-types': workspace:0.9.3
       '@mds-core/mds-utils': workspace:0.6.1
+      ajv: 8.11.0
       pg: 8.7.3
       typeorm: 0.3.6
       typeorm-cursor-pagination: 0.6.1
@@ -1310,6 +1311,7 @@ importers:
       '@mds-core/mds-stream': link:../mds-stream
       '@mds-core/mds-types': link:../mds-types
       '@mds-core/mds-utils': link:../mds-utils
+      ajv: 8.11.0
       pg: 8.7.3
       typeorm: 0.3.6_pg@8.7.3+ts-node@10.7.0
       typeorm-cursor-pagination: 0.6.1_typeorm@0.3.6

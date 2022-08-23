@@ -1,0 +1,295 @@
+{
+  "type": "object",
+  "properties": {
+    "policy_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string",
+      "nullable": true,
+      "default": null
+    },
+    "description": {
+      "type": "string"
+    },
+    "provider_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "nullable": true,
+      "default": null
+    },
+    "start_date": {
+      "type": "integer",
+      "minimum": 100000000000,
+      "maximum": 99999999999999
+    },
+    "end_date": {
+      "type": "integer",
+      "minimum": 100000000000,
+      "maximum": 99999999999999,
+      "nullable": true,
+      "default": null
+    },
+    "prev_policies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "nullable": true,
+      "default": null
+    },
+    "published_date": {
+      "type": "integer",
+      "minimum": 100000000000,
+      "maximum": 99999999999999,
+      "nullable": true,
+      "default": null
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "$id": "ParkingTimeLimitRule",
+        "type": "object",
+        "properties": {
+          "accessibility_options": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "wheelchair_accessible"
+              ]
+            },
+            "nullable": true
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "sun",
+                "mon",
+                "tue",
+                "wed",
+                "thu",
+                "fri",
+                "sat"
+              ]
+            },
+            "nullable": true
+          },
+          "end_time": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^\\d{2}:\\d{2}:\\d{2}$"
+          },
+          "geographies": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": false,
+            "minItems": 1
+          },
+          "maximum": {
+            "type": "number",
+            "nullable": true
+          },
+          "messages": {
+            "type": "object",
+            "required": [],
+            "nullable": true,
+            "default": null
+          },
+          "minimum": {
+            "type": "number",
+            "nullable": true
+          },
+          "modality": {
+            "type": "string",
+            "pattern": "micromobility",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "rule_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rule_type": {
+            "type": "string",
+            "pattern": "time"
+          },
+          "rule_units": {
+            "type": "string",
+            "default": "minutes"
+          },
+          "rate_amount": {
+            "type": "number",
+            "nullable": true,
+            "default": null
+          },
+          "rate_recurrence": {
+            "type": "string",
+            "enum": [
+              null,
+              "once",
+              "each_time_unit",
+              "per_complete_time_unit"
+            ],
+            "nullable": true,
+            "default": null
+          },
+          "states": {
+            "type": "object",
+            "properties": {
+              "available": {
+                "type": "array",
+                "maxItems": 0,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "non_operational": {
+                "type": "array",
+                "maxItems": 0,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reserved": {
+                "type": "array",
+                "maxItems": 0,
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "available",
+              "non_operational",
+              "reserved"
+            ]
+          },
+          "start_time": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^\\d{2}:\\d{2}:\\d{2}$"
+          },
+          "value_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "vehicle_types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "car",
+                "bicycle",
+                "scooter",
+                "moped",
+                "other"
+              ]
+            },
+            "nullable": true
+          },
+          "service_types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "standard",
+                "shared",
+                "luxury"
+              ]
+            },
+            "nullable": true,
+            "default": null
+          },
+          "transaction_types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "pick_up",
+                "drop_off"
+              ]
+            },
+            "nullable": true,
+            "default": null
+          },
+          "propulsion_types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "human",
+                "electric",
+                "electric_assist",
+                "hybrid",
+                "combustion"
+              ]
+            },
+            "nullable": true,
+            "default": null
+          }
+        },
+        "required": [
+          "geographies",
+          "name",
+          "rule_id",
+          "rule_type",
+          "rule_units"
+        ]
+      },
+      "maxItems": 1
+    }
+  },
+  "oneOf": [
+    {
+      "if": {
+        "properties": {
+          "rules": {
+            "type": "array",
+            "contains": {
+              "type": "object",
+              "properties": {
+                "rule_type": {
+                  "type": "string",
+                  "const": "rate"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "currency": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "currency"
+        ]
+      }
+    }
+  ],
+  "required": [
+    "policy_id",
+    "name",
+    "description",
+    "start_date",
+    "rules"
+  ]
+}

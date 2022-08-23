@@ -32,6 +32,7 @@
     "@mds-core/mds-stream": "workspace:0.4.7",
     "@mds-core/mds-types": "workspace:0.9.3",
     "@mds-core/mds-utils": "workspace:0.6.1",
+    "ajv": "8.11.0",
     "pg": "8.7.3",
     "typeorm": "0.3.6",
     "typeorm-cursor-pagination": "0.6.1"
