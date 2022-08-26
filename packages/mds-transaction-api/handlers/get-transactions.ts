@@ -149,15 +149,21 @@ export const GetTransactionsHandler = async (
     const provider_id = scopes.includes('transactions:read') ? queried_provider_id : res.locals.claims!.provider_id!
 
     const {
+      start_receipt_timestamp,
+      end_receipt_timestamp,
       start_timestamp,
       end_timestamp,
       limit = 10
-    } = parseRequest(req).single({ parser: Number }).query('start_timestamp', 'end_timestamp', 'limit')
+    } = parseRequest(req)
+      .single({ parser: Number })
+      .query('start_receipt_timestamp', 'end_receipt_timestamp', 'start_timestamp', 'end_timestamp', 'limit')
 
     const { transactions, cursor } = await TransactionServiceClient.getTransactions({
       provider_ids: provider_id ? [provider_id] : undefined,
       before,
       after,
+      start_receipt_timestamp,
+      end_receipt_timestamp,
       start_timestamp,
       end_timestamp,
       order,
@@ -172,6 +178,8 @@ export const GetTransactionsHandler = async (
         ? constructUrls(req, {
             order,
             provider_id,
+            start_receipt_timestamp,
+            end_receipt_timestamp,
             start_timestamp,
             end_timestamp,
             limit,
@@ -182,6 +190,8 @@ export const GetTransactionsHandler = async (
         ? constructUrls(req, {
             order,
             provider_id,
+            start_receipt_timestamp,
+            end_receipt_timestamp,
             start_timestamp,
             end_timestamp,
             limit,
@@ -210,10 +220,14 @@ export const GetTransactionsAsCsvHandler = async (
 
     const order = getOrderOption(req)
     const {
+      start_receipt_timestamp,
+      end_receipt_timestamp,
       start_timestamp,
       end_timestamp,
       limit = 10
-    } = parseRequest(req).single({ parser: Number }).query('start_timestamp', 'end_timestamp', 'limit')
+    } = parseRequest(req)
+      .single({ parser: Number })
+      .query('start_receipt_timestamp', 'end_receipt_timestamp', 'start_timestamp', 'end_timestamp', 'limit')
     const PICKABLE_COLUMNS = <const>[
       'transaction_id',
       'provider_id',
@@ -266,6 +280,8 @@ export const GetTransactionsAsCsvHandler = async (
 
     const options = {
       provider_ids: provider_id ? [provider_id] : undefined,
+      start_receipt_timestamp,
+      end_receipt_timestamp,
       start_timestamp,
       end_timestamp,
       order,

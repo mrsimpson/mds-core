@@ -18,10 +18,12 @@ import { CreateTransactionsTable1607356754555 } from './1607356754555-CreateTran
 import { TransactionsSearchIndicies1615586339528 } from './1615586339528-TransactionsSearchIndicies'
 import { ChangeRecordedColumnDefaultExpression1644682449755 } from './1644682449755-ChangeRecordedColumnDefaultExpression'
 import { AddProviderIdTimestampIndex1656441290628 } from './1656441290628-AddProviderIdTimestampIndex'
+import { OptimizeTimestampIndices1661200976056 } from './1661200976056-OptimizeTimestampIndices'
 
 export default [
   CreateTransactionsTable1607356754555,
   TransactionsSearchIndicies1615586339528,
   ChangeRecordedColumnDefaultExpression1644682449755,
-  AddProviderIdTimestampIndex1656441290628
+  AddProviderIdTimestampIndex1656441290628,
+  OptimizeTimestampIndices1661200976056
 ]

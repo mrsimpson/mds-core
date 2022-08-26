@@ -21,7 +21,8 @@ import { Column, Entity, Index } from 'typeorm'
 import { FEE_TYPE } from '../../@types'
 
 @Entity('transactions')
-@Index(['provider_id', 'timestamp'])
+@Index(['provider_id', 'receipt_timestamp', 'fee_type'])
+@Index(['provider_id', 'timestamp', 'fee_type'])
 export class TransactionEntity extends IdentityColumn(RecordedColumn(class {})) {
   @Column('uuid', { primary: true })
   transaction_id: UUID
@@ -46,6 +47,9 @@ export class TransactionEntity extends IdentityColumn(RecordedColumn(class {})) 
 
   @Column('jsonb')
   receipt: object
+
+  @Column('bigint', { transformer: BigintTransformer })
+  receipt_timestamp: Timestamp
 }
 
 export type TransactionEntityCreateModel = EntityCreateModel<TransactionEntity>
