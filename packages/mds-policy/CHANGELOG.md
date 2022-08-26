@@ -1,5 +1,18 @@
 # @mds-core/mds-policy
 
+## 0.8.25
+
+### Patch Changes
+
+- a7a19a60: Adding validators for policy intents
+- Updated dependencies [a7a19a60]
+- Updated dependencies [a7a19a60]
+- Updated dependencies [1878b5ae]
+  - @mds-core/mds-policy-service@0.14.2
+  - @mds-core/mds-schema-validators@0.5.19
+  - @mds-core/mds-db@0.6.43
+  - @mds-core/mds-api-helpers@0.3.17
+
 ## 0.8.24
 
 ### Patch Changes

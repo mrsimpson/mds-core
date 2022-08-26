@@ -1,6 +1,6 @@
 {
   "name": "@mds-core/mds-schema-validators",
-  "version": "0.5.18",
+  "version": "0.5.19",
   "description": "Mobility Data Specification JSON schema definition and validation",
   "keywords": [
     "mds",

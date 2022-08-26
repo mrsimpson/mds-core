@@ -1,5 +1,13 @@
 # @mds-core/mds-ingest-service
 
+## 0.14.1
+
+### Patch Changes
+
+- 9d2b1652: [HHH-43] Drop Telemetry Annotations table, update previous migrations on that table to be safe for tests.
+- Updated dependencies [1878b5ae]
+  - @mds-core/mds-schema-validators@0.5.19
+
 ## 0.14.0
 
 ### Minor Changes

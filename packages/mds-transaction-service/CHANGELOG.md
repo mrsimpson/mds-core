@@ -1,5 +1,15 @@
 # @mds-core/mds-transaction-service
 
+## 0.9.2
+
+### Patch Changes
+
+- 79bc0561: [PLAT-541] Promote receipt.timestamp to receipt_timestamp column, optimize indices
+- Updated dependencies [1878b5ae]
+- Updated dependencies [9d2b1652]
+  - @mds-core/mds-schema-validators@0.5.19
+  - @mds-core/mds-ingest-service@0.14.1
+
 ## 0.9.1
 
 ### Patch Changes
