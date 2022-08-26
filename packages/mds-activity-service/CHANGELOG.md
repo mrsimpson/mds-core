@@ -1,5 +1,12 @@
 # @mds-core/mds-activity-service
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [1878b5ae]
+  - @mds-core/mds-schema-validators@0.5.19
+
 ## 0.1.5
 
 ### Patch Changes

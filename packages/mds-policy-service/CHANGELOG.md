@@ -1,5 +1,15 @@
 # @mds-core/mds-policy-service
 
+## 0.14.2
+
+### Patch Changes
+
+- a7a19a60: Adding validators for policy intents
+- a7a19a60: PA-139: Adding PermittedParking policy intent
+- Updated dependencies [1878b5ae]
+  - @mds-core/mds-schema-validators@0.5.19
+  - @mds-core/mds-geography-service@0.10.44
+
 ## 0.14.1
 
 ### Patch Changes

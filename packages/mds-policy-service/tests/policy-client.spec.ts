@@ -22,6 +22,7 @@ import type {
   PermittedParkingIntentDraft,
   PermittedVehicleCountIntentDraft,
   PolicyMetadataDomainModel,
+  ProviderRebalancingZoneIntentDraft,
   TIME_FORMAT
 } from '../@types'
 import { PolicyServiceClient } from '../client'
@@ -34,6 +35,7 @@ import {
   POLICY3_JSON,
   POLICY_WITH_DUPE_RULE,
   TEST_GEOGRAPHY_UUID1,
+  TEST_GEOGRAPHY_UUID2,
   TEST_PROVIDER_ID1
 } from '../test_data/policies'
 import { createPolicyAndGeographyFactory, PolicyFactory, RulesFactory } from './helpers'
@@ -109,7 +111,6 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
           end_date
         }
       }
-
       const policy = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
       const { policy_id } = policy
       expect(policy).toMatchObject({
@@ -136,7 +137,12 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
       const publishedPolicy = await PolicyServiceClient.readPolicy(policy_id, { withStatus: true })
       expect(publishedPolicy.status).toBe('pending')
-      expect(publishedPolicy?.rules[0]?.states).toMatchObject({})
+      expect(publishedPolicy?.rules[0]?.states).toEqual({
+        available: [],
+        non_operational: [],
+        reserved: [],
+        unknown: []
+      })
 
       const { status, ...policyWithoutStatus } = publishedPolicy
       const [[kafkaPolicy]] = mockStream.write.mock.calls
@@ -198,6 +204,30 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       })
     })
 
+    it('throws if name is not there', async () => {
+      const draft = {
+        intent_type: 'no_parking',
+        rule_fields: {
+          geographies: [TEST_GEOGRAPHY_UUID1],
+          days: ['mon'],
+          start_time: '09:00:00',
+          end_time: '10:00:00'
+        },
+        policy_fields: {
+          name: null,
+          description: 'aname',
+          provider_ids: [TEST_PROVIDER_ID1],
+          start_date: now(),
+          end_date: null
+        }
+      }
+      await expect(
+        PolicyServiceClient.writePolicyIntentToPolicy(draft as unknown as NoParkingIntentDraft)
+      ).rejects.toMatchObject({
+        type: 'ValidationError'
+      })
+    })
+
     it('adjusts the start_date to fit the spec', async () => {
       const draft: NoParkingIntentDraft = {
         intent_type: 'no_parking',
@@ -243,7 +273,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       const { policy_id, rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
       expect(rules[0]?.maximum).toEqual(10)
       expect(rules[0]?.minimum).toEqual(5)
-      expect(rules[0]?.states).toMatchObject({})
+      expect(rules[0]?.states).toEqual({})
 
       const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
       expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('permitted_vehicle_count')
@@ -257,7 +287,8 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
           days: ['mon'],
           start_time: '09:00:00',
           end_time: '10:00:00',
-          maximum: 10
+          maximum: 10,
+          rule_units: 'hours'
         },
         policy_fields: {
           name: 'aname',
@@ -271,7 +302,7 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
       const { policy_id, rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
       expect(rules[0]?.maximum).toEqual(10)
       expect(rules[0]?.minimum).toEqual(0)
-      expect(rules[0]?.rule_units).toEqual('minutes')
+      expect(rules[0]?.rule_units).toEqual('hours')
       expect(rules[0]?.states).toMatchObject({ available: [], non_operational: [], reserved: [] })
 
       const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
@@ -314,6 +345,111 @@ describe('spot check unit test policy functions with SimplePolicy', () => {
 
       const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
       expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('permitted_parking')
+    })
+
+    it('will not publish a PermittedParking policy intent with more than one geography in a rule', async () => {
+      const draft: PermittedParkingIntentDraft = {
+        intent_type: 'permitted_parking',
+        rule_fields: [
+          {
+            geographies: [TEST_GEOGRAPHY_UUID1, TEST_GEOGRAPHY_UUID2],
+            days: ['mon'],
+            start_time: '09:00:00',
+            end_time: '10:00:00',
+            maximum: 10
+          },
+          {
+            geographies: [TEST_GEOGRAPHY_UUID1],
+            days: ['mon'],
+            start_time: '09:00:00',
+            end_time: '10:00:00',
+            maximum: 0
+          }
+        ],
+        policy_fields: {
+          name: 'aname',
+          description: 'aname',
+          provider_ids: [TEST_PROVIDER_ID1],
+          start_date: now(),
+          end_date: null
+        }
+      }
+
+      await expect(PolicyServiceClient.writePolicyIntentToPolicy(draft)).rejects.toMatchObject({
+        type: 'ValidationError'
+      })
+    })
+
+    it('handles publishing a ProviderRebalancingZone policy intent', async () => {
+      const draft: ProviderRebalancingZoneIntentDraft = {
+        intent_type: 'provider_rebalancing_zone',
+        rule_fields: [
+          {
+            geographies: [TEST_GEOGRAPHY_UUID1],
+            days: ['mon'],
+            start_time: '09:00:00',
+            end_time: '10:00:00',
+            maximum: 10,
+            states: {}
+          },
+          {
+            geographies: [TEST_GEOGRAPHY_UUID1],
+            days: ['mon'],
+            start_time: '09:00:00',
+            end_time: '10:00:00',
+            maximum: 30,
+            states: {}
+          },
+          {
+            geographies: [TEST_GEOGRAPHY_UUID1],
+            days: ['mon'],
+            start_time: '08:00:00',
+            end_time: '12:00:00',
+            maximum: 0,
+            states: {
+              available: ['provider_drop_off'],
+              elsewhere: ['provider_drop_off'],
+              non_operational: ['provider_drop_off'],
+              on_trip: ['provider_drop_off'],
+              removed: ['provider_drop_off'],
+              reserved: ['provider_drop_off'],
+              unknown: ['provider_drop_off']
+            }
+          }
+        ],
+        policy_fields: {
+          name: 'aname',
+          description: 'aname',
+          provider_ids: [TEST_PROVIDER_ID1],
+          start_date: now(),
+          end_date: null
+        }
+      }
+
+      const { policy_id, rules } = await PolicyServiceClient.writePolicyIntentToPolicy(draft)
+      expect(rules[0]?.maximum).toEqual(10)
+      expect(rules[0]?.minimum).toEqual(0)
+      expect(rules[0]?.start_time).toEqual('09:00:00')
+      expect(rules[0]?.end_time).toEqual('10:00:00')
+      expect(rules[1]?.maximum).toEqual(30)
+      expect(rules[1]?.minimum).toEqual(0)
+      expect(rules[0]?.states).toEqual({})
+      expect(rules[2]?.states).toEqual({
+        available: ['provider_drop_off'],
+        elsewhere: ['provider_drop_off'],
+        non_operational: ['provider_drop_off'],
+        on_trip: ['provider_drop_off'],
+        removed: ['provider_drop_off'],
+        reserved: ['provider_drop_off'],
+        unknown: ['provider_drop_off']
+      })
+      expect(rules[2]?.maximum).toEqual(0)
+      expect(rules[2]?.minimum).toEqual(0)
+      expect(rules[2]?.start_time).toEqual('08:00:00')
+      expect(rules[2]?.end_time).toEqual('12:00:00')
+
+      const metadata = await PolicyServiceClient.readSinglePolicyMetadata(policy_id)
+      expect((metadata?.policy_metadata as { intent_type: string })?.intent_type).toEqual('provider_rebalancing_zone')
     })
 
     it('can CRUD a SimplePolicy', async () => {

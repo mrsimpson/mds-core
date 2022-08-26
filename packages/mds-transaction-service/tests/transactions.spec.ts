@@ -244,7 +244,7 @@ describe('Transaction Service Tests', () => {
           expect(lastPage.length).toEqual(1) // last page, so lower than custom page size
         })
 
-        it('Get Bulk Transactions within a time range, with default paging', async () => {
+        it('Get Bulk Transactions within a time range (by timestamp), with default paging', async () => {
           const [start_timestamp, end_timestamp] = [1620100000000, 1620100000300] // Garbage arbitrary timestamps
 
           /**
@@ -283,6 +283,48 @@ describe('Transaction Service Tests', () => {
           secondPage.forEach(({ timestamp }) => {
             expect(timestamp).toBeGreaterThanOrEqual(start_timestamp)
             expect(timestamp).toBeLessThanOrEqual(end_timestamp)
+          })
+        })
+
+        it('Get Bulk Transactions within a time range (by receipt_timestamp), with default paging', async () => {
+          const [start_receipt_timestamp, end_receipt_timestamp] = [1620100000000, 1620100000300] // Garbage arbitrary timestamps
+
+          /**
+           * Will generate transactions with differing receipt_timestamps **WITHIN** our time bounds, like 100_000, 100_001, 100_002, ..., 100_014
+           */
+          const inBoundsTransactions = [...transactionsGenerator(15)].map((transaction, i) => ({
+            ...transaction,
+            receipt: { ...transaction.receipt, timestamp: start_receipt_timestamp + i }
+          }))
+          /**
+           * Will Generate transactions **OUTSIDE** of our time bounds, like 200_001, 200_001, ..., 200_0014
+           */
+          const outOfBoundsTransactions = [...transactionsGenerator(15)].map((transaction, i) => ({
+            ...transaction,
+            receipt: { ...transaction.receipt, timestamp: end_receipt_timestamp + 1 + i }
+          }))
+          const transactionsToPersist = [...inBoundsTransactions, ...outOfBoundsTransactions]
+          await TransactionServiceClient.createTransactions(transactionsToPersist)
+
+          const { transactions: firstPage, cursor: firstCursor } = await TransactionServiceClient.getTransactions({
+            start_receipt_timestamp,
+            end_receipt_timestamp
+          })
+          expect(firstPage.length).toEqual(10) // default page size
+          firstPage.forEach(({ receipt: { timestamp } }) => {
+            expect(timestamp).toBeGreaterThanOrEqual(start_receipt_timestamp)
+            expect(timestamp).toBeLessThanOrEqual(end_receipt_timestamp)
+          })
+
+          const { transactions: secondPage } = await TransactionServiceClient.getTransactions({
+            start_receipt_timestamp,
+            end_receipt_timestamp,
+            after: firstCursor.afterCursor ?? undefined
+          })
+          expect(secondPage.length).toEqual(5)
+          secondPage.forEach(({ receipt: { timestamp } }) => {
+            expect(timestamp).toBeGreaterThanOrEqual(start_receipt_timestamp)
+            expect(timestamp).toBeLessThanOrEqual(end_receipt_timestamp)
           })
         })
 

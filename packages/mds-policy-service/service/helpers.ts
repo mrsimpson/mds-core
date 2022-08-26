@@ -1,12 +1,12 @@
-import { asArray, isDefined, minutes, now, uuid } from '@mds-core/mds-utils'
-import type { PolicyDomainModel } from '../@types'
+import { isDefined, minutes, now, uuid } from '@mds-core/mds-utils'
+import type { PolicyDomainModel, Rule } from '../@types'
 import type { IntentDraft, IntentRuleUserFields, INTENT_TYPE } from '../@types/intents'
 import { BASE_POLICY_DEFAULTS, INTENT_RULE_CONSTANTS } from '../@types/intents'
 
 export const TWENTY_MINUTES = minutes(20)
 const POLICY_START_DATE_FUDGE_FACTOR = 1000
 
-function ruleFieldToRule(intent_type: INTENT_TYPE, ruleField: IntentRuleUserFields) {
+function ruleFieldToRule(intent_type: INTENT_TYPE, ruleField: IntentRuleUserFields): Rule {
   return { rule_id: uuid(), ...INTENT_RULE_CONSTANTS[intent_type], ...ruleField }
 }
 
@@ -26,7 +26,9 @@ export function translateIntentToPolicy<I extends INTENT_TYPE>(draft: IntentDraf
     draft.policy_fields.start_date = now() + TWENTY_MINUTES + POLICY_START_DATE_FUDGE_FACTOR
   }
 
-  const rules = asArray(draft.rule_fields).map(rule_field => ruleFieldToRule(draft.intent_type, rule_field))
+  const rules = Array.isArray(draft.rule_fields)
+    ? draft.rule_fields.map(rule_field => ruleFieldToRule(draft.intent_type, rule_field))
+    : [ruleFieldToRule(draft.intent_type, draft.rule_fields)]
 
   return {
     policy_id: uuid(),

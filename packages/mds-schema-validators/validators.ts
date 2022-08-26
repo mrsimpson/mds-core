@@ -34,7 +34,7 @@ export const HasPropertyAssertion = <T>(obj: unknown, ...props: (keyof T)[]): ob
 
 export type Schema<T> = JSONSchemaType<T>
 
-export type SchemaValidator<T> = {
+export type SchemaValidator<T> = ValidateFunction<T> & {
   validate: (input: unknown) => T
   isValid: (input: unknown) => input is T
   $schema: Schema<T> & { $schema: string }
@@ -68,7 +68,8 @@ export const SchemaValidator = <T>(
     'float',
     'date'
   ]).compile($schema)
-  return {
+
+  return Object.assign(validator, {
     validate: (input: unknown) => {
       if (!validator(input)) {
         const [{ instancePath, message } = { instancePath: 'Data', message: 'is invalid' }] = validator.errors ?? []
@@ -78,5 +79,5 @@ export const SchemaValidator = <T>(
     },
     isValid: (input: unknown): input is T => validator(input),
     $schema
-  }
+  })
 }

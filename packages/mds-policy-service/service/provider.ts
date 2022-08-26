@@ -23,7 +23,18 @@ import { PolicyServiceLogger } from '../logger'
 import { PolicyRepository } from '../repository'
 import { translateIntentToPolicy } from './helpers'
 import { PolicyStreamKafka } from './stream'
-import { validatePolicyDomainModel, validatePolicyMetadataDomainModel, validatePresentationOptions } from './validators'
+import {
+  validateNoParkingPolicyIntent,
+  validateParkingTimeLimitPolicyIntent,
+  validatePermittedParkingPolicyIntent,
+  validatePermittedVehicleCountPolicyIntent,
+  validateProviderRebalancingZonePolicyIntent
+} from './validators'
+import {
+  validatePolicyDomainModel,
+  validatePolicyMetadataDomainModel,
+  validatePresentationOptions
+} from './validators/policy'
 
 const serviceErrorWrapper = async <T>(method: string, exec: () => Promise<T>) => {
   try {
@@ -103,8 +114,34 @@ export const PolicyServiceProvider: ServiceProvider<PolicyService, PolicyService
     }),
   writePolicyIntentToPolicy: (context, intent_draft) =>
     serviceErrorWrapper('writePolicyIntentToPolicy', async () => {
-      // TODO insert ajv validation here
-      const { policy_id } = await PolicyRepository.writePolicy(translateIntentToPolicy(intent_draft))
+      switch (intent_draft.intent_type) {
+        case 'no_parking': {
+          validateNoParkingPolicyIntent(intent_draft)
+          break
+        }
+        case 'permitted_vehicle_count': {
+          validatePermittedVehicleCountPolicyIntent(intent_draft)
+          break
+        }
+        case 'parking_time_limit': {
+          validateParkingTimeLimitPolicyIntent(intent_draft)
+          break
+        }
+        case 'permitted_parking': {
+          validatePermittedParkingPolicyIntent(intent_draft)
+          break
+        }
+        case 'provider_rebalancing_zone': {
+          validateProviderRebalancingZonePolicyIntent(intent_draft)
+          break
+        }
+        default: {
+          throw new BadParamsError('Unknown intent type!')
+        }
+      }
+      const policy = translateIntentToPolicy(intent_draft)
+
+      const { policy_id } = await PolicyRepository.writePolicy(policy)
       await PolicyRepository.writePolicyMetadata({
         policy_id,
         policy_metadata: { intent_type: intent_draft.intent_type }

@@ -179,6 +179,8 @@ export type SORT_DIRECTION = typeof SORT_DIRECTION[number]
 
 export interface TransactionSearchParams {
   provider_ids?: UUID[]
+  start_receipt_timestamp?: Timestamp
+  end_receipt_timestamp?: Timestamp
   start_timestamp?: Timestamp
   end_timestamp?: Timestamp
   search_text?: string
@@ -221,7 +223,6 @@ export interface TransactionService {
   createTransactions: (transactions: TransactionDomainCreateModel[]) => TransactionDomainModel[]
 
   /**  if auth token has a provider_id, it must match */
-  /**  read-back bulk TODO search criteria */
   getTransactions: (params: TransactionSearchParams) => { transactions: TransactionDomainModel[]; cursor: Cursor }
   /** TODO if auth token has a provider_id, it must match */
   /**  read back single */

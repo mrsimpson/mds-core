@@ -1,5 +1,11 @@
 # @mds-core/mds-schema-validators
 
+## 0.5.19
+
+### Patch Changes
+
+- 1878b5ae: Allow access to Ajv validate function
+
 ## 0.5.18
 
 ### Patch Changes

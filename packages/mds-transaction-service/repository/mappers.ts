@@ -35,7 +35,7 @@ export const TransactionEntityToDomain = ModelMapper<
   TransactionDomainModel,
   TransactionEntityToDomainOptions
 >((entity, options) => {
-  const { id, recorded, receipt, ...domain } = entity
+  const { id, recorded, receipt, receipt_timestamp, ...domain } = entity
   return { ...domain, receipt: receipt as TransactionDomainModel['receipt'] }
 })
 
@@ -71,7 +71,13 @@ export const TransactionDomainToEntityCreate = ModelMapper<
   TransactionEntityCreateOptions
 >(({ device_id = null, ...domain }, options) => {
   const { recorded } = options ?? {}
-  return { ...domain, device_id, recorded }
+
+  // Promote receipt columns to entity columns for optimized indices
+  const {
+    receipt: { timestamp: receipt_timestamp }
+  } = domain
+
+  return { ...domain, device_id, recorded, receipt_timestamp }
 })
 
 type TransactionOperationEntityCreateOptions = Partial<{

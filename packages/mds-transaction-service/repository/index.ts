@@ -84,6 +84,8 @@ export const TransactionRepository = ReadWriteRepository.Create(
       ): Promise<{ transactions: TransactionDomainModel[]; cursor: Cursor }> => {
         const {
           provider_ids,
+          start_receipt_timestamp,
+          end_receipt_timestamp,
           start_timestamp,
           end_timestamp,
           search_text,
@@ -108,7 +110,14 @@ export const TransactionRepository = ReadWriteRepository.Create(
           const queryBuilder = connection
             .getRepository(TransactionEntity)
             .createQueryBuilder(alias)
-            .where({ ...resolveTimeBounds({ start_timestamp, end_timestamp }) })
+            .where({
+              ...resolveTimeBounds({ key: 'timestamp', start_timestamp, end_timestamp }),
+              ...resolveTimeBounds({
+                key: 'receipt_timestamp',
+                start_timestamp: start_receipt_timestamp,
+                end_timestamp: end_receipt_timestamp
+              })
+            })
             .andWhere(resolveConditions(alias, { start_amount, end_amount, fee_type, search_text }))
 
           if (provider_ids && provider_ids.length > 0) {
@@ -133,8 +142,17 @@ export const TransactionRepository = ReadWriteRepository.Create(
       },
 
       getTransactionSummary: async (search: TransactionSearchParams): Promise<TransactionSummary> => {
-        const { provider_ids, start_timestamp, end_timestamp, search_text, start_amount, end_amount, fee_type } =
-          validateTransactionSearchParams(search)
+        const {
+          provider_ids,
+          start_receipt_timestamp,
+          end_receipt_timestamp,
+          start_timestamp,
+          end_timestamp,
+          search_text,
+          start_amount,
+          end_amount,
+          fee_type
+        } = validateTransactionSearchParams(search)
 
         try {
           const connection = await repository.connect('ro')
@@ -151,7 +169,14 @@ export const TransactionRepository = ReadWriteRepository.Create(
             .select(
               'provider_id, SUM(amount) as amount, SUM(CASE WHEN amount != 0 THEN 1 ELSE 0 END) AS non_zero_amount_count, SUM(CASE WHEN amount = 0 THEN 1 ELSE 0 END) as zero_amount_count'
             )
-            .where({ ...resolveTimeBounds({ start_timestamp, end_timestamp }) })
+            .where({
+              ...resolveTimeBounds({ key: 'timestamp', start_timestamp, end_timestamp }),
+              ...resolveTimeBounds({
+                key: 'receipt_timestamp',
+                start_timestamp: start_receipt_timestamp,
+                end_timestamp: end_receipt_timestamp
+              })
+            })
             .andWhere(resolveConditions(alias, { start_amount, end_amount, fee_type, search_text }))
 
           if (provider_ids && provider_ids.length > 0) {

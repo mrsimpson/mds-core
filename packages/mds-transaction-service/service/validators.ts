@@ -107,6 +107,8 @@ export const { validate: validateTransactionSearchParams } = SchemaValidator<Tra
     type: 'object',
     properties: {
       provider_ids: { type: 'array', items: uuidSchema, nullable: true, default: null },
+      start_receipt_timestamp: nullableTimestamp,
+      end_receipt_timestamp: nullableTimestamp,
       start_timestamp: nullableTimestamp,
       end_timestamp: nullableTimestamp,
       search_text: nullableString,

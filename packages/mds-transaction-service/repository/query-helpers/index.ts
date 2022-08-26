@@ -3,21 +3,25 @@ import type { FindOperator } from 'typeorm'
 import { Between, Brackets, LessThan, MoreThan } from 'typeorm'
 import type { FEE_TYPE } from '../../@types'
 
+type TimestampKey = 'timestamp' | 'receipt_timestamp'
+
 export const resolveTimeBounds = ({
+  key,
   start_timestamp,
   end_timestamp
 }: {
+  key: TimestampKey
   start_timestamp?: Timestamp
   end_timestamp?: Timestamp
-}): { timestamp?: FindOperator<number> } => {
+}): { [K in TimestampKey]?: FindOperator<number> } => {
   if (start_timestamp && end_timestamp) {
-    return { timestamp: Between(start_timestamp, end_timestamp) }
+    return { [key]: Between(start_timestamp, end_timestamp) }
   }
   if (start_timestamp) {
-    return { timestamp: MoreThan(start_timestamp) }
+    return { [key]: MoreThan(start_timestamp) }
   }
   if (end_timestamp) {
-    return { timestamp: LessThan(end_timestamp) }
+    return { [key]: LessThan(end_timestamp) }
   }
   return {}
 }

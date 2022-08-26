@@ -1,5 +1,17 @@
 # @mds-core/mds-transaction-api
 
+## 0.2.62
+
+### Patch Changes
+
+- 79bc0561: [PLAT-541] Add receipt_timestamp querying to GET Transactions handlers.
+- Updated dependencies [1878b5ae]
+- Updated dependencies [79bc0561]
+  - @mds-core/mds-schema-validators@0.5.19
+  - @mds-core/mds-transaction-service@0.9.2
+  - @mds-core/mds-provider-service@0.3.7
+  - @mds-core/mds-api-helpers@0.3.17
+
 ## 0.2.61
 
 ### Patch Changes
